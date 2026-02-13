@@ -76,6 +76,7 @@
   "buy3": "Al",
   "sell3": "Sat",
   "liquidity2": "Likidite",
+  "liquidity3": "Likidite",
   "time": "Zaman",
   "type": "Tür",
   "swapPrice": "Fiyat",
@@ -605,5 +606,15 @@
   "created": "Oluşturuldu",
   "topPlatforms": "En İyi Platformlar",
   "hideLiq": "Havuz bilgilerini gizlemek için tıklayın",
-  "showLiq": "Havuz bilgilerini görüntülemek için tıklayın"
+  "showLiq": "Havuz bilgilerini görüntülemek için tıklayın",
+  "monitored1": "Cüzdan Etkinliği",
+  "availableLiquidity": "Mevcut likidite",
+  "poolPair": "İşlem çifti",
+  "googleAuthNotBoundTip": "Google Authenticator bağlı değil. Hesabınızı korumak için cüzdan adresini silmeden önce Google Authenticator'ı bağlayın.",
+  "goToBind": "Bağlamaya git",
+  "past24h": "Son 24 saat içinde",
+  "priceChangeZoonSetting": "Fiyat Değişimi Saat Dilimi Ayarı",
+  "group": "Grup",
+  "manage": "Üstesinden gelmek",
+  "priceChangeZoonSettingTip": "<div>24 saatlik biçim: Fiyat artışı veya düşüşü, dünün aynı saatindeki fiyatla karşılaştırıldığında 24 saatlik yuvarlanma esasına göre hesaplanır<br/>\n0:00 (UTC 8 00:00): Fiyat artışı veya düşüşü Pekin saatiyle 00:00'daki açılış fiyatına göre hesaplanır</div>"
 }

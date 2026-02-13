@@ -10,7 +10,7 @@
     </div>
     <div class="w-full text-12px color-[--main-text]">
       <!-- list -->
-      <el-scrollbar :height="300">
+      <el-scrollbar :max-height="300">
         <el-skeleton v-if="loading" :rows="5" animated style="--el-skeleton-circle-size: 32px;padding: 12px">
           <template #template>
             <el-skeleton-item variant="p" style="width: 100%" />
@@ -61,8 +61,8 @@
             </div>
           </div>
         </template>
-        <ave-empty v-else="!loading && tableList.length === 0" class="pt-100px">
-          <span class="color-[--third-text] text-12px lh-16px mt-10px">{{ $t('emptyNoData') }}</span>
+        <ave-empty v-else="!loading && tableList.length === 0" class="h-200px flex items-center justify-center">
+          <span class="color-[--third-text] text-12px lh-16px">{{ $t('emptyNoData') }}</span>
         </ave-empty>
       </el-scrollbar>
     </div>

@@ -20,12 +20,9 @@ export function useDevPop() {
     loading: false,
     tableList: [],
   })
-  watch(
-    () => router.currentRoute.value.fullPath,
-    () => {
-      $tooltip.hide()
-    }
-  )
+  onBeforeRouteLeave(() => {
+    $tooltip.hide()
+  })
 
 const contentKey = ref(0)
 

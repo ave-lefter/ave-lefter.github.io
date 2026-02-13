@@ -9,26 +9,7 @@ class="w-monitor bg-[--secondary-bg] w-100% h-100% pl-12px pr-6px relative overf
         class="absolute top-3px left-50% ml--6px text-6px bg-[--dialog-list-hover] drag-handle"
     />
     <el-tabs v-model="activeName" style="" class="m-tabs" @tab-change="handleClick">
-      <el-tab-pane :label="$t('walletManage')" :name="0" lazy>
-        <WalletManage v-if="botStore.evmAddress" v-bind="walletManageProps" :isLarge="props.isLarge"/>
-        <AveEmpty
-          v-else
-          :style="{height:`${props.scrollHeight-50}px`}"
-          class="overflow-hidden"
-        >
-          <span class="text-12px mt-10px color-[--third-text]">{{ $t('noBotWalletTip') }}</span>
-          <el-button
-            type="primary"
-            class="mt-10px"
-            @click="botStore.$patch({
-            connectVisible: true
-          })"
-          >
-            {{ $t('connectWallet') }}
-          </el-button>
-        </AveEmpty>
-      </el-tab-pane>
-      <el-tab-pane :label="$t('monitored')" :name="1" lazy>
+      <el-tab-pane :label="$t('insidersActivity')" :name="0" lazy>
         <template v-if="botStore.evmAddress" >
           <div
             v-if="props.isLarge"
@@ -133,7 +114,7 @@ class="w-monitor bg-[--secondary-bg] w-100% h-100% pl-12px pr-6px relative overf
                 <QuickSwap
                   :quickBuyValue="quickBuyValue"
                   :row="{...row,...{target_token:row?.target_address,token0_address:row?.from_address,token1_address:row?.to_address,symbol:row?._target_Token?.symbol}}"
-                  classNames="min-w-70px h-24px!"
+                  classNames="min-w-70px h-24px! w-quickSwap"
                   mainNameVisible
                 />
               </template>
@@ -154,7 +135,7 @@ class="w-monitor bg-[--secondary-bg] w-100% h-100% pl-12px pr-6px relative overf
               :style="{
                 height:props.scrollHeight+'px',
                 // height:'500px',
-                '--el-table-border':'1px solid var(--main-divider)'
+                '--el-table-border':'1px solid transparent'
               }"
               row-class='cursor-pointer group'
               :rowEventHandlers="{
@@ -190,7 +171,7 @@ class="w-monitor bg-[--secondary-bg] w-100% h-100% pl-12px pr-6px relative overf
                       <QuickSwap
                         :quickBuyValue="quickBuyValue"
                         :row="{...row,...{target_token:row?.target_address,token0_address:row?.from_address,token1_address:row?.to_address,symbol:row?._target_Token?.symbol}}"
-                        classNames="min-w-70px h-24px!  hidden! group-hover:block!"
+                        classNames="min-w-70px h-24px!  hidden! group-hover:block! w-quickSwap"
                         mainNameVisible
                       />
                       <div
@@ -264,6 +245,26 @@ class="w-monitor bg-[--secondary-bg] w-100% h-100% pl-12px pr-6px relative overf
           </el-button>
         </AveEmpty>
       </el-tab-pane>
+      <el-tab-pane :label="$t('manage')" :name="1" lazy>
+        <WalletManage v-if="botStore.evmAddress" v-bind="walletManageProps" :isLarge="props.isLarge"/>
+        <AveEmpty
+          v-else
+          :style="{height:`${props.scrollHeight-50}px`}"
+          class="overflow-hidden"
+        >
+          <span class="text-12px mt-10px color-[--third-text]">{{ $t('noBotWalletTip') }}</span>
+          <el-button
+            type="primary"
+            class="mt-10px"
+            @click="botStore.$patch({
+            connectVisible: true
+          })"
+          >
+            {{ $t('connectWallet') }}
+          </el-button>
+        </AveEmpty>
+      </el-tab-pane>
+   
       <el-tab-pane disabled>
          <template #label>
             <div class="cursor-move w-100% h-100% drag-handle" />
@@ -272,7 +273,7 @@ class="w-monitor bg-[--secondary-bg] w-100% h-100% pl-12px pr-6px relative overf
       <el-tab-pane disabled>
         <template #label>
           <div class="m-op flex-end gap-8px w-100% h-100%">
-            <template v-if="activeName===1 && props.isLarge">
+            <template v-if="activeName===0 && props.isLarge">
               <FilterType v-model="txType" :options="txTypeList" />
               <Icon
                 ref="audioButtonRef"
@@ -286,13 +287,13 @@ class="w-monitor bg-[--secondary-bg] w-100% h-100% pl-12px pr-6px relative overf
                 /> -->
               <pro-tag size="small" class="cursor-pointer w-55px" @click="toggleMc=!toggleMc">{{ !toggleMc?'U/Pri':'C/MC' }}<Icon name="lsicon:switch-filled" class="ml-4px text-12px"/></pro-tag>
             </template>
-            <el-button v-if="(activeName===1) && botStore.evmAddress" :ref="(ref)=>addButtonRef=ref" size="small" style="height: 20px;" class="dialog-button"  :dark="isDark" >
+            <el-button v-if="(activeName===0) && botStore.evmAddress" :ref="(ref)=>addButtonRef=ref" size="small" style="height: 20px;" class="dialog-button"  :dark="isDark" >
               <Icon name="ic:baseline-person-add-alt-1" class="text-12px  mr-5px"/>
               {{ $t('addWallet') }}
             </el-button>
 
             <QuickBuyInput
-              v-if="(activeName===1)&&isLarge"
+              v-if="(activeName===0)&&isLarge"
               v-model="quickBuyValue"
               size="small"
             />
@@ -306,15 +307,7 @@ class="w-monitor bg-[--secondary-bg] w-100% h-100% pl-12px pr-6px relative overf
         </template>
       </el-tab-pane>
     </el-tabs>
-    <el-popover placement="top-start" popper-class="el-select__popper" popper-style="width: 150px;min-width: 150px; padding: 6px 0" trigger="click" ref="audioPopoverRef"  virtual-triggering :virtual-ref="audioButtonRef"
->
-      <ul  class="el-select-dropdown__list group">
-        <li v-for="item in audioList" :key="item" class="el-select-dropdown__item text-[--main-text] flex-between" :class="audioSettings.audio.monitor===item?'text-[--primary-color]!':''" @click="()=>handleAudioSelect(item)">
-          <span>{{ item ? item : $t('close') }}</span>
-          <Icon v-if="audioSettings.audio.monitor===item" name="material-symbols:check"  class="text-16px color-[--main-text]"/>
-        </li>
-      </ul>
-    </el-popover>
+    <AudioPopover v-if="audioButtonRef" :buttonRef="audioButtonRef" type="monitor"/>
     <AddFavAddressPop v-if="addButtonRef" ref="addFavAddressPopRef" :buttonRef="addButtonRef" @onConfirm="handleConfirmAdd" />
   </div>
 </template>
@@ -359,7 +352,6 @@ const firstActivated = ref(true)
 const addButtonRef = ref()
 
 const audioButtonRef = ref()
-const audioPopoverRef = ref<PopoverInstance>()
   
 const toggleMc = ref(false)
 const addFavAddressPopRef = ref()
@@ -390,7 +382,7 @@ onMounted(async () => {
 })
  useVisibilityChange(() => {
   botStore.bot_subscribe()
-  if(visible.value&&(activeName.value===1)){
+  if(visible.value&&(activeName.value===0)){
     updateDateSource()
   }
 })
@@ -408,7 +400,7 @@ watch(() => txType.value, (val) => {
 })
 watch(() => visible.value, (val) => {
   if(!val) return
-  if(activeName.value===1){
+  if(activeName.value===0){
     updateDateSource()
     nextTick(() => {
       if (!firstActivated.value && aveTableRef.value) {
@@ -418,12 +410,6 @@ watch(() => visible.value, (val) => {
     })
   }
 })
-
-function handleAudioSelect(item:string){ 
-  console.log('handleAudioSelect', item)
-  audioPopoverRef.value?.hide()
-  audioSettings.value.audio.monitor=item
-}
 
 function handleClick(name: number|string) {
   if(name===1){
@@ -504,7 +490,7 @@ const columns = computed(() => {
 })
 watch(() => wsStore.wsResult[WSEventType.MONITOR], (val) => {
   mergeDataSource(val)
-  if(visible.value&&(activeName.value===1)){
+  if(visible.value&&(activeName.value===0)){
     updateDateSource()
   }
 })
@@ -534,7 +520,7 @@ const mergeDataSource = (msg:any) => {
 }
 
 const updateDateSource = throttle(function() {
-  if(!visible.value||(activeName.value!==1)) return
+  if(!visible.value||(activeName.value!==0)) return
   dataSource.value.splice(0, dataSource.value?.length, ...dataSourceCache.value)
 
   // dataSource.value=dataSource.value.map(i=>{
@@ -760,5 +746,8 @@ function jumpToken({ e,rowData }: { e: Event; rowData: any }) {
 :deep() .el-button--small{
   padding-left: 8px !important;
   padding-right: 8px !important;
+}
+:deep() .w-quickSwap .m-text{
+  margin-top: -2px;
 }
 </style>

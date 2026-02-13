@@ -19,9 +19,10 @@ onMounted(() => {
 })
 
 const { hotList } = storeToRefs(useGlobalStore())
+const {zone} = storeToRefs(useGlobalStore())
 const sort = shallowRef({
   activeSort: 0,
-  sortBy: '' as 'current_price_usd' | 'price_change' | 'mcap' | 'symbol'
+  sortBy: '' as 'current_price_usd' | 'price_change' | 'price_change_v2' | 'mcap' | 'symbol'
 })
 // const wsStore = useWSStore()
 // const priceV2Store = usePriceV2Store()
@@ -62,13 +63,17 @@ const columns = computed(() => {
     flex: 'flex-1 justify-end',
     sort: true
   }, {
-    label: '24h%',
+    label: t('Chg') + '%',
     // label: t('Chg') + '%',
-    value: 'price_change',
+    value: zone.value === '24h' ? 'price_change_v2' : 'price_change',
     flex: 'flex-1 justify-end',
     sort: true
   }]
 })
+watch(()=>zone.value,(val)=>{
+  sort.value.sortBy=val==='24h'?'price_change_v2':'price_change'
+})
+
 
 // watch(() => wsStore.wsResult[WSEventType.PRICEV2], (val: IPriceV2Response) => {
 //   const idToPriceMap: { [key: string]: IPriceV2Response['prices'][0] } = {}
@@ -178,13 +183,13 @@ const columns = computed(() => {
               ${{ formatNumber(row.current_price_usd, 4) }}
             </template>
           </div>
-          <div :class="getColorClass(row.price_change_v2)">
-            <template v-if="Number(row.price_change_v2) === 0">0</template>
-            <template v-else-if="row.price_change_v2 === '--'">--</template>
+          <div :class="getColorClass((zone==='24h'? row.price_change_v2 :row.price_change))">
+            <template v-if="Number((zone==='24h'? row.price_change_v2 :row.price_change)) === 0">0</template>
+            <template v-else-if="(zone==='24h'? row.price_change_v2 :row.price_change) === '--'">--</template>
             <template v-else>
               {{
-                Number(row.price_change_v2) > 0 ? '+' : '-'
-              }}{{ formatNumber(Math.abs(Number(row.price_change_v2)), 2) }}%
+                Number((zone==='24h'? row.price_change_v2 :row.price_change)) > 0 ? '+' : '-'
+              }}{{ formatNumber(Math.abs(Number((zone==='24h'? row.price_change_v2 :row.price_change))), 2) }}%
             </template>
           </div>
         </div>

@@ -87,6 +87,7 @@
   "buy3": "Mua",
   "sell3": "Bán",
   "liquidity2": "Thanh khoản",
+  "liquidity3": "Thanh khoản",
   "time": "Thời gian",
   "type": "Loại",
   "swapPrice": "Giá",
@@ -849,5 +850,15 @@
   "applyForActivation": "",
   "monitorBotError": "Địa chỉ robot giám sát không được hỗ trợ",
   "hideLiq": "Bấm để ẩn thông tin nhóm",
-  "showLiq": "Bấm để hiển thị thông tin nhóm"
+  "showLiq": "Bấm để hiển thị thông tin nhóm",
+  "monitored1": "Hoạt động trên ví",
+  "availableLiquidity": "Thanh khoản khả dụng",
+  "poolPair": "Cặp giao dịch",
+  "googleAuthNotBoundTip": "Google Authenticator chưa được liên kết. Để bảo vệ tài khoản của bạn, vui lòng liên kết Google Authenticator trước khi xóa địa chỉ ví.",
+  "goToBind": "Đi đến liên kết",
+  "past24h": "Trong 24 giờ qua",
+  "priceChangeZoonSetting": "Cài đặt múi giờ thay đổi giá",
+  "group": "Nhóm",
+  "manage": "Quản lý",
+  "priceChangeZoonSettingTip": "<div>Đồng hồ 24 giờ: Giá tăng hoặc giảm được tính theo chu kỳ luân phiên 24 giờ, so với giá cùng thời điểm ngày hôm qua<br/>\n0:00 (UTC 8 00:00): Giá tăng hoặc giảm được tính dựa trên giá mở cửa lúc 0:00 giờ Bắc Kinh</div>"
 }

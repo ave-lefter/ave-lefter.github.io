@@ -13,7 +13,7 @@ let sortParam:any={}
 
 let timeoutId: any = null;
 const tableRef = ref<TableInstance | null>(null)
-const {isDark} = storeToRefs(useGlobalStore())
+const {isDark,zone} = storeToRefs(useGlobalStore())
 const botStore = useBotStore()
 const walletStore = useWalletStore()
 const configStore = useConfigStore()
@@ -172,6 +172,7 @@ watch(() => wsStore.wsResult[WSEventType.PRICEV2], (priceData) => {
         ...token,
         current_price_usd: newPrice,
         price_change_24h: priceUpdate.price_change_v2,
+        price_change: priceUpdate.price_change,
         pool_circulating_supply: (token.total - token.lock_amount - token.burn_amount - token.other_amount) * newPrice
       }
     }
@@ -355,9 +356,8 @@ const getList = async () => {
       res.data?.map((i: any) => ({
         id: `${i.token}-${i.chain}`,
         ...i,
-        price_change_24h:
-          // i?.chain == 'brc20' ? i.price_change_v2 || 0 : i.price_change || 0,
-          i?.price_change_v2 ||i?.price_change|| 0,
+        price_change_24h:i.price_change_v2||i.price_change||0,
+        price_change:i.price_change||0,
         pool_circulating_supply: (i.total - i.lock_amount - i.burn_amount - i.other_amount) * i.current_price_usd,
         group_id: activeTab.value,
       }))) ||
@@ -375,6 +375,14 @@ const getList = async () => {
 
   loading.value = false
 }
+
+watch(()=>zone.value,(val)=>{
+  if(sortParam.prop&&sortParam.order){
+    sortParam.prop=(val==='24h'? 'price_change_24h' :'price_change')
+    handleSortChange(sortParam)
+  }
+})
+
 
 // 获取分组列表
 const getGroupList = async () => {
@@ -630,16 +638,16 @@ onBeforeUnmount(() => {
             ${{ formatNumber2(row.pool_circulating_supply || 0, 2, 4, 10 ** 4) }}
           </template>
         </el-table-column>
-        <el-table-column label="24h%" sortable="custom" :sort-orders="['descending', 'ascending', null]"
-          prop="price_change_24h" align="right">
+        <el-table-column :label="t('Chg')+'%'" sortable="custom" :sort-orders="['descending', 'ascending', null]"
+          :prop="zone==='24h'?'price_change_24h':'price_change'" align="right">
           <template #default="{ row }">
-            <span v-if="Number(row.price_change_24h || 0) > 0" class="text-[#12b886]">
-              +{{ formatNumber2(row.price_change_24h || 0, 2) }}%
+            <span v-if="Number((zone==='24h'? row.price_change_24h :row.price_change)|| 0) > 0" class="text-[#12b886]">
+              +{{ formatNumber2((zone==='24h'? row.price_change_24h :row.price_change) || 0, 2) }}%
             </span>
-            <span v-else-if="Number(row.price_change_24h || 0) == 0" class="text-[#848E9C]">
+            <span v-else-if="Number((zone==='24h'? row.price_change_24h :row.price_change) || 0) == 0" class="text-[#848E9C]">
               0%
             </span>
-            <span v-else class="text-[#ff646d]">{{ formatNumber2(row.price_change_24h || 0, 2) }}%</span>
+            <span v-else class="text-[#ff646d]">{{ formatNumber2((zone==='24h'? row.price_change_24h :row.price_change) || 0, 2) }}%</span>
           </template>
         </el-table-column>
         <el-table-column :label="t('riskScore')" sortable="custom" :sort-orders="['descending', 'ascending', null]"

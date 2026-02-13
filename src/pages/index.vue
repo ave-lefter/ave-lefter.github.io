@@ -87,12 +87,13 @@
       <div class="flex-1" />
       <Setting :chain="activeChain" :pumpConfig="pumpConfig"/>
       <BlackList />
-      <QuickSwapSet
+      <!-- <QuickSwapSet
         v-model:quickBuyValue="quickBuyValue"
         :chain="activeChain"
         :settingsButtonVisible="true"
         class="mr-12px"
-      />
+      /> -->
+      <SlippageSetMarket class="mr-10px ml-auto" :chain="activeChain" @mousedown.stop />
       <AutoSellSetting :chain="activeChain" root-class="mr-0"/>
     </div>
     <el-row type="flex" :gutter="pumpSetting.isGutter ? 10 : 2" class="w-full pl-16px" :class="pumpSetting.isGutter? 'pr-6px': 'pr-14px'">
@@ -106,7 +107,7 @@
                 width="24"
                 alt=""
               >
-              <span class="color-[--d-F5F5F5-l-333]">{{ $t('new1') }}</span>
+              <span class="color-[--d-F5F5F5-l-333] text-14px">{{ $t('new1') }}</span>
             </template>
             <div v-else class="tabs single" >
               <button
@@ -145,10 +146,42 @@
               <Icon name="custom:stop" class="color-#FFA622 text-16px"/>
             </span>
             <span class="flex-1" />
+            <el-input
+              v-if="pumpSetting?.show_search"
+              ref="inputSearch"
+              v-model.trim="pump_query[activeChain].new"
+              class="search-input1 px-20px mr-4px"
+              size="small"
+              :placeholder="$t('search')"
+              @input="(val) => pump_query[activeChain].new = val.replace(/\s/g, '')"
+            >
+              <template #prefix>
+                <Icon
+                  class="text-12px text-[var(--third-text)]"
+                  name="custom:search"
+                />
+              </template>
+              <template #suffix>
+                <Icon
+                  v-if="pump_query[activeChain].new"
+                  name="pajamas:clear"
+                  class="color-[--third-text] text-12px hover:opacity-70% cursor-pointer mr-10px"
+                  @click="pump_query[activeChain].new = ''"
+                />
+              </template>
+            </el-input>
+
+            <QuickSwapSetCustom
+              v-model:quickBuyValue="quickBuyValue1"
+              v-model:customSelected="swapSetSelected1"
+              :chain="activeChain"
+              class="mr-8px"
+            />
             <AudioSelect activeTab="new" :chain="activeChain"/>
             <PumpFilter
               :key="`pumpFilter_${activeChain}_new`"
               :storage="`pumpFilter_${activeChain}_new`"
+              hideReferenceText
               @update:filterData="handlerFilterConfirm"
             />
           </div>
@@ -158,7 +191,8 @@
             :scrollHeight="scrollHeight"
             type="new"
             :tableList="list1 || []"
-            :quickBuyValue="quickBuyValue"
+            :quickBuyValue="quickBuyValue1"
+            :swapSetSelected="swapSetSelected1"
             :loading="pumpV3[activeChain]['new']['loading']"
             @mouseover="isPausedObj.new = true"
             @mouseleave="isPausedObj.new = false"
@@ -175,7 +209,7 @@
                 width="24"
                 alt=""
               >
-              <span class="color-[--d-F5F5F5-l-333]">{{ $t('soon') }}</span>
+              <span class="color-[--d-F5F5F5-l-333] text-14px">{{ $t('soon') }}</span>
             </template>
             <div v-else class="tabs single" >
               <button
@@ -214,10 +248,41 @@
               <Icon name="custom:stop" class="color-#FFA622 text-16px"/>
             </span>
             <span class="flex-1" />
+            <el-input
+              v-if="pumpSetting?.show_search"
+              ref="inputSearch"
+              v-model.trim="pump_query[activeChain].soon"
+              class="search-input1 px-20px mr-4px"
+              size="small"
+              :placeholder="$t('search')"
+              @input="(val) => pump_query[activeChain].soon = val.replace(/\s/g, '')"
+            >
+              <template #prefix>
+                <Icon
+                  class="text-12px text-[var(--third-text)]"
+                  name="custom:search"
+                />
+              </template>
+              <template #suffix>
+                <Icon
+                  v-if="pump_query[activeChain].soon"
+                  name="pajamas:clear"
+                  class="color-[--third-text9] text-12px hover:opacity-70% cursor-pointer mr-10px"
+                  @click="pump_query[activeChain].soon = ''"
+                />
+              </template>
+            </el-input>
+            <QuickSwapSetCustom
+              v-model:quickBuyValue="quickBuyValue2"
+              v-model:customSelected="swapSetSelected2"
+              :chain="activeChain"
+              class="mr-8px"
+            />
             <AudioSelect activeTab="soon" :chain="activeChain"/>
             <PumpFilter
               :key="`pumpFilter_${activeChain}_soon`"
               :storage="`pumpFilter_${activeChain}_soon`"
+              hideReferenceText
               @update:filterData="handlerFilterConfirm"
             />
           </div>
@@ -226,7 +291,8 @@
             :scrollHeight="scrollHeight"
             type="soon"
             :tableList="list2 || []"
-            :quickBuyValue="quickBuyValue"
+            :quickBuyValue="quickBuyValue2"
+            :swapSetSelected="swapSetSelected2"
             :loading="pumpV3[activeChain]['soon']['loading']"
             isSoon
             @mouseover="isPausedObj.soon = true"
@@ -244,7 +310,7 @@
                 width="24"
                 alt=""
               >
-              <span class="color-[--d-F5F5F5-l-333]">{{ $t('graduated') }}</span>
+              <span class="color-[--d-F5F5F5-l-333] text-14px">{{ $t('graduated') }}</span>
             </template>
             <div v-else class="tabs single" >
               <button
@@ -284,10 +350,41 @@
               <Icon name="custom:stop" class="color-#FFA622 text-16px"/>
             </span>
             <span class="flex-1" />
+            <el-input
+              v-if="pumpSetting?.show_search"
+              ref="inputSearch"
+              v-model.trim="pump_query[activeChain].graduated"
+              class="search-input1 px-20px mr-4px"
+              size="small"
+              :placeholder="$t('search')"
+              @input="(val) => pump_query[activeChain].graduated = val.replace(/\s/g, '')"
+            >
+              <template #prefix>
+                <Icon
+                  class="text-12px text-[var(--third-text)]"
+                  name="custom:search"
+                />
+              </template>
+              <template #suffix>
+                <Icon
+                  v-if="pump_query[activeChain].graduated"
+                  name="pajamas:clear"
+                  class="color-[--third-text] text-12px hover:opacity-70% cursor-pointer mr-10px"
+                  @click="pump_query[activeChain].graduated = ''"
+                />
+              </template>
+            </el-input>
+            <QuickSwapSetCustom
+              v-model:quickBuyValue="quickBuyValue3"
+              v-model:customSelected="swapSetSelected3"
+              :chain="activeChain"
+              class="mr-8px"
+            />
             <AudioSelect activeTab="graduated" :chain="activeChain"/>
             <PumpFilter
               :key="`pumpFilter_${activeChain}_graduated`"
               :storage="`pumpFilter_${activeChain}_graduated`"
+              hideReferenceText
               @update:filterData="handlerFilterConfirm"
             />
           </div>
@@ -296,7 +393,8 @@
             :scrollHeight="scrollHeight"
             :tableList="list3 || []"
             type="graduated"
-            :quickBuyValue="quickBuyValue"
+            :quickBuyValue="quickBuyValue3"
+            :swapSetSelected="swapSetSelected3"
             :loading="pumpV3[activeChain]['graduated']['loading']"
             isOut
             @mouseover="isPausedObj.graduated = true"
@@ -315,8 +413,7 @@
 </template>
 
 <script setup lang="ts">
-import { useStorage, useWindowSize, useThrottleFn, useDocumentVisibility } from '@vueuse/core'
-import QuickSwapSet from '@/components/quickSwap/quickSwapSet.vue'
+import { useStorage, useWindowSize, useThrottleFn, useDocumentVisibility, useDebounceFn } from '@vueuse/core'
 import PumpList from './pump/components/pumpList.vue'
 import Setting from './pump/components/setting.vue'
 import BlackList from './pump/components/blackList.vue'
@@ -333,6 +430,8 @@ import type {
 import { isEqual, throttle } from 'lodash-es'
 import AutoSellSetting from '@/components/autoSellSetting/index.vue'
 import AudioSelect from './pump/components/audioSelect.vue'
+import SlippageSetMarket from './token/components/right/botSwap/slippageSetMarket.vue'
+import QuickSwapSetCustom from '@/components/quickSwap/quickSwapSetCustom.vue'
 defineOptions({
   name: 'pump' // 显式命名
 })
@@ -358,6 +457,12 @@ let isInitObj = {
   graduated: true
 }
 const quickBuyValue = useStorage('quickBuyValue', '0.01')
+const quickBuyValue1 = useStorage('quickBuyValue1', '0.01')
+const quickBuyValue2 = useStorage('quickBuyValue2', '0.01')
+const quickBuyValue3 = useStorage('quickBuyValue3', '0.01')
+const swapSetSelected1 = useStorage<BotSettingKey>('swapSetSelected1', 's1')
+const swapSetSelected2 = useStorage<BotSettingKey>('swapSetSelected2', 's1')
+const swapSetSelected3 = useStorage<BotSettingKey>('swapSetSelected3', 's1')
 const activeChain = useStorage<ChainKey>(
   'pump_activeChain2',
   'bsc',
@@ -378,7 +483,7 @@ const orderGraduated= computed(() => {
 })
 const pumpConfig = shallowRef<PumpConfig[]>()
 const isRotate = ref(false)
-const { pump_notice, pumpV3, pumpFilterDefault } = storeToRefs(usePumpStore())
+const { pump_notice, pumpV3, pumpFilterDefault, pump_query } = storeToRefs(usePumpStore())
 const pumpAudio = useTemplateRef('pumpAudio')
 const visible_platforms = shallowRef(false)
 const fourmemeListObj = reactive<Record<ChainKey, Record<CategoryKey, PumpObj[]>>>({
@@ -975,7 +1080,7 @@ const getChangedValue = (A: string[], B: string[]): string | null => {
 
 let isLeave = true
 
-onActivated(() => {
+onMounted(() => {
   bindAudioCanPlay()
   isLeave = false
   wsTableListCache = {}
@@ -1004,7 +1109,7 @@ onActivated(() => {
   }
 })
 
-onDeactivated(()=>{
+onUnmounted(()=>{
   // 清理 watch 监听器，防止内存泄漏
   // watchPumpStateUnwatch?.()
   // watchTokenUpdatedUnwatch?.()
@@ -1164,8 +1269,6 @@ function wsUpdateTableList(wsList: WSPumpObj[]) {
 function getPumpConfig() {
   _getPumpConfig().then((res) => {
     pumpConfig.value = Array.isArray(res) ? res : []
-    console.log('----pumpConfig--------', pumpConfig.value)
-    console.log('-------fourmemeListObj-----', fourmemeListObj)
     pumpConfig.value?.forEach(i => {
       if (!pumpV3.value[i.chain]?.platforms?.length) {
         const platforms = i.platforms?.map(y => {
@@ -1216,6 +1319,46 @@ function getPumpConfig() {
     })
   })
 }
+
+watch(()=>pump_query.value[activeChain.value].new, () => {
+  debouncedFetch('new')
+}, { deep: true })
+watch(()=>pump_query.value[activeChain.value].soon, () => {
+  debouncedFetch('soon')
+}, { deep: true })
+watch(()=>pump_query.value[activeChain.value].graduated, () => {
+  debouncedFetch('graduated')
+}, { deep: true })
+
+const debouncedFetch = useDebounceFn((type) => search(type), 500)
+function search(type: string) {
+  if (type == 'new') {
+    const pumpFilter_new = localStorage.getItem(`pumpFilter_${activeChain.value}_new`)
+    const params1 = {
+      category: 'new',
+      ...(pumpFilter_new ? JSON.parse(pumpFilter_new) : ''),
+    }
+    getPump(params1, true)
+  }
+  if (type == 'soon') {
+    const pumpFilter_soon = localStorage.getItem(`pumpFilter_${activeChain.value}_new`)
+    const params2 = {
+      category: 'soon',
+      ...(pumpFilter_soon ? JSON.parse(pumpFilter_soon) : ''),
+    }
+    getPump(params2, true)
+  }
+  if (type == 'graduated') {
+    const pumpFilter_graduated = localStorage.getItem(`pumpFilter_${activeChain.value}_graduated`)
+    const params3 = {
+      category: 'graduated',
+      ...(pumpFilter_graduated ? JSON.parse(pumpFilter_graduated) : ''),
+    }
+    getPump(params3, true)
+  }
+}
+
+
 function handlerFilterConfirm(
   val: { progress_min?: string; progress_max?: string; chain: ChainKey; platforms: string; has_sm?: boolean},
   type: string
@@ -1242,6 +1385,8 @@ function handlerFilterConfirm(
   }
   getPump({ ...(params as { category: CategoryKey }), ...val }, true)
 }
+
+
 function single(type: string) {
   if (width.value < 1024) {
     if (type == activeTab.value) {
@@ -1310,6 +1455,13 @@ async function getPump(rawParams: {
     queryParams.platforms = platformList.join(',')
   }
 
+  if (pump_query.value[currentChain][queryParams.category]) {
+    if (isFilter) {
+      queryParams.q = queryParams.q + pump_query.value[currentChain][queryParams.category]
+    } else {
+      queryParams.q =  pump_query.value[currentChain][queryParams.category]
+    }
+  }
   if (queryParams.has_sm) {
     delete queryParams.sm_list
   } else if (Array.isArray(queryParams.sm_list) && queryParams.sm_list.length > 0) {
@@ -1799,7 +1951,7 @@ function hitBlacklist(item:PumpObj, black: pumpBlack) {
 :deep().search-input1 {
   background: var(--main-input-button-bg);
   padding: 1px;
-  width: 200px;
+  width: 120px;
   border-radius: 4px;
   border: none;
   .el-input__wrapper {

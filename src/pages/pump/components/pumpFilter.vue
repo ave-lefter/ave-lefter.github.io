@@ -11,7 +11,7 @@
       :persistent="false"
     >
       <template #reference>
-        <div :class="['filter-btn', { active: visible }, filterNumber > 0 ? 'hight': '']">
+        <div :class="['filter-btn', { active: visible }, filterNumber > 0 ? 'hight': '']" class="min-h-28px">
           <Icon
             id="custom-filter"
             name="custom:filter"

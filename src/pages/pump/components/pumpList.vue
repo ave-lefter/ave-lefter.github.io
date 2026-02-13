@@ -196,8 +196,45 @@
                     >
                       <Icon name="custom:ai" class="text-14px" />
                     </a>
-                  </div>
 
+                    <span
+                      v-if="row.buy_tax && row.sell_tax"
+                    >
+                      <span
+                        v-if="row.buy_tax == row.sell_tax"
+                        class=""
+                        :style="{
+                              color:(Number(row?.sell_tax) > 5 ? '#F6465D' : 'var(--secondary-text)'),
+                          }"
+                      >
+                        Tax {{ formatNumber(row?.sell_tax || 0, 2) }}%
+                      </span>
+                      <span
+                        v-else
+                          :style="{
+                              color: (Number(row?.sell_tax) > 5 || Number(row?.buy_tax) > 5  ? '#F6465D' :'var(--secondary-text)'),
+                          }"
+                      >
+                      B {{ formatNumber(row?.buy_tax || 0, 2) }}%&nbsp;&nbsp;S {{ formatNumber(row?.sell_tax || 0, 2) }}%
+                      </span>
+                    </span>
+                    <span
+                      v-else-if="row.buy_tax"
+                      :style="{
+                            color:(Number(row?.buy_tax) > 5 ? '#F6465D' : 'var(--secondary-text)'),
+                        }"
+                    >
+                      B {{ formatNumber(row?.buy_tax || 0, 2) }}%
+                    </span>
+                    <span
+                      v-else-if="row.sell_tax"
+                        :style="{
+                            color:(Number(row?.sell_tax) > 5 ? '#F6465D' : 'var(--secondary-text)'),
+                        }"
+                    >
+                      S {{ formatNumber(row?.sell_tax || 0, 2) }}%
+                    </span>
+                  </div>
                   <div class="flex-start text-12px mt-5px">
                       <div
                         v-tooltip="formatDate(row?.created_at || row?.time)"
@@ -355,10 +392,10 @@
                     </div>
                     <HolderRank
                     v-if="route.name === 'index' && pumpSetting?.define?.some((i) => i === 'kol')"
-                    class="flex mr-8px bg-btn"
+                    class="flex mr-8px"
                     :tokenId="(row?.token || row?.target_token) + '-' + row?.chain"
                     type="kol"
-                    :ratio="row?.kol_ratio"
+                    :ratio="Number(row?.kol_ratio || 0)"
                     >
                       <div class="flex items-center">
                         <Icon
@@ -371,7 +408,23 @@
                           {{ formatNumber(row?.kol_tag_count || 0, 2) }}</span>
                       </div>
                     </HolderRank>
-
+                    <HolderRank
+                      v-if="route.name === 'index' && pumpSetting?.define?.some((i) => i === 'smart')"
+                      class="flex mr-8px"
+                      :tokenId="(row?.token || row?.target_token) + '-' + row?.chain"
+                      type="smart"
+                      :ratio="Number(row?.smart_wallet_ratio || 0)"
+                      >
+                      <div class="flex items-center color-[--third-text]">
+                          <Icon
+                            class="iconfont icon-rug mr-4px text-10px vertical-middle "
+                            name="custom:smart-plain"
+                            :style="{color: Number(formatNumber(row?.smart_wallet_tag_count || 0, 2) || 0) > 0 ?'var(--yellow)' : 'var(--third-text)'}"
+                          />
+                          <span v-if="Number(row?.smart_wallet_tag_count) === 0 || row?.smart_wallet_tag_count == null" class="color-[--secondary-text]" >0</span>
+                          <span v-else class="color-[--main-text]">{{ formatNumber(row?.smart_wallet_tag_count || 0, 2) }}</span>
+                        </div>
+                    </HolderRank>
                     <div
                       v-tooltip="{
                         content:
@@ -394,23 +447,6 @@
                       </span>
                     </div>
                     <HolderRank
-                      v-if="route.name === 'index' && pumpSetting?.define?.some((i) => i === 'smart')"
-                      class="flex mr-8px bg-btn"
-                      :tokenId="(row?.token || row?.target_token) + '-' + row?.chain"
-                      type="smart"
-                      :ratio="row?.smart_wallet_ratio"
-                      >
-                      <div class="flex items-center color-[--third-text]">
-                          <Icon
-                            class="iconfont icon-rug mr-4px text-10px vertical-middle "
-                            name="custom:smart-plain"
-                            :style="{color: Number(formatNumber(row?.smart_wallet_tag_count || 0, 2) || 0) > 0 ?'var(--yellow)' : 'var(--third-text)'}"
-                          />
-                          <span v-if="Number(row?.smart_wallet_tag_count) === 0 || row?.smart_wallet_tag_count == null" class="color-[--secondary-text]" >0</span>
-                          <span v-else class="color-[--main-text]">{{ formatNumber(row?.smart_wallet_tag_count || 0, 2) }}</span>
-                        </div>
-                    </HolderRank>
-                    <HolderRank
                       v-if="route.name === 'index'"
                       class="flex mr-8px bg-btn"
                       :tokenId="(row?.token || row?.target_token) + '-' + row?.chain"
@@ -430,46 +466,6 @@
                     </HolderRank>
                   </div>
                   <div class="mt-5px flex-start text-11px">
-                    <template
-                      v-if="row.buy_tax && row.sell_tax"
-                    >
-                      <span
-                        v-if="row.buy_tax == row.sell_tax"
-                        class="mr-5px"
-                        :style="{
-                              color:(Number(row?.sell_tax) > 5 ? '#F6465D' : 'var(--secondary-text)'),
-                          }"
-                      >
-                        Tax {{ formatNumber(row?.sell_tax || 0, 2) }}%
-                      </span>
-                      <span
-                        v-else
-                        class="mr-5px"
-                          :style="{
-                              color: (Number(row?.sell_tax) > 5 || Number(row?.buy_tax) > 5  ? '#F6465D' :'var(--secondary-text)'),
-                          }"
-                      >
-                      B {{ formatNumber(row?.buy_tax || 0, 2) }}%&nbsp;&nbsp;S {{ formatNumber(row?.sell_tax || 0, 2) }}%
-                      </span>
-                    </template>
-                    <span
-                      v-else-if="row.buy_tax"
-                      class="mr-5px"
-                      :style="{
-                            color:(Number(row?.buy_tax) > 5 ? '#F6465D' : 'var(--secondary-text)'),
-                        }"
-                    >
-                      B {{ formatNumber(row?.buy_tax || 0, 2) }}%
-                    </span>
-                    <span
-                      v-else-if="row.sell_tax"
-                      class="mr-5px"
-                        :style="{
-                            color:(Number(row?.sell_tax) > 5 ? '#F6465D' : 'var(--secondary-text)'),
-                        }"
-                    >
-                      S {{ formatNumber(row?.sell_tax || 0, 2) }}%
-                    </span>
                     <PumpPop
                         v-if="row?.medias?.some(i=> i.icon === 'twitter') && route.name === 'index'"
                         :tokenId="(row.token + '-' + row.chain)"
@@ -739,6 +735,7 @@ class="flex-start mr-8px bg-btn"
                   <QuickSwap
                     v-if="parseInt(pumpSetting?.size_swap|| '0') > 0"
                     :quickBuyValue="quickBuyValue"
+                    :swapSetSelected="props.swapSetSelected"
                     :row="row"
                     classNames="bg-[--up-color] color-#fff"
                     :size="pumpSetting.size_swap"
@@ -761,6 +758,7 @@ class="flex-start mr-8px bg-btn"
       </span>
     </transition>
     <el-popover
+      v-if="showPopSearch"
       v-model:visible="showPopSearch"
       :virtual-ref="$refs.currentBtnRef[currentIndex]"
       virtual-triggering
@@ -817,6 +815,10 @@ const props = defineProps({
   quickBuyValue: {
     type: String,
     default: () => '',
+  },
+  swapSetSelected: {
+    type: String as PropType<'s1' | 's2' | 's3'>,
+    default: '',
   },
   loading: {
     type: Boolean,
@@ -887,10 +889,10 @@ onDeactivated(() => {
 onUnmounted(() => {
   $tooltip?.hide?.()
   similarHide?.()
-  Object.keys($refs.value.currentBtnRef).forEach((key) => {
-    delete $refs.value.currentBtnRef[key]
-  })
-  $refs.value.currentBtnRef = {}
+  // Object.keys($refs.value.currentBtnRef).forEach((key) => {
+  //   delete $refs.value.currentBtnRef[key]
+  // })
+  // $refs.value.currentBtnRef = {}
 })
 
 function handleContextMenu(e: MouseEvent, row: { target_token: string; chain: string }) {
@@ -905,6 +907,13 @@ function handleContextMenu(e: MouseEvent, row: { target_token: string; chain: st
 }
 
 function tableRowClick(row: { target_token: string; chain: string }) {
+    if ($tooltip) {
+    $tooltip.hide?.()
+    $tooltip.destroy?.()
+  }
+  similarHide?.()
+  showPopSearch.value = false
+
   router.push({
     name: 'token-id',
     params: { id: row.target_token + '-' + row.chain },

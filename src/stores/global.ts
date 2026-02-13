@@ -7,6 +7,7 @@ import type{ GetHotTokensResponse } from '@/api/token'
 import type { ILatestNotice } from '~/api/user'
 import { getUserFavoriteGroups, type GetUserFavoriteGroupsResponse } from '~/api/fav'
 export const useGlobalStore = defineStore('global', () => {
+  const t = getGlobalT()
   const wsStore = useWSStore()
   const localeStore = useLocaleStore()
   const themeStore = useThemeStore()
@@ -162,6 +163,15 @@ export const useGlobalStore = defineStore('global', () => {
     },
     jump: 'close',
     border: '',
+  })
+  // 涨跌幅时区
+  const zone=useStorage('zone','24h')
+
+  const zoneList=computed(()=>{
+    return [
+    {key:'24h',value:t('past24h')},
+    {key:'+8h',value:'UTC+8, 00:00'},
+  ]
   })
 
   watch(
@@ -399,6 +409,8 @@ export const useGlobalStore = defineStore('global', () => {
     showImport,
     showBotRecord,
     batchRemarkFormData,
-    klineSettingPop
+    klineSettingPop,
+    zone,
+    zoneList
   }
 })
