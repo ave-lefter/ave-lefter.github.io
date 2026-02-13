@@ -1,84 +1,41 @@
 <template>
-  <div
-    class="w-full h-full bg-[--secondary-bg] p-12px"
-    :class="{ 'pr-16px': trackerStore.isLeftFixed, 'pl-16px': trackerStore.isRightFixed }"
-  >
-    <Icon
-      name="custom:drag2"
-      class="absolute top-4px left-50% ml--6px text-6px bg-[--dialog-list-hover] drag-handle"
-    />
+  <div class="w-full h-full bg-[--secondary-bg] p-12px"
+    :class="{ 'pr-16px': trackerStore.isLeftFixed, 'pl-16px': trackerStore.isRightFixed }">
+    <Icon name="custom:drag2" class="absolute top-4px left-50% ml--6px text-6px bg-[--dialog-list-hover] drag-handle" />
     <div class="flex items-center pb-14px border-b-1px border-b-solid border-b-[--border] mb-12px">
       <div class="flex justify-between items-center">{{ t('twitterTracker') }}</div>
       <div class="flex-1 drag-handle h-20px" />
       <div class="flex items-center gap-12px">
-        <Icon
-          v-if="botStore.evmAddress"
-          name="custom:pump-setting"
+        <Icon v-if="botStore.evmAddress" name="custom:pump-setting"
           class="color-[--secondary-text] hover:color-[--main-text] cursor-pointer text-14px"
-          @click="emits('setDrawerVisible', true)"
-        />
-        <Icon
-          name="custom:close"
-          class="text-14px shrink-0 cursor-pointer color-[--main-text]"
-          @click="trackerStore.visible = false"
-        />
+          @click="emits('setDrawerVisible', true)" />
+        <Icon name="custom:close" class="text-14px shrink-0 cursor-pointer color-[--main-text]"
+          @click="trackerStore.visible = false" />
       </div>
     </div>
     <div class="flex justify-between mb-12px items-center">
-      <div class="flex gap-16px">
-        <span
-          v-for="el in tabs"
-          :key="el.value"
-          :class="[
-            'text-14px cursor-pointer',
-            activeTab === el.value ? 'color-[--main-text]' : 'color-[--secondary-text]',
-          ]"
-          @click="setActiveTab(el.value)"
-        >
+      <div class="flex items-center gap-16px">
+        <span v-for="el in tabs" :key="el.value" :class="[
+          'text-14px cursor-pointer',
+          activeTab === el.value ? 'color-[--main-text]' : 'color-[--secondary-text]',
+        ]" @click="setActiveTab(el.value)">
           {{ el.label }}
         </span>
-      </div>
-      <!-- <el-checkbox
-        v-if="botStore.accessToken && !isMine"
-        v-model="follow_only"
-        size="small"
-        class="[&.el-checkbox.el-checkbox--small]:h-16px text-12px"
-        @change="confirmQuery"
-      >
-        {{ t('onlyFollowing') }}
-      </el-checkbox> -->
-    </div>
-    <div class="flex justify-between items-center mb-14px">
-      <div class="flex items-center gap-8px color-[--secondary-text]">
-        <el-popover
-          v-model:visible="filterVisible"
-          placement="bottom-end"
-          trigger="click"
-          :width="164"
-        >
+         <div class="flex items-center gap-8px color-[--secondary-text]">
+        <el-popover v-model:visible="filterVisible" placement="bottom-end" trigger="click" :width="164"
+          :persistent="false">
           <template #reference>
             <Icon name="custom:filter" class="text-12px cursor-pointer" />
           </template>
           <template #default>
-            <el-checkbox
-                v-model="checkAll"
-                :indeterminate="isIndeterminate"
-                class="[--el-checkbox-height:16px] mb-12px"
-                @change="handleCheckAllChange"
-            >
-                {{t('all')}}
+            <el-checkbox v-model="checkAll" :indeterminate="isIndeterminate" class="[--el-checkbox-height:16px] mb-12px"
+              @change="handleCheckAllChange">
+              {{ t('all') }}
             </el-checkbox>
-            <el-checkbox-group
-              v-model="query.types"
-              class="flex flex-col [--el-checkbox-height:16px] gap-12px"
-              @change="handleCheckedChange"
-            >
+            <el-checkbox-group v-model="query.types" class="flex flex-col [--el-checkbox-height:16px] gap-12px"
+              @change="handleCheckedChange">
               <!--mb-16px border-b-solid border-b-1px border-b-[--dialog-divider] -->
-              <el-checkbox
-                v-for="option in checkboxOptions"
-                :key="option.value"
-                :value="option.value"
-              >
+              <el-checkbox v-for="option in checkboxOptions" :key="option.value" :value="option.value">
                 {{ option.label }}
               </el-checkbox>
             </el-checkbox-group>
@@ -104,41 +61,53 @@
             </div>
           </template>
         </el-popover>
-        <Icon
-          ref="audioButtonRef"
-          :name="globalStore.audioSettings.audio.twitter ? 'custom:ad' : 'custom:admute'"
-          class="mr-4px cursor-pointer"
-        />
+        <el-popover v-model:visible="audioVisible" trigger="click" popper-class="el-select__popper">
+          <template #reference>
+            <Icon class="cursor-pointer"
+              :name="globalStore.audioSettings.audio.twitter ? 'custom:ad' : 'custom:admute'" />
+          </template>
+          <template #default>
+            <ul class="el-scrollbar__view el-select-dropdown__list [&&]:m--12px">
+              <li v-for="item in audioList" :key="item" class="el-select-dropdown__item hover:bg-[--border]"
+                :class="{ 'bg-[--border]': globalStore.audioSettings.audio.twitter === item }"
+                @click="globalStore.audioSettings.audio.twitter = item; audioVisible = false;">
+                <span class="text-12px">{{ item || $t('close') }}</span>
+              </li>
+            </ul>
+          </template>
+        </el-popover>
+        <Icon v-show="isPaused" name="custom:stop"/>
+
+        <!-- <el-dropdown :persistent="false" trigger="click">
+            <div class="w-24px h-24px bg-[--main-list-hover] flex items-center justify-center rounded-4px cursor-pointer"><Icon name="material-symbols:language"/></div>
+            <template #dropdown>
+              <el-dropdown-menu>
+                      <el-dropdown-item>Action 1</el-dropdown-item>
+                      <el-dropdown-item>Action 2</el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+        </el-dropdown> -->
       </div>
-      <!-- <el-input
-      v-model="query.token_keyword"
-        style="--el-input-bg-color:var(--main-list-hover);--el-input-height:26px;"
-        class="w-160px"
-        size="small"
-        clearable
-        :placeholder="t('searchCA')"
-        @input="debouncedConfirmInput"
-      >
+      </div>
+      <el-input v-model="query.token_keyword" style="--el-input-bg-color:var(--main-list-hover);--el-input-height:26px;"
+        class="w-160px" size="small" clearable :placeholder="t('searchCA')" @input="debouncedConfirmInput">
         <template #prefix>
           <Icon name="custom:search" />
         </template>
-      </el-input> -->
+      </el-input>
     </div>
-    <AudioPopover v-if="audioButtonRef" :buttonRef="audioButtonRef" type="twitter"/>
-    <TwitterTrackerList :isMine="isMine" @endReached="getList" @startAttention="emits('setDrawerVisible', true)" />
-    <audio
-      ref="twitterAudio" controls style="display: none"
-      :src="getAudioUrl(globalStore.audioSettings.audio.twitter)"
-      :volume="+globalStore.audioSettings.audio.volume/100 || 0.5"
-    />
+    <TwitterTrackerList :isMine="isMine" @stop="val => isPaused = val" @endReached="debouncedGetList" @startAttention="emits('setDrawerVisible', true)" />
+    <audio ref="twitterAudio" controls style="display: none" :src="getAudioUrl(globalStore.audioSettings.audio.twitter)"
+      :volume="+globalStore.audioSettings.audio.volume / 100 || 0.5" />
   </div>
 </template>
 
 <script setup name="trackerPop">
-import { useStorage } from '@vueuse/core'
+import { useDebounceFn, useStorage } from '@vueuse/core'
 import TwitterTrackerList from './list.vue'
 import { getAllFollowIds, getTwitterList } from '~/api/twitter'
 import { useV2WSStore } from '~/stores/v2ws'
+import { useTrackerTypes } from './constants'
 const emits = defineEmits(['setDrawerVisible'])
 const { t } = useI18n()
 const trackerStore = useTwitterTrackerStore()
@@ -147,17 +116,19 @@ const globalStore = useGlobalStore()
 const botStore = useBotStore()
 const activeTab = ref(1)
 const filterVisible = ref(false)
+const audioVisible = ref(false)
+const isPaused = ref(false)
+const wsCacheArr = shallowRef([])
 
 const twitterAudio = useTemplateRef('twitterAudio')
 const followIds = useStorage('twFollowIds', [])
 const query = ref({ ...trackerStore.query })
-const audioButtonRef = ref()
-defineProps({
-  scrollHeight: {
-    type: Number,
-    default: 0,
-  },
-})
+// defineProps({
+//   scrollHeight: {
+//     type: Number,
+//     default: 0,
+//   },
+// })
 // const follow_only = ref(false)
 const TAB_TYPE = {
   HOT: 1,
@@ -170,12 +141,7 @@ const tabs = computed(() => [
   { label: t('hot2'), value: TAB_TYPE.HOT },
   { label: t('mine'), value: TAB_TYPE.MINE },
 ])
-const checkboxOptions = computed(() => [
-  { label: t('tweet'), value: 1 },
-  { label: t('retweet'), value: 3 },
-  { label: t('quote'), value: 2 },
-  { label: t('reply'), value: 4 },
-])
+const {arr:checkboxOptions} = useTrackerTypes()
 const isMine = computed(() => {
   return activeTab.value === TAB_TYPE.MINE
 })
@@ -209,8 +175,8 @@ const _getAllFollowIds = async () => {
   const res = await getAllFollowIds()
   followIds.value = res.authors || []
 }
-watch(()=>botStore.accessToken,val=>{
-  if(val && isMine.value){
+watch(() => botStore.accessToken, val => {
+  if (val && isMine.value) {
     reset()
     getList()
   }
@@ -231,19 +197,20 @@ const confirmQuery = () => {
   }
   getList()
 }
-// const debouncedConfirmInput = useDebounceFn(confirmQuery, 300)
+const debouncedConfirmInput = useDebounceFn(confirmQuery, 300)
 
 const getList = async () => {
   // const _follow_only = isMine.value || follow_only.value
   const _activeTab = activeTab.value
-  if(isMine.value && !botStore.accessToken){
-   return
+  if (isMine.value && !botStore.accessToken) {
+    return
   }
+  if(trackerStore.loading || trackerStore.finished) return
   trackerStore.loading = true
   try {
     const res = await getTwitterList({
       ...query.value,
-      follow_only:isMine.value,
+      follow_only: isMine.value,
       types: query.value.types.join(','),
     })
     if (res && activeTab.value === _activeTab) {
@@ -263,48 +230,60 @@ const getList = async () => {
   }
 }
 
+const debouncedGetList = useDebounceFn(getList, 100)
+
 getList()
 
-function subscribePublicTwitter(method) {
-  v2WsStore.send({
-    jsonrpc: '2.0',
-    method,
-    params: ['public_twitter', 'hot'],
-    id: 1,
-  })
-}
-
-subscribePublicTwitter('subscribe')
-
-const twitterHandler = async(val) => {
-  if (query.value.types.includes(+val.type)) {
-    if (isMine.value && !followAuthorIds.value.includes(val.author_id)) {
+const twitterHandler = async (val) => {
+  if (query.value.types.includes(+val.type) && !query.value.token_keyword) {
+    if (isMine.value && !followAuthorIds.value.includes(val.author?.author_id)) {
       return
     }
-    val.follow_status = followAuthorIds.value.includes(val.author_id) ? 1 : 0
-    trackerStore.list.unshift(val)
-    if (trackerStore.list.length > 100) {
-      trackerStore.list.pop()
+    // 判断是否已经存在该推特
+    const index = trackerStore.list.findIndex(el => el.tweet_id === val.tweet_id)
+    val.follow_status = followAuthorIds.value.includes(val.author?.author_id) ? 1 : 0
+    if (index!==-1) {
+      trackerStore.list[index] = val
+      return
+    }
+    
+    if(isPaused.value){
+      wsCacheArr.value.unshift(val)
+      wsCacheArr.value = wsCacheArr.value.slice(0,100)
+    } else {
+      trackerStore.list.unshift(val)
+      if (trackerStore.list.length > 100) {
+        trackerStore.list.pop()
+      }
     }
     if (twitterAudio.value && globalStore.audioSettings.audio.twitter) {
       twitterAudio.value.play()
     }
   }
 }
+
+watch(() => isPaused.value, (val) => {
+  if (!val) {
+    trackerStore.list.unshift(...wsCacheArr.value)
+    trackerStore.list = trackerStore.list.slice(0,100)
+    wsCacheArr.value = []
+  }
+})
+
 watch(
   () => v2WsStore.wsResult[WSEventV2Type.PUBLIC_TWITTER],
   twitterHandler
 )
 
-watch(()=>followAuthorIds.value,()=>{
-  if(isMine.value){
-    trackerStore.list = trackerStore.list.filter(el=>{
+watch(() => followAuthorIds.value, () => {
+  if (isMine.value) {
+    trackerStore.list = trackerStore.list.filter(el => {
       return followAuthorIds.value.includes(el.author.author_id)
     })
   }
 })
 
-useVisibilityChange(()=>{
+useVisibilityChange(() => {
   trackerStore.list = []
   query.value.page_token = ''
   getList()
