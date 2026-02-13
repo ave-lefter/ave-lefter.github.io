@@ -11,7 +11,7 @@ const pumpStore = usePumpStore()
   <el-popover v-model:visible="audioVisible" trigger="click" popper-class="el-select__popper" :persistent="false">
     <template #reference>
       <div
-        class="bg-[--main-input-button-bg] py-4px px-10px rounded-4px mr-8px color-[--third-text] cursor-pointer  hover:color-[--d-F5F5F5-l-333] flex items-center justify-center min-h-28px"
+        class="bg-[--main-input-button-bg] py-5px px-8px rounded-4px mr-8px color-[--third-text] cursor-pointer  hover:color-[--d-F5F5F5-l-333] flex items-center justify-center min-h-28px"
         :class="{
           'color-[--main-text]': pumpStore.pump_notice?.[chain]?.[activeTab],
         }">

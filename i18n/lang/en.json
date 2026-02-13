@@ -1987,9 +1987,9 @@
   "smarterRatio": "Smarter Ratio",
   "devWallet": "DEV Wallet",
   "monitorBotError": "Monitoring robot address not supported",
-  "subCount":"Sub Count",
-  "subCountTips":"The number of wallet users tracking this account",
-  "twitterMax":"You can monitor up to 50 Twitter accounts",
+  "subCount": "Sub Count",
+  "subCountTips": "The number of wallet users tracking this account",
+  "twitterMax": "You can monitor up to 50 Twitter accounts",
   "home": "Home",
   "tokenStatistics": "Token Statistics",
   "dev3": "Developer",
@@ -2032,5 +2032,8 @@
   "realPnl": "Actual P&L",
   "remeberMeTips": "Only use 'Remember Me' if you are using a secure device that you own. Selecting this option can expose your keys and information to others if you are on a public or non-secured device.",
   "copySuccess2": "Image has been successfully copied to the clipboard!",
-  "sharePosition": "Share Position"
+  "sharePosition": "Share Position",
+  "BlackListTwitter": "BlackList Twitter",
+  "tOPSameAddress": "TOP Same Address",
+  "twitter": "Twitter"
 }

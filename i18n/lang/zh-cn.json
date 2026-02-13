@@ -1981,9 +1981,9 @@
   "invitedUser": "邀请用户",
   "chainWallet3": "链钱包",
   "monitorBotError": "不支持监控机器人地址",
-  "subCount":"订阅人数",
-  "subCountTips":"正在追踪该账号的钱包用户数",
-  "twitterMax":"推特监控账号数量上限为 50 个",
+  "subCount": "订阅人数",
+  "subCountTips": "正在追踪该账号的钱包用户数",
+  "twitterMax": "推特监控账号数量上限为 50 个",
   "home": "主页",
   "markersBuy": "总买入钱包数",
   "markersSell": "总卖出钱包数",
@@ -2033,5 +2033,8 @@
   "realPnl": "实际盈亏",
   "remeberMeTips": "仅当您使用自己的安全设备时才使用'记住我' 。如果您使用的是公共或非安全设备，选择此选项可能会将您的密钥和信息暴露给他人。",
   "copySuccess2": "图片已成功复制到剪贴板！",
-  "sharePosition": "持仓分享"
+  "sharePosition": "持仓分享",
+  "BlackListTwitter": "拉黑推特号",
+  "tOPSameAddress": "TOP同车地址",
+  "twitter": "推特号"
 }

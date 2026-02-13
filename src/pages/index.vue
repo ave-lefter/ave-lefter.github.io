@@ -107,7 +107,7 @@
                 width="24"
                 alt=""
               >
-              <span class="color-[--d-F5F5F5-l-333]">{{ $t('new1') }}</span>
+              <span class="color-[--d-F5F5F5-l-333] text-14px">{{ $t('new1') }}</span>
             </template>
             <div v-else class="tabs single" >
               <button
@@ -146,6 +146,31 @@
               <Icon name="custom:stop" class="color-#FFA622 text-16px"/>
             </span>
             <span class="flex-1" />
+            <el-input
+              v-if="pumpSetting?.show_search"
+              ref="inputSearch"
+              v-model.trim="pump_query[activeChain].new"
+              class="search-input1 px-20px mr-4px"
+              size="small"
+              :placeholder="$t('search')"
+              @input="(val) => pump_query[activeChain].new = val.replace(/\s/g, '')"
+            >
+              <template #prefix>
+                <Icon
+                  class="text-12px text-[var(--third-text)]"
+                  name="custom:search"
+                />
+              </template>
+              <template #suffix>
+                <Icon
+                  v-if="pump_query[activeChain].new"
+                  name="pajamas:clear"
+                  class="color-[--third-text] text-12px hover:opacity-70% cursor-pointer mr-10px"
+                  @click="pump_query[activeChain].new = ''"
+                />
+              </template>
+            </el-input>
+
             <QuickSwapSetCustom
               v-model:quickBuyValue="quickBuyValue1"
               v-model:customSelected="swapSetSelected1"
@@ -184,7 +209,7 @@
                 width="24"
                 alt=""
               >
-              <span class="color-[--d-F5F5F5-l-333]">{{ $t('soon') }}</span>
+              <span class="color-[--d-F5F5F5-l-333] text-14px">{{ $t('soon') }}</span>
             </template>
             <div v-else class="tabs single" >
               <button
@@ -223,6 +248,30 @@
               <Icon name="custom:stop" class="color-#FFA622 text-16px"/>
             </span>
             <span class="flex-1" />
+            <el-input
+              v-if="pumpSetting?.show_search"
+              ref="inputSearch"
+              v-model.trim="pump_query[activeChain].soon"
+              class="search-input1 px-20px mr-4px"
+              size="small"
+              :placeholder="$t('search')"
+              @input="(val) => pump_query[activeChain].soon = val.replace(/\s/g, '')"
+            >
+              <template #prefix>
+                <Icon
+                  class="text-12px text-[var(--third-text)]"
+                  name="custom:search"
+                />
+              </template>
+              <template #suffix>
+                <Icon
+                  v-if="pump_query[activeChain].soon"
+                  name="pajamas:clear"
+                  class="color-[--third-text9] text-12px hover:opacity-70% cursor-pointer mr-10px"
+                  @click="pump_query[activeChain].soon = ''"
+                />
+              </template>
+            </el-input>
             <QuickSwapSetCustom
               v-model:quickBuyValue="quickBuyValue2"
               v-model:customSelected="swapSetSelected2"
@@ -261,7 +310,7 @@
                 width="24"
                 alt=""
               >
-              <span class="color-[--d-F5F5F5-l-333]">{{ $t('graduated') }}</span>
+              <span class="color-[--d-F5F5F5-l-333] text-14px">{{ $t('graduated') }}</span>
             </template>
             <div v-else class="tabs single" >
               <button
@@ -301,6 +350,30 @@
               <Icon name="custom:stop" class="color-#FFA622 text-16px"/>
             </span>
             <span class="flex-1" />
+            <el-input
+              v-if="pumpSetting?.show_search"
+              ref="inputSearch"
+              v-model.trim="pump_query[activeChain].graduated"
+              class="search-input1 px-20px mr-4px"
+              size="small"
+              :placeholder="$t('search')"
+              @input="(val) => pump_query[activeChain].graduated = val.replace(/\s/g, '')"
+            >
+              <template #prefix>
+                <Icon
+                  class="text-12px text-[var(--third-text)]"
+                  name="custom:search"
+                />
+              </template>
+              <template #suffix>
+                <Icon
+                  v-if="pump_query[activeChain].graduated"
+                  name="pajamas:clear"
+                  class="color-[--third-text] text-12px hover:opacity-70% cursor-pointer mr-10px"
+                  @click="pump_query[activeChain].graduated = ''"
+                />
+              </template>
+            </el-input>
             <QuickSwapSetCustom
               v-model:quickBuyValue="quickBuyValue3"
               v-model:customSelected="swapSetSelected3"
@@ -340,7 +413,7 @@
 </template>
 
 <script setup lang="ts">
-import { useStorage, useWindowSize, useThrottleFn, useDocumentVisibility } from '@vueuse/core'
+import { useStorage, useWindowSize, useThrottleFn, useDocumentVisibility, useDebounceFn } from '@vueuse/core'
 import PumpList from './pump/components/pumpList.vue'
 import Setting from './pump/components/setting.vue'
 import BlackList from './pump/components/blackList.vue'
@@ -351,7 +424,8 @@ import type {
   PumpObj,
   ChainKey,
   CategoryKey,
-  WSPumpObj
+  WSPumpObj,
+  pumpBlack
 } from '@/api/types/pump'
 import { isEqual, throttle } from 'lodash-es'
 import AutoSellSetting from '@/components/autoSellSetting/index.vue'
@@ -409,7 +483,7 @@ const orderGraduated= computed(() => {
 })
 const pumpConfig = shallowRef<PumpConfig[]>()
 const isRotate = ref(false)
-const { pump_notice, pumpV3, pumpFilterDefault } = storeToRefs(usePumpStore())
+const { pump_notice, pumpV3, pumpFilterDefault, pump_query } = storeToRefs(usePumpStore())
 const pumpAudio = useTemplateRef('pumpAudio')
 const visible_platforms = shallowRef(false)
 const fourmemeListObj = reactive<Record<ChainKey, Record<CategoryKey, PumpObj[]>>>({
@@ -529,15 +603,6 @@ const tabsList = computed(() => {
 })
 const list1 = computed(() => {
   let list = fourmemeListObj?.[activeChain.value]?.new || []
-  if (pumpSetting.value.isBlacklist && pumpBlackList.value?.length > 0) {
-    list = list.filter(
-      (item) =>
-        !pumpBlackList.value?.some(
-          (i) =>
-            (i.address == item.token  && i.type=='ca' || i.address == item.symbol && i.type=='keyword' || i.address == item.token  && i.type=='dev')
-        )
-    )
-  }
   const list1 = (wsTableList.value || [])?.filter(i => i.state === 'new' && i.chain === activeChain.value)
   const pumpFilter = localStorage.getItem(`pumpFilter_${activeChain.value}_new`)
   const wsList = getFilterData(list1, pumpFilter)
@@ -604,21 +669,17 @@ const list1 = computed(() => {
   }
   if (filterList?.length) {
     filterList = mergeStatisticsList(mapStatistics.value, filterList)
+    if (pumpSetting.value.isBlacklist && pumpBlackList.value?.length) {
+        filterList = filterList.filter(
+        item => !pumpBlackList.value.some(black => hitBlacklist(item, black))
+      )
+    }
     fourmemeListObj[activeChain.value].new = filterList?.slice?.(0, 100) || []
   }
   return filterList?.slice?.(0, 100)
 })
 const list2 = computed(() => {
   let list = fourmemeListObj?.[activeChain.value]?.soon || []
-  if (pumpSetting.value.isBlacklist && pumpBlackList.value?.length > 0) {
-    list = list.filter(
-      (item) =>
-        !pumpBlackList.value?.some(
-          (i) =>
-          (i.address == item.token  && i.type=='ca' || i.address == item.symbol && i.type=='keyword' || i.address == item.token  && i.type=='dev')
-        )
-    )
-  }
   const list1 = (wsTableList.value || [])?.filter(i => (i.state === 'migrating') && i.chain === activeChain.value)
   const pumpFilter = localStorage.getItem(`pumpFilter_${activeChain.value}_soon`)
   const wsList = getFilterData(list1, pumpFilter)
@@ -694,20 +755,16 @@ const list2 = computed(() => {
         !tokenSet.has(i.target_token)
     )
 
+    if (pumpSetting.value.isBlacklist && pumpBlackList.value?.length) {
+        filterList = filterList.filter(
+        item => !pumpBlackList.value.some(black => hitBlacklist(item, black))
+      )
+    }
      fourmemeListObj[activeChain.value].soon = filterList?.slice?.(0, 100) || []
     return filterList?.slice?.(0, 100)
   })
 const list3 = computed(() => {
 let list = fourmemeListObj?.[activeChain.value]?.graduated || []
-if (pumpSetting.value.isBlacklist && pumpBlackList.value?.length > 0) {
-  list = list.filter(
-    (item) =>
-      !pumpBlackList.value?.some(
-        (i) =>
-        (i.address == item.token  && i.type=='ca' || i.address == item.symbol && i.type=='keyword' || i.address == item.token  && i.type=='dev')
-      )
-  )
-}
   const list1 = (wsTableList.value || [])?.filter(i => i.state === 'migrated' && i.chain === activeChain.value)
   const pumpFilter = localStorage.getItem(`pumpFilter_${activeChain.value}_graduated`)
   const wsList = getFilterData(list1, pumpFilter)
@@ -774,6 +831,11 @@ if (pumpSetting.value.isBlacklist && pumpBlackList.value?.length > 0) {
   }
   if (filterList?.length) {
     filterList = mergeStatisticsList(mapStatistics.value, filterList)
+    if (pumpSetting.value.isBlacklist && pumpBlackList.value?.length) {
+        filterList = filterList.filter(
+        item => !pumpBlackList.value.some(black => hitBlacklist(item, black))
+      )
+    }
     fourmemeListObj[activeChain.value].graduated = filterList?.slice?.(0, 100) || []
   }
   return filterList?.slice?.(0, 100)
@@ -1207,8 +1269,6 @@ function wsUpdateTableList(wsList: WSPumpObj[]) {
 function getPumpConfig() {
   _getPumpConfig().then((res) => {
     pumpConfig.value = Array.isArray(res) ? res : []
-    console.log('----pumpConfig--------', pumpConfig.value)
-    console.log('-------fourmemeListObj-----', fourmemeListObj)
     pumpConfig.value?.forEach(i => {
       if (!pumpV3.value[i.chain]?.platforms?.length) {
         const platforms = i.platforms?.map(y => {
@@ -1259,6 +1319,46 @@ function getPumpConfig() {
     })
   })
 }
+
+watch(()=>pump_query.value[activeChain.value].new, () => {
+  debouncedFetch('new')
+}, { deep: true })
+watch(()=>pump_query.value[activeChain.value].soon, () => {
+  debouncedFetch('soon')
+}, { deep: true })
+watch(()=>pump_query.value[activeChain.value].graduated, () => {
+  debouncedFetch('graduated')
+}, { deep: true })
+
+const debouncedFetch = useDebounceFn((type) => search(type), 500)
+function search(type: string) {
+  if (type == 'new') {
+    const pumpFilter_new = localStorage.getItem(`pumpFilter_${activeChain.value}_new`)
+    const params1 = {
+      category: 'new',
+      ...(pumpFilter_new ? JSON.parse(pumpFilter_new) : ''),
+    }
+    getPump(params1, true)
+  }
+  if (type == 'soon') {
+    const pumpFilter_soon = localStorage.getItem(`pumpFilter_${activeChain.value}_new`)
+    const params2 = {
+      category: 'soon',
+      ...(pumpFilter_soon ? JSON.parse(pumpFilter_soon) : ''),
+    }
+    getPump(params2, true)
+  }
+  if (type == 'graduated') {
+    const pumpFilter_graduated = localStorage.getItem(`pumpFilter_${activeChain.value}_graduated`)
+    const params3 = {
+      category: 'graduated',
+      ...(pumpFilter_graduated ? JSON.parse(pumpFilter_graduated) : ''),
+    }
+    getPump(params3, true)
+  }
+}
+
+
 function handlerFilterConfirm(
   val: { progress_min?: string; progress_max?: string; chain: ChainKey; platforms: string; has_sm?: boolean},
   type: string
@@ -1285,6 +1385,8 @@ function handlerFilterConfirm(
   }
   getPump({ ...(params as { category: CategoryKey }), ...val }, true)
 }
+
+
 function single(type: string) {
   if (width.value < 1024) {
     if (type == activeTab.value) {
@@ -1353,6 +1455,13 @@ async function getPump(rawParams: {
     queryParams.platforms = platformList.join(',')
   }
 
+  if (pump_query.value[currentChain][queryParams.category]) {
+    if (isFilter) {
+      queryParams.q = queryParams.q + pump_query.value[currentChain][queryParams.category]
+    } else {
+      queryParams.q =  pump_query.value[currentChain][queryParams.category]
+    }
+  }
   if (queryParams.has_sm) {
     delete queryParams.sm_list
   } else if (Array.isArray(queryParams.sm_list) && queryParams.sm_list.length > 0) {
@@ -1747,6 +1856,22 @@ function mergeLogo(prev: any, next: any) {
     appendix: next.appendix || prev.appendix,
   }
 }
+function hitBlacklist(item:PumpObj, black: pumpBlack) {
+  if (black.type === 'twitter') {
+    const address = black.address?.replace('@', '')
+    return item.medias?.some(m => m.url?.includes(address))
+  }
+
+  if (black.type === 'keyword') {
+    return black.address === item.symbol
+  }
+
+  if (black.type === 'ca' || black.type === 'dev') {
+    return black.address === item.token
+  }
+
+  return false
+}
 </script>
 
 <style scoped lang="scss">
@@ -1826,7 +1951,7 @@ function mergeLogo(prev: any, next: any) {
 :deep().search-input1 {
   background: var(--main-input-button-bg);
   padding: 1px;
-  width: 200px;
+  width: 120px;
   border-radius: 4px;
   border: none;
   .el-input__wrapper {
