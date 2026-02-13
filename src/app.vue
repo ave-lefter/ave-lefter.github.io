@@ -2,7 +2,7 @@
   <NuxtPwaAssets />
   <el-config-provider :locale="elementLocale">
     <NuxtLayout>
-      <NuxtPage :keepalive="{include: 'pump'}"/>
+      <NuxtPage />
     </NuxtLayout>
   </el-config-provider>
   <TokenDetails/>

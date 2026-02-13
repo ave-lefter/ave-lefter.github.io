@@ -1018,7 +1018,7 @@ const getChangedValue = (A: string[], B: string[]): string | null => {
 
 let isLeave = true
 
-onActivated(() => {
+onMounted(() => {
   bindAudioCanPlay()
   isLeave = false
   wsTableListCache = {}
@@ -1047,7 +1047,7 @@ onActivated(() => {
   }
 })
 
-onDeactivated(()=>{
+onUnmounted(()=>{
   // 清理 watch 监听器，防止内存泄漏
   // watchPumpStateUnwatch?.()
   // watchTokenUpdatedUnwatch?.()

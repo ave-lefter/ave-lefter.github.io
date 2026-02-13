@@ -3,7 +3,7 @@ import BigNumber from 'bignumber.js'
 import {ElNotification} from 'element-plus'
 import {useStorage} from '@vueuse/core'
 import {bot_createSolTx, bot_createSwapEvmTx, bot_createSwapTonTx, bot_getTokenBalance} from '~/api/bot'
-import { formatBotGasTips } from '~/utils/bot'
+import { formatBotGasTips, hasCreateTxError, getCreateTxErrorMsg, handleBotError } from '~/utils/bot'
 import type { BotChain, BotSettingKey } from '~/utils/types'
 import useWalletSwap from './quickSwap/wallet'
 import { recordTxV2, updateTxV2 } from '~/api/tracking'
@@ -179,13 +179,18 @@ const tokenStore = useTokenStore()
 const wsStore = useWSStore()
 function handleTxSuccess(res: any, _batchId: string) {
   if (res) {
+    const chain = props.row.chain
+    const txInfo: any = res?.[0] || {}
+    if (hasCreateTxError(txInfo)) {
+      handleBotError(getCreateTxErrorMsg(txInfo))
+      loadingSwap.value = false
+      return
+    }
     let Timer: null | ReturnType<typeof setTimeout> = setTimeout(() => {
       // ElNotification({type: 'success', message: t('transactionsSubmitted')})
       tokenStore.placeOrderUpdate++
       loadingSwap.value = false
     }, 500)
-    const chain = props.row.chain
-    const txInfo: any = res?.[0] || {}
     const recordTxUrlObj = {
       solana: '/botapi/swap/createSolTx',
       ton: '/botapi/swap/createSwapTonTx',

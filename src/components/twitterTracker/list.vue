@@ -5,19 +5,19 @@
       {{ t('connectBotWallet') }}
     </el-button>
   </AveEmpty>
-  <div v-else-if="props.isMine && isEmpty" class="flex flex-col items-center pt-60px">
+  <div v-else-if="props.isMine && isEmpty && !trackerStore.query.token_keyword" class="flex flex-col items-center pt-60px">
     <Icon name="custom:twitter-empty" class="text-61px mb-12px color-[--icon-color]" />
     <span class="color-[--third-text] text-12px mb-20px mt-4px">{{ t('twitterEmpty') }}</span>
     <el-button type="primary" class="text-12px w-266px h-40px" @click="emits('startAttention')">
       {{ t('attention') }}
     </el-button>
   </div>
-  <div v-else-if="!props.isMine && isEmpty">
+  <div v-else-if="isEmpty">
     <AveEmpty class="pt-40px">
       <span class="color-[--third-text] text-12px mb-20px mt-4px">{{ t('emptyNoData') }}</span>
     </AveEmpty>
   </div>
-  <div v-else ref="parentRef" class="overflow-y-auto scrollbar-hide" style="height:calc(100% - 120px)">
+  <div v-else ref="parentRef" class="overflow-y-auto scrollbar-hide" style="height:calc(100% - 120px)" @mouseenter="emits('stop',true)" @mouseleave="emits('stop',false)">
     <div :style="{
       height: `${totalSize}px`,
       width: '100%',
@@ -49,7 +49,7 @@ import { useInfiniteScroll } from '@vueuse/core'
 
 const parentRef = ref(null)
 const { t } = useI18n()
-const emits = defineEmits(['startAttention', 'endReached'])
+const emits = defineEmits(['startAttention', 'endReached','stop'])
 const props = defineProps({
   isMine: {
     type: Boolean

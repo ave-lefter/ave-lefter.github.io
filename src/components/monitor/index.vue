@@ -9,7 +9,7 @@ class="w-monitor bg-[--secondary-bg] w-100% h-100% pl-12px pr-6px relative overf
         class="absolute top-3px left-50% ml--6px text-6px bg-[--dialog-list-hover] drag-handle"
     />
     <el-tabs v-model="activeName" style="" class="m-tabs" @tab-change="handleClick">
-      <el-tab-pane :label="$t('monitored1')" :name="0" lazy>
+      <el-tab-pane :label="$t('insidersActivity')" :name="0" lazy>
         <template v-if="botStore.evmAddress" >
           <div
             v-if="props.isLarge"
@@ -245,7 +245,7 @@ class="w-monitor bg-[--secondary-bg] w-100% h-100% pl-12px pr-6px relative overf
           </el-button>
         </AveEmpty>
       </el-tab-pane>
-      <el-tab-pane :label="$t('walletManage')" :name="1" lazy>
+      <el-tab-pane :label="$t('manage')" :name="1" lazy>
         <WalletManage v-if="botStore.evmAddress" v-bind="walletManageProps" :isLarge="props.isLarge"/>
         <AveEmpty
           v-else
@@ -307,15 +307,7 @@ class="w-monitor bg-[--secondary-bg] w-100% h-100% pl-12px pr-6px relative overf
         </template>
       </el-tab-pane>
     </el-tabs>
-    <el-popover placement="top-start" popper-class="el-select__popper" popper-style="width: 150px;min-width: 150px; padding: 6px 0" trigger="click" ref="audioPopoverRef"  virtual-triggering :virtual-ref="audioButtonRef"
->
-      <ul  class="el-select-dropdown__list group">
-        <li v-for="item in audioList" :key="item" class="el-select-dropdown__item text-[--main-text] flex-between" :class="audioSettings.audio.monitor===item?'text-[--primary-color]!':''" @click="()=>handleAudioSelect(item)">
-          <span>{{ item ? item : $t('close') }}</span>
-          <Icon v-if="audioSettings.audio.monitor===item" name="material-symbols:check"  class="text-16px color-[--main-text]"/>
-        </li>
-      </ul>
-    </el-popover>
+    <AudioPopover v-if="audioButtonRef" :buttonRef="audioButtonRef" type="monitor"/>
     <AddFavAddressPop v-if="addButtonRef" ref="addFavAddressPopRef" :buttonRef="addButtonRef" @onConfirm="handleConfirmAdd" />
   </div>
 </template>
@@ -360,7 +352,6 @@ const firstActivated = ref(true)
 const addButtonRef = ref()
 
 const audioButtonRef = ref()
-const audioPopoverRef = ref<PopoverInstance>()
   
 const toggleMc = ref(false)
 const addFavAddressPopRef = ref()
@@ -419,12 +410,6 @@ watch(() => visible.value, (val) => {
     })
   }
 })
-
-function handleAudioSelect(item:string){ 
-  console.log('handleAudioSelect', item)
-  audioPopoverRef.value?.hide()
-  audioSettings.value.audio.monitor=item
-}
 
 function handleClick(name: number|string) {
   if(name===1){
