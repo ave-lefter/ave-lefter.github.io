@@ -48,7 +48,7 @@
 <script setup lang="ts">
 import BigNumber from 'bignumber.js'
 import TokenList from './tokenList.vue'
-import { _getFollowTokens, _getSuccessFollowTxs, _getFailFollowTxs, _getFailFollowTxs } from '~/api/copyTrade'
+import { _getFollowTokens, _getSuccessFollowTxs, _getFailFollowTxs } from '~/api/copyTrade'
 const { copyObj } = storeToRefs(useCopyTradeStore())
 const $t = getGlobalT()
 const props = defineProps({
