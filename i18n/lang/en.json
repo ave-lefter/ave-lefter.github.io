@@ -2016,5 +2016,5 @@
   "priceChangeZoonSetting": "Price Change Time Zone Setting",
   "group": "Group",
   "manage": "Manage",
-  "priceChangeZoonSettingTip": "<div>24-hour clock: The price increase or decrease is calculated on a 24-hour rolling basis, compared with the price at the same time yesterday<br/>\n\n0:00 Beijing time (UTC 8 00:00): The price increase or decrease is calculated based on the opening price at 0:00 Beijing time</div>"
+  "priceChangeZoonSettingTip": "<div>24-hour clock: The price increase or decrease is calculated on a 24-hour rolling basis, compared with the price at the same time yesterday<br/>\n\n0:00 (UTC 8 00:00): The price increase or decrease is calculated based on the opening price at 0:00 Beijing time</div>"
 }

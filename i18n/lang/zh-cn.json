@@ -2017,5 +2017,5 @@
   "priceChangeZoonSetting": "涨跌幅时区设置",
   "group": "分组",
   "manage": "管理",
-  "priceChangeZoonSettingTip": "<div>24 小时制：涨跌幅按24小时滚动计算，与昨日同一时刻价格对比<br/>\n北京时间 0 点(UTC+8 00:00)：涨跌幅按北京时间0点开盘价计算</div>"
+  "priceChangeZoonSettingTip": "<div>24小时制：涨跌幅按24小时滚动计算，与昨日同一时刻价格对比<br/>\n0点(UTC+8 00:00)：涨跌幅按北京时间0点开盘价计算</div>"
 }
