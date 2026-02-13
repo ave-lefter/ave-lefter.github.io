@@ -171,8 +171,15 @@
          </div>
           <Icon name="ep:arrow-right"/>
         </div>
+        <div class="flex items-center justify-between mb-16px cursor-pointer" @click="globalStore.audioSettings.active = 'wallet'">
+          <div class="flex items-center gap-8px">
+            <Icon name="custom:wallet-fill" class="text-16px"/>
+            <span>{{ $t('walletSettings') }}</span>
+          </div>
+          <Icon name="ep:arrow-right"/>
+        </div>
         <el-dropdown
-:persistent="false"
+          :persistent="false"
           trigger="click"
           popper-class="dropdown-lang"
           class="w-full"

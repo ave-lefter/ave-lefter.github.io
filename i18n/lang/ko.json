@@ -1464,5 +1464,11 @@
   "monitored1": "지갑 활동",
   "availableLiquidity": "사용 가능한 유동성",
   "googleAuthNotBoundTip": "Google 인증기가 바인드되지 않았습니다. 계정 보호를 위해 지갑 주소를 삭제하기 전에 Google 인증기를 바인드하십시오.",
-  "goToBind": "바인드하러 가기"
+  "goToBind": "바인드하러 가기",
+  "walletPageSettings": "지갑 페이지 설정",
+  "walletSettings": "지갑 설정",
+  "clickWalletAddress": "지갑 주소 클릭",
+  "rightClickWalletAddress": "지갑 주소 우클릭",
+  "openInNewTab": "새 탭에서 열기",
+  "invalidTransactions": "무효한 거래"
 }

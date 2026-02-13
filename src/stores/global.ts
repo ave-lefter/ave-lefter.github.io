@@ -222,6 +222,10 @@ export const useGlobalStore = defineStore('global', () => {
       limit:'',
       volume:50,
       twitter:''
+    },
+    wallet:{
+      clickAction:0, // 0: 跳转, 1: 新tab打开
+      rightClickAction:0 // 0: 不打开, 1: 新tab打开
     }
   })
 

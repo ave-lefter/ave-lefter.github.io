@@ -860,5 +860,11 @@
   "availableLiquidity": "Доступная ликвидность",
   "poolPair": "Торговая пара",
   "googleAuthNotBoundTip": "Google Authenticator не привязан. Для защиты вашей учетной записи привяжите Google Authenticator перед удалением адреса кошелька.",
-  "goToBind": "Перейти к привязке"
+  "goToBind": "Перейти к привязке",
+  "walletPageSettings": "Настройки страницы кошелька",
+  "walletSettings": "Настройки кошелька",
+  "clickWalletAddress": "Нажать на адрес кошелька",
+  "rightClickWalletAddress": "Правый клик на адрес кошелька",
+  "openInNewTab": "Открыть в новой вкладке",
+  "invalidTransactions": "Недействительные транзакции"
 }

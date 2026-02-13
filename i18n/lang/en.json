@@ -2011,5 +2011,11 @@
   "monitored1": "Wallet Activity",
   "availableLiquidity": "Available Liquidity",
   "googleAuthNotBoundTip": "Google Authenticator not detected. To protect your account, please bind Google Authenticator before deleting wallet address.",
-  "goToBind": "Go to Bind"
+  "goToBind": "Go to Bind",
+  "walletPageSettings": "Wallet Page Settings",
+  "walletSettings": "Wallet Settings",
+  "clickWalletAddress": "Click Wallet Address",
+  "rightClickWalletAddress": "Right-click Wallet Address",
+  "openInNewTab": "Open in New Tab",
+  "invalidTransactions": "Invalid Transactions"
 }

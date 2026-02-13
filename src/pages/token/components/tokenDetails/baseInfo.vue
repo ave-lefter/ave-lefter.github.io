@@ -340,6 +340,7 @@ const collect = async () => {
       </div>
       <NuxtLink
         v-if="$route.path.indexOf('/address/') == -1"
+        :target="globalStore.audioSettings?.wallet?.clickAction == 1  ? '_blank' : ''"
         :to="`/address/${tokenDetailStore.user_address}/${tokenDetailStore.tokenInfo!.chain}`" class="py-7px px-8px bg-[--border] rounded-4px color-[--main-text] text-12px"
         @click.stop="tokenDetailStore.drawerVisible = false"
       >

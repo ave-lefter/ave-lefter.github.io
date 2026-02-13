@@ -611,5 +611,11 @@
   "availableLiquidity": "Mevcut likidite",
   "poolPair": "İşlem çifti",
   "googleAuthNotBoundTip": "Google Authenticator bağlı değil. Hesabınızı korumak için cüzdan adresini silmeden önce Google Authenticator'ı bağlayın.",
-  "goToBind": "Bağlamaya git"
+  "goToBind": "Bağlamaya git",
+  "walletPageSettings": "Cüzdan sayfa ayarları",
+  "walletSettings": "Cüzdan ayarları",
+  "clickWalletAddress": "Cüzdan adresine tıkla",
+  "rightClickWalletAddress": "Cüzdan adresine sağ tıkla",
+  "openInNewTab": "Yeni sekmede aç",
+  "invalidTransactions": "Geçersiz işlemler"
 }
