@@ -61,21 +61,8 @@
             </div>
           </template>
         </el-popover>
-        <el-popover v-model:visible="audioVisible" trigger="click" popper-class="el-select__popper">
-          <template #reference>
-            <Icon class="cursor-pointer"
+        <Icon class="cursor-pointer" ref="audioButtonRef"
               :name="globalStore.audioSettings.audio.twitter ? 'custom:ad' : 'custom:admute'" />
-          </template>
-          <template #default>
-            <ul class="el-scrollbar__view el-select-dropdown__list [&&]:m--12px">
-              <li v-for="item in audioList" :key="item" class="el-select-dropdown__item hover:bg-[--border]"
-                :class="{ 'bg-[--border]': globalStore.audioSettings.audio.twitter === item }"
-                @click="globalStore.audioSettings.audio.twitter = item; audioVisible = false;">
-                <span class="text-12px">{{ item || $t('close') }}</span>
-              </li>
-            </ul>
-          </template>
-        </el-popover>
         <Icon v-show="isPaused" name="custom:stop"/>
 
         <!-- <el-dropdown :persistent="false" trigger="click">
@@ -96,6 +83,7 @@
         </template>
       </el-input>
     </div>
+    <AudioPopover v-if="audioButtonRef" :buttonRef="audioButtonRef" type="twitter"/>
     <TwitterTrackerList :isMine="isMine" @stop="val => isPaused = val" @endReached="debouncedGetList" @startAttention="emits('setDrawerVisible', true)" />
     <audio ref="twitterAudio" controls style="display: none" :src="getAudioUrl(globalStore.audioSettings.audio.twitter)"
       :volume="+globalStore.audioSettings.audio.volume / 100 || 0.5" />
@@ -119,7 +107,7 @@ const filterVisible = ref(false)
 const audioVisible = ref(false)
 const isPaused = ref(false)
 const wsCacheArr = shallowRef([])
-
+const audioButtonRef = ref()
 const twitterAudio = useTemplateRef('twitterAudio')
 const followIds = useStorage('twFollowIds', [])
 const query = ref({ ...trackerStore.query })
