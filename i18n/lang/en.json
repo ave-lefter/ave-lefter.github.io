@@ -2044,5 +2044,7 @@
   "twitterTracker2": "News",
   "onlyTitle": "Only Title",
   "ViewFullText": "View full text",
-  "socialMediaTracker": "Media Tracker"
+  "socialMediaTracker": "Media Tracker",
+  "sellInits": "Sell Inits.",
+  "confirmSellAlTips": "Cashing out now will empty one wallet's holdings and may cause a loss. Proceed with breakeven?"
 }
