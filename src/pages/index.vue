@@ -560,6 +560,8 @@ type StatisticsItem = {
   phishing_ratio: string,
   sells_tx_24h_count:number
   buys_tx_24h_count: number
+  headline_en: string
+  headline_cn: string
 }
 let portraitTimer: ReturnType<typeof setTimeout> | null = null
 let isPortraitSubscribed = false
@@ -1706,6 +1708,8 @@ const DIRECT_MAP: [keyof StatisticsItem, keyof PumpObj][] = [
   ['first_transfer_in_from', 'dev_first_transfer_in_from'],
   ['first_transfer_in_from_label', 'dev_first_transfer_in_from_label'],
   ['age_seconds', 'dev_age_seconds'],
+  ['headline_cn', 'headline_cn'],
+  ['headline_en', 'headline_en']
 ]
 const NUMBER_MAP: [keyof StatisticsItem, keyof PumpObj][] = [
   ['holder_count', 'holders'],//dev_holder_count
@@ -1751,7 +1755,6 @@ function mergeStatisticsList(
       return i
     }
     const next = { ...i }
-
     /** progress（特殊处理） */
     if (obj.progress != null) {
       const p = Number(obj.progress)
@@ -1834,7 +1837,9 @@ const MERGE_KEYS = [
   'smart_wallet_ratio',
   'first_transfer_in_from',
   'first_transfer_in_from_label',
-  'age_seconds'
+  'age_seconds',
+  'headline_en',
+  'headline_cn',
 ] as const
 
 function mergeStatistics(prev: any, next: any) {
