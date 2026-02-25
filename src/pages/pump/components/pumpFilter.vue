@@ -199,6 +199,7 @@ const props = defineProps({
 
 const emit = defineEmits(['update:filterData', 'update:visible'])
 const globalStore = useGlobalStore()
+const pumpStore = usePumpStore()
 const configStore = useConfigStore()
 const { isDark } = storeToRefs(globalStore)
 const { t } = useI18n()

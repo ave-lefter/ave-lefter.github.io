@@ -82,6 +82,43 @@ export const usePumpStore = defineStore('pumpStore', () => {
   })
 
   const pumpConfig = shallowRef<PumpConfig[]>([])
+  const pumpFilterDefault = {
+    q: '',
+    dev_sale_out: 0,
+    platforms: 'pump,moonshot',
+    progress_min: '', //进度
+    progress_max: '',
+
+    lage: '', //代币时长
+    rage: '',
+    dev_balance_ratio_cur_min: '', //dev 持仓%
+    dev_balance_ratio_cur_max: '',
+    holder_min: '', //持有人
+    holder_max: '',
+    holders_top10_ratio_min: '', //top10 持仓%
+    holders_top10_ratio_max: '',
+    lsnip: '', //狙击人数
+    rsnip: '',
+    smart_money_tx_count_24h_min: '', // 聪明钱交易数 （买入数+卖出数）
+    smart_money_tx_count_24h_max: '',
+    lins: '', //老鼠仓
+    rins: '',
+    lkol: '', //KOL交易人数
+    rkol: '',
+    lrug: '', //跑路概率
+    rrug: '',
+
+    market_cap_min: '', // 市值
+    market_cap_max: '',
+    volume_u_24h_min: '', //交易额
+    volume_u_24h_max: '',
+    lbtx: '', //买入交易数
+    rbtx: '',
+    lstx: '', //卖出交易数
+    rstx: '',
+    has_sm: 0,
+    sm_list: [],
+  }
 
   function getPumpConfig() {
     _getPumpConfig().then((res) => {
@@ -137,62 +174,26 @@ export const usePumpStore = defineStore('pumpStore', () => {
     'pump_solana_platforms',
     ['pump', 'moonshot', 'raydium', 'jupstudio', 'moon_new', 'cookingcity', 'bonk', 'bags']
   )
-  const pumpFilterDefault = {
-    q: '',
-    dev_sale_out: 0,
-    platforms: 'pump,moonshot',
-    progress_min: '', //进度
-    progress_max: '',
-
-    lage: '', //代币时长
-    rage: '',
-    dev_balance_ratio_cur_min: '', //dev 持仓%
-    dev_balance_ratio_cur_max: '',
-    holder_min: '', //持有人
-    holder_max: '',
-    holders_top10_ratio_min: '', //top10 持仓%
-    holders_top10_ratio_max: '',
-    lsnip: '', //狙击人数
-    rsnip: '',
-    smart_money_tx_count_24h_min: '', // 聪明钱交易数 （买入数+卖出数）
-    smart_money_tx_count_24h_max: '',
-    lins: '', //老鼠仓
-    rins: '',
-    lkol: '', //KOL交易人数
-    rkol: '',
-    lrug: '', //跑路概率
-    rrug: '',
-
-    market_cap_min: '', // 市值
-    market_cap_max: '',
-    volume_u_24h_min: '', //交易额
-    volume_u_24h_max: '',
-    lbtx: '', //买入交易数
-    rbtx: '',
-    lstx: '', //卖出交易数
-    rstx: '',
-    has_sm: 0,
-    sm_list: [],
-  }
+  
   const pumpV3: RemovableRef<Record<ChainKey, pumpData>> = useStorage(
-    'pumpV14',
+    'pumpV15',
     {
       solana: {
         platforms: [],
         new: {
           count: 0,
           loading: false,
-          // pumpFilter: pumpFilterDefault,
+          pumpFilter: pumpFilterDefault,
         },
         soon: {
           count: 0,
           loading: false,
-          // pumpFilter: pumpFilterDefault,
+          pumpFilter: pumpFilterDefault,
         },
         graduated: {
           count: 0,
           loading: false,
-          // pumpFilter: pumpFilterDefault,
+          pumpFilter: pumpFilterDefault,
         },
       },
       bsc: {
@@ -200,17 +201,17 @@ export const usePumpStore = defineStore('pumpStore', () => {
         new: {
           count: 0,
           loading: false,
-          // pumpFilter: pumpFilterDefault,
+          pumpFilter: pumpFilterDefault,
         },
         soon: {
           count: 0,
           loading: false,
-          // pumpFilter: pumpFilterDefault,
+          pumpFilter: pumpFilterDefault,
         },
         graduated: {
           count: 0,
           loading: false,
-          // pumpFilter: pumpFilterDefault,
+          pumpFilter: pumpFilterDefault,
         },
       },
       xlayer: {
@@ -270,6 +271,7 @@ export const usePumpStore = defineStore('pumpStore', () => {
     },
     localStorage
   )
+  console.log('pumpV3',pumpV3.value)
   const activeChain = useStorage<ChainKey>(
     'pump_activeChain',
     'bsc',
