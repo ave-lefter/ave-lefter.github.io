@@ -164,7 +164,6 @@
         </div>
       </template>
       <template #default>
-<<<<<<< HEAD
         <div class="flex items-center justify-between mb-16px cursor-pointer" @click="globalStore.audioSettings.active = 'notice'">
          <div class="flex items-center gap-8px">
           <Icon name="custom:alert" class="text-16px"/>
@@ -206,11 +205,7 @@
             </el-dropdown-menu>
           </template>
         </el-dropdown>
-        <div class="flex items-center justify-between cursor-pointer" @click="botTipDialogRef && botTipDialogRef?.openBotTipDialog()">
-          <div class="flex items-center gap-8px">
-            <Icon name="custom:rockets" class="text-16px"/>
-          {{ $t('newFeature') }}
-=======
+
         <div class="flex flex-col">
           <div class="flex items-center justify-between mb-16px cursor-pointer" @click="globalStore.audioSettings.active = 'notice'">
            <div class="flex items-center gap-8px">
@@ -292,7 +287,6 @@
             {{ $t('newFeature') }}
             </div>
             <Icon name="ep:arrow-right"/>
->>>>>>> origin/master
           </div>
         </div>
       </template>
