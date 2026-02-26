@@ -1214,7 +1214,13 @@ function onWsKline(
         }
         if (_pair !== pair1) {
           const price = _price
-          if (!lastPairPrice && Math.abs(price - lastPairPrice) > lastPairPrice * 0.35) {
+          if (!props.isRank && 'pairs' in tokenStore) {
+            const currentPairInfo = tokenStore?.pairs?.find((i) => i.pair === pair.value)
+            if (currentPairInfo && !Number(currentPairInfo?.reserve0) && !Number(currentPairInfo?.reserve1)) {
+              return
+            }
+          }
+          if (lastPairPrice && Math.abs(price - lastPairPrice) > lastPairPrice * 0.35) {
             return
           }
         }
