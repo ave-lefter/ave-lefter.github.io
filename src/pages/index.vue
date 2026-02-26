@@ -1176,7 +1176,6 @@ function getPumpConfig() {
           }
         }) || []
         const platformsString = platforms.join(',')
-        console.log('platformsString',platformsString)
         pumpV3.value[i.chain] = {
           ...(pumpV3.value[i.chain] || {}),
           platforms,
