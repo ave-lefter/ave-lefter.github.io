@@ -31,7 +31,7 @@
       @close="handleNoticeClose"
     />
     <div
-      class="info flex items-center bg-[--secondary-bg] mb-1px h-64px p-x-16px text-12px color-[--third-text]"
+      class="info flex items-center bg-[--secondary-bg] mb-.5px h-64px p-x-16px text-12px color-[--third-text]"
     >
       <!-- <Icon
         name="material-symbols:kid-star"

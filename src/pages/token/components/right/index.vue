@@ -26,7 +26,7 @@
           <div class="text-12px color-[--third-text]">DEV</div>
         </div>
       </div> -->
-        <div class="p-15px bg-[--secondary-bg] mt-1px">
+        <div class="p-15px bg-[--secondary-bg] mt-.5px">
           <!-- <BotSwap /> -->
           <component :is="SwapCom" :key="walletStore.address ? 'Swap' : 'BotSwap'" />
         </div>
