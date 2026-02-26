@@ -7,7 +7,7 @@
       <div :class="`flex justify-between items-center clickable ${activeParentTab===2?'color-[--main-text]':'color-[--secondary-text]'}`" @click="activeParentTab=2">{{ t('twitterTracker2') }}</div>
       <div class="flex-1 drag-handle h-20px" />
       <div class="flex items-center gap-12px">
-        <Icon v-if="botStore.evmAddress" name="custom:pump-setting"
+        <Icon v-if="botStore.evmAddress&&activeParentTab===1" name="custom:pump-setting"
           class="color-[--secondary-text] hover:color-[--main-text] cursor-pointer text-14px"
           @click="emits('setDrawerVisible', true)" />
         <Icon name="custom:close" class="text-14px shrink-0 cursor-pointer color-[--main-text]"
