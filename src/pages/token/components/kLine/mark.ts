@@ -179,6 +179,7 @@ export function useKlineMarks() {
         onDataCallback(marks || [])
         return
       }
+      console.log('no dddd')
       if(profilingMarksCache.has(id) && markTabsChecked.value?.[v.id]) {
         const res = touchCache(profilingMarksCache, id) || []
         const marks = formatProfilingToMarks(res, interval, v.id, v.name)
@@ -531,7 +532,8 @@ const priorityOrder = ['25','31','30','19','16']
                     sell: item.direction === 'sell' ? holderData : null,
                     wallet_address: item.wallet_address,
                     wallet_logo:    item.wallet_logo || {}
-                  }]
+                  }],
+                  time:item.time
                 }
                 addMarks.push(markData)
               }
