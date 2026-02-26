@@ -139,9 +139,6 @@ const getItem = (virtualRow) => {
 //   virtualizer.update()
 // })
 
-watch(() => lang.value.includes('zh'), () => {
-  reCreateChild()
-})
 
 
 setTimeout(() => {
