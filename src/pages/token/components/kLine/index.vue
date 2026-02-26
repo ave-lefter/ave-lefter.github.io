@@ -211,7 +211,7 @@ import {
 import type { WSTx, KLineBar, SimpleWSTx } from './types'
 import BigNumber from 'bignumber.js'
 import { useKlineMarks } from './mark'
-import { DefaultHeight, WSSimpleTxChain } from '~/utils/constants'
+import { DefaultHeight, WSSimpleTxChain, SupportTokenKlineLaunchpad, SupportTokenKlineChains } from '~/utils/constants'
 import { TW_STUDY } from './constant'
 import UnknownRisk from './unknownRisk.vue'
 import DialogRemind from './dialogRemind.vue'
@@ -230,6 +230,7 @@ const localeStore = useLocaleStore()
 const route = useRoute()
 const walletStore = useWalletStore()
 const scrollTop = ref(0)
+const wsStore = useWSStore()
 const totalHolders = computed(() => [
   { id: 'trade', name: t('mine') },
   {
@@ -298,6 +299,12 @@ const dialogVisible_remind = ref(false)
 //   year: 50
 // })
 
+const migrated = ref( null as null | {
+  migrate_time: number
+  migrate_uprice: string
+  showMarket: boolean
+  mcap: number
+})
 const chain = computed(() => {
   return getAddressAndChainFromId(token.value)?.chain || tokenStore?.token?.chain || ''
 })
@@ -346,17 +353,48 @@ watch(
   }
 )
 
-watch(pair, (val) => {
-  if (val === klinePair.value) return
+watch([pair, () => tokenStore.selectedToken], () => {
   switchTokenKline()
 })
-
 watch(
-  () => tokenStore.selectedToken,
-  () => {
-    switchTokenKline()
+  () => wsStore.wsResult[WSEventType.SWITCH_MAIN_PAIR_V2],
+  (val) => {
+
+    if (isReady.value && route.name === 'token-id' && val) {
+      const new_main_pair_data = val.new_main_pair_data
+        if(new_main_pair_data.target_token == tokenAddress.value){
+          const migrate_uprice = new_main_pair_data.target_token == new_main_pair_data.token0_address ? new_main_pair_data?.token1_price_usd : new_main_pair_data?.token1_price_usd
+          if (new_main_pair_data?.blocktime && migrate_uprice) {
+            migrated.value = {
+              migrate_time: new_main_pair_data?.blocktime,
+              migrate_uprice: migrate_uprice,
+              showMarket: showMarket.value,
+              mcap: new BigNumber(migrate_uprice || 0).times(tokenStore?.token?.total || 0).toNumber(),
+            }
+            setTimeout(() => {
+              onMarkChanged(true)
+            }, 500)
+          } else {
+            migrated.value = {
+              migrate_time: 0,
+              migrate_uprice: '0',
+              showMarket: false,
+              mcap: 0,
+            }
+            setTimeout(() => {
+              onMarkChanged(false)
+            }, 500)
+          }
+        }
+    }
   }
 )
+// watch(
+//   () => tokenStore.selectedToken,
+//   () => {
+//     switchTokenKline()
+//   }
+// )
 
 function switchTokenKline() {
   isReadyLine = false
@@ -411,7 +449,6 @@ watch(()=>localeStore.locale,()=>{
 })
 
 const price = 0
-const wsStore = useWSStore()
 
 // const marks = shallowRef([{ id: 'trade', name: '我的' }])
 
@@ -843,14 +880,13 @@ async function initChart() {
             from,
             to: firstDataRequest ? 0 : Math.max(to, firstBarTime || 0),
           }
+
           const isTokenKline =
-            SupportTokenKlineChains?.includes?.(chain.value) &&
             !props.isRank &&
             'tokenAllPair' in tokenStore &&
             tokenStore?.tokenAllPair &&
-            tokenStore?.selectedToken
-
-          console.log('[getBars] isTokenKline', isTokenKline)
+            tokenStore?.selectedToken ||
+            (firstDataRequest && tokenStore?.selectedToken)
           if (!isTokenKline) {
             params.pair_id = pair.value + '-' + chain.value
             delete params.token_id
@@ -859,6 +895,21 @@ async function initChart() {
           const getKlineFunc = isTokenKline ? getTokenKlineHistory : getKlineHistoryData
           getKlineFunc(params)
             .then((res) => {
+              if (res?.extra_data?.migrate_time && res?.extra_data?.migrate_uprice) {
+                migrated.value = {
+                  migrate_time: new Date(res.extra_data.migrate_time).getTime() / 1000,
+                  migrate_uprice: res.extra_data.migrate_uprice,
+                  showMarket: showMarket.value,
+                  mcap: new BigNumber(res.extra_data.migrate_uprice || 0).times(tokenStore?.token?.total || 0).toNumber(),
+                }
+              } else {
+                migrated.value = {
+                  migrate_time: 0,
+                  migrate_uprice: '0',
+                  showMarket: false,
+                  mcap: 0,
+                }
+              }
               const bars1 = res?.kline_data || []
               const bars =
                 bars1?.map?.((i) => ({
@@ -994,6 +1045,7 @@ async function initChart() {
           chain: chain.value || '',
           user: user.value,
           onDataCallback,
+          migrated: migrated.value,
         })
         // getUserKlineTxTags({
         //   from,
@@ -1075,7 +1127,7 @@ async function initChart() {
         break;
       }
     }
-    
+
     const $patchParams = {
       drawerVisible: true,
       tokenInfo: {
@@ -1163,6 +1215,7 @@ function onWsKline(
       }
       if (target === t && !loading) {
         const _pair = 'pair' in tx ? tx.pair : tx.pair_address
+        const pair1 = tokenStore.selectedToken ? tokenStore.tokenInfo?.pairs?.[0]?.pair : tokenStore?.pairAddress
         const _price =
           'price_u' in tx
             ? Number(tx.price_u || 0)
@@ -1171,12 +1224,21 @@ function onWsKline(
                   ? tx.from_price_usd
                   : tx.to_price_usd
               ) || 0
-        if (_pair === pair.value) {
+        if (_pair === pair1) {
           lastPairPrice = _price
         }
-        if (_pair !== pair.value) {
+        if (tx?.tag === 'PairNoiseTx' || tx?.tag === 'TokenNoiseTx') {
+          return
+        }
+        if (_pair !== pair1) {
           const price = _price
-          if (!lastPairPrice && Math.abs(price - lastPairPrice) > lastPairPrice * 0.35) {
+          if (!props.isRank && 'pairs' in tokenStore) {
+            const currentPairInfo = tokenStore?.pairs?.find((i) => i.pair === pair.value)
+            if (currentPairInfo && !Number(currentPairInfo?.reserve0) && !Number(currentPairInfo?.reserve1)) {
+              return
+            }
+          }
+          if (lastPairPrice && Math.abs(price - lastPairPrice) > lastPairPrice * 0.35) {
             return
           }
         }

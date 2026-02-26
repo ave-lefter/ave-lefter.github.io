@@ -214,7 +214,7 @@
                 </template>
               </el-popover>
 
-              <template v-if="pair && getTags(pair)?.normal_tag?.length > 0">
+              <!-- <template v-if="pair && getTags(pair)?.normal_tag?.length > 0">
                 <div
                   v-for="(i, index) in getTags(pair)?.normal_tag"
                   :key="index"
@@ -249,7 +249,7 @@
                     {{ $t(i?.tag) }}
                   </span>
                 </div>
-              </template>
+              </template> -->
               <img
                 v-if="token?.launchpad"
                 v-tooltip="token.launchpad"
@@ -460,7 +460,7 @@
                 {{ formatNumber(tokenInfoExtra?.sell_tax ||0, 1) }}%
               </span>
             </div>
-            <template v-if="pair && getTags(pair)?.signal_arr?.length > 0">
+            <!-- <template v-if="pair && getTags(pair)?.signal_arr?.length > 0">
               <div
                 v-for="(i, index) in getTags(pair)?.signal_arr?.slice(0, 3)"
                 :key="index"
@@ -542,8 +542,8 @@
                   </template>
                 </span>
               </div>
-            </template>
-            <div
+            </template> -->
+            <!-- <div
               v-if="
                 pair &&
                 getTags(pair)?.signal_arr?.findIndex(
@@ -588,7 +588,7 @@
               >
                 {{ formatNumber(pair?.smart_money_sell_count_24h || 0, 0) }}
               </span>
-            </div>
+            </div> -->
             <top50 />
             <el-popover width="120px" popper-class="[--el-popover-bg-color:--border] !min-w-[120px]" :persistent="false">
               <template #reference>
@@ -628,14 +628,14 @@
       </div>
 
       <div class="flex-1" />
-      <!-- <div
+      <div
         v-if="(pair?.progress ?? 0) > 0 && (pair?.progress ?? 0) < 100"
         class="item"
       >
         <div class="flex items-center min-w-90px justify-between">
           <span>{{ $t('progress') }}</span
           ><span class="ml-5px">{{ formatNumber(pair?.progress || 0, 2) }}%</span>
-          <Icon
+          <!-- <Icon
             v-if="pair?.amm === 'unknown'"
             v-tooltip="pair?.amm"
             name="tdesign:help-circle-filled"
@@ -658,7 +658,7 @@
               onerror="this.src='/icon-default.png'"
               height="16"
             >
-          </a>
+          </a> -->
         </div>
         <el-progress
           class="mt-10px"
@@ -668,7 +668,7 @@
           :show-text="false"
           style="width: 90px"
         />
-      </div> -->
+      </div>
       <div class="item ml-24px items-end!">
         <span class="text-20px color-[--main-text]">
           ${{ formatNumber(price || 0, { decimals: 4, limit: 6 }) }}</span
@@ -685,6 +685,12 @@
           }) }}%</span
         >
       </div>
+      <div class="item ml-24px ">
+        <span>{{ $t('mcap') }}</span>
+        <span class="block mt-8px color-[--main-text]"
+          >${{ formatNumber(marketCap, 2) }}</span
+        >
+      </div>
       <el-popover popper-style="padding: 0;border-radius: 8px;" width="250" placement="top" :teleported="false" trigger="hover">
         <template #reference>
           <div class="ml-24px cursor-pointer">
@@ -699,7 +705,7 @@
             class="flex p-10px justify-between pb-8px text-12px"
           >
             <span class="text-12px color-[--third-text]">{{ $t('availableLiquidity') }}</span>
-            <span class="color-[--main-text]"">{{ formatNumber(tokenStore.token?.main_pair_tvl || 0, 1) }}</span>
+            <span class="color-[--main-text]">${{ formatNumber(tokenStore.token?.main_pair_tvl || 0, 1) }}</span>
           </div>
           <!--流动性-->
           <div class="max-h-300px px-10px overflow-auto v-scroller-container">
@@ -744,18 +750,12 @@
         </div>
       </el-popover>
 
-      <div v-if="(pair?.progress ?? 0) > 0 && (pair?.progress ?? 0) < 100" class="item ml-24px">
+      <!-- <div v-if="(pair?.progress ?? 0) > 0 && (pair?.progress ?? 0) < 100" class="item ml-24px">
         <span>{{ $t('progress') }}</span>
         <span class="block mt-8px color-[--main-text]"
           >{{ formatNumber(pair?.progress || 0, 2) }}%</span
         >
-      </div>
-      <div class="item ml-24px ">
-        <span>{{ $t('mcap') }}</span>
-        <span class="block mt-8px color-[--main-text]"
-          >${{ formatNumber(marketCap, 2) }}</span
-        >
-      </div>
+      </div> -->
       <div class="item ml-24px">
         <span>{{ $t('24Volume') }}</span>
         <span class="block mt-8px color-[--main-text]"
@@ -1096,6 +1096,25 @@ const marketCap = computed(() => {
 })
 
 const volume24 = computed(() => {
+  const isSupportTokenKlineLaunchpad = SupportTokenKlineLaunchpad?.includes?.(
+    chain.value + '-' + (tokenStore?.token?.launchpad || '')
+  )
+  const isTokenKline =
+    (SupportTokenKlineChains?.includes?.(chain.value) ||
+      isSupportTokenKlineLaunchpad) &&
+    'tokenAllPair' in tokenStore &&
+    tokenStore?.tokenAllPair &&
+    tokenStore?.selectedToken
+  if (isTokenKline) {
+    const pairs = tokenStore?.pairs || []
+    if (pairs?.length > 0) {
+      const total_volume_24 = pairs?.reduce((sum, item) => {
+        return sum + (item.volume_u || 0)
+      }, 0)
+      return total_volume_24 || tokenStore.tokenInfoExtra?.volume_24 || 0
+    }
+    return tokenStore.tokenInfoExtra?.volume_24 || 0
+  }
   return tokenStore.pair?.volume_u || tokenStore.tokenInfoExtra?.volume_24 || 0
 })
 const tokenInfoExtra= computed(()=>{

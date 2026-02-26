@@ -76,6 +76,7 @@ import { BelowChartTable } from './components/belowChartTable'
 import KLine from '~/pages/token/components/kLine/index.vue'
 import { OrderBook } from './components/orderBook'
 import { getAiSummary } from '@/api/token'
+import { SupportTokenKlineLaunchpad } from '~/utils/constants'
 
 definePageMeta({
   name: 'token-id',
@@ -258,6 +259,11 @@ function _getTokenInfo() {
     .then((res) => {
       tokenStore.tokenInfo = res
       tokenStore.pairAddress = res?.pairs?.[0].pair || ''
+      const isSupportTokenKlineLaunchpad = SupportTokenKlineLaunchpad?.includes?.(res?.token.chain + '-' + (res?.token?.launchpad || ''))
+      const isTokenKline = (SupportTokenKlineChains?.includes?.(res?.token.chain || '') || isSupportTokenKlineLaunchpad)
+      if (isTokenKline) {
+        tokenStore.selectedToken = true
+      }
     })
     .finally(() => {
       tokenStore.loadingToken = false
@@ -304,6 +310,7 @@ function visibilitychangeFn() {
 }
 
 onBeforeMount(() => {
+  tokenStore.pairAddress = ''
   init()
   subscribePortrait()
   document.addEventListener('visibilitychange', visibilitychangeFn)
