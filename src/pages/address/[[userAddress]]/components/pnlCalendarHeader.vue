@@ -23,15 +23,15 @@
         </span>
       </div>
 
-      <div class="flex items-center gap-4px p-2px bg-[--main-input-button-bg] rounded-4px">
+      <div class="flex items-center gap-6px p-2px bg-[--main-input-button-bg] rounded-4px">
         <Icon
-          class="cursor-pointer text-14px"
-          :class="isChartView ? 'color-[--main-text]' : 'color-[--third-text]'"
+          class="cursor-pointer text-14px p-2px rounded-3px"
+          :class="isChartView ? 'color-[--main-text] bg-[--secondary-bg]' : 'color-[--third-text]'"
           name="custom:chart"
           @click="isChartView = !isChartView"
         />
         <Icon
-          class="cursor-pointer text-14px color-[--third-text]"
+          class="cursor-pointer text-14px color-[--third-text] p-2px"
           name="ic:outline-share"
           @click="emit('share')"
         />
@@ -83,6 +83,7 @@ const monthValue = computed({
 
 :deep(.pnl-month-input .el-input__inner) {
   font-size: 12px;
+  font-weight: 500;
   color: var(--main-text);
   cursor: pointer;
 }

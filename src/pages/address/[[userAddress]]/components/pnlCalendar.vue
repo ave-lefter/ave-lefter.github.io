@@ -51,7 +51,7 @@
       :formatterTooltip="formatterTooltip"
     />
 
-    <el-dialog v-model="shareDialogVisible" width="520px" append-to-body destroy-on-close>
+    <el-dialog v-model="shareDialogVisible" width="560px" append-to-body destroy-on-close>
       <template #header>
         <div class="text-14px lh-20px color-[--main-text]">{{ t('pnlCalendar') }}</div>
       </template>
@@ -61,7 +61,7 @@
       </div>
 
       <div class="flex justify-end mt-12px">
-        <el-button type="primary" @click="copySharePoster">复制图片</el-button>
+        <el-button type="primary" class="min-w-92px" @click="copySharePoster">复制图片</el-button>
       </div>
     </el-dialog>
 
