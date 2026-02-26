@@ -92,6 +92,10 @@ const props = defineProps({
   onlyTitle: {
     type: Boolean,
     default: false
+  },
+  total: {
+    type: Number,
+    default: 0
   }
 })
 
@@ -113,7 +117,7 @@ const virtualizer = useVirtualizer(
 )
 const virtualItems = computed(() => virtualizer.value.getVirtualItems())
 const totalSize = computed(() => virtualizer.value.getTotalSize())
-const isEmpty = computed(() => props.dataSource.length === 0)
+const isEmpty = computed(() => props.total === 0)
 
 const getItem = (virtualRow) => {
   return props.dataSource[virtualRow.index] || {}

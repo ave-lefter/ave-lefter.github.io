@@ -95,7 +95,7 @@
         </div>
         <el-checkbox class="[--el-checkbox-height:14px]"  v-model="onlyTitle" :label="t('onlyTitle')"/>
       </div>
-     <NewsList v-if="shouldRenderChild" :dataSource="dataSource2" @endReached="debouncedGetList2" :onlyTitle="onlyTitle"  @stop="val => isPaused2 = val"/>
+     <NewsList v-if="shouldRenderChild" :total="total2" :dataSource="dataSource2" @endReached="debouncedGetList2" :onlyTitle="onlyTitle"  @stop="val => isPaused2 = val"/>
     </template>
     <div v-else>null</div>
     <AudioPopover v-if="audioButtonRef" :buttonRef="audioButtonRef" type="twitter"/>
@@ -137,7 +137,7 @@ const audioButtonRef2 = ref()
 const twitterAudio = useTemplateRef('twitterAudio')
 const followIds = useStorage('twFollowIds', [])
 
-const {dataSource: dataSource2, getList:getList2} = useNews({newsAudio,activeParentTab,isPaused:isPaused2})
+const {dataSource: dataSource2, getList:getList2,total:total2} = useNews({newsAudio,activeParentTab,isPaused:isPaused2})
 const query = ref({ ...trackerStore.query })
 // defineProps({
 //   scrollHeight: {
