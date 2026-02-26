@@ -38,3 +38,36 @@ export function _getDevInfo(token_id: string): Promise<{
     }
   })
 }
+
+//同车代币
+export interface HolderRankItem {
+  amount: string
+  balance_radio: string
+  balance_usd: string
+  chain: string
+  is_wallet_address_fav: number
+  remark: string
+  tag_type: number
+  wallet_address: string
+  wallet_logo: string
+}
+export function _getHolderRank(params: {
+  token_id: string
+  self_address?: string
+  tag_type?: number
+}): Promise<{
+  items: HolderRankItem[]
+}> {
+  const { token_id, self_address, tag_type } = params
+  const { $api } = useNuxtApp()
+
+  return $api('/v2api/token_info/v1/token/holders/rank', {
+    method: 'get',
+    query: {
+      limit: 100,
+      token_id,
+      self_address,
+      tag_type,
+    },
+  })
+}

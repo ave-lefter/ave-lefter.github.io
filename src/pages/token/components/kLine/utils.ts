@@ -1513,7 +1513,7 @@ export function useKOLAvgPriceLine(getWidget: () => IChartingLibraryWidget | nul
             lineId: '' as EntityId
           }
           return acc
-        }, avePriceMap)
+        }, avePriceMap) || {}
       createAvgPriceLinePoll()
     }).catch((err) => {
       console.log(err)
@@ -1527,7 +1527,6 @@ export function useKOLAvgPriceLine(getWidget: () => IChartingLibraryWidget | nul
     const chart = _widget?.activeChart?.()
     if (!chart) return
     if (!avePriceMap) return
-
     Object.values(avePriceMap).forEach(item => {
       if (item.lineId) {
         chart?.removeEntity?.(item.lineId)

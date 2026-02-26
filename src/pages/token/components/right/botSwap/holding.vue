@@ -15,7 +15,7 @@
     <div class="flex-1">
       <div class="text-11px color-[--third-text] flex items-center justify-center">
         <span>{{ $t('profit2') }}</span>
-        <Icon name="custom:price" class="text-11px clickable ml-5px" :class="[isShowB ? 'color-[--third-text]' : 'color-[--secondary-text]']" @click.stop="isShowB=!isShowB" />
+        <Icon name="custom:price" class="text-11px clickable ml-5px" :class="[isShowB ? 'color-[--third-text]' : 'color-[--secondary-text]']" @click.stop="isShowB=!isShowB" @mousedown.stop @mouseup.stop />
       </div>
       <div class="text-12px mt-5px" :class="[Number(walletTokenInfo?.total_profit || 0) > 0 ? 'color-#12B886' : 'color-#F6465D']">
         <template v-if="!isShowB">

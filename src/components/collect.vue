@@ -96,6 +96,7 @@ function changeActiveGroupId(groupId:number) {
             <Icon
                 name="custom:star"
                 :class="`${iconClass} ${isCollected ? 'color-[--yellow]' : 'color-[--icon-color]'}`"
+                @click.stop
             />
         </template>
         <template #default>

@@ -152,7 +152,7 @@
         </div>
       </div>
     </el-popover>
-    <el-popover :persistent="false" trigger="click" placement="bottom-end">
+    <el-popover :persistent="false" trigger="click" placement="bottom-end" :popper-style="{minWidth: '248px',width: 'auto'}">
       <template #reference>
         <div
           class="bg-[--main-input-button-bg] rounded-4px p-8px px-10px ml-8px h-32px flex items-center cursor-pointer hover:opacity-80"
@@ -164,46 +164,88 @@
         </div>
       </template>
       <template #default>
-        <div class="flex items-center justify-between mb-16px cursor-pointer" @click="globalStore.audioSettings.active = 'notice'">
-         <div class="flex items-center gap-8px">
-          <Icon name="custom:alert" class="text-16px"/>
-          {{ $t('pushSettings') }}
-         </div>
-          <Icon name="ep:arrow-right"/>
-        </div>
-        <el-dropdown
-:persistent="false"
-          trigger="click"
-          popper-class="dropdown-lang"
-          class="w-full"
-          @command="langStore.setLanguage"
-        >
-          <div class="flex flex-1 items-center justify-between mb-16px cursor-pointer">
-              <div class="flex items-center gap-8px">
-                <Icon name="material-symbols:language" class="text-16px"/>
-                {{locales.find(i=>i.code === langStore.locale)?.name}}
-              </div>
-              <Icon name="ep:arrow-right"/>
-            </div>
-          <template #dropdown>
-            <el-dropdown-menu>
-              <el-dropdown-item
-                v-for="(item, $index) in locales"
-                :key="$index"
-                :command="item?.code"
-                :class="{ active: langStore.locale == item.code }"
-              >
-                {{ item?.name }}
-              </el-dropdown-item>
-            </el-dropdown-menu>
-          </template>
-        </el-dropdown>
-        <div class="flex items-center justify-between cursor-pointer" @click="botTipDialogRef && botTipDialogRef?.openBotTipDialog()">
-          <div class="flex items-center gap-8px">
-            <Icon name="custom:rockets" class="text-16px"/>
-          {{ $t('newFeature') }}
+        <div class="flex flex-col">
+          <div class="flex items-center justify-between mb-16px cursor-pointer" @click="globalStore.audioSettings.active = 'notice'">
+           <div class="flex items-center gap-8px">
+            <Icon name="custom:alert" class="text-16px"/>
+            {{ $t('pushSettings') }}
+           </div>
+            <Icon name="ep:arrow-right"/>
           </div>
-          <Icon name="ep:arrow-right"/>
+          <el-dropdown
+  :persistent="false"
+            trigger="click"
+            popper-class="dropdown-lang"
+            placement="bottom-end"
+            class="w-auto"
+            @command="langStore.setLanguage"
+          >
+            <div class="flex flex-1 items-center justify-between mb-16px cursor-pointer relative">
+                <div class="flex items-center gap-8px ">
+                  <Icon name="material-symbols:language" class="text-16px"/>
+                  <span class="mt--2px">{{locales.find(i=>i.code === langStore.locale)?.name}}</span>
+                </div>
+                <Icon name="ep:arrow-right"/>
+              </div>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item
+                  v-for="(item, $index) in locales"
+                  :key="$index"
+                  :command="item?.code"
+                  :class="{ active: langStore.locale == item.code }"
+                >
+                  {{ item?.name }}
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
+          <el-dropdown
+  :persistent="false"
+            trigger="click"
+            placement="bottom-end"
+            popper-class="dropdown-lang"
+            class="w-auto"
+            @command="key=>globalStore.zone=key"
+          >
+            <div class="flex flex-1 items-center justify-between mb-16px cursor-pointer  gap-24px">
+                <div class="flex items-center gap-8px">
+                  <Icon name="custom:locale" class="text-16px"/>
+                  <span class="mt--2px flex items-center gap-2px">
+                    {{ $t('priceChangeZoonSetting') }}
+                    <el-tooltip
+                      placement="bottom-start"  :persistent="false"
+                    >
+                      <template #content> <div v-html="$t('priceChangeZoonSettingTip')" class="max-w-224px"></div></template>
+                      <Icon name="ri:error-warning-line" class='rotate-180 text-16px text-[--third-text]' />
+                    </el-tooltip>
+                  </span>
+                </div>
+                <div class="flex gap-4px items-center">
+                  <span class="font-400 text-12px text-[--third-text]">{{zoonName}}</span>
+                  <Icon name="ep:arrow-right"/>
+                </div>
+            </div>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item
+                  v-for="(item, $index) in globalStore.zoneList"
+                  :key="$index"
+                  :command="item?.key"
+                  :class="{ active: globalStore.zone== item.key }"
+                >
+                  {{ item?.value }}
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
+          <div class="flex items-center justify-between cursor-pointer" @click="botTipDialogRef && botTipDialogRef?.openBotTipDialog()">
+            <div class="flex items-center gap-8px">
+              <Icon name="custom:rockets" class="text-16px"/>
+            {{ $t('newFeature') }}
+            </div>
+            <Icon name="ep:arrow-right"/>
+          </div>
         </div>
       </template>
     </el-popover>
@@ -301,6 +343,10 @@ const openPasteText = useStorage('openPasteText', false, localStorage)
 
 const routeName = computed(() => {
   return (route.name || '') as string
+})
+
+const zoonName= computed(() => {
+  return globalStore.zoneList.find(i=>i.key === globalStore.zone)?.value
 })
 
 const list = computed(() => {

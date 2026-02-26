@@ -1464,5 +1464,10 @@
   "monitored1": "지갑 활동",
   "availableLiquidity": "사용 가능한 유동성",
   "googleAuthNotBoundTip": "Google 인증기가 바인드되지 않았습니다. 계정 보호를 위해 지갑 주소를 삭제하기 전에 Google 인증기를 바인드하십시오.",
-  "goToBind": "바인드하러 가기"
+  "goToBind": "바인드하러 가기",
+  "past24h": "지난 24시간 동안",
+  "priceChangeZoonSetting": "가격 변동 시간대 설정",
+  "group": "그룹",
+  "manage": "관리하다",
+  "priceChangeZoonSettingTip": "<div>24시간제: 어제 같은 시간의 가격과 비교하여 24시간 단위로 가격 증가 또는 감소를 계산합니다.<br/>\n0:00 (UTC 8 00:00): 가격 인상 또는 감소는 베이징 시간 0:00의 시가를 기준으로 계산됩니다.</div>"
 }
