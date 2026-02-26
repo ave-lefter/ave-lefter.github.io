@@ -7,6 +7,7 @@ export default function useNews(props:{newsAudio:any,activeParentTab:any,isPause
   const dataSource=shallowRef([] as Array<any>)
   let Timer:null|ReturnType<typeof setTimeout>=null
   let originDataSource:Array<any>=[]
+  let firstId=''
   let needUpdate = false
   const paginationParams= shallowRef({pageNO: 1,pageSize: 15})
 
@@ -43,6 +44,7 @@ export default function useNews(props:{newsAudio:any,activeParentTab:any,isPause
       Timer=setInterval(() => {
         getList(true)
       },5*1000*60)
+      // },5*1000)
     }
   })
   onUnmounted(() => {
@@ -116,11 +118,12 @@ export default function useNews(props:{newsAudio:any,activeParentTab:any,isPause
             }
           }).sort((a,b) => b.created_at - a.created_at)
         if(needCheck){
-          if(originDataSource?.[0]?.id && formatList?.[0]?.id !== originDataSource?.[0]?.id){
+          if(firstId && formatList?.[0]?.id !== firstId){
             play()
             if(props.isPaused.value || (props.activeParentTab.value!==2)){
               needUpdate = true
             }else{
+              needUpdate = false
               originDataSource= [...formatList]
               dataSource.value=groupByDay(originDataSource)
               trackerStore.finished2 = list?.length < paginationParams.value.pageSize
@@ -130,10 +133,12 @@ export default function useNews(props:{newsAudio:any,activeParentTab:any,isPause
               }
             }
           }
+          firstId = formatList?.[0]?.id
         }else{
           if(paginationParams.value.pageNO === 1){
             originDataSource= [...formatList]
             dataSource.value=groupByDay(originDataSource)
+            firstId= formatList?.[0]?.id
           }else{
             originDataSource.push(...formatList)
             dataSource.value=groupByDay(Array.from(new Set(originDataSource.map(item => item.id)))
@@ -151,6 +156,7 @@ export default function useNews(props:{newsAudio:any,activeParentTab:any,isPause
         }
         trackerStore.finished2 = true
       }
+      console.log('trackerStore.finished2', needUpdate)
       // trackerStore.finished2 = list.length < 10
     } catch (error) {
       console.error('Error fetching Twitter2 tracker list:', error)

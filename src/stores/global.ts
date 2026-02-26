@@ -232,7 +232,7 @@ export const useGlobalStore = defineStore('global', () => {
       limit:'',
       volume:50,
       twitter:'',
-      news:'Message'
+      news:'Bong'
     }
   })
 
