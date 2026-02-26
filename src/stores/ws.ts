@@ -94,6 +94,7 @@ export const useWSStore = defineStore('ws', () => {
         useTokenStore().onSwitchMainPairV2(data)
       } else if (event === WSEventType.PUBLIC_PORTRAIT) {
         usePublicPortraitStore().updatePublicPortrait(data?.msg || [])
+        wsResult[event] = data?.msg || []
       }  else {
         wsResult[event] = data
       }

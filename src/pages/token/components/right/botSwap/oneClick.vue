@@ -118,7 +118,7 @@ import { useLocalStorage, useEventListener } from '@vueuse/core'
 import { ElNotification } from 'element-plus'
 import BigNumber from 'bignumber.js'
 import { NATIVE_TOKEN } from '@/utils/constants'
-import { formatBotGasTips } from '@/utils/bot'
+import { formatBotGasTips, hasCreateTxError, getCreateTxErrorMsg, handleBotError } from '@/utils/bot'
 import { useBotSwap } from '~/composables/botSwap'
 import { bot_createSolTx, bot_createSwapEvmTx, bot_createSwapTonTx } from '@/api/bot'
 import RefreshBalance from './refreshBalance.vue'
@@ -458,6 +458,18 @@ async function submitBotSwap(amount1: string | number, type: 'buy' | 'sell', ind
     }
     bot_createSwapEvmTx(data).then(res => {
       if (res) {
+        const txInfo: any = res?.[0] || {}
+        if (hasCreateTxError(txInfo)) {
+          const walletName = botStore.walletList?.find?.(j => j?.evmAddress?.toLowerCase?.() === txInfo?.creatorAddress?.toLowerCase?.())?.name || ''
+          handleBotError(walletName ? walletName + ' ' + getCreateTxErrorMsg(txInfo) : getCreateTxErrorMsg(txInfo))
+          finishPromptFail()
+          if (isBuy) {
+            loadingSwapBuy.value[index] = false
+          } else {
+            loadingSwapSell.value[index] = false
+          }
+          return
+        }
         let Timer: null | ReturnType<typeof setTimeout> = setTimeout(() => {
           // this.$store.state.bot.historyUpdate++
           // ElNotification({ type: 'success', message: t('transactionsSubmitted') })
@@ -471,7 +483,6 @@ async function submitBotSwap(amount1: string | number, type: 'buy' | 'sell', ind
           }
           // this.dialogVisibleSwap = false
         }, 500)
-        const txInfo: any = res?.[0] || {}
         recordTxV2({
           txInfo,
           chain: chain,

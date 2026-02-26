@@ -4,7 +4,7 @@ import {getUserBalance, type GetUserBalanceResponse} from '~/api/swap'
 import type {IAssetResponse, IPriceV2Response} from '~/api/types/ws'
 import {bot_createSolTx, bot_createSwapEvmTx, bot_createSwapTonTx, bot_getTokenBalance} from '~/api/bot'
 import {ElNotification} from 'element-plus'
-import {formatBotGasTips} from '~/utils/bot'
+import {formatBotGasTips, hasCreateTxError, getCreateTxErrorMsg, handleBotError} from '~/utils/bot'
 import BigNumber from 'bignumber.js'
 import {useDebounceFn, useThrottleFn} from '@vueuse/core'
 import {useWalletStore} from '~/stores/wallet'
@@ -472,13 +472,18 @@ async function submitSwap(balance: number, row: GetUserBalanceResponse & { index
 
 function handleTxSuccess(res: any, _batchId: string, tokenId: string, row: GetUserBalanceResponse) {
   if (res) {
+    const chain = row?.chain || ''
+    const txInfo: any = res?.[0] || {}
+    if (hasCreateTxError(txInfo)) {
+      handleBotError(getCreateTxErrorMsg(txInfo))
+      loadingSwap.value[tokenId] = false
+      return
+    }
     let Timer: null | ReturnType<typeof setTimeout> = setTimeout(() => {
       // ElNotification({type: 'success', message: t('transactionsSubmitted')})
       tokenStore.placeOrderUpdate++
       loadingSwap.value[tokenId] = false
     }, 500)
-    const chain = row?.chain || ''
-    const txInfo: any = res?.[0] || {}
 
     const recordTxUrlObj = {
       solana: '/botapi/swap/createSolTx',

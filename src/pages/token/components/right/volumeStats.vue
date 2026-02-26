@@ -1,5 +1,5 @@
 <template>
-  <div class="flex items-center justify-between text-12px mt-10px rounded-4px">
+  <div class="flex items-center justify-between text-12px mt-4px rounded-4px">
     <div>
       <div class="color-[--third-text]">{{ tabActiveName }} {{ $t('vol') }}</div>
       <div class="color-[--main-text] mt-5px">

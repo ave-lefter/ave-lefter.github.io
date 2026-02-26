@@ -617,5 +617,10 @@
   "clickWalletAddress": "Cüzdan adresine tıkla",
   "rightClickWalletAddress": "Cüzdan adresine sağ tıkla",
   "openInNewTab": "Yeni sekmede aç",
-  "invalidTransactions": "Geçersiz işlemler"
+  "invalidTransactions": "Geçersiz işlemler",
+  "past24h": "Son 24 saat içinde",
+  "priceChangeZoonSetting": "Fiyat Değişimi Saat Dilimi Ayarı",
+  "group": "Grup",
+  "manage": "Üstesinden gelmek",
+  "priceChangeZoonSettingTip": "<div>24 saatlik biçim: Fiyat artışı veya düşüşü, dünün aynı saatindeki fiyatla karşılaştırıldığında 24 saatlik yuvarlanma esasına göre hesaplanır<br/>\n0:00 (UTC 8 00:00): Fiyat artışı veya düşüşü Pekin saatiyle 00:00'daki açılış fiyatına göre hesaplanır</div>"
 }
