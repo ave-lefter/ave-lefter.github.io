@@ -121,7 +121,8 @@ export const usePumpStore = defineStore('pumpStore', () => {
   }
 
   function getPumpConfig() {
-    _getPumpConfig().then((res) => {
+    return _getPumpConfig().then((res) => {
+      console.log('----set----',res)
       pumpConfig.value = res || []
       pumpConfig.value.forEach(i => {
         if (!pumpV3.value[i.chain]?.platforms?.length) {
@@ -271,7 +272,7 @@ export const usePumpStore = defineStore('pumpStore', () => {
     },
     localStorage
   )
-  console.log('pumpV3',pumpV3.value)
+  
   const activeChain = useStorage<ChainKey>(
     'pump_activeChain',
     'bsc',
@@ -362,6 +363,6 @@ export const usePumpStore = defineStore('pumpStore', () => {
     pump_notice,
     shouldHide,
     pumpV3,
-    pumpFilterDefault
+    pumpFilterDefault:ref(pumpFilterDefault)
   }
 })

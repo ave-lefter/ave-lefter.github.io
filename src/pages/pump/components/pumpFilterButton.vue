@@ -3,18 +3,15 @@
     <Icon id="custom-filter" name="custom:filter" class="text-10px cursor-pointer"
       :class="!hideReferenceText ? 'mr-3px' : ''" />
     <span v-if="!hideReferenceText">{{ $t('filter') }}</span>
-    <span v-if="filterNumber > 0" class="filter-number">{{ filterNumber }}</span>
+    <span v-if="props.filterNumber > 0" class="filter-number">{{ props.filterNumber }}</span>
   </div>
 </template>
 
 <script setup lang="ts">
-import { usePumpTableDataFetching } from '@/utils/index.js'
-import { getFilterNumber } from '../utils'
-
 const props = defineProps({
-  storage: {
-    type: String,
-    default: 'pumpFilter_bsc_new'
+  filterNumber: {
+    type: Number,
+    default: 0
   },
   hideReferenceText: {
     type: Boolean
@@ -26,12 +23,6 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update:visible'])
-
-const tableFilter = usePumpTableDataFetching(props.storage)
-
-const filterNumber = computed(() => {
-  return getFilterNumber(tableFilter.value)
-})
 
 function handleClick() {
   emit('update:visible', true)

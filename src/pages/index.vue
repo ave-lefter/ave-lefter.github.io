@@ -149,7 +149,7 @@
             <AudioSelect activeTab="new" :chain="activeChain"/>
             <PumpFilterButton
               :key="`pumpFilterButton_${activeChain}_new`"
-              :storage="`pumpFilter_${activeChain}_new`"
+              :filterNumber="getFilterNumber(pumpStore.pumpV3[activeChain].new.pumpFilter || {})"
               :visible="filterVisible && activeFilterType === 'new'"
               @update:visible="(val) => handleFilterVisibleChange(val, 'new')"
             />
@@ -219,7 +219,7 @@
             <AudioSelect activeTab="soon" :chain="activeChain"/>
             <PumpFilterButton
               :key="`pumpFilterButton_${activeChain}_soon`"
-              :storage="`pumpFilter_${activeChain}_soon`"
+               :filterNumber="getFilterNumber(pumpStore.pumpV3[activeChain].soon.pumpFilter || {})"
               :visible="filterVisible && activeFilterType === 'soon'"
               @update:visible="(val) => handleFilterVisibleChange(val, 'soon')"
             />
@@ -290,7 +290,7 @@
             <AudioSelect activeTab="graduated" :chain="activeChain"/>
             <PumpFilterButton
               :key="`pumpFilterButton_${activeChain}_graduated`"
-              :storage="`pumpFilter_${activeChain}_graduated`"
+               :filterNumber="getFilterNumber(pumpStore.pumpV3[activeChain].graduated.pumpFilter || {})"
               :visible="filterVisible && activeFilterType === 'graduated'"
               @update:visible="(val) => handleFilterVisibleChange(val, 'graduated')"
             />
@@ -312,7 +312,6 @@
 
     <!-- 统一的 Filter 对话框 -->
     <PumpFilter
-      :key="`pumpFilter_${activeChain}_${activeFilterType}`"
       v-model:visible="filterVisible"
       :activeChain="activeChain"
       :activeFilterType="activeFilterType"
@@ -344,9 +343,9 @@ import type {
   CategoryKey,
   WSPumpObj
 } from '@/api/types/pump'
-import { isEqual, throttle } from 'lodash-es'
 import AutoSellSetting from '@/components/autoSellSetting/index.vue'
 import AudioSelect from './pump/components/audioSelect.vue'
+import { getFilterNumber } from './pump/utils'
 defineOptions({
   name: 'pump' // 显式命名
 })
@@ -366,6 +365,7 @@ const activeTab = shallowRef('new')
 const route = useRoute()
 const { t } = useI18n()
 const wsv2Store = useV2WSStore()
+const pumpStore = usePumpStore()
 let isInitObj = {
   new: true,
   soon: true,
@@ -525,7 +525,7 @@ const list1 = computed(() => {
     )
   }
   const list1 = (wsTableList.value || [])?.filter(i => i.state === 'new' && i.chain === activeChain.value)
-  const pumpFilter = localStorage.getItem(`pumpFilter_${activeChain.value}_new`)
+  const pumpFilter = pumpStore.pumpV3[activeChain.value].new.pumpFilter
   const wsList = getFilterData(list1, pumpFilter)
   const wsList1 = wsList?.filter((i: { pair: string }) => !list?.some(j => j.pair === i.pair))
   let filterList = [...wsList1, ...list].map(i => {
@@ -596,7 +596,7 @@ const list2 = computed(() => {
     )
   }
   const list1 = (wsTableList.value || [])?.filter(i => (i.state === 'migrating') && i.chain === activeChain.value)
-  const pumpFilter = localStorage.getItem(`pumpFilter_${activeChain.value}_soon`)
+  const pumpFilter = pumpStore.pumpV3[activeChain.value].soon.pumpFilter
   const wsList = getFilterData(list1, pumpFilter)
   const wsList1 = wsList?.filter((i: { pair: string }) => !list?.some(j => j.pair === i.pair))
   let filterList = [...wsList1, ...list].map(i => {
@@ -675,7 +675,7 @@ if (pumpSetting.value.isBlacklist && pumpBlackList.value?.length > 0) {
   )
 }
   const list1 = (wsTableList.value || [])?.filter(i => i.state === 'migrated' && i.chain === activeChain.value)
-  const pumpFilter = localStorage.getItem(`pumpFilter_${activeChain.value}_graduated`)
+  const pumpFilter = pumpStore.pumpV3[activeChain.value].graduated.pumpFilter
   const wsList = getFilterData(list1, pumpFilter)
   const wsList1 = wsList?.filter((i: { pair: string }) => !list?.some(j => j.pair === i.pair))
   let filterList = [...wsList1, ...list].map(i => {
@@ -1181,17 +1181,17 @@ function getPumpConfig() {
           new: {
             count: 0,
             loading: false,
-            pumpFilter: pumpFilterDefault,
+            pumpFilter: pumpFilterDefault.value,
           },
           soon: {
             count: 0,
             loading: false,
-            pumpFilter: pumpFilterDefault,
+            pumpFilter: pumpFilterDefault.value,
           },
           graduated: {
             count: 0,
             loading: false,
-            pumpFilter: pumpFilterDefault,
+            pumpFilter: pumpFilterDefault.value,
           },
         }
       }
@@ -1258,23 +1258,23 @@ function single(type: string) {
   }
 }
 function getPumpList(isFilter = false) {
-  const new1 = localStorage.getItem(`pumpFilter_${activeChain.value}_new`)
-  const soon = localStorage.getItem(`pumpFilter_${activeChain.value}_soon`)
-  const graduated = localStorage.getItem(`pumpFilter_${activeChain.value}_graduated`)
+  const new1 = pumpStore.pumpV3[activeChain.value].new.pumpFilter
+  const soon = pumpStore.pumpV3[activeChain.value].soon.pumpFilter
+  const graduated = pumpStore.pumpV3[activeChain.value].graduated.pumpFilter
   const params1 = {
     category: 'new',
-    ...(new1 ? JSON.parse(new1) : ''),
+    ...(new1 ?? ''),
   }
   getPump(params1, isFilter)
   const params2 = {
     category: 'soon',
-    ...(soon ? JSON.parse(soon) : ''),
+    ...(soon ?? ''),
   }
 
   getPump(params2, isFilter)
   const params3 = {
     category: 'graduated',
-    ...(graduated ? JSON.parse(graduated): ''),
+    ...(graduated ?? ''),
   }
   getPump(params3, isFilter)
 }
@@ -1327,7 +1327,7 @@ async function getPump(rawParams: {
 
   // 4. Loading 状态处理
   const state = pumpV3.value[currentChain]?.[category]
-  if (state.loading) return
+  if (state?.loading) return
   if (state?.count === 0) state.loading = true
 
 
@@ -1392,7 +1392,7 @@ function parseDate(dateStr?: string | number, toSeconds = false) {
   return toSeconds ? ms / 1000 : ms
 }
 function getFilterData(list: PumpObj[], conditions: any) {
-  conditions = JSON.parse(conditions) || {}
+  conditions = conditions || {}
   return list?.filter((i) => {
     let pass = true
     if (conditions?.q) {

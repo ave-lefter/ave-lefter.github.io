@@ -174,7 +174,7 @@
 
 <script setup lang="ts">
 import { handleError } from 'vue'
-import { usePumpTableDataFetching, _isArray, _isString } from '@/utils/index.js'
+import { _isArray, _isString } from '@/utils/index.js'
 import { getFilterNumber } from '../utils'
 import { isEqual } from 'lodash-es'
 
@@ -331,7 +331,7 @@ const localVisible = computed({
 const formRef = ref()
 type FormType = typeof initForm
 const form = ref<FormType>(initForm)
-let tableFilter = usePumpTableDataFetching(storage.value)
+let tableFilter = pumpStore.pumpV3[props.activeChain][props.activeFilterType]?.pumpFilter
 
 const tabs2Active = ref('indicator')
 const Tabs2Enum = {
@@ -359,19 +359,19 @@ const indicatorArr = computed(() => {
 const setCheckedPlatforms = () => {
    const platformsAll = props.platformsList.map((i: any) => i.platform).join(',')
     let platforms = platformsAll
-    if (tableFilter?.value?.platforms) {
-      let platformsArr = tableFilter?.value?.platforms?.split?.(',')
+    if (tableFilter?.platforms) {
+      let platformsArr = tableFilter?.platforms?.split?.(',')
       platformsArr = platformsArr.filter(el => {
         return props.platformsList.some((i: any) => i.platform === el)
       })
       platforms = platformsArr.join(',')
     }
-    form.value = { ...tableFilter.value, platforms: platforms }
+    form.value = { ...tableFilter, platforms: platforms }
 }
 watch(() => props.platformsList, (val, oldValue) => {
   if (isEqual(val, oldValue)) return
   setCheckedPlatforms()
-   emit('update:filterData', { ...form.value }, storage.value)
+  emit('update:filterData', { ...form.value }, storage.value)
 })
 watch(() => props.visible, (val) => {
   if (val) {
@@ -379,7 +379,7 @@ watch(() => props.visible, (val) => {
   }
 })
 watch(activeTab,()=>{
- tableFilter = usePumpTableDataFetching(storage.value)
+ tableFilter = pumpStore.pumpV3[props.activeChain][props.activeFilterType]?.pumpFilter
   setCheckedPlatforms()
 })
 // watch(() => storage.value, (val) => {
@@ -568,7 +568,7 @@ function handleConfirm() {
   formRef.value?.validate((valid: boolean) => {
     if (valid) {
       const form1 = { ...form.value }
-      tableFilter.value = { ...form1 }
+      tableFilter = { ...form1 }
       console.log('----------form1-------------', form1)
       emit('update:filterData', { ...form1 }, storage.value)
     } else {
@@ -584,7 +584,7 @@ function reset() {
     formRef.value.resetFields()  // 重置表单字段
   }
   const form = { ...initForm }
-  tableFilter.value = { ...form }  // 更新过滤器数据
+  tableFilter = { ...form }  // 更新过滤器数据
   // 触发更新事件
   emit('update:filterData', { ...form }, storage.value)
 }
@@ -647,8 +647,7 @@ const isArray = _isArray
 const isString = _isString
 const getItemFilterNumber = value => {
   if (value === activeTab.value) return getFilterNumber(form.value)
-  const itemStorage = localStorage.getItem(`pumpFilter_${props.activeChain}_${value}`)
-  return itemStorage ? getFilterNumber(JSON.parse(itemStorage)) : 0
+  return getFilterNumber(pumpStore.pumpV3[props.activeChain][props.activeFilterType]?.pumpFilter || {})
 }
 </script>
 
