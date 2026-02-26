@@ -3,89 +3,106 @@
     :class="{ 'pr-16px': trackerStore.isLeftFixed, 'pl-16px': trackerStore.isRightFixed }">
     <Icon name="custom:drag2" class="absolute top-4px left-50% ml--6px text-6px bg-[--dialog-list-hover] drag-handle" />
     <div class="flex items-center pb-14px border-b-1px border-b-solid border-b-[--border] mb-12px">
-      <div class="flex justify-between items-center">{{ t('twitterTracker') }}</div>
+      <div :class="`flex justify-between items-center mr-16px clickable ${activeParentTab===1?'color-[--main-text]':'color-[--secondary-text]'}`" @click="activeParentTab=1">{{ t('twitterTracker') }}</div>
+      <div :class="`flex justify-between items-center clickable ${activeParentTab===2?'color-[--main-text]':'color-[--secondary-text]'}`" @click="activeParentTab=2">{{ t('twitterTracker2') }}</div>
       <div class="flex-1 drag-handle h-20px" />
       <div class="flex items-center gap-12px">
-        <Icon v-if="botStore.evmAddress" name="custom:pump-setting"
+        <Icon v-if="botStore.evmAddress&&activeParentTab===1" name="custom:pump-setting"
           class="color-[--secondary-text] hover:color-[--main-text] cursor-pointer text-14px"
           @click="emits('setDrawerVisible', true)" />
         <Icon name="custom:close" class="text-14px shrink-0 cursor-pointer color-[--main-text]"
           @click="trackerStore.visible = false" />
       </div>
     </div>
-    <div class="flex justify-between mb-12px items-center">
-      <div class="flex items-center gap-16px">
-        <span v-for="el in tabs" :key="el.value" :class="[
-          'text-14px cursor-pointer',
-          activeTab === el.value ? 'color-[--main-text]' : 'color-[--secondary-text]',
-        ]" @click="setActiveTab(el.value)">
-          {{ el.label }}
-        </span>
-         <div class="flex items-center gap-8px color-[--secondary-text]">
-        <el-popover v-model:visible="filterVisible" placement="bottom-end" trigger="click" :width="164"
-          :persistent="false">
-          <template #reference>
-            <Icon name="custom:filter" class="text-12px cursor-pointer" />
-          </template>
-          <template #default>
-            <el-checkbox v-model="checkAll" :indeterminate="isIndeterminate" class="[--el-checkbox-height:16px] mb-12px"
-              @change="handleCheckAllChange">
-              {{ t('all') }}
-            </el-checkbox>
-            <el-checkbox-group v-model="query.types" class="flex flex-col [--el-checkbox-height:16px] gap-12px"
-              @change="handleCheckedChange">
-              <!--mb-16px border-b-solid border-b-1px border-b-[--dialog-divider] -->
-              <el-checkbox v-for="option in checkboxOptions" :key="option.value" :value="option.value">
-                {{ option.label }}
-              </el-checkbox>
-            </el-checkbox-group>
-            <!-- <el-checkbox-group
-              v-model="query.types"
-              class="flex flex-col [--el-checkbox-height:16px] gap-12px"
-            >
-              <el-checkbox
-                v-for="option in fixedCheckboxOptions"
-                :key="option.value"
-                :value="option.value"
-              >
-                {{ option.label }}
-              </el-checkbox>
-            </el-checkbox-group> -->
-            <div class="pt-16px flex items-center">
-              <el-button class="min-w-0" @click="filterVisible = false">
-                {{ t('cancel') }}
-              </el-button>
-              <el-button class="min-w-0" type="primary" @click="confirmQuery">
-                {{ t('confirm') }}
-              </el-button>
-            </div>
-          </template>
-        </el-popover>
-        <Icon class="cursor-pointer" ref="audioButtonRef"
-              :name="globalStore.audioSettings.audio.twitter ? 'custom:ad' : 'custom:admute'" />
-        <Icon v-show="isPaused" name="custom:stop"/>
-
-        <!-- <el-dropdown :persistent="false" trigger="click">
-            <div class="w-24px h-24px bg-[--main-list-hover] flex items-center justify-center rounded-4px cursor-pointer"><Icon name="material-symbols:language"/></div>
-            <template #dropdown>
-              <el-dropdown-menu>
-                      <el-dropdown-item>Action 1</el-dropdown-item>
-                      <el-dropdown-item>Action 2</el-dropdown-item>
-              </el-dropdown-menu>
+    <template v-if="activeParentTab===1">  
+      <div class="flex justify-between mb-12px items-center">
+        <div class="flex items-center gap-16px">
+          <span v-for="el in tabs" :key="el.value" :class="[
+            'text-14px cursor-pointer',
+            activeTab === el.value ? 'color-[--main-text]' : 'color-[--secondary-text]',
+          ]" @click="setActiveTab(el.value)">
+            {{ el.label }}
+          </span>
+           <div class="flex items-center gap-8px color-[--secondary-text]">
+          <el-popover v-model:visible="filterVisible" placement="bottom-end" trigger="click" :width="164"
+            :persistent="false">
+            <template #reference>
+              <Icon name="custom:filter" class="text-12px cursor-pointer" />
             </template>
-        </el-dropdown> -->
+            <template #default>
+              <el-checkbox v-model="checkAll" :indeterminate="isIndeterminate" class="[--el-checkbox-height:16px] mb-12px"
+                @change="handleCheckAllChange">
+                {{ t('all') }}
+              </el-checkbox>
+              <el-checkbox-group v-model="query.types" class="flex flex-col [--el-checkbox-height:16px] gap-12px"
+                @change="handleCheckedChange">
+                <!--mb-16px border-b-solid border-b-1px border-b-[--dialog-divider] -->
+                <el-checkbox v-for="option in checkboxOptions" :key="option.value" :value="option.value">
+                  {{ option.label }}
+                </el-checkbox>
+              </el-checkbox-group>
+              <!-- <el-checkbox-group
+                v-model="query.types"
+                class="flex flex-col [--el-checkbox-height:16px] gap-12px"
+              >
+                <el-checkbox
+                  v-for="option in fixedCheckboxOptions"
+                  :key="option.value"
+                  :value="option.value"
+                >
+                  {{ option.label }}
+                </el-checkbox>
+              </el-checkbox-group> -->
+              <div class="pt-16px flex items-center">
+                <el-button class="min-w-0" @click="filterVisible = false">
+                  {{ t('cancel') }}
+                </el-button>
+                <el-button class="min-w-0" type="primary" @click="confirmQuery">
+                  {{ t('confirm') }}
+                </el-button>
+              </div>
+            </template>
+          </el-popover>
+          <Icon class="cursor-pointer" ref="audioButtonRef"
+                :name="globalStore.audioSettings.audio.twitter ? 'custom:ad' : 'custom:admute'" />
+          <Icon v-show="isPaused" name="custom:stop"/>
+          <!-- <el-dropdown :persistent="false" trigger="click">
+              <div class="w-24px h-24px bg-[--main-list-hover] flex items-center justify-center rounded-4px cursor-pointer"><Icon name="material-symbols:language"/></div>
+              <template #dropdown>
+                <el-dropdown-menu>
+                        <el-dropdown-item>Action 1</el-dropdown-item>
+                        <el-dropdown-item>Action 2</el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+          </el-dropdown> -->
+        </div>
+        </div>
+        <el-input v-model="query.token_keyword" style="--el-input-bg-color:var(--main-list-hover);--el-input-height:26px;"
+          class="w-160px" size="small" clearable :placeholder="t('searchCA')" @input="debouncedConfirmInput">
+          <template #prefix>
+            <Icon name="custom:search" />
+          </template>
+        </el-input>
       </div>
+      <TwitterTrackerList :isMine="isMine" @stop="val => isPaused = val" @endReached="debouncedGetList" @startAttention="emits('setDrawerVisible', true)" />
+    </template>
+    <template v-else-if="activeParentTab===2">
+      <div class="flex justify-between mb-12px items-center">
+        <div class="flex items-center gap-8px">
+          <Icon class="cursor-pointer color-[--secondary-text]" ref="audioButtonRef2"
+              :name="globalStore.audioSettings.audio.news ? 'custom:ad' : 'custom:admute'" />
+          <Icon v-show="isPaused2" name="custom:stop"/>
+        </div>
+        <el-checkbox class="[--el-checkbox-height:14px]"  v-model="onlyTitle" :label="t('onlyTitle')"/>
       </div>
-      <el-input v-model="query.token_keyword" style="--el-input-bg-color:var(--main-list-hover);--el-input-height:26px;"
-        class="w-160px" size="small" clearable :placeholder="t('searchCA')" @input="debouncedConfirmInput">
-        <template #prefix>
-          <Icon name="custom:search" />
-        </template>
-      </el-input>
-    </div>
+     <NewsList  :dataSource="dataSource2" @endReached="debouncedGetList2" :onlyTitle="onlyTitle"  @stop="val => isPaused2 = val"/>
+    </template>
+    <div v-else>null</div>
     <AudioPopover v-if="audioButtonRef" :buttonRef="audioButtonRef" type="twitter"/>
-    <TwitterTrackerList :isMine="isMine" @stop="val => isPaused = val" @endReached="debouncedGetList" @startAttention="emits('setDrawerVisible', true)" />
+    <AudioPopover v-if="audioButtonRef2" :buttonRef="audioButtonRef2" type="news"/>
     <audio ref="twitterAudio" controls style="display: none" :src="getAudioUrl(globalStore.audioSettings.audio.twitter)"
+      :volume="+globalStore.audioSettings.audio.volume / 100 || 0.5" />
+    <audio ref="newsAudio" controls style="display: none" :src="getAudioUrl(globalStore.audioSettings.audio.news)"
       :volume="+globalStore.audioSettings.audio.volume / 100 || 0.5" />
   </div>
 </template>
@@ -93,23 +110,33 @@
 <script setup name="trackerPop">
 import { useDebounceFn, useStorage } from '@vueuse/core'
 import TwitterTrackerList from './list.vue'
+import NewsList from './newsList.vue'
+import useNews from './useNews'
 import { getAllFollowIds, getTwitterList } from '~/api/twitter'
 import { useV2WSStore } from '~/stores/v2ws'
 import { useTrackerTypes } from './constants'
 const emits = defineEmits(['setDrawerVisible'])
 const { t } = useI18n()
+const newsAudio = useTemplateRef('newsAudio')
+
+
 const trackerStore = useTwitterTrackerStore()
 const v2WsStore = useV2WSStore()
 const globalStore = useGlobalStore()
 const botStore = useBotStore()
 const activeTab = ref(1)
+const activeParentTab = ref(1)
 const filterVisible = ref(false)
 const audioVisible = ref(false)
 const isPaused = ref(false)
+const isPaused2 = ref(false)
 const wsCacheArr = shallowRef([])
 const audioButtonRef = ref()
+const audioButtonRef2 = ref()
 const twitterAudio = useTemplateRef('twitterAudio')
 const followIds = useStorage('twFollowIds', [])
+
+const {dataSource: dataSource2, getList:getList2} = useNews({newsAudio,activeParentTab,isPaused:isPaused2})
 const query = ref({ ...trackerStore.query })
 // defineProps({
 //   scrollHeight: {
@@ -118,6 +145,9 @@ const query = ref({ ...trackerStore.query })
 //   },
 // })
 // const follow_only = ref(false)
+const onlyTitle = shallowRef(false)
+
+
 const TAB_TYPE = {
   HOT: 1,
   MINE: 2,
@@ -220,8 +250,11 @@ const getList = async () => {
 
 const debouncedGetList = useDebounceFn(getList, 100)
 
-getList()
+const debouncedGetList2 = useDebounceFn(getList2, 100)
 
+onMounted(() => {
+  getList()
+})
 const twitterHandler = async (val) => {
   if (query.value.types.includes(+val.type) && !query.value.token_keyword) {
     if (isMine.value && !followAuthorIds.value.includes(val.author?.author_id)) {
@@ -234,8 +267,7 @@ const twitterHandler = async (val) => {
       trackerStore.list[index] = val
       return
     }
-    
-    if(isPaused.value){
+    if(isPaused.value || activeParentTab.value !== 1) {
       wsCacheArr.value.unshift(val)
       wsCacheArr.value = wsCacheArr.value.slice(0,100)
     } else {
@@ -250,8 +282,8 @@ const twitterHandler = async (val) => {
   }
 }
 
-watch(() => isPaused.value, (val) => {
-  if (!val) {
+watch([() => isPaused.value, () => activeParentTab.value], ([val,val2]) => {
+  if (!val && val2 === 1) {
     trackerStore.list.unshift(...wsCacheArr.value)
     trackerStore.list = trackerStore.list.slice(0,100)
     wsCacheArr.value = []
