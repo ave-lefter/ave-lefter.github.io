@@ -1,37 +1,53 @@
 <template>
-  <div class="flex justify-between w-full mb-12px">
-    <div class="flex items-center gap-4px text-12px h-16px">
-      {{ date }}
-      <div class="flex items-center gap-2px p-2px bg-[--main-input-button-bg] rounded-2px">
+  <div class="flex justify-between w-full mb-12px items-center">
+    <div class="flex items-center gap-6px text-12px h-24px">
+      <el-date-picker
+        v-model="monthValue"
+        type="month"
+        value-format="YYYY-MM-DD"
+        :clearable="false"
+        :editable="false"
+        popper-class="pnl-month-picker"
+        class="pnl-month-input"
+      />
+      <Icon name="ri:arrow-down-s-line" class="color-[--third-text] text-14px" />
+    </div>
+
+    <div class="flex items-center gap-8px">
+      <div class="text-12px">
+        {{ $t('totalPnl') }}:
+        <span :class="getColor(summary?.month_total_profit || 0).color">
+          {{ addSign(summary?.month_total_profit || 0) }}${{
+            formatNumber(Math.abs(summary?.month_total_profit || 0), 1)
+          }}
+        </span>
+      </div>
+
+      <div class="flex items-center gap-4px p-2px bg-[--main-input-button-bg] rounded-4px">
         <Icon
-          class="cursor-pointer"
-          :class="isChartView ? 'color-[--main-text] bg-[-icon-color]' : 'color-[--third-text]'"
+          class="cursor-pointer text-14px"
+          :class="isChartView ? 'color-[--main-text]' : 'color-[--third-text]'"
           name="custom:chart"
           @click="isChartView = !isChartView"
         />
+        <Icon
+          class="cursor-pointer text-14px color-[--third-text]"
+          name="ic:outline-share"
+          @click="emit('share')"
+        />
       </div>
-    </div>
-    <div class="text-12px cursor-pointer" @click="dialogCalendarVis = true">
-      {{ $t('totalPnl') }}:
-      <span :class="getColor(summary.month_total_profit).color">
-        {{ addSign(summary.month_total_profit) }}${{
-          formatNumber(Math.abs(summary.month_total_profit), 1)
-        }}
-      </span>
     </div>
   </div>
 </template>
 <script setup>
 import dayjs from 'dayjs'
 
-const localeStore = useLocaleStore()
 const isChartView = defineModel('isChartView')
-const dialogCalendarVis = defineModel('dialogCalendarVis')
-const props = defineProps({
-  date: {
-    type: String,
-    required: true,
-  },
+const selectedDate = defineModel('selectedDate')
+
+const emit = defineEmits(['share'])
+
+defineProps({
   getColor: {
     type: Function,
     required: true,
@@ -42,9 +58,37 @@ const props = defineProps({
   },
 })
 
-const date = computed(() => {
-  return localeStore.locale === 'zh-cn'
-    ? dayjs(props.date).format('YYYY-MM')
-    : dayjs(props.date).format('MMM YYYY')
+const monthValue = computed({
+  get() {
+    return selectedDate.value || dayjs().format('YYYY-MM-DD')
+  },
+  set(val) {
+    if (!val) return
+    selectedDate.value = dayjs(val).startOf('month').format('YYYY-MM-DD')
+  },
 })
 </script>
+
+<style scoped lang="scss">
+:deep(.pnl-month-input) {
+  width: 90px;
+}
+
+:deep(.pnl-month-input .el-input__wrapper) {
+  background: transparent;
+  box-shadow: none;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+:deep(.pnl-month-input .el-input__inner) {
+  font-size: 12px;
+  color: var(--main-text);
+  cursor: pointer;
+}
+
+:deep(.pnl-month-input .el-input__prefix),
+:deep(.pnl-month-input .el-input__suffix) {
+  display: none;
+}
+</style>

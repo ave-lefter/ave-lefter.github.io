@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div ref="shareDom">
     <el-calendar
       v-show="!isChartView"
       :model-value="new Date()"
@@ -7,12 +7,12 @@
     >
       <template #header>
         <PnlCalendarHeader
-          v-model:dialogCalendarVis="dialogCalendarVis"
+          v-model:selectedDate="selectedDate"
           v-model:isChartView="isChartView"
-          :date="selectedDate"
           :getColor="getColor"
           :summary="summary"
           @update:isChartView="updateIsChartView"
+          @share="openShareDialog"
         />
       </template>
       <template #date-cell="{ data: { date } }">
@@ -35,11 +35,11 @@
     </el-calendar>
     <div v-show="isChartView" class="flex flex-col justify-between h-full">
       <PnlCalendarHeader
-        v-model:dialogCalendarVis="dialogCalendarVis"
+        v-model:selectedDate="selectedDate"
         v-model:isChartView="isChartView"
-        :date="selectedDate"
         :summary="summary"
         :getColor="getColor"
+        @share="openShareDialog"
       />
       <div ref="chartContainer" class="w-414px h-231px" />
     </div>
@@ -50,6 +50,21 @@
       :userChain="userChain"
       :formatterTooltip="formatterTooltip"
     />
+
+    <el-dialog v-model="shareDialogVisible" width="520px" append-to-body destroy-on-close>
+      <template #header>
+        <div class="text-14px lh-20px color-[--main-text]">{{ t('pnlCalendar') }}</div>
+      </template>
+
+      <div class="bg-[--secondary-bg] rounded-8px p-12px">
+        <img v-if="shareImage" :src="shareImage" alt="share" class="w-full rounded-8px">
+      </div>
+
+      <div class="flex justify-end mt-12px">
+        <el-button type="primary" @click="copySharePoster">复制图片</el-button>
+      </div>
+    </el-dialog>
+
     <el-popover
       ref="popoverRef"
       :virtual-ref="buttonRef"
@@ -68,6 +83,7 @@
 <script setup>
 import * as echarts from 'echarts'
 import dayjs from 'dayjs'
+import html2canvas from 'html2canvas'
 import { getProfitCalendar } from '~/api/wallet'
 import PnlCalendarHeader from './pnlCalendarHeader.vue'
 import PnlDialog from './pnlDialog.vue'
@@ -90,10 +106,13 @@ const summary = ref({})
 const isChartView = ref(false)
 let chartInstance = null
 const chartContainer = useTemplateRef('chartContainer')
+const shareDom = useTemplateRef('shareDom')
 const buttonRef = ref(null)
 const popVisible = ref(false)
 const tooltipDate = ref('')
 const dialogCalendarVis = ref(false)
+const shareDialogVisible = ref(false)
+const shareImage = ref('')
 
 const getColor = (value) => {
   if (value === 0) {
@@ -129,10 +148,17 @@ const _getProfitCalendar = async () => {
     user_chain: props.userChain,
     date: selectedDate.value,
   })
+  dateMapToPnl.value = {}
   ;(res.days || []).forEach((item) => {
     dateMapToPnl.value[item.date] = item
   })
   summary.value = res.summary || {}
+
+  if (isChartView.value) {
+    setTimeout(() => {
+      initOrUpdateChart()
+    }, 20)
+  }
 }
 
 const getPnl = (date) => {
@@ -272,6 +298,59 @@ const clickDay = (date, $event) => {
     tooltipDate.value = dayjs(date).format('YYYY-MM-DD')
   }
 }
+
+const generateShareImage = async () => {
+  if (!shareDom.value) return ''
+  const canvas = await html2canvas(shareDom.value, {
+    backgroundColor: null,
+    scale: 2,
+    allowTaint: true,
+    useCORS: true,
+    scrollY: 0,
+    scrollX: 0,
+  })
+  return canvas.toDataURL('image/png')
+}
+
+const openShareDialog = async () => {
+  shareDialogVisible.value = true
+  shareImage.value = await generateShareImage()
+}
+
+const copySharePoster = async () => {
+  if (!shareDom.value) return
+  const canvas = await html2canvas(shareDom.value, {
+    backgroundColor: null,
+    scale: 2,
+    allowTaint: true,
+    useCORS: true,
+    scrollY: 0,
+    scrollX: 0,
+  })
+
+  canvas.toBlob(async (blob) => {
+    if (!blob) {
+      ElMessage.error('复制失败')
+      return
+    }
+
+    try {
+      const item = new ClipboardItem({ 'image/png': blob })
+      await navigator.clipboard.write([item])
+      ElMessage.success('复制成功')
+    } catch (err) {
+      console.error('无法复制图片: ', err)
+      ElMessage.error('复制失败')
+    }
+  }, 'image/png')
+}
+
+watch(
+  () => selectedDate.value,
+  () => {
+    _getProfitCalendar()
+  }
+)
 
 watch(
   () => themeStore.isDark,
