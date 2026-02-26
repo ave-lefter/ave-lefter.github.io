@@ -88,11 +88,14 @@
     </template>
     <template v-else-if="activeParentTab===2">
       <div class="flex justify-between mb-12px items-center">
-        <Icon class="cursor-pointer color-[--secondary-text]" ref="audioButtonRef2"
-            :name="globalStore.audioSettings.audio.news ? 'custom:ad' : 'custom:admute'" />
+        <div class="flex items-center gap-8px">
+          <Icon class="cursor-pointer color-[--secondary-text]" ref="audioButtonRef2"
+              :name="globalStore.audioSettings.audio.news ? 'custom:ad' : 'custom:admute'" />
+          <Icon v-show="isPaused2" name="custom:stop"/>
+        </div>
         <el-checkbox class="[--el-checkbox-height:14px]"  v-model="onlyTitle" :label="t('onlyTitle')"/>
       </div>
-     <NewsList  :dataSource="dataSource2" @endReached="debouncedGetList2" :onlyTitle="onlyTitle"/>
+     <NewsList  :dataSource="dataSource2" @endReached="debouncedGetList2" :onlyTitle="onlyTitle"  @stop="val => isPaused2 = val"/>
     </template>
     <div v-else>null</div>
     <AudioPopover v-if="audioButtonRef" :buttonRef="audioButtonRef" type="twitter"/>
@@ -116,7 +119,7 @@ const emits = defineEmits(['setDrawerVisible'])
 const { t } = useI18n()
 const newsAudio = useTemplateRef('newsAudio')
 
-const {dataSource: dataSource2, getList:getList2} = useNews({newsAudio})
+
 const trackerStore = useTwitterTrackerStore()
 const v2WsStore = useV2WSStore()
 const globalStore = useGlobalStore()
@@ -126,11 +129,14 @@ const activeParentTab = ref(1)
 const filterVisible = ref(false)
 const audioVisible = ref(false)
 const isPaused = ref(false)
+const isPaused2 = ref(false)
 const wsCacheArr = shallowRef([])
 const audioButtonRef = ref()
 const audioButtonRef2 = ref()
 const twitterAudio = useTemplateRef('twitterAudio')
 const followIds = useStorage('twFollowIds', [])
+
+const {dataSource: dataSource2, getList:getList2} = useNews({newsAudio,activeParentTab,isPaused:isPaused2})
 const query = ref({ ...trackerStore.query })
 // defineProps({
 //   scrollHeight: {

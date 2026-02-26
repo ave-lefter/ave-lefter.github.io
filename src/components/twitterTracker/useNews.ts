@@ -1,6 +1,5 @@
-import { set } from 'lodash-es'
 import { getNews} from '~/api/twitter'
-export default function useNews(props:{newsAudio:any}) {
+export default function useNews(props:{newsAudio:any,activeParentTab:any,isPaused:any}) {
   const walletStore = useWalletStore()
   const {lang,audioSettings} = storeToRefs(useGlobalStore())
   const trackerStore = useTwitterTrackerStore()
@@ -8,8 +7,33 @@ export default function useNews(props:{newsAudio:any}) {
   const dataSource=shallowRef([] as Array<any>)
   let Timer:null|ReturnType<typeof setTimeout>=null
   let originDataSource:Array<any>=[]
-
+  let needUpdate = false
   const paginationParams= shallowRef({pageNO: 1,pageSize: 15})
+
+  watch(
+    () => props.activeParentTab.value,
+    (val) => {
+      if(val===2){
+        if(!props.isPaused.value){
+          paginationParams.value.pageNO = 1
+          needUpdate=false
+          getList()
+        }
+      }
+    }
+  )
+  watch(
+    () => props.isPaused.value,
+    (val) => {
+      if(!val){
+        if(needUpdate&& (props.activeParentTab.value===2)){
+          paginationParams.value.pageNO = 1
+          needUpdate=false
+          getList()
+        }
+      }
+    }
+  )
   onMounted(() => {
     getList()
     if(Timer){
@@ -17,11 +41,9 @@ export default function useNews(props:{newsAudio:any}) {
       Timer=null
     }else{
       Timer=setInterval(() => {
-        paginationParams.value.pageNO = 1
         getList(true)
       },5*1000*60)
     }
-  
   })
   onUnmounted(() => {
     if(Timer){
@@ -79,6 +101,7 @@ export default function useNews(props:{newsAudio:any}) {
         userAddress:walletStore.address,
         lang:lang1,
         ...paginationParams.value,
+        ...(needCheck?{pageNO:1}:{})
       })
       const list = res?.list || []
       if (Array.isArray(list) && list?.length > 0) {
@@ -92,24 +115,35 @@ export default function useNews(props:{newsAudio:any}) {
               full_text:item?.content?.items?.[0]?.legacy?.full_text
             }
           }).sort((a,b) => b.created_at - a.created_at)
-        if(paginationParams.value.pageNO === 1){
-          if(needCheck){
-            if(formatList?.[0]?.id !== originDataSource?.[0]?.id){
-              play()
+        if(needCheck){
+          if(originDataSource?.[0]?.id && formatList?.[0]?.id !== originDataSource?.[0]?.id){
+            play()
+            if(props.isPaused.value || (props.activeParentTab.value!==2)){
+              needUpdate = true
+            }else{
+              originDataSource= [...formatList]
+              dataSource.value=groupByDay(originDataSource)
+              trackerStore.finished2 = list?.length < paginationParams.value.pageSize
+              trackerStore.loading2 = false
+              if (!trackerStore.finished2) {
+                paginationParams.value.pageNO++
+              }
             }
           }
-          originDataSource= formatList
-        
-          dataSource.value=groupByDay(originDataSource)
         }else{
-          originDataSource.push(...formatList)
-          dataSource.value=groupByDay(Array.from(new Set(originDataSource.map(item => item.id)))
-            .map(id => originDataSource.find(item => item.id === id)).sort((a,b) => b.created_at - a.created_at))
-        }
-        trackerStore.finished2 = list?.length < paginationParams.value.pageSize
-        trackerStore.loading2 = false
-        if (!trackerStore.finished2) {
-          paginationParams.value.pageNO++
+          if(paginationParams.value.pageNO === 1){
+            originDataSource= [...formatList]
+            dataSource.value=groupByDay(originDataSource)
+          }else{
+            originDataSource.push(...formatList)
+            dataSource.value=groupByDay(Array.from(new Set(originDataSource.map(item => item.id)))
+              .map(id => originDataSource.find(item => item.id === id)).sort((a,b) => b.created_at - a.created_at))
+          }
+          trackerStore.finished2 = list?.length < paginationParams.value.pageSize
+          trackerStore.loading2 = false
+          if (!trackerStore.finished2) {
+            paginationParams.value.pageNO++
+          }
         }
       } else{
         if(paginationParams.value.pageNO  === 1) {
@@ -118,7 +152,6 @@ export default function useNews(props:{newsAudio:any}) {
         trackerStore.finished2 = true
       }
       // trackerStore.finished2 = list.length < 10
-      console.log('trackerStore.finished2', dataSource.value,originDataSource)
     } catch (error) {
       console.error('Error fetching Twitter2 tracker list:', error)
     } finally {

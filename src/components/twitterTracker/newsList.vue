@@ -2,7 +2,7 @@
   <AveEmpty v-if="isEmpty" class="pt-40px">
     <span class="color-[--third-text] text-12px mb-20px mt-4px">{{ t('emptyNoData') }}</span>
   </AveEmpty>
-  <div v-else ref="parentRef" class="overflow-y-auto scrollbar-hide" style="height:calc(100% - 120px)">
+  <div v-else ref="parentRef" class="overflow-y-auto scrollbar-hide" style="height:calc(100% - 120px)" @mouseenter="emits('stop',true)" @mouseleave="emits('stop',false)">
     <div :style="{
           height: `${totalSize}px`,
           width: '100%',
@@ -40,6 +40,10 @@
                           </span>
                       </template>
                   </TimerCount>
+                  <span v-else-if="Number(formatTimeFromNow(getItem(virtualRow).created_at, true))>60 * 60 * 24"
+                      class="text-[--secondary-text] text-12px">
+                      {{ formatDate(getItem(virtualRow).created_at, 'YYYY-MM-DD HH:mm:ss') }}
+                  </span>
                   <span v-else v-tooltip="formatDate(getItem(virtualRow).created_at, 'YYYY-MM-DD HH:mm:ss')"
                       class="text-[--secondary-text] text-12px">
                       {{ formatTimeFromNow(getItem(virtualRow).created_at) }}
@@ -92,7 +96,7 @@ const props = defineProps({
 })
 
 const { t } = useI18n()
-const emits = defineEmits(['endReached'])
+const emits = defineEmits(['endReached','stop'])
 const trackerStore = useTwitterTrackerStore()
 const sentinel1 = ref(null)
 const sentinel2 = ref(null)
