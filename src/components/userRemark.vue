@@ -194,7 +194,7 @@ function handleContextMenu(e: MouseEvent) {
   const rightClickAction = globalStore.audioSettings?.wallet?.rightClickAction
   // rightClickAction: 0 不打开, 1 新tab打开
   if (rightClickAction === 1) {
-    const url = `/address/${props.address}?chain=${props.chain}`
+    const url = `/address/${props.address}/${props.chain}`
     window.open(url, '_blank')
   }
 }
