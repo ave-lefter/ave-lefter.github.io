@@ -203,7 +203,7 @@ export const useGlobalStore = defineStore('global', () => {
     sort: 'created_timestamp',
     sort_dir: 'DESC',
   })
-  const audioSettings = useStorage('audioSettings-v2',{
+  const audioSettings = useStorage('audioSettings-v3',{
     active:'',
     notice:{
       monitor:true,
