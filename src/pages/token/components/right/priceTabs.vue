@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-[--secondary-bg]" @mouseleave="mouseLeave" v-if="!volumeVisible">
+  <div class="bg-[--secondary-bg] h-64px" @mouseleave="mouseLeave" v-if="!volumeVisible">
     <div class="tabs pt-11px pb-10px px-15px">
     <button
       v-for="item in tabs"
@@ -15,7 +15,7 @@
     </button>
    </div>
   </div>
-  <div v-else @mouseenter="volumeVisible=false;console.log('mouseEnter')" class="bg-[--secondary-bg] py-8px px-15px">
+  <div v-else @mouseenter="volumeVisible=false;console.log('mouseEnter')" class="bg-[--secondary-bg] py-8px px-15px h-64px">
     <template v-for="item in tabs" :key="item.id">
       <VolumeStats
         v-if="modelValue === item.id"
