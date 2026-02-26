@@ -6,7 +6,7 @@ import { BigNumber } from 'bignumber.js'
 import type { GetTotalHoldersResponse} from '~/api/stats'
 import {getTotalHolders} from '~/api/stats'
 import { ElMessage } from 'element-plus'
-import {DefaultHeight} from '~/utils/constants'
+import { DefaultHeight, SupportTokenKlineLaunchpad, SupportTokenKlineChains } from '~/utils/constants'
 import { getXType } from '~/api/x'
 
 type Token = {

@@ -214,7 +214,7 @@
                 </template>
               </el-popover>
 
-              <template v-if="pair && getTags(pair)?.normal_tag?.length > 0">
+              <!-- <template v-if="pair && getTags(pair)?.normal_tag?.length > 0">
                 <div
                   v-for="(i, index) in getTags(pair)?.normal_tag"
                   :key="index"
@@ -249,7 +249,7 @@
                     {{ $t(i?.tag) }}
                   </span>
                 </div>
-              </template>
+              </template> -->
               <img
                 v-if="token?.launchpad"
                 v-tooltip="token.launchpad"
@@ -460,7 +460,7 @@
                 {{ formatNumber(tokenInfoExtra?.sell_tax ||0, 1) }}%
               </span>
             </div>
-            <template v-if="pair && getTags(pair)?.signal_arr?.length > 0">
+            <!-- <template v-if="pair && getTags(pair)?.signal_arr?.length > 0">
               <div
                 v-for="(i, index) in getTags(pair)?.signal_arr?.slice(0, 3)"
                 :key="index"
@@ -542,8 +542,8 @@
                   </template>
                 </span>
               </div>
-            </template>
-            <div
+            </template> -->
+            <!-- <div
               v-if="
                 pair &&
                 getTags(pair)?.signal_arr?.findIndex(
@@ -588,7 +588,7 @@
               >
                 {{ formatNumber(pair?.smart_money_sell_count_24h || 0, 0) }}
               </span>
-            </div>
+            </div> -->
             <top50 />
             <el-popover width="120px" popper-class="[--el-popover-bg-color:--border] !min-w-[120px]" :persistent="false">
               <template #reference>
@@ -1080,6 +1080,18 @@ const marketCap = computed(() => {
 })
 
 const volume24 = computed(() => {
+  const isSupportTokenKlineLaunchpad = SupportTokenKlineLaunchpad?.includes?.(
+    chain.value + '-' + (tokenStore?.token?.launchpad || '')
+  )
+  const isTokenKline =
+    (SupportTokenKlineChains?.includes?.(chain.value) ||
+      isSupportTokenKlineLaunchpad) &&
+    'tokenAllPair' in tokenStore &&
+    tokenStore?.tokenAllPair &&
+    tokenStore?.selectedToken
+  if (isTokenKline) {
+    return tokenStore.tokenInfoExtra?.volume_24 || 0
+  }
   return tokenStore.pair?.volume_u || tokenStore.tokenInfoExtra?.volume_24 || 0
 })
 const tokenInfoExtra= computed(()=>{

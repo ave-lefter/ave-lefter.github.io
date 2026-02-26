@@ -4,6 +4,7 @@ import { useLocalStorage, type RemovableRef } from '@vueuse/core'
 import type { IChartingLibraryWidget, Mark } from '~/types/tradingview/charting_library'
 import { getUserKlineTxTags, getKlineProfilingTagsV2, type IGetKlineProfilingTagsV2Item,  type HolderBuy, type WalletLogo } from '@/api/token'
 import type { SimpleWSTx, WSTx } from './types'
+import { SupportTokenKlineLaunchpad, SupportTokenKlineChains } from '~/utils/constants'
 
 type TradeSide = {
   amount: number
@@ -180,6 +181,7 @@ export function useKlineMarks() {
     }
     marksTabs.value.forEach((v) => {
       const id = pair + '-' + chain + '-' + user + '-' + interval + '-' + v.id + '-' + from + '-' + to
+
       if (marksMap.has(id) && markTabsChecked.value?.[v.id]) {
         const res = touchCache(marksMap, id)
         const marks = formatToMarks(res || [], interval, v.id, v.name)
@@ -191,28 +193,44 @@ export function useKlineMarks() {
         onDataCallback(marks)
         return
       }
+      const isSupportTokenKlineLaunchpad = SupportTokenKlineLaunchpad?.includes?.(
+        chain + '-' + (tokenStore?.token?.launchpad || '')
+      )
+      const isTokenKline =
+        (SupportTokenKlineChains?.includes?.(chain) ||
+          isSupportTokenKlineLaunchpad) &&
+        'tokenAllPair' in tokenStore &&
+        tokenStore?.tokenAllPair &&
+        tokenStore?.selectedToken
       if (v.id === 'trade' && markTabsChecked.value?.[v.id]) {
-        getUserKlineTxTags({
+        let data = {
           from,
           to,
           interval,
-          pair: pair + '-' + chain,
           token_address: token,
-          user_address: user
-        }).then(res => {
+          user_address: user,
+          pair: pair + '-' + chain
+        }
+        getUserKlineTxTags(data).then((res) => {
           const marks = formatToMarks(res, interval, v.id, v.name)
           setCache(marksMap, id, res || [])
           onDataCallback(marks || [])
         })
       } else if (markTabsChecked.value?.[v.id]) {
-        getKlineProfilingTagsV2({
+        let data = {
           from,
           to,
           interval,
-          pair_id: pair + '-' + chain,
-          type: v.id
-        }).then(res => {
-          if(Array.isArray(res)){
+          type: v.id,
+          ...(!isTokenKline && {
+            pair_id: pair + '-' + chain,
+          }),
+          ...(isTokenKline && {
+            token_id: token,
+          }),
+        }
+        getKlineProfilingTagsV2(data).then((res) => {
+          if (Array.isArray(res)) {
             const marks = formatProfilingToMarks(res || [], interval, v.id, v.name)
             setCache(profilingMarksCache, id, marks)
             onDataCallback(marks || [])

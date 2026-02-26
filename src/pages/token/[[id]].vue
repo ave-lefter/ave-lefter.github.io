@@ -76,6 +76,7 @@ import { BelowChartTable } from './components/belowChartTable'
 import KLine from '~/pages/token/components/kLine/index.vue'
 import { OrderBook } from './components/orderBook'
 import { getAiSummary } from '@/api/token'
+import { SupportTokenKlineLaunchpad } from '~/utils/constants'
 
 definePageMeta({
   name: 'token-id',

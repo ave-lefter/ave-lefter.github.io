@@ -243,25 +243,27 @@ export function getUserKlineTxTags(data: {
   interval: string
   from: number
   to: number
-  pair: string
   token_address: string
+  pair: string
   user_address?: string
-}): Promise<Array<{
-  sell?: {
-    amount: number
-    txns: number
-    volume: number
-  }
-  buy?: {
-    amount: number
-    txns: number
-    volume: number
-  }
-  time: number
-}>> {
+}): Promise<
+  Array<{
+    sell?: {
+      amount: number
+      txns: number
+      volume: number
+    }
+    buy?: {
+      amount: number
+      txns: number
+      volume: number
+    }
+    time: number
+  }>
+> {
   const { $api } = useNuxtApp()
   const user_address = data?.user_address
-  if (!user_address || !data?.pair) {
+  if (!user_address) {
     return Promise.resolve([])
   }
   return $api(`/v1api/v4/pairs/${data?.pair}/kline_tx_tags`, {
@@ -269,7 +271,7 @@ export function getUserKlineTxTags(data: {
     query: {
       ...data,
       user_address,
-    }
+    },
   }).catch(() => {
     return Promise.resolve([])
   })
@@ -333,11 +335,12 @@ export function getKlineProfilingTagsV2(data:{
   from: number
   to: number
   type: string
-  pair_id: string
+  pair_id?: string
+  token_id?: string
 }):Promise<IGetKlineProfilingTagsV2Item[]>{
-  if (!data?.pair_id) {
-    return Promise.resolve([])
-  }
+  // if (!data?.pair_id) {
+  //   return Promise.resolve([])
+  // }
   const { $api } = useNuxtApp()
   return $api('/v2api/token_info/v1/kline/profiling_tags', {
     method: 'get',

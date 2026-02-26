@@ -211,7 +211,7 @@ import {
 import type { WSTx, KLineBar, SimpleWSTx } from './types'
 import BigNumber from 'bignumber.js'
 import { useKlineMarks } from './mark'
-import { DefaultHeight, WSSimpleTxChain } from '~/utils/constants'
+import { DefaultHeight, WSSimpleTxChain, SupportTokenKlineLaunchpad, SupportTokenKlineChains } from '~/utils/constants'
 import { TW_STUDY } from './constant'
 import UnknownRisk from './unknownRisk.vue'
 import DialogRemind from './dialogRemind.vue'
@@ -360,7 +360,6 @@ watch(
   (val) => {
 
     if (isReady.value && route.name === 'token-id' && val) {
-      console.log('------WSEventType.SWITCH_MAIN_PAIR_V2----------------',val)
       const new_main_pair_data = val.new_main_pair_data
         if(new_main_pair_data.target_token == tokenAddress.value){
           const migrate_uprice = new_main_pair_data.target_token == new_main_pair_data.token0_address ? new_main_pair_data?.token1_price_usd : new_main_pair_data?.token1_price_usd
