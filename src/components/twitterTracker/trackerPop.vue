@@ -88,7 +88,7 @@
     </template>
     <template v-else-if="activeParentTab===2">
       <div class="flex justify-between mb-12px items-center">
-        <Icon class="cursor-pointer" ref="audioButtonRef2"
+        <Icon class="cursor-pointer color-[--secondary-text]" ref="audioButtonRef2"
             :name="globalStore.audioSettings.audio.news ? 'custom:ad' : 'custom:admute'" />
         <el-checkbox class="[--el-checkbox-height:14px]"  v-model="onlyTitle" :label="t('onlyTitle')"/>
       </div>

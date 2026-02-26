@@ -20,12 +20,12 @@
                 <Icon name="ri:calendar-check-line" class="text-14px"></Icon>
                 {{ getItem(virtualRow) }}
               </div>
-              <div v-else class="flex shrink-1 gap-12px">
+              <div v-else class="flex shrink-1 gap-12px w-full">
                 <div class="w-8px h-full relative grow-0">
                   <div :class="`w-8px h-8px ${virtualRow.index===0?'border-[--primary-color]':'border-[--third-text]'} border-[1px] border-solid border-rd-[50%] mt-7px relative z-2 bg-[--secondary]`"></div>
                   <div v-if="typeof props.dataSource?.[virtualRow.index+1] !== 'string'" class="h-full border-l-[--dialog-divider] border-l-[1px] border-l-solid absolute left-3px z-1"></div>
                 </div>
-                <div class="font-400 text-14px text-[--secondary-text] grow-1">
+                <div class="font-400 text-14px text-[--secondary-text] grow-1 w-full">
                   <!-- <div class="font-400 text-14px lh-20px mb-8px">4分钟前</div> -->
                   <TimerCount
                       v-if="getItem(virtualRow).created_at && Number(formatTimeFromNow(getItem(virtualRow).created_at, true)) < 60"
@@ -46,7 +46,7 @@
                   </span>
                   <div class="font-500 text-16px lh-22px text-[--main-text] mb-8px mt-8px">{{ getItem(virtualRow)?.title }}</div>
                   <div v-if="!onlyTitle" class="text-14px lh-22px mb-8px text-[--secondary-text]">{{ getItem(virtualRow)?.full_text }}</div>
-                  <div class="flex justify-between mb-12px items-center font-400 text-12px lh-14px">
+                  <div class="flex justify-between mb-12px items-center font-400 text-12px lh-14px w-full">
                     <a class="text-[--primary-color]" :href="getItem(virtualRow)?.url" target="_blank">[{{ t('ViewFullText') }}]</a>
                     <div>{{ t('source') }}: {{ getItem(virtualRow)?.source }}</div>
                   </div>

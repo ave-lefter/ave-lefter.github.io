@@ -9,7 +9,7 @@ export default function useNews(props:{newsAudio:any}) {
   let Timer:null|ReturnType<typeof setTimeout>=null
   let originDataSource:Array<any>=[]
 
-  const paginationParams= shallowRef({pageNO: 1,pageSize: 30})
+  const paginationParams= shallowRef({pageNO: 1,pageSize: 15})
   onMounted(() => {
     getList()
     if(Timer){
