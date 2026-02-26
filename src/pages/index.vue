@@ -1175,23 +1175,25 @@ function getPumpConfig() {
             return y.platform || ''
           }
         }) || []
+        const platformsString = platforms.join(',')
+        console.log('platformsString',platformsString)
         pumpV3.value[i.chain] = {
           ...(pumpV3.value[i.chain] || {}),
           platforms,
           new: {
             count: 0,
             loading: false,
-            pumpFilter: pumpFilterDefault.value,
+            pumpFilter: {...pumpFilterDefault.value,platforms:platformsString},
           },
           soon: {
             count: 0,
             loading: false,
-            pumpFilter: pumpFilterDefault.value,
+            pumpFilter: {...pumpFilterDefault.value,platforms:platformsString},
           },
           graduated: {
             count: 0,
             loading: false,
-            pumpFilter: pumpFilterDefault.value,
+            pumpFilter: {...pumpFilterDefault.value,platforms:platformsString},
           },
         }
       }
