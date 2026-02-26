@@ -267,8 +267,7 @@ const twitterHandler = async (val) => {
       trackerStore.list[index] = val
       return
     }
-    console.log('twitterHandler11', isPaused.value)
-    if(isPaused.value && activeParentTab.value === 1) {
+    if(isPaused.value || activeParentTab.value !== 1) {
       wsCacheArr.value.unshift(val)
       wsCacheArr.value = wsCacheArr.value.slice(0,100)
     } else {
@@ -283,8 +282,8 @@ const twitterHandler = async (val) => {
   }
 }
 
-watch(() => isPaused.value, (val) => {
-  if (!val) {
+watch([() => isPaused.value, () => activeParentTab.value], ([val,val2]) => {
+  if (!val && val2 === 1) {
     trackerStore.list.unshift(...wsCacheArr.value)
     trackerStore.list = trackerStore.list.slice(0,100)
     wsCacheArr.value = []
