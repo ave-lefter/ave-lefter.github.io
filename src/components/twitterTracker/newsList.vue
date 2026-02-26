@@ -101,6 +101,7 @@ const trackerStore = useTwitterTrackerStore()
 const sentinel1 = ref(null)
 const sentinel2 = ref(null)
 const parentRef = ref(null)
+const {lang} = storeToRefs(useGlobalStore())
 const virtualizer = useVirtualizer(
   computed(() => ({
     count: props.dataSource.length,
@@ -117,19 +118,37 @@ const isEmpty = computed(() => props.dataSource.length === 0)
 const getItem = (virtualRow) => {
   return props.dataSource[virtualRow.index] || {}
 }
-useIntersectionObserver(
-  sentinel2,
-  ([{ isIntersecting }]) => {
-    if (isIntersecting && !trackerStore.loading2 && !trackerStore.finished2) {
-      trackerStore.showFooter=true
-      emits('endReached')
-    }
-  },
-  {
-    root: parentRef,
-    threshold: 0.1,
-  }
-).value
+// useIntersectionObserver(
+//   sentinel2,
+//   ([{ isIntersecting }]) => {
+//     if (isIntersecting && !trackerStore.loading2 && !trackerStore.finished2) {
+//       trackerStore.showFooter=true
+//       emits('endReached')
+//     }
+//   },
+//   {
+//     root: parentRef,
+//     threshold: 0.1,
+//   }
+// ).value
+// watch(()=>trackerStore.showFooter, (val) => {
+//   virtualizer.update()
+// })
+
+watch(() => lang.value.includes('zh'), () => {
+  reCreateChild()
+})
+
+
+setTimeout(() => {
+    useInfiniteScroll(parentRef, ()=>{
+      // emits('endReached')
+      if (!trackerStore.loading2 && !trackerStore.finished2) {
+        trackerStore.showFooter=true
+        emits('endReached')
+      }
+    }, { distance: 100 })
+},500)
 </script>
 
 <style scoped>

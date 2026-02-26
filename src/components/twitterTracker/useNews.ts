@@ -118,7 +118,7 @@ export default function useNews(props:{newsAudio:any,activeParentTab:any,isPause
             }
           }).sort((a,b) => b.created_at - a.created_at)
         if(needCheck){
-          if(firstId && formatList?.[0]?.id !== firstId){
+          if(formatList?.[0]?.id !== firstId){
             play()
             if(props.isPaused.value || (props.activeParentTab.value!==2)){
               needUpdate = true

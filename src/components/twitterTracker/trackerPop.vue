@@ -95,7 +95,7 @@
         </div>
         <el-checkbox class="[--el-checkbox-height:14px]"  v-model="onlyTitle" :label="t('onlyTitle')"/>
       </div>
-     <NewsList  :dataSource="dataSource2" @endReached="debouncedGetList2" :onlyTitle="onlyTitle"  @stop="val => isPaused2 = val"/>
+     <NewsList v-if="shouldRenderChild" :dataSource="dataSource2" @endReached="debouncedGetList2" :onlyTitle="onlyTitle"  @stop="val => isPaused2 = val"/>
     </template>
     <div v-else>null</div>
     <AudioPopover v-if="audioButtonRef" :buttonRef="audioButtonRef" type="twitter"/>
@@ -123,6 +123,7 @@ const newsAudio = useTemplateRef('newsAudio')
 const trackerStore = useTwitterTrackerStore()
 const v2WsStore = useV2WSStore()
 const globalStore = useGlobalStore()
+const {lang} = storeToRefs(useGlobalStore())
 const botStore = useBotStore()
 const activeTab = ref(1)
 const activeParentTab = ref(1)
@@ -302,7 +303,19 @@ watch(() => followAuthorIds.value, () => {
     })
   }
 })
+const shouldRenderChild = shallowRef(true)
 
+const reCreateChild = () => {
+  shouldRenderChild.value = false
+  // 确保 DOM更新
+  nextTick(() => {
+    shouldRenderChild.value = true
+  })
+}
+
+watch([() => lang.value.includes('zh'), () => onlyTitle.value], () => {
+  reCreateChild()
+})
 useVisibilityChange(() => {
   trackerStore.list = []
   query.value.page_token = ''
