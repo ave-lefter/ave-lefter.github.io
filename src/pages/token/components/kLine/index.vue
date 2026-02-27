@@ -566,7 +566,7 @@ function createTogglePriceWarningButton() {
 
   const updateButtonContent = () => {
     btn.innerHTML =
-      '<div style="display: flex;align-items: center;cursor:pointer;padding: 7px 5px 7px 0;border-radius: 6px;" onMouseOver="this.style.background=\'none\'"  onMouseLeave="this.style.background=\'none\'"><svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14.4 12.1429H16V13.7619H0V12.1429H1.6V6.47619C1.6 4.7586 2.27428 3.11135 3.47452 1.89683C4.67475 0.682311 6.30261 0 8 0C9.69739 0 11.3253 0.682311 12.5255 1.89683C13.7257 3.11135 14.4 4.7586 14.4 6.47619V12.1429ZM12.8 12.1429V6.47619C12.8 5.188 12.2943 3.95256 11.3941 3.04167C10.4939 2.13078 9.27304 1.61905 8 1.61905C6.72696 1.61905 5.50606 2.13078 4.60589 3.04167C3.70571 3.95256 3.2 5.188 3.2 6.47619V12.1429H12.8ZM5.6 15.381H10.4V17H5.6V15.381Z" fill="#9CA1A8"/></svg></div>'
+      '<div style="display: flex;align-items: center;cursor:pointer;padding: 7px 0px 7px 0;border-radius: 6px;" onMouseOver="this.style.background=\'none\'"  onMouseLeave="this.style.background=\'none\'"><svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14.4 12.1429H16V13.7619H0V12.1429H1.6V6.47619C1.6 4.7586 2.27428 3.11135 3.47452 1.89683C4.67475 0.682311 6.30261 0 8 0C9.69739 0 11.3253 0.682311 12.5255 1.89683C13.7257 3.11135 14.4 4.7586 14.4 6.47619V12.1429ZM12.8 12.1429V6.47619C12.8 5.188 12.2943 3.95256 11.3941 3.04167C10.4939 2.13078 9.27304 1.61905 8 1.61905C6.72696 1.61905 5.50606 2.13078 4.60589 3.04167C3.70571 3.95256 3.2 5.188 3.2 6.47619V12.1429H12.8ZM5.6 15.381H10.4V17H5.6V15.381Z" fill="#9CA1A8"/></svg></div>'
   }
 
   btn.onclick = () => {
