@@ -70,6 +70,17 @@ function init() {
   resetListStatus()
 }
 
+// 右键点击事件处理
+function handleContextMenu(e: MouseEvent, row: any) {
+  e.preventDefault()
+  const rightClickAction = globalStore.audioSettings?.wallet?.rightClickAction
+  // rightClickAction: 0 不打开, 1 新tab打开
+  if (rightClickAction === 1) {
+    const url = `/address/${row.user_address}/${row.tokenInfo.chain}`
+    window.open(url, '_blank')
+  }
+}
+
 function resetListStatus() {
   listQuery.value.pageNO = 1
   listQuery.value.max_block_number = 0
@@ -320,11 +331,14 @@ const collect = async () => {
             </div>
           </div>
           <div class="flex items-center gap-6px">
-            <span class="text-12px color-[--secondary-text]">{{
+            <span
+              class="text-12px color-[--secondary-text]"
+              @contextmenu.stop="handleContextMenu($event, tokenDetailStore)"
+            >{{
                 tokenDetailStore.user_address.slice(0, 4)
               }}...{{ tokenDetailStore.user_address.slice(-4) }}</span>
             <Icon
-              v-copy="tokenDetailStore.user_address"
+              v-copy="tokenDetailStore.user_address"`
               name="bxs:copy"
               class="cursor-pointer color-[--third-text] text-10px"
             />
