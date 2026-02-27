@@ -93,11 +93,11 @@
         </el-tooltip>
         <div class="ml-8px">
           <div class="flex items-center">
-            <span
-              class="text-16px leading-[1.25] color-[--main-text] font-500"
-              >{{ token?.symbol }}</span
-            >
-            <span class="ml-8px text-12px font-500 mr-8px">{{
+            <span class="text-16px leading-[1.25] color-[--main-text] font-500 ellipsis max-w-250px tokenName1">{{ token?.symbol }}
+            </span>
+            <span class="text-16px leading-[1.25] color-[--main-text] font-500 ellipsis max-w-250px tokenName2" v-tooltip="token?.symbol">{{ token?.symbol }}
+            </span>
+            <span class="ml-8px text-12px font-500 mr-8px ellipsis" style="max-width: 60px" v-tooltip="token?.name">{{
               token?.name
             }}</span>
             <div class="flex items-center justify-start">
@@ -1530,5 +1530,26 @@ async function handleSearchTokenName() {
 .item {
   display: flex;
   flex-direction: column;
+}
+@media screen and (max-width: 1080px) {
+  .tokenName1{
+    display: none;
+  }
+  .tokenName2{
+    cursor: pointer;
+    display: inline-block;
+    max-width: 100px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+}
+@media screen and (min-width: 1081px) {
+  .tokenName1{
+    display: inline-block;
+  }
+  .tokenName2{
+    display: none;
+  }
 }
 </style>
