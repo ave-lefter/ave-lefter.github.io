@@ -401,7 +401,7 @@ function toggleMode(mode: string) {
             :to="`/token/${row.token}-${row.chain}`"
           >
             <div class="flex items-center flex-1">
-              <TokenImg class="mr-8px" :row="row" v-tooltip="{
+              <TokenImg class="mr-8px" :row="{...row,issue_platform:''}" v-tooltip="{
                 content:{
                   is:TokenImg,
                   props:{

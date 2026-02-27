@@ -200,9 +200,11 @@ onUnmounted(() => {
         </div>
       </a>
       <div class="flex-1" />
-      <OrderBookButton v-model="orderBookVisible" />
-      <OneClick />
-      <Bubble />
+      <div class="flex  gap-20px mt--12px items-stretch">
+        <OrderBookButton v-model="orderBookVisible"/>
+        <OneClick/>
+        <Bubble/>
+      </div>
     </div>
     <OrdersTab v-show="activeTab === 'Orders'" :currentActiveTab="activeTab"/>
     <!-- <DevTokens v-show="activeTab === 'DevTokens'"/> -->
