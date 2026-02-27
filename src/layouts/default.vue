@@ -8,11 +8,11 @@
     <div :style="botStore.connectVisible && [{ filter: 'url(#blur)' }]" class="w-100vw h-100vh">
       <TheHeader />
       <!-- :style="signalStore.translateStyle"  translate-x-0px-->
-      <!-- <TokenHistory
+      <TokenHistory
         v-if="tokenHistoryVisible && globalStore.tokenHistoryVisible && route.name !== 'perp-id'"
         class="border-t-solid border-t-[--main-divider]"
         :style="{ paddingLeft: _style.paddingLeft, paddingRight: _style.paddingRight }"
-      /> -->
+      />
       <div
         :class="[
           'relative flex bg-[--main-divider] gap-1px pt-1px transition-transform transition-duration-300 overflow-hidden',
@@ -97,7 +97,7 @@ const topVisible = computed(() => {
   return ['/smart', '/address'].some((url) => route.fullPath.includes(url))
 })
 const tokenHistoryVisible = computed(() => {
-  return !route.fullPath.includes('/token/') && route.fullPath !== '/'
+  return !route.fullPath.includes('/token/') && route.fullPath !== '/markets'
 })
 
 const scrollTopEvent = useEventBus(BusEventType.SCROLL_TO_TOP)

@@ -48,9 +48,9 @@ const elseHeight = computed(() => {
   let substractHeight = 302
   const tokenHisHeight = 33
   const activeCheckHeight = 32
-  // if (globalStore.tokenHistoryVisible) {
-  //   substractHeight += tokenHisHeight
-  // }
+  if (globalStore.tokenHistoryVisible) {
+    substractHeight += tokenHisHeight
+  }
   if (props.dialogValues.type === 'activeList') {
     substractHeight += activeCheckHeight
   }

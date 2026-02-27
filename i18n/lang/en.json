@@ -2035,5 +2035,6 @@
   "sharePosition": "Share Position",
   "BlackListTwitter": "BlackList Twitter",
   "tOPSameAddress": "TOP Same Address",
-  "twitter": "Twitter"
+  "twitter": "Twitter",
+  "topBar":"topBar"
 }
