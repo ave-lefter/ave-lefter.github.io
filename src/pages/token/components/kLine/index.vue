@@ -364,7 +364,7 @@ watch(
     if (isReady.value && route.name === 'token-id' && val) {
       const new_main_pair_data = val.new_main_pair_data
         if(new_main_pair_data.target_token == tokenAddress.value){
-          const migrate_uprice = new_main_pair_data.target_token == new_main_pair_data.token0_address ? new_main_pair_data?.token1_price_usd : new_main_pair_data?.token1_price_usd
+          const migrate_uprice = new_main_pair_data.target_token == new_main_pair_data.token0_address ? new_main_pair_data?.token1_price_usd : new_main_pair_data?.token0_price_usd
           if (new_main_pair_data?.blocktime && migrate_uprice) {
             migrated.value = {
               migrate_time: new_main_pair_data?.blocktime,
