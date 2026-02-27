@@ -248,8 +248,9 @@
                           <TimerCount
                             v-if="row?.created_at || row?.time"
                             :key="row.pair + '-' + row.chain"
-                            :timestamp="row.created_at || row.time"
+                            :timestamp="Number(row.created_at || row.time || 0)"
                             :end-time="60"
+                            mode="count-up"
                           >
                             <template #default="{ seconds }">
                               <span>
