@@ -177,7 +177,7 @@
             <Icon name="custom:side-bar-fill" class="text-16px"/>
               {{ $t('topBar') }}
            </div>
-           <el-switch v-model="globalStore.tokenHistoryVisible"></el-switch>
+           <el-switch class="[&&]:h-20px" v-model="globalStore.tokenHistoryVisible"></el-switch>
           </div>
           <el-dropdown
   :persistent="false"
