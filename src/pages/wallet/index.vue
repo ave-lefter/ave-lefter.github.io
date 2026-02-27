@@ -100,9 +100,9 @@
 </template>
 
 <script setup lang="ts">
-import List from './list.vue'
-import Import from './import.vue'
-import Record from './record.vue'
+import List from './components/list.vue'
+import Import from './components/import.vue'
+import Record from './components/record.vue'
 import {
   _getMultiWalletsAllChain,
   _generateWallet,
