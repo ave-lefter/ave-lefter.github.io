@@ -16,7 +16,7 @@
         <td>
           <div class="main flex justify-start items-center">
             <span>{{ tokenAllPair?.symbol || '' }}</span>
-            <Icon v-tooltip="{ content: $t('allPairsTips'), props: { placement: 'top-start',  'popper-class':'max-w-250px', 'arrow-offset': '12' }}" name="solar:dollar-bold" class="color-#FFA622 text-14px ml-4px" />
+            <Icon v-tooltip="{ content: $t('allPairsTips'), props: { placement: 'top-start',  'popper-class':'max-w-250px', 'arrow-offset': 12 }}" name="solar:dollar-bold" class="color-#FFA622 text-14px ml-4px" />
           </div>
           <div class="minor">[All Pools]</div>
         </td>
