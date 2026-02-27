@@ -70,11 +70,11 @@
                 {{ t('devClose') }}
               </span>
             </el-checkbox>
-            <el-checkbox size="default" :model-value="!form.dev_sale_out" @change="(val) => form.dev_sale_out = !val">
+            <!-- <el-checkbox size="default" :model-value="!form.dev_sale_out" @change="(val) => form.dev_sale_out = !val">
                <span class="color-[--secondary-text]">
                 {{ t('devNotClose') }}
               </span>
-            </el-checkbox>
+            </el-checkbox> -->
             <!-- <el-checkbox size="default" v-model="form[indicate.value]" v-for="indicate in indicatorArr"
               :key="indicate.value" :label="indicate.label" class="[&&]:mr-0 [&&]:[--el-checkbox-height:16px]">
               <span class="color-[--secondary-text]">
