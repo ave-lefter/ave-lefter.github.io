@@ -2,7 +2,7 @@
   <el-popover v-model:visible="tgWalletVisible" placement="bottom-end" :width="360" trigger="click" popper-style="--el-popover-padding: 0;">
     <template #reference>
       <div
-        class="flex text-12px clickable-btn color-[--main-text] bg-[--main-input-button-bg] h-32px cursor-pointer flex items-center border-rd-4px px-10px py-0 min-w-80px  ml-8px">
+        class="flex text-12px clickable-btn color-[--main-text] bg-[--main-input-button-bg] h-32px cursor-pointer flex items-center border-rd-4px pl-10px pr-3px py-0 min-w-80px  ml-8px">
         <img
           class="border-rd-[50%] mr-5px" height="16" :src="generateAvatarIcon(botStore?.userInfo?.name || '')"
           alt="">
