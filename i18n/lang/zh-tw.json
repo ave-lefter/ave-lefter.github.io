@@ -2016,5 +2016,9 @@
   "sharePosition": "分享持仓",
   "BlackListTwitter": "拉黑推特号",
   "tOPSameAddress": "TOP同车地址",
-  "twitter": "推特號"
+  "twitter": "推特號",
+  "twitterTracker2": "最新快訊",
+  "onlyTitle": "只看標題",
+  "socialMediaTracker": "社媒監控",
+  "ViewFullText": "查看全文"
 }

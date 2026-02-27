@@ -893,7 +893,7 @@
     </div>
     <div
       v-show="globalStore.showRight"
-      class="absolute bg-[--main-list-hover] w-10px h-32px z-1 cursor-pointer flex items-center justify-center top-0px right--11px hover:w-30px hover:right--31px hover:h-36px  transition-all rounded-tl-4px rounded-bl-4px color-[--third-text] hover:color-[--main-text]"
+      class="absolute bg-[--main-list-hover] w-10px h-32px z-1 cursor-pointer flex items-center justify-center top-0px right--11px hover:w-30px hover:right--31px hover:h-36px  transition-all rounded-tr-4px rounded-br-4px color-[--third-text] hover:color-[--main-text]"
       @click="globalStore.$patch({ showRight: false })"
     >
       <Icon name="material-symbols:arrow-forward-ios" class="text-12px" />

@@ -39,7 +39,7 @@
           <div class="flex items-center justify-center text-14px">
             <Icon name="custom:twitter2" />
           </div>
-          {{ t('twitterTracker') }}
+          {{ t('socialMediaTracker') }}
         </div>
       </el-badge>
       <el-popover popper-style="padding: 0;border-radius: 8px;" width="auto" placement="top" :teleported="false" trigger="hover">
