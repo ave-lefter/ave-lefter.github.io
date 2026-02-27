@@ -93,9 +93,9 @@
         </el-tooltip>
         <div class="ml-8px">
           <div class="flex items-center">
-            <span class="text-16px leading-[1.25] color-[--main-text] font-500 ellipsis max-w-250px tokenName1">{{ token?.symbol }}
+            <span class="text-16px leading-[1.25] color-[--main-text] font-500 ellipsis max-w-260px tokenName1">{{ token?.symbol }}
             </span>
-            <span class="text-16px leading-[1.25] color-[--main-text] font-500 ellipsis max-w-250px tokenName2" v-tooltip="token?.symbol">{{ token?.symbol }}
+            <span class="text-16px leading-[1.25] color-[--main-text] font-500 ellipsis max-w-260px tokenName2" v-tooltip="token?.symbol">{{ token?.symbol }}
             </span>
             <span class="ml-8px text-12px font-500 mr-8px ellipsis" style="max-width: 60px" v-tooltip="token?.name">{{
               token?.name
