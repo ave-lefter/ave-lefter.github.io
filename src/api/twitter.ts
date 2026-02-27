@@ -165,6 +165,19 @@ function getTwitterByAuthor(author_id:number,page_token?:number) {
       })
 }
 
+
+function getNews(params:{lang?:string,userAddress?:string,pageNO?:number,pageSize?:number}){ 
+    const { $api } = useNuxtApp()
+    return $api('/v1api/v2/discover/news', {
+        method: 'get',
+        query: {
+            lang: params.lang,
+            userAddress: params.userAddress,
+            pageNO: params.pageNO||1,
+            pageSize: params.pageSize||30
+        }
+    })
+}
 export {
     getHotKolList,
     followKol,
@@ -176,5 +189,6 @@ export {
     getTwitterById,
     getAllFollowIds,
     getKolProfile,
-    getTwitterByAuthor
+    getTwitterByAuthor,
+    getNews
 }
