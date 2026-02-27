@@ -7,7 +7,7 @@
                 prop: conditions.sort,
                 order: conditions.sort_dir ? conditions.sort_dir + 'ending' : null,
             }" fit header-row-class-name="text-12px"
-row-class-name="cursor-pointer color-[--secondary-text] text-12px"
+              row-class-name="cursor-pointer color-[--secondary-text] text-12px"
                 @sort-change="handleSortChange">
                 <template #empty>
                     <AveEmpty v-if="!loadingRun" class="table-empty">

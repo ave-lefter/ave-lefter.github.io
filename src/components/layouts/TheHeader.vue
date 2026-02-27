@@ -178,34 +178,6 @@
           </div>
           <Icon name="ep:arrow-right"/>
         </div>
-        <el-dropdown
-          :persistent="false"
-          trigger="click"
-          popper-class="dropdown-lang"
-          class="w-full"
-          @command="langStore.setLanguage"
-        >
-          <div class="flex flex-1 items-center justify-between mb-16px cursor-pointer">
-              <div class="flex items-center gap-8px">
-                <Icon name="material-symbols:language" class="text-16px"/>
-                {{locales.find(i=>i.code === langStore.locale)?.name}}
-              </div>
-              <Icon name="ep:arrow-right"/>
-            </div>
-          <template #dropdown>
-            <el-dropdown-menu>
-              <el-dropdown-item
-                v-for="(item, $index) in locales"
-                :key="$index"
-                :command="item?.code"
-                :class="{ active: langStore.locale == item.code }"
-              >
-                {{ item?.name }}
-              </el-dropdown-item>
-            </el-dropdown-menu>
-          </template>
-        </el-dropdown>
-
         <div class="flex flex-col">
           <div class="flex items-center justify-between mb-16px cursor-pointer" @click="globalStore.audioSettings.active = 'notice'">
            <div class="flex items-center gap-8px">

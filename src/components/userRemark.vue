@@ -15,7 +15,7 @@
         :class="addressClass"
         :style="addressStyle"
         :title="showAddressTitle ? remark2 : undefined"
-        @contextmenu.stop="handleContextMenu"
+        @click.stop="handleContextMenu"
         @mouseover.stop="mouseoverAddress"
       >
         {{ remark1 }}
@@ -26,7 +26,7 @@
         :class="addressClass"
         :style="addressStyle"
         :title="showAddressTitle ? remark2 : undefined"
-        @contextmenu="handleContextMenu"
+        @click.stop="handleContextMenu"
       >
        {{ remark1 }}
       </span>
@@ -191,10 +191,12 @@ function sendRemarkToServer(remark: string) {
 // 右键点击事件处理
 function handleContextMenu(e: MouseEvent) {
   e.preventDefault()
-  const rightClickAction = globalStore.audioSettings?.wallet?.rightClickAction
+  const rightClickAction = globalStore.audioSettings?.wallet?.clickAction
   // rightClickAction: 0 不打开, 1 新tab打开
+  const url = `/address/${props.address}/${props.chain}`
   if (rightClickAction === 1) {
-    const url = `/address/${props.address}/${props.chain}`
+    window.open(url, '_blank')
+  }else {
     window.open(url, '_blank')
   }
 }
