@@ -237,7 +237,7 @@ export const useGlobalStore = defineStore('global', () => {
   })
 
   // 预留一个全局变量，用于控制 token 历史的显示
-  const tokenHistoryVisible = true
+  const tokenHistoryVisible = useStorage('tokenHistoryVis',false)
   const klineSettingPop = ref({
     visible:false,
     position:[] as number[]

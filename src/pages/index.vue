@@ -846,8 +846,8 @@ const mergedBaseList = computed(() => {
   return [...list1.value, ...list2.value, ...list3.value]
 })
 const scrollHeight = computed(()=>{
-  return 'calc(100vh - 215px)'
-  // return globalStore.tokenHistoryVisible ? 'calc(100vh - 248px)':'calc(100vh - 215px)'
+  // return 'calc(100vh - 215px)'
+  return globalStore.tokenHistoryVisible ? 'calc(100vh - 248px)':'calc(100vh - 215px)'
 })
 
 
