@@ -671,7 +671,7 @@
       </div>
       <div class="item ml-24px items-end!">
         <span class="text-20px color-[--main-text]">
-          ${{ formatNumber(price || 0, { decimals: 4, limit: 6 }) }}</span
+          ${{ showMarket? formatNumber(marketCap, 2) : formatNumber(price || 0, { decimals: 4, limit: 6 }) }}</span
         >
         <span
           class="block mt-4px"
@@ -685,10 +685,16 @@
           }) }}%</span
         >
       </div>
-      <div class="item ml-24px ">
+      <div v-if="!showMarket" class="item ml-24px ">
         <span>{{ $t('mcap') }}</span>
         <span class="block mt-8px color-[--main-text]"
           >${{ formatNumber(marketCap, 2) }}</span
+        >
+      </div>
+      <div v-else class="item ml-24px ">
+        <span>{{ $t('price') }}</span>
+        <span class="block mt-8px color-[--main-text]"
+          >${{ formatNumber(price || 0, { decimals: 4, limit: 6 }) }}</span
         >
       </div>
       <el-popover popper-style="padding: 0;border-radius: 8px;" width="250" placement="top" :teleported="false" trigger="hover">
@@ -945,7 +951,7 @@ const { evmAddress } = storeToRefs(useBotStore())
 const themeStore = useThemeStore()
 const { t } = useI18n()
 const route = useRoute()
-const { mode,dialogVisible_search,dialogSearchText } = storeToRefs(useGlobalStore())
+const { mode, dialogVisible_search, dialogSearchText, showMarket } = storeToRefs(useGlobalStore())
 
 const editableGroup = shallowRef(false)
 const groupId = shallowRef(0)

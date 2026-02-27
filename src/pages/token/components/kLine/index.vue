@@ -231,6 +231,7 @@ const route = useRoute()
 const walletStore = useWalletStore()
 const scrollTop = ref(0)
 const wsStore = useWSStore()
+const { showMarket } = storeToRefs(useGlobalStore())
 const totalHolders = computed(() => [
   { id: 'trade', name: t('mine') },
   {
@@ -469,8 +470,6 @@ const listenerGuidMap = new Map()
 const resolution = shallowRef(localStorage.getItem('tv_resolution') || '15')
 const themeStore = useThemeStore()
 let _widget: null | IChartingLibraryWidget = null
-
-const showMarket = useLocalStorage('tv_showMarket', false)
 
 // 切换主题
 watch(
