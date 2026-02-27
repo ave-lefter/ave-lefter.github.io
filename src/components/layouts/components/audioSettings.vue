@@ -793,6 +793,11 @@ function getEstimatedGas() {
           :title="$t('twitterTracker')"
           @playAudio="playAudio('twitter')"
         />
+        <AudioSettingsItem
+          v-model="audioSettings.audio.news"
+          :title="$t('twitterTracker2')"
+          @playAudio="playAudio('news')"
+        />
         <div class="mb-21px text-12px">{{ $t('tradeSound') }}</div>
         <AudioSettingsItem
           v-model="audioSettings.audio.marketBuy"

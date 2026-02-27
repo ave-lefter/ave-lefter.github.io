@@ -2036,5 +2036,9 @@
   "BlackListTwitter": "BlackList Twitter",
   "tOPSameAddress": "TOP Same Address",
   "twitter": "Twitter",
-  "topBar":"topBar"
+  "topBar":"topBar",
+  "twitterTracker2": "News",
+  "onlyTitle": "Only Title",
+  "ViewFullText": "View full text",
+  "socialMediaTracker": "Media Tracker"
 }

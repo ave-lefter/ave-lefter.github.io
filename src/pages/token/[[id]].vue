@@ -31,7 +31,7 @@
 
           <div
             v-show="!globalStore.showRight"
-            class="absolute bg-[--main-list-hover] w-10px h-32px z-1 cursor-pointer flex items-center justify-center top-0px right-0 hover:w-30px hover:h-36px transition-all rounded-tr-4px rounded-br-4px color-[--third-text] hover:color-[--main-text]"
+            class="absolute bg-[--main-list-hover] w-10px h-32px z-1 cursor-pointer flex items-center justify-center top-0px right-0 hover:w-30px hover:h-36px transition-all rounded-tl-4px rounded-bl-4px color-[--third-text] hover:color-[--main-text]"
             @click="globalStore.$patch({ showRight: true })"
           >
             <Icon name="material-symbols:arrow-back-ios-new-rounded" class="text-12px" />

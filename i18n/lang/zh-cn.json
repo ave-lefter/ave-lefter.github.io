@@ -2037,5 +2037,9 @@
   "BlackListTwitter": "拉黑推特号",
   "tOPSameAddress": "TOP同车地址",
   "twitter": "推特号",
-  "topBar":"顶部栏"
+  "topBar":"顶部栏",
+  "twitterTracker2": "最新快讯",
+  "onlyTitle": "只看标题",
+  "ViewFullText": "查看全文",
+  "socialMediaTracker": "社媒监控"
 }
