@@ -291,7 +291,6 @@ watch(
         </div>
         <div class="flex items-center">
           <RankFilter
-            v-if="activeTab === 'hot'"
             :storageKey="configMap[activeTab as keyof typeof configMap]?.storageKey"
             :getDefaultColumns="configMap[activeTab as keyof typeof configMap].getDefaultColumns"
             :ammList="ammList"

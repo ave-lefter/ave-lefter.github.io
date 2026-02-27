@@ -10,7 +10,7 @@ const props = defineProps<{
   ammList: IGetTreasureConfig['swaps']
 }>()
 const { t } = useI18n()
-const storeColumns = useStorage(props.storageKey, props.getDefaultColumns(t))
+let storeColumns = useStorage(props.storageKey, props.getDefaultColumns(t))
 const visible = ref(false)
 const searchKey = ref('')
 const tempFilter = ref<Record<string,any>>({})
@@ -48,6 +48,9 @@ const filterNumber = computed(() => {
 const modelColumns = computed(() => storeColumns.value?.filter((item: any) =>item.children || item.isVisible))
 const dexVisible = computed(() => modelColumns.value?.find((item: any) => item.key === 'dex')?.isVisible)
 
+watch(() => props.storageKey, () => {
+  storeColumns = useStorage(props.storageKey, props.getDefaultColumns(t))
+})
 watch(visible,()=>{
   // 打开弹窗同步所有筛选条件
   if(visible.value){
