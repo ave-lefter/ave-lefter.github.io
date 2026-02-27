@@ -178,25 +178,24 @@
                       v-if="
                         summaryList(
                           lang == 'zh-cn' || lang == 'zh-tw'
-                            ? row?.summary_cn || ''
-                            : row?.summary || ''
-                        )?.length && isOut
+                            ? row?.headline_cn || ''
+                            : row?.headline_en || ''
+                        )?.length
                       "
                       v-tooltip.raw="{
                         content: buildTooltipContent(
                           lang == 'zh-cn' || lang == 'zh-tw'
-                            ? row?.summary_cn || ''
-                            : row?.summary || ''
+                            ? row?.headline_cn || ''
+                            : row?.headline_en || ''
                         ),
                         props: {
                           placement: 'top-start',
                         },
                       }"
-                      class="media-item clickable"
+                      class="media-item clickable mr-5px"
                     >
                       <Icon name="custom:ai" class="text-14px" />
                     </a>
-
                     <span
                       v-if="row.buy_tax && row.sell_tax"
                     >
@@ -249,8 +248,9 @@
                           <TimerCount
                             v-if="row?.created_at || row?.time"
                             :key="row.pair + '-' + row.chain"
-                            :timestamp="row.created_at || row.time"
+                            :timestamp="Number(row.created_at || row.time || 0)"
                             :end-time="60"
+                            mode="count-up"
                           >
                             <template #default="{ seconds }">
                               <span>
@@ -977,8 +977,19 @@ function addOrRemoveBlaclList(item: { token: string , medias: any[]}, type: 'ca'
 //   isPaused.value = false
 // }
 
+// function summaryList(summary: string): string[] {
+//   return summary?.match(/\d\.[^0-9]*/g) || []
+// }
 function summaryList(summary: string): string[] {
-  return summary?.match(/\d\.[^0-9]*/g) || []
+  if (!summary) return []
+  const regex = /\d+\.\s*[\s\S]*?(?=\d+\.|$)/g
+
+  const matches = summary.match(regex)
+
+  if (matches && matches.length > 0) {
+    return matches.map(i => i.trim())
+  }
+  return [summary.trim()]
 }
 
 function buildTooltipContent(summary: string): string {

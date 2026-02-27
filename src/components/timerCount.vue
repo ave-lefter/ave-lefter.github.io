@@ -5,26 +5,30 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 
 interface TimerContext {
   seconds: number
   formatted: string
   formattedData: {
+    days: number
     hours: number
     minutes: number
     seconds: number
-    days: number
   }
 }
 
+type TimerMode = 'auto' | 'count-up' | 'count-down'
+
 const props = withDefaults(defineProps<{
-  autoStart?: boolean
-  startTime?: number
-  timestamp?: number
-  endTime?: number
+  mode?: TimerMode        // 计时模式
+  autoStart?: boolean     // 是否自动开始
+  startTime?: number      // 正计时起始偏移（秒）
+  timestamp?: number      // 目标时间戳（秒）
+  endTime?: number        // 结束目标（秒，正计时有效）
   format?: string | ((totalSeconds: number) => string)
 }>(), {
+  mode: 'auto',
   autoStart: true,
   startTime: 0,
   timestamp: undefined,
@@ -37,168 +41,172 @@ const emit = defineEmits<{
   (e: 'done'): void
 }>()
 
-// 是否为倒计时模式
-const isCountdown = ref(false)
-const countdownTargetMs = ref(0)
-
-const now = Date.now()
-const currentTimeMs = () => Date.now()
-
-// 如果 timestamp 存在并且是将来的时间，则进入倒计时
-if (props.timestamp !== undefined && props.timestamp * 1000 >= now) {
-  isCountdown.value = true
-  countdownTargetMs.value = props.timestamp * 1000
-}
-
-const startTimeMs = computed(() => {
-  if (isCountdown.value) {
-    return Math.max(0, countdownTargetMs.value - currentTimeMs())
-  } else if (props.timestamp !== undefined) {
-    return currentTimeMs() - props.timestamp * 1000
-  }
-  return (props.startTime ?? 0) * 1000
-})
-
-const endTimeMs = props.endTime !== undefined ? props.endTime * 1000 : undefined
-
-const elapsedTimeMs = ref(startTimeMs.value)
-const startTimestamp = ref(0)
+// 状态变量
 const isRunning = ref(false)
+const elapsedTimeMs = ref(0)
+const isCountdownMode = ref(false)
 let rafId: ReturnType<typeof requestAnimationFrame> | null = null
+let startTimestamp = 0 // 系统基准时间戳
 let lastSecond = -1
 
-function pad(n: number, width = 2): string {
-  return n.toString().padStart(width, '0')
-}
+// 辅助函数
+const currentTimeMs = () => Date.now()
+const pad = (n: number) => n.toString().padStart(2, '0')
 
-function formatWithTemplate(ms: number, template: string): string {
-  const totalSeconds = Math.floor(ms / 1000)
+/**
+ * 核心初始化逻辑：计算初始时间并确定计时方向
+ */
+function initTimer() {
+  const now = currentTimeMs()
 
-  const { days, hours, minutes, seconds } = getTimeDataFromSec(totalSeconds)
-
-  const replaceMap: Record<string, string | number> = {
-    'DD': pad(days),
-    'D': days,
-    'HH': pad(hours),
-    'H': hours,
-    'mm': pad(minutes),
-    'm': minutes,
-    'ss': pad(seconds),
-    's': seconds,
+  // 1. 确定方向
+  if (props.mode === 'count-down') {
+    isCountdownMode.value = true
+  } else if (props.mode === 'count-up') {
+    isCountdownMode.value = false
+  } else {
+    // auto 模式逻辑
+    isCountdownMode.value = !!(props.timestamp && props.timestamp * 1000 > now)
   }
 
-  return template.replace(/DD|D|HH|H|mm|m|ss|s/g, (match) => String(replaceMap[match]))
+  // 2. 设置初始毫秒数（负值强制归零）
+  if (isCountdownMode.value) {
+    const target = (props.timestamp || 0) * 1000
+    elapsedTimeMs.value = Math.max(0, target - now)
+  } else {
+    if (props.timestamp !== undefined) {
+      // 若提供 timestamp 且为正计时，计算已过去多久
+      elapsedTimeMs.value = Math.max(0, now - props.timestamp * 1000)
+    } else {
+      // 否则使用普通的 startTime
+      elapsedTimeMs.value = Math.max(0, props.startTime * 1000)
+    }
+  }
 }
 
-function getTimeDataFromSec(totalSeconds: number) {
+/**
+ * 获取分解后的时间数据
+ */
+function getTimeData(totalSeconds: number) {
   const days = Math.floor(totalSeconds / 86400)
-  const hours = Math.floor((totalSeconds - days * 86400) / 3600)
-  const r1 = totalSeconds - days * 86400 - hours * 3600
-  const minutes = Math.floor(r1 / 60)
-  const seconds = Math.floor(r1 - minutes * 60)
-
-  return {
-    days,
-    hours,
-    minutes,
-    seconds
-  }
+  const hours = Math.floor((totalSeconds % 86400) / 3600)
+  const minutes = Math.floor((totalSeconds % 3600) / 60)
+  const seconds = totalSeconds % 60
+  return { days, hours, minutes, seconds }
 }
 
+/**
+ * 计算属性：暴露给插槽的对象
+ */
 const timerContext = computed<TimerContext>(() => {
-  const ms = elapsedTimeMs.value
-  const totalSeconds = Math.floor(ms / 1000)
-
-  const { days, hours, minutes, seconds } = getTimeDataFromSec(totalSeconds)
+  const totalSeconds = Math.floor(elapsedTimeMs.value / 1000)
+  const data = getTimeData(totalSeconds)
 
   let formatted = ''
   if (typeof props.format === 'function') {
     formatted = props.format(totalSeconds)
   } else {
-    formatted = formatWithTemplate(ms, props.format)
+    const map: Record<string, string | number> = {
+      'DD': pad(data.days), 'D': data.days,
+      'HH': pad(data.hours), 'H': data.hours,
+      'mm': pad(data.minutes), 'm': data.minutes,
+      'ss': pad(data.seconds), 's': data.seconds,
+    }
+    formatted = props.format.replace(/DD|D|HH|H|mm|m|ss|s/g, (m) => String(map[m]))
   }
 
   return {
     seconds: totalSeconds,
     formatted,
-    formattedData: {
-      days,
-      hours,
-      minutes,
-      seconds
-    }
+    formattedData: data
   }
 })
 
+/**
+ * 开始/继续计时
+ */
 function start() {
   if (isRunning.value) return
 
-  isRunning.value = true
-  if (isCountdown.value) {
-    elapsedTimeMs.value = countdownTargetMs.value - currentTimeMs()
+  // 重新校准基准点，确保暂停后继续的准确性
+  if (isCountdownMode.value) {
+    // 倒计时基准点即为目标时间
+    // 逻辑在 update 中通过 props.timestamp 处理
   } else {
-    elapsedTimeMs.value = startTimeMs.value
+    // 正计时基准点 = 当前系统时间 - 已流逝的时间
+    startTimestamp = currentTimeMs() - elapsedTimeMs.value
   }
-  startTimestamp.value = currentTimeMs() - elapsedTimeMs.value
-  // lastSecond = timerContext.value.seconds
-  lastSecond = -1
-  emit('update:seconds', timerContext.value.seconds)
+
+  isRunning.value = true
+
   const update = () => {
     if (!isRunning.value) return
 
     const now = currentTimeMs()
-    if (isCountdown.value) {
-      const remaining = countdownTargetMs.value - now
-      if (remaining <= 0) {
+
+    if (isCountdownMode.value) {
+      const target = (props.timestamp || 0) * 1000
+      const diff = target - now
+      if (diff <= 0) {
         elapsedTimeMs.value = 0
-        emit('update:seconds', 0)
-        emit('done')
-        stop()
+        handleEnd()
         return
       }
-      elapsedTimeMs.value = remaining
+      elapsedTimeMs.value = diff
     } else {
-      elapsedTimeMs.value = now - startTimestamp.value
-      if (endTimeMs !== undefined && elapsedTimeMs.value >= endTimeMs) {
-        elapsedTimeMs.value = endTimeMs
-        emit('update:seconds', timerContext.value.seconds)
-        stop()
+      const diff = now - startTimestamp
+      if (props.endTime !== undefined && diff >= props.endTime * 1000) {
+        elapsedTimeMs.value = props.endTime * 1000
+        handleEnd()
         return
       }
+      elapsedTimeMs.value = diff
     }
 
-    const currentSecond = timerContext.value.seconds
-    if (currentSecond !== lastSecond) {
-      lastSecond = currentSecond
-      emit('update:seconds', currentSecond)
+    // 秒级触发 update 事件
+    const currentSec = Math.floor(elapsedTimeMs.value / 1000)
+    if (currentSec !== lastSecond) {
+      lastSecond = currentSec
+      emit('update:seconds', currentSec)
     }
 
     rafId = requestAnimationFrame(update)
   }
 
-  update()
+  rafId = requestAnimationFrame(update)
+}
+
+function handleEnd() {
+  stop()
+  emit('update:seconds', Math.floor(elapsedTimeMs.value / 1000))
+  emit('done')
 }
 
 function stop() {
   isRunning.value = false
-  if (rafId !== null) {
-    cancelAnimationFrame(rafId)
-    rafId = null
-  }
+  if (rafId) cancelAnimationFrame(rafId)
 }
 
 function reset() {
   stop()
-  elapsedTimeMs.value = startTimeMs.value
+  initTimer()
   lastSecond = -1
-  emit('update:seconds', timerContext.value.seconds)
+  emit('update:seconds', Math.floor(elapsedTimeMs.value / 1000))
+  if (props.autoStart) start()
 }
 
-defineExpose({ start, stop, reset })
+// 监听配置变化
+watch(() => [props.timestamp, props.mode, props.startTime], () => {
+  reset()
+})
 
 onMounted(() => {
+  initTimer()
   if (props.autoStart) start()
 })
 
 onUnmounted(stop)
+
+// 暴露 API 给父组件
+defineExpose({ start, stop, reset, isRunning })
 </script>

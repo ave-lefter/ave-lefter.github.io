@@ -4,6 +4,7 @@ import { useLocalStorage, type RemovableRef } from '@vueuse/core'
 import type { IChartingLibraryWidget, Mark } from '~/types/tradingview/charting_library'
 import { getUserKlineTxTags, getKlineProfilingTagsV2, type IGetKlineProfilingTagsV2Item,  type HolderBuy, type WalletLogo } from '@/api/token'
 import type { SimpleWSTx, WSTx } from './types'
+import { SupportTokenKlineLaunchpad, SupportTokenKlineChains } from '~/utils/constants'
 
 type TradeSide = {
   amount: number
@@ -158,9 +159,14 @@ export function useKlineMarks() {
   onUnmounted(() => {
     clearRootNodeHandler()
   })
+  type MigratedType = {
+      migrate_time: number
+      migrate_uprice: string
+      showMarket: boolean
+      mcap: number
+  }
 
-
-  function getMarks({from, to, interval, onDataCallback, pair, chain, token, user}: {
+  function getMarks({from, to, interval, onDataCallback, pair, chain, token, user, migrated}: {
     from: number
     to: number
     interval: string
@@ -169,10 +175,21 @@ export function useKlineMarks() {
     chain: string;
     token: string;
     user: string;
+    migrated: MigratedType
   }) {
+    const isSupportTokenKlineLaunchpad = SupportTokenKlineLaunchpad?.includes?.(
+      chain + '-' + (tokenStore?.token?.launchpad || '')
+    )
+    const isTokenKline =
+      (SupportTokenKlineChains?.includes?.(chain) || isSupportTokenKlineLaunchpad) &&
+      'tokenAllPair' in tokenStore &&
+      tokenStore?.tokenAllPair &&
+      tokenStore?.selectedToken
+    if (migrated.migrate_time && migrated.migrate_uprice && isTokenKline) {
+      getMigrated(onDataCallback, migrated)
+    }
     marksTabs.value.forEach((v) => {
-      const id = pair + '-' + chain + '-' + user  + '-' + interval + '-' + v.id + '-' + from + '-' + to
-      
+      const id = pair + '-' + chain + '-' + user + '-' + interval + '-' + v.id + '-' + from + '-' + to
       if (marksMap.has(id) && markTabsChecked.value?.[v.id]) {
         const res = touchCache(marksMap, id)
         const marks = formatToMarks(res || [], interval, v.id, v.name)
@@ -187,27 +204,34 @@ export function useKlineMarks() {
         return
       }
       if (v.id === 'trade' && markTabsChecked.value?.[v.id]) {
-        getUserKlineTxTags({
+        let data = {
           from,
           to,
           interval,
-          pair: pair + '-' + chain,
           token_address: token,
-          user_address: user
-        }).then(res => {
+          user_address: user,
+          pair: pair + '-' + chain
+        }
+        getUserKlineTxTags(data).then((res) => {
           const marks = formatToMarks(res, interval, v.id, v.name)
           setCache(marksMap, id, res || [])
           onDataCallback(marks || [])
         })
       } else if (markTabsChecked.value?.[v.id]) {
-        getKlineProfilingTagsV2({
+        let data = {
           from,
           to,
           interval,
-          pair_id: pair + '-' + chain,
-          type: v.id
-        }).then(res => {
-          if(Array.isArray(res)){
+          type: v.id,
+          ...(!isTokenKline && {
+            pair_id: pair + '-' + chain,
+          }),
+          ...(isTokenKline && {
+            token_id: token,
+          }),
+        }
+        getKlineProfilingTagsV2(data).then((res) => {
+          if (Array.isArray(res)) {
             const marks = formatProfilingToMarks(res || [], interval, v.id, v.name)
             const cacheArr = (res||[]).map(el=>{
               return {
@@ -222,6 +246,29 @@ export function useKlineMarks() {
       }
     })
   }
+  function getMigrated(onDataCallback: (marks: any[]) => void, migrated: MigratedType) {
+    let result: Mark[] = []
+    const urlPrefix = useConfigStore().globalConfig?.token_logo_url || 'https://www.iconaves.com/'
+    result = [
+      {
+        id: `${migrated.migrate_time}-${migrated.migrate_uprice}-migrated`,
+        time: migrated.migrate_time,
+        color: { background: 'transparent', border: 'transparent' },
+        imageUrl: `${urlPrefix}signals/marks/mark-m.png`,
+        label: 'M',
+        labelFontColor: '#fff',
+        minSize: 20,
+        hoveredBorderWidth: 0,
+        // position: isBuy ? 'below' : 'above',
+        borderWidth: 0,
+        text: `${formatDate(migrated.migrate_time * 1000, 'YYYY-MM-DD HH:mm:ss')} ${t('migratedTo')}
+          ${migrated.showMarket ? `${t('migratedMCap')}: $${formatNumber(migrated.mcap, 2)}` : `${t('migratedPrice')}: ${migrated.migrate_uprice ? '$' + formatNumber(migrated.migrate_uprice || 0) : '--'}`} `,
+        showLabelWhenImageLoaded: false,
+      },
+    ]
+    onDataCallback(result || [])
+  }
+
 
   function formatProfilingToMarks(
     data: IGetKlineProfilingTagsV2Item[],
@@ -405,7 +452,6 @@ export function useKlineMarks() {
     // Sorting only at the end
     return result.sort((a, b) => a.time - b.time)
   }
-
   function getMarkTooltipContent(entry: {
     volume: number
     time: number

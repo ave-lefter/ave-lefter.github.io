@@ -561,4 +561,8 @@ onMounted(() => {
 })
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+:deep(.caret-wrapper){
+  width: 17px;
+}
+</style>
