@@ -177,15 +177,10 @@ export function useKlineMarks() {
     user: string;
     migrated: MigratedType
   }) {
-    const isSupportTokenKlineLaunchpad = SupportTokenKlineLaunchpad?.includes?.(
-      chain + '-' + (tokenStore?.token?.launchpad || '')
-    )
-    const isTokenKline =
-      (SupportTokenKlineChains?.includes?.(chain) || isSupportTokenKlineLaunchpad) &&
-      'tokenAllPair' in tokenStore &&
-      tokenStore?.tokenAllPair &&
-      tokenStore?.selectedToken
-    if (migrated.migrate_time && migrated.migrate_uprice && isTokenKline) {
+
+    const isTokenKline = tokenStore?.selectedToken
+    console.log('----------migrate_uprice-2----------', migrated, tokenStore?.selectedToken)
+    if (migrated?.migrate_time && isTokenKline) {
       getMigrated(onDataCallback, migrated)
     }
     marksTabs.value.forEach((v) => {
