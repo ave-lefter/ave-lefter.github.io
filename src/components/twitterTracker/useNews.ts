@@ -1,21 +1,23 @@
 import { getNews} from '~/api/twitter'
 export default function useNews(props:{newsAudio:any,activeParentTab:any,isPaused:any}) {
+  let Timer:null|ReturnType<typeof setTimeout>=null
+  let originDataSource:Array<any>=[]
+  let firstId=''
+  let needUpdate = false
+
   const walletStore = useWalletStore()
   const {lang,audioSettings} = storeToRefs(useGlobalStore())
   const trackerStore = useTwitterTrackerStore()
   // const globalStore = useGlobalStore()
   const dataSource=shallowRef([] as Array<any>)
-  let Timer:null|ReturnType<typeof setTimeout>=null
-  let originDataSource:Array<any>=[]
-  let firstId=''
-  let needUpdate = false
+  const total=shallowRef(0)
   const paginationParams= shallowRef({pageNO: 1,pageSize: 15})
 
   watch(
     () => props.activeParentTab.value,
     (val) => {
       if(val===2){
-        if(!props.isPaused.value){
+        if(needUpdate&&!props.isPaused.value){
           paginationParams.value.pageNO = 1
           needUpdate=false
           getList()
@@ -118,7 +120,7 @@ export default function useNews(props:{newsAudio:any,activeParentTab:any,isPause
             }
           }).sort((a,b) => b.created_at - a.created_at)
         if(needCheck){
-          if(firstId && formatList?.[0]?.id !== firstId){
+          if(formatList?.[0]?.id !== firstId){
             play()
             if(props.isPaused.value || (props.activeParentTab.value!==2)){
               needUpdate = true
@@ -150,6 +152,7 @@ export default function useNews(props:{newsAudio:any,activeParentTab:any,isPause
             paginationParams.value.pageNO++
           }
         }
+        total.value=res.total
       } else{
         if(paginationParams.value.pageNO  === 1) {
           dataSource.value = []
@@ -165,5 +168,5 @@ export default function useNews(props:{newsAudio:any,activeParentTab:any,isPause
     }
   }
 
-  return { dataSource, getList }
+  return { dataSource, getList,total }
 }
