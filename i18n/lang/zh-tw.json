@@ -1534,6 +1534,7 @@
   "score2": "積分",
   "todayVolume": "今日交易量",
   "totalPnl": "總盈虧",
+  "monthTotalPnl": "當月總盈虧",
   "maxDrawdown": "最大回撤 (30D)",
   "accountBalance": "賬戶餘額",
   "fundingRate": "資金費率",

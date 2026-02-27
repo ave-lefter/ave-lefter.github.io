@@ -250,11 +250,17 @@ export interface Day {
 }
 
 export interface Summary {
-  month_total_profit:      number;
-  month_total_buy_count:   number;
-  month_total_sell_count:  number;
-  month_total_buy_volume:  number;
-  month_total_sell_volume: number;
+  month_total_profit:           number;
+  month_total_buy_count:        number;
+  month_total_sell_count:       number;
+  month_total_buy_volume:       number;
+  month_total_sell_volume:      number;
+  win_days_count?:              number;
+  loss_days_count?:            number;
+  total_profit_on_win_days?:    number;
+  total_profit_on_loss_days?:  number;
+  current_win_streak?:          number;
+  max_consecutive_win_days?:    number;
 }
 // 获取盈亏日历
 export function getProfitCalendar(params:{

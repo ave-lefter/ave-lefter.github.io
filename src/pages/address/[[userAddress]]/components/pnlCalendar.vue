@@ -2,7 +2,8 @@
   <div ref="shareDom">
     <el-calendar
       v-show="!isChartView"
-      :model-value="new Date()"
+      :key="calendarMonthKey"
+      :model-value="calendarDisplayDate"
       class="[&&]:[--el-calendar-cell-width:44px] [&&]:[--el-fill-color-blank:transparent]"
     >
       <template #header>
@@ -15,18 +16,18 @@
           @share="openShareDialog"
         />
       </template>
-      <template #date-cell="{ data: { date } }">
-        <template v-if="dayjs(date).isSame(dayjs(selectedDate), 'month')">
+      <template #date-cell="{ data }">
+        <template v-if="data.type === 'current-month'">
           <div
             class="text-center h-full"
-            :class="[getColor(getPnl(date)).bg, 'cursor-pointer']"
-            @click="clickDay(date, $event)"
+            :class="[getColor(getPnl(data.date)).bg, 'cursor-pointer']"
+            @click="clickDay(data.date, $event)"
           >
             <span class="text-12px color-[--third-text] lh-14px">{{
-              dayjs(date).format('DD')
+              dayjs(data.date).format('DD')
             }}</span>
-            <div class="text-12px lh-14px mt-2px" :class="getColor(getPnl(date)).color">
-              {{ addSign(getPnl(date)) }}${{ formatNumber(Math.abs(getPnl(date)),{decimals:1,limit:4}) }}
+            <div class="text-12px lh-14px mt-2px" :class="getColor(getPnl(data.date)).color">
+              {{ addSign(getPnl(data.date)) }}${{ formatNumber(Math.abs(getPnl(data.date)),{decimals:1,limit:4}) }}
             </div>
           </div>
         </template>
@@ -56,8 +57,59 @@
         <div class="text-14px lh-20px color-[--main-text]">{{ t('pnlCalendar') }}</div>
       </template>
 
-      <div class="bg-[--secondary-bg] rounded-8px p-12px">
-        <img v-if="shareImage" :src="shareImage" alt="share" class="w-full rounded-8px">
+      <div ref="shareCardDom" class="share-card bg-[--secondary-bg] rounded-8px p-12px">
+        <div class="text-14px lh-20px color-[--main-text] mb-8px">{{ t('pnlCalendar') }}</div>
+        <div class="flex items-center justify-center gap-4px text-12px color-[--third-text] mb-12px">
+          <span>{{ shareCardMonthLabel }} UTC+0</span>
+        </div>
+        <div class="text-12px mb-8px" :class="getColor(summary?.month_total_profit ?? 0).color">
+          {{ addSign(summary?.month_total_profit ?? 0) }}${{
+            formatNumber(Math.abs(summary?.month_total_profit ?? 0), 1)
+          }}
+        </div>
+        <div class="flex gap-2px mb-8px">
+          <div class="h-4px rounded-2px bg-[--up-color]" :style="`width:${shareCardPercent.profit}%`" />
+          <div class="h-4px rounded-2px bg-[--down-color]" :style="`width:${shareCardPercent.loss}%`" />
+        </div>
+        <div class="flex justify-between text-12px lh-16px mb-12px color-[--third-text]">
+          <div>
+            <span class="color-[--up-color]">{{ summary?.win_days_count ?? 0 }} / </span>
+            <span class="color-[--up-color]">${{ formatNumber(summary?.total_profit_on_win_days ?? 0, 1) }}</span>
+          </div>
+          <div>
+            <span class="color-[--down-color]">{{ summary?.loss_days_count ?? 0 }} / </span>
+            <span class="color-[--down-color]">${{ formatNumber(Math.abs(summary?.total_profit_on_loss_days ?? 0), 1) }}</span>
+          </div>
+        </div>
+        <el-calendar
+          :range="shareCardRange"
+          class="share-card-calendar [&&]:[--el-calendar-cell-width:44px] [&&]:[--el-fill-color-blank:transparent]"
+        >
+          <template #header>
+            <span />
+          </template>
+          <template #date-cell="{ data }">
+            <template v-if="data.type === 'current-month'">
+              <div class="text-center h-full" :class="getColor(getPnl(data.date)).bg">
+                <span class="text-12px color-[--third-text] lh-14px">{{ dayjs(data.date).format('DD') }}</span>
+                <div class="text-12px lh-14px mt-2px" :class="getColor(getPnl(data.date)).color">
+                  {{ addSign(getPnl(data.date)) }}${{ formatNumber(Math.abs(getPnl(data.date)), { decimals: 1, limit: 4 }) }}
+                </div>
+              </div>
+            </template>
+            <span v-else />
+          </template>
+        </el-calendar>
+        <div class="mt-12px flex items-center justify-between text-12px color-[--third-text]">
+          <div class="flex gap-16px">
+            <span v-if="shareCardIsCurrentMonth">{{ t('currentStreak') }}: {{ summary?.current_win_streak ?? 0 }}d</span>
+            <span>{{ shareCardMonthShort }} {{ t('maxStreak') }}: {{ summary?.max_consecutive_win_days ?? 0 }}d</span>
+          </div>
+          <div class="flex items-center gap-4px">
+            <img height="26" src="~/assets/images/avedex_mobile_logo.png" alt="Ave">
+            <Icon name="custom:ave-ai" class="color-[--d-FFF-l-000] text-14px" />
+          </div>
+        </div>
       </div>
 
       <div class="flex justify-end mt-12px">
@@ -81,6 +133,7 @@
 </template>
 
 <script setup>
+import BigNumber from 'bignumber.js'
 import * as echarts from 'echarts'
 import dayjs from 'dayjs'
 import html2canvas from 'html2canvas'
@@ -107,12 +160,38 @@ const isChartView = ref(false)
 let chartInstance = null
 const chartContainer = useTemplateRef('chartContainer')
 const shareDom = useTemplateRef('shareDom')
+const shareCardDom = useTemplateRef('shareCardDom')
 const buttonRef = ref(null)
 const popVisible = ref(false)
 const tooltipDate = ref('')
 const dialogCalendarVis = ref(false)
 const shareDialogVisible = ref(false)
-const shareImage = ref('')
+
+/** 主日历展示的月份，随 selectedDate 切换 */
+const calendarMonthKey = computed(() => dayjs(selectedDate.value).format('YYYY-MM'))
+const calendarDisplayDate = computed(() =>
+  dayjs(selectedDate.value).startOf('month').toDate()
+)
+const shareCardRange = computed(() => [
+  dayjs(selectedDate.value).startOf('month').toDate(),
+  dayjs(selectedDate.value).endOf('month').toDate(),
+])
+const shareCardMonthLabel = computed(() => dayjs(selectedDate.value).format('MMM YYYY'))
+const shareCardMonthShort = computed(() => dayjs(selectedDate.value).format('MMM'))
+const shareCardIsCurrentMonth = computed(
+  () => dayjs(selectedDate.value).format('YYYY-MM') === dayjs().format('YYYY-MM')
+)
+const shareCardPercent = computed(() => {
+  const win = summary.value?.total_profit_on_win_days ?? 0
+  const loss = Math.abs(summary.value?.total_profit_on_loss_days ?? 0)
+  const total = new BigNumber(win).plus(loss)
+  if (total.isZero()) {
+    return { profit: 50, loss: 50 }
+  }
+  const profit = +formatNumber(new BigNumber(win).div(total).multipliedBy(100).toString(), 1)
+  const lossPct = +formatNumber(new BigNumber(loss).div(total).multipliedBy(100).toString(), 1)
+  return { profit, loss: lossPct }
+})
 
 const getColor = (value) => {
   if (value === 0) {
@@ -299,27 +378,13 @@ const clickDay = (date, $event) => {
   }
 }
 
-const generateShareImage = async () => {
-  if (!shareDom.value) return ''
-  const canvas = await html2canvas(shareDom.value, {
-    backgroundColor: null,
-    scale: 2,
-    allowTaint: true,
-    useCORS: true,
-    scrollY: 0,
-    scrollX: 0,
-  })
-  return canvas.toDataURL('image/png')
-}
-
-const openShareDialog = async () => {
+const openShareDialog = () => {
   shareDialogVisible.value = true
-  shareImage.value = await generateShareImage()
 }
 
 const copySharePoster = async () => {
-  if (!shareDom.value) return
-  const canvas = await html2canvas(shareDom.value, {
+  if (!shareCardDom.value) return
+  const canvas = await html2canvas(shareCardDom.value, {
     backgroundColor: null,
     scale: 2,
     allowTaint: true,
@@ -412,5 +477,27 @@ onUnmounted(() => {
 }
 :global(.el-calendar-table .el-calendar-day:hover) {
   cursor: default;
+}
+
+.share-card :deep(.el-calendar__header) {
+  padding: 0;
+  border-bottom: 0 none;
+}
+.share-card :deep(.el-calendar__body) {
+  padding: 0;
+}
+.share-card :deep(.el-calendar-table tr td) {
+  border: 0 none !important;
+}
+.share-card :deep(.el-calendar-table .el-calendar-day) {
+  padding: 2px;
+  --el-calendar-selected-bg-color: transparent;
+}
+.share-card :deep(.el-calendar-table thead th) {
+  padding: 0;
+  padding-bottom: 11px;
+  font-size: 12px;
+  line-height: 20px;
+  color: var(--third-text);
 }
 </style>

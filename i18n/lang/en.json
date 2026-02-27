@@ -1553,6 +1553,7 @@
   "score2": "My Points",
   "todayVolume": "Today Volume",
   "totalPnl": "Total PnL",
+  "monthTotalPnl": "Month Total PnL",
   "maxDrawdown": "Max Drawdown (30D)",
   "accountBalance": "Account Balance",
   "fundingRate": "Funding Rate",
