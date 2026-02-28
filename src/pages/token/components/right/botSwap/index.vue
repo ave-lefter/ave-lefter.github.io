@@ -1,6 +1,6 @@
 <template>
   <div ref="bot-swap-container" class="bot-swap-container">
-    <Holding  />
+    <Holding  :isForceShow="true"/>
     <BestToken/>
     <div class="tabs">
       <button v-for="(item, index) in tabs" :key="index" class="tab-item" :class="{ active: item.value === activeTab, [`tab-${item.value}`]: true }" type="button" @click="activeTab = item.value">
@@ -9,7 +9,7 @@
     </div>
     <div v-if="botStore?.userInfo?.evmAddress && botStore?.isSupportChains?.includes(chain)" class="flex items-center h-40px">
       <div class="tabs-1 mr-5px">
-        <button v-for="item in BotSettingsArr" :key="item.value" :class="{'active': item.value === botSettingStore?.botSettings?.[chain]?.[activeTab]?.selected}" type="button" @click.stop="onSelectBotSwapSet(item.value)">{{ item.label }}</button>
+        <button v-for="item in BotSettingsArr" :key="item.value" class="hover:bg-[--tab-active-bg]! hover:text-[--main-text]!" :class="{'active': item.value === botSettingStore?.botSettings?.[chain]?.[activeTab]?.selected}" type="button" @click.stop="onSelectBotSwapSet(item.value)">{{ item.label }}</button>
         <!-- <button v-for="item in BotSettingsArr" :key="item.value" :class="{'active': item.value === botSettingStore?.botSettings?.[chain]?.selected}" type="button" @click.stop="onSelectBotSwapSet(item.value)">{{ item.label }}</button> -->
       </div>
       <SlippageSet :canSetAuto="true" :isAutoSell="swapType === 'market'" :chain="(tokenStore.tokenInfo?.token?.chain as BotChain)" :setting="botSettingStore?.botSettings[chain]"/>
@@ -252,8 +252,8 @@ onMounted(() => {
       height: 20px;
       text-align: center;
       &.active {
-        background: var(--tab-active-bg);
-        color: var(--main-text);
+        background: var(--tab-active-bg) !important;
+        color: var(--primary-color) !important;
       }
     }
   }

@@ -1618,7 +1618,7 @@ onMounted(() => {
       padding: 0 10px;
     }
     :deep() .el-input-group__prepend {
-      --el-fill-color-light: var(--border);
+      // --el-fill-color-light: var(--border);
       min-width: 70px;
       padding: 0 12px;
     }

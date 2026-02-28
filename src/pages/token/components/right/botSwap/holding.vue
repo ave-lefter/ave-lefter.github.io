@@ -1,14 +1,14 @@
 <template>
-  <div v-if="(Number(walletTokenInfo?.balance_usd || 0) > 0 && Number(tokenStore.swap?.token?.balance || 0) > 0) || isShow || isForceShow" class="max-h-54px flex items-start justify-between color-[--main-text] text-center bg-[--main-list-hover] mb-12px py-10px rd-4px">
-    <div class="flex-1">
+  <div v-if="(Number(walletTokenInfo?.balance_usd || 0) > 0 && Number(tokenStore.swap?.token?.balance || 0) > 0) || isShow || isForceShow" class="max-h-54px flex items-start justify-between color-[--main-text] text-center border-[--main-list-hover] border-1px border-solid mb-12px py-10px rd-4px">
+    <div class="flex-1 border-r-[--main-divider] border-r-1px border-r-solid">
       <div class="text-11px color-[--third-text]">{{ $t('bought') }}</div>
       <div class="text-12px mt-5px color-#12B886">${{ formatNumber(walletTokenInfo?.total_purchase_usd || 0, 2) }}</div>
     </div>
-    <div class="flex-1">
+    <div class="flex-1 border-r-[--main-divider] border-r-1px border-r-solid">
       <div class="text-11px color-[--third-text]">{{ $t('sold') }}</div>
       <div class="text-12px mt-5px" :class="[Number(walletTokenInfo?.total_sold_usd || 0) > 0 ? 'color-#F6465D' : 'color-[--third-text]']">${{ formatNumber(walletTokenInfo?.total_sold_usd || 0, 2) }}</div>
     </div>
-    <div class="flex-1">
+    <div class="flex-1 border-r-[--main-divider] border-r-1px border-r-solid">
       <div class="text-11px color-[--third-text]">{{ $t('holding') }}</div>
       <div class="text-12px  mt-5px">${{ formatNumber(walletTokenInfo?.balance_usd || 0, 2) }}</div>
     </div>

@@ -12,7 +12,7 @@
         }" name="material-symbols:help-rounded" class="text-14px color-[--icon-color] cursor-pointer ml-3px" />
       </div>
       <!-- <div class="flex items-center gap-5px" v-show="isAutoSellConfig" > -->
-      <div class="flex items-center gap-5px">
+      <div v-if="isAutoSellConfig" class="flex items-center gap-5px">
         <el-select popper-class="w-selectAutoSell" v-model="autoSellConfigName" :placeholder="t('defaultPolicy')" style="width: 110px" @change="changeAutoSellConfig" placement="bottom-end" :persistent="false" size="small" :disabled="!isAutoSellConfig" v-tooltip="autoSellConfigNameStr">
           <li class="el-select-dropdown__item text-[--third-text]!">{{ t('defaultPolicy') }}</li>
           <el-option
