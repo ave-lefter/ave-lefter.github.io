@@ -103,7 +103,7 @@ const tabs = computed(() => {
     { title: $t('copyToken'), id: 'token' },
     { title: $t('copyCompleted'), id: 'success' },
     { title: $t('copyFailed'), id: 'failed' },
-    { title: $t('invalidTransactions'), id: 'invalid' },
+    // { title: $t('invalidTransactions'), id: 'invalid' },
   ]
   return commonTabs
 })
