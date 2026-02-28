@@ -295,22 +295,22 @@
                 >
                 <div class="text-12px mt-3px">
                   <span
-                    v-if="Number(row.price_change) > 0"
+                    v-if="Number((zone==='24h'? row.price_change_v2 :row.price_change)) > 0"
                     style="color: #12b886; padding: 10px 0"
                   >
-                    +{{ formatNumber(row.price_change || 0) }}%
+                    +{{ formatNumber((zone==='24h'? row.price_change_v2 :row.price_change) || 0) }}%
                   </span>
                   <span
-                    v-if="Number(row.price_change) == 0"
+                    v-if="Number((zone==='24h'? row.price_change_v2 :row.price_change)) == 0"
                     style="color: #848e9c; padding: 10px 0"
                   >
                     0%
                   </span>
                   <span
-                    v-if="Number(row.price_change) < 0"
+                    v-if="Number((zone==='24h'? row.price_change_v2 :row.price_change)) < 0"
                     style="color: #ff646d; padding: 10px 0"
                   >
-                    {{ formatNumber(row.price_change || 0) }}%
+                    {{ formatNumber((zone==='24h'? row.price_change_v2 :row.price_change) || 0) }}%
                   </span>
                 </div>
               </div>
@@ -445,6 +445,7 @@ const activeSort = shallowRef<SortValue>(0)
 const sortBy = shallowRef<string>('')
 const isShowDate = shallowRef<boolean>(false)
 const popoverVisible = shallowRef(false)
+const {zone} = storeToRefs(useGlobalStore())
 const openTimeList = shallowRef([
   { text: '> $100', value: '100' },
   { text: '> $1000', value: '1000' },
