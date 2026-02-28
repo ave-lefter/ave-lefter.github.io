@@ -15,9 +15,9 @@
                     </AveEmpty>
                 </template>
                 <TokenColumn subImgKey="issue_platform" :column-props="{
-                    label: $t('walletToken'),
-    width: '170',
-                    fixed: 'left',
+                  label: $t('walletToken'),
+                  width: '170',
+                  fixed: 'left',
                 }" />
                 <el-table-column align="right" :width="100" sortable="custom"
                     :sort-orders="['descending', 'ascending', null]" :label="$t('time')" prop="created_at">
