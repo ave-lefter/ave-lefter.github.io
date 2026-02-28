@@ -196,8 +196,8 @@ function handleContextMenu(e: MouseEvent) {
   const url = `/address/${props.address}/${props.chain}`
   if (rightClickAction === 1) {
     window.open(url, '_blank')
-  }else {
-    window.open(url, '_blank')
+  } else {
+    window.open(url)
   }
 }
 </script>

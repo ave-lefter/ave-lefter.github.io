@@ -868,14 +868,19 @@ function openMarkerTooltip(row: IGetSimpleTxsResponse & { senderProfile: Profile
 }
 
 function goBrowser(row: IGetSimpleTxsResponse) {
+  const rightClickAction = globalStore.audioSettings?.wallet?.clickAction
+  let targe = ''
+  if (rightClickAction === 1) {
+    targe ='_blank'
+  }
   window.open(
-    formatExplorerUrl(row.chain, row.transaction, 'tx')
+    formatExplorerUrl(row.chain, row.transaction, 'tx'), targe
   )
 }
 
 const tabsContainer = ref<HTMLElement | null>(null)
 function setActiveTab(val: string,index:number) {
-  if(val===activeTab.value) return 
+  if(val===activeTab.value) return
   activeTab.value = val
   // if (val === '-100' && !followStore.currentAddress) {
   //   return
