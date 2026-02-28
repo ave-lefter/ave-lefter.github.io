@@ -613,7 +613,7 @@
   "googleAuthNotBoundTip": "Google Authenticator bağlı değil. Hesabınızı korumak için cüzdan adresini silmeden önce Google Authenticator'ı bağlayın.",
   "goToBind": "Bağlamaya git",
   "past24h": "Son 24 saat içinde",
-  "priceChangeZoonSetting": "Fiyat Değişimi Saat Dilimi Ayarı",
+  "priceChangeZoonSetting": "TZ'yi değiştir",
   "group": "Grup",
   "manage": "Üstesinden gelmek",
   "priceChangeZoonSettingTip": "<div>24 saatlik biçim: Fiyat artışı veya düşüşü, dünün aynı saatindeki fiyatla karşılaştırıldığında 24 saatlik yuvarlanma esasına göre hesaplanır<br/>\n0:00 (UTC 8 00:00): Fiyat artışı veya düşüşü Pekin saatiyle 00:00'daki açılış fiyatına göre hesaplanır</div>",

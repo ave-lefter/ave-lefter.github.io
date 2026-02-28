@@ -17,16 +17,16 @@
         <span>{{ $t('profit2') }}</span>
         <Icon name="custom:price" class="text-11px clickable ml-5px" :class="[isShowB ? 'color-[--third-text]' : 'color-[--secondary-text]']" @click.stop="isShowB=!isShowB" @mousedown.stop @mouseup.stop />
       </div>
-      <div class="text-12px mt-5px" :class="[Number(walletTokenInfo?.total_profit || 0) > 0 ? 'color-#12B886' : 'color-#F6465D']">
+      <div class="text-12px mt-5px" :class="getColor()">
         <template v-if="!isShowB">
-           {{ Number(walletTokenInfo?.total_profit || 0) > 0 ? '' : '-' }}${{ formatNumber(Math.abs(Number(walletTokenInfo?.total_profit) || 0), 2) }}
+           {{ getPlusSign() }}${{ formatNumber(Math.abs(Number(walletTokenInfo?.total_profit) || 0), 2) }}
         </template>
          <template v-else>
            {{ formatNumber(Number(walletTokenInfo?.total_profit || 0) / Number(walletTokenInfo?.main_token_price || 1), 2) }} {{ walletTokenInfo?.main_token_symbol || '' }}
         </template>
 
       </div>
-      <div class="text-8px" :class="[Number(walletTokenInfo?.total_profit_ratio || 0) > 0 ? 'color-#12B886' : 'color-#F6465D']">({{ formatNumber(Number(walletTokenInfo?.total_profit_ratio || 0) * 100, 2) }}%)</div>
+      <div class="text-8px" :class="getColor()">({{ formatNumber(Number(walletTokenInfo?.total_profit_ratio || 0) * 100, 2) }}%)</div>
     </div>
   </div>
 </template>
@@ -56,6 +56,28 @@ const userAddress = computed(() => {
   }
   return botStore.userInfo?.addresses?.find?.(i => i?.chain === chain)?.address
 })
+
+function getPlusSign(){
+  switch (true) {
+    case Number(walletTokenInfo?.value?.total_profit || 0) > 0:
+      return '+'
+    case Number(walletTokenInfo?.value?.total_profit || 0) < 0:
+      return '-'
+    default:
+      return ''
+  }
+}
+
+function getColor(){
+  switch (true) {
+    case Number(walletTokenInfo?.value?.total_profit || 0) > 0:
+      return 'color-#12B886'
+    case Number(walletTokenInfo?.value?.total_profit || 0) < 0:
+      return 'color-#F6465D'
+    default:
+      return 'color-[--third-text]'
+  }
+}
 
 watch(userAddress, (val) => {
   isShow.value = false

@@ -9,11 +9,13 @@
     </div>
     <div v-if="botStore?.userInfo?.evmAddress && botStore?.isSupportChains?.includes(chain)" class="flex items-center h-40px">
       <div class="tabs-1 mr-5px">
-        <button v-for="item in BotSettingsArr" :key="item.value" class="hover:bg-[--tab-active-bg]! hover:text-[--main-text]!" :class="{'active': item.value === botSettingStore?.botSettings?.[chain]?.[activeTab]?.selected}" type="button" @click.stop="onSelectBotSwapSet(item.value)">{{ item.label }}</button>
+        <button v-for="item in BotSettingsArr" :key="item.value" class="hover:bg-[--tab-active-bg]! hover:text-[--main-text]!" :class="{'active': item.value === botSettingStore?.botSettings?.[chain]?.[activeTab]?.selected}" type="button" @click.stop="onSelectBotSwapSet(item.value)" @mouseenter="showPopover(item.value)"
+          @mouseleave="visible = false" :ref="setBtnRef" :id="item.value"
+        >{{ item.label }}</button>
         <!-- <button v-for="item in BotSettingsArr" :key="item.value" :class="{'active': item.value === botSettingStore?.botSettings?.[chain]?.selected}" type="button" @click.stop="onSelectBotSwapSet(item.value)">{{ item.label }}</button> -->
       </div>
       <SlippageSet :canSetAuto="true" :isAutoSell="swapType === 'market'" :chain="(tokenStore.tokenInfo?.token?.chain as BotChain)" :setting="botSettingStore?.botSettings[chain]"/>
-      <BatchWallet :chain="chain" :boundary="boundary" />
+      <BatchWallet :chain="chain" :boundary="boundary"/>
     </div>
     <div class="select-box">
       <el-tabs v-model="swapType" class="select-tabs">
@@ -27,13 +29,59 @@
       </div> -->
     </div>
     <Swap :activeTab="activeTab" :swapType="swapType" :tabs1="tabs1" :tabs2="tabs2" @getTokenBalance="getTokenBalance"/>
+    <el-popover
+      v-model:visible="visible"
+      popper-class="new-popover"
+      :virtual-ref="currentBtnRef"
+      virtual-triggering
+      trigger="contextmenu"
+      placement="bottom"
+      popper-style="min-width: auto; width: auto;"
+      :persistent="false"
+    >
+      <ul class="text-12px">
+        <li class="mb-4px flex-start">
+          <Icon name="custom:slippage" class="color-[--third-text] ml-0 mr-6px cursor-pointer min-w-16px"/>
+          <span class="mr-4px color-[--third-text]">{{ $t('slippage') }}</span>
+          <span v-if="botSettingStore.botSettings?.[chain]?.buy?.[selected]?.slippage !== 'auto'">
+            {{
+              botSettingStore.botSettings?.[chain || '']?.buy?.[selected]?.slippage
+            }}%</span>
+          <span v-else>{{ $t('auto') }}</span>
+        </li>
+        <li v-if="isEvmChain(chain || '')" class="mt-4px mb-4px flex-start">
+          <Icon v-tooltip="$t('estimatedGas')" name="custom:gas" class="color-[--third-text] ml-0 mr-3px cursor-pointer min-w-18px"/>
+          <span class="mr-5px color-[--third-text]">{{ $t('estimatedGas') }}</span>
+          <span>${{ getEstimatedGas() }}</span>
+        </li>
+        <li v-if="chain === 'solana'" class="mt-4px mb-4px flex-start">
+          <Icon name="custom:gas" class="color-[--third-text] mr-3px cursor-pointer ml-0 min-w-18px"/>
+          <span class="mr-5px color-[--third-text] whitespace-nowrap block">{{ $t('priorityFee') }}</span>
+          <span class="whitespace-nowrap">{{ botPriorityFee }} SOL</span>
+        </li>
+        <li class="mt-4px mb-4px flex-start">
+          <Icon :name="`custom:half-${globalStore.mode}`" class="text-18px color-[--third-text] ml-0 mr-3px cursor-pointer min-w-18px"/>
+          <span class="mr-5px color-[--third-text] whitespace-nowrap">{{ $t('autoSellHalf') }}</span>
+          <span>{{  botSettingStore.autoSellConfigs?.autoSell ? $t('on') : $t('off') }}</span>
+        </li>
+
+        <li class="mt-4px flex-start">
+          <Icon name="custom:mev" class="text-14px color-[--third-text] ml-0 mt--2px mr-3px cursor-pointer min-w-18px"/>
+          <span class="mr-5px color-[--third-text]">{{ $t('mev') }}</span>
+          <span>{{  botSettingStore.botSettings?.[chain]?.buy?.[selected]?.mev ? $t('on')  : $t('off') }}</span>
+        </li>
+
+      </ul>
+    </el-popover>
   </div>
 </template>
 <script setup lang="ts">
+import {formatBotGasTips} from '@/utils/bot'
+import {isEvmChain, getRpcProvider} from '@/utils'
 import { NATIVE_TOKEN } from '@/utils/constants'
 import SlippageSet from './slippageSet.vue'
 import Swap from './swap.vue'
-import Bignumber from 'bignumber.js'
+import BigNumber from 'bignumber.js'
 import { useBotSwap } from '~/composables/botSwap'
 import Holding from './holding.vue'
 import BatchWallet from './batchWallet.vue'
@@ -50,12 +98,22 @@ const wsStore = useWSStore()
 const botSwapStore = useBotSwapStore()
 const boundary = useTemplateRef('bot-swap-container')
 
+
+const globalStore = useGlobalStore()
+const visible = ref(false)
+const selected = ref<BotSettingKey>('s1')
+const btnRefs = ref<Record<string, HTMLElement | null>>({})
+const currentBtnRef = ref<HTMLElement | null>(null)
+
 const { getTokenBalance } = useBotSwap()
 
 const chain = computed(() => {
   return (getAddressAndChainFromId(route.params?.id as string)?.chain || tokenStore.token?.chain) as BotChain
 })
 
+const gasPrice = computed(() => {
+  return gasPriceObj?.[chain.value] || 0
+})
 
 const tabs = computed<Array<{ value: 'buy' | 'sell', name: string }>>(() => {
   return [
@@ -81,7 +139,7 @@ const tabs2 = computed(() => {
   return list.map(i => {
     return {
       name: i + '%',
-      value: new Bignumber(i).div(100).toString()
+      value: new BigNumber(i).div(100).toString()
     }
   })
 })
@@ -150,7 +208,63 @@ onMounted(() => {
   // getWalletTxData()
 })
 
+const botPriorityFee = computed(() => {
+  if (!botStore.isSupportChains.includes(chain.value)) {
+    return ''
+  }
+  const botSettings = botSettingStore.botSettings?.[chain.value]?.buy?.[selected.value]
+  const mev = botSettings?.mev
 
+  const {gasTip1List, gasTip2List} = formatBotGasTips(botSwapStore.gasTip, chain.value)
+  const gasTips = mev ? gasTip1List : gasTip2List
+  const gasIndex = mev ? 0 : 1
+  const settings = botSettings?.gas[gasIndex]
+  const priorityFee = settings?.customFee || gasTips?.[settings?.level as number]
+  return priorityFee
+})
+
+function setBtnRef(el: HTMLElement | null) {
+  if (el && el?.id) {
+    btnRefs.value[el?.id] = el
+  }
+}
+
+function showPopover(item: BotSettingKey) {
+  console.log('showPopover', item)
+  selected.value = item
+  currentBtnRef.value = btnRefs.value[item] || null
+  visible.value = true
+  getGasPrice()
+}
+
+const gasPriceObj: Record<string, number> = reactive({})
+
+function getGasPrice() {
+  if (!isEvmChain(chain.value) || gasPriceObj[chain.value]) {
+    return
+  }
+
+  getRpcProvider(chain.value)?.getFeeData().then(res => {
+    if (res) {
+      gasPriceObj[chain.value] = new BigNumber(res.gasPrice || 0).toNumber()
+    }
+  })
+}
+
+function getEstimatedGas() {
+  if (isEvmChain(chain.value) && botStore?.isSupportChains?.includes(chain.value)) {
+    const botSettings = botSettingStore.botSettings?.[chain.value]?.buy?.[selected.value]
+    const mev = botSettings?.mev
+    const nativePrice = botSwapStore.mainTokensPrice?.find(item => item.chain === chain.value && item.token === getChainInfo(chain.value)?.wmain_wrapper)?.current_price_usd || tokenStore.swap.native.price || 0
+    const {gasTip1List, gasTip2List} = formatBotGasTips(botSwapStore.gasTip, chain.value)
+    const gasTips = mev ? gasTip1List : gasTip2List
+    const settings = mev ? botSettings?.gas[0] : botSettings?.gas[1]
+    const extraGasPrice = settings?.customFee || gasTips?.[settings?.level as number] || '3'
+    const gasLimit = botSwapStore.gasTip?.find?.(i => i.chain === chain.value && i.mev === !!mev)?.gasLimit || 200000
+    return formatNumber(new BigNumber(gasPrice.value).plus(new BigNumber(extraGasPrice).times(String(10 ** 9))).times(gasLimit).times(nativePrice).div(String(10 ** 18)).toFixed(), 2)
+  }
+  return 0
+}
 
 </script>
 <style lang="scss" scoped>
