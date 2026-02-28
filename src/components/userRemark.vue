@@ -15,7 +15,8 @@
         :class="addressClass"
         :style="addressStyle"
         :title="showAddressTitle ? remark2 : undefined"
-        @click.stop="handleContextMenu"
+        @contextmenu.stop ="handleContextMenu"
+        @click.stop="handleClick"
         @mouseover.stop="mouseoverAddress"
       >
         22{{ remark1 }}
@@ -26,7 +27,8 @@
         :class="addressClass"
         :style="addressStyle"
         :title="showAddressTitle ? remark2 : undefined"
-        @click.stop="handleContextMenu"
+        @contextmenu.stop ="handleContextMenu"
+        @click.stop="handleClick"
       >
        11{{ remark1 }}
       </span>
@@ -187,9 +189,19 @@ function sendRemarkToServer(remark: string) {
       loadingEdit.value = false
     })
 }
-
 // 右键点击事件处理
 function handleContextMenu(e: MouseEvent) {
+  e.preventDefault()
+  const rightClickAction = globalStore.audioSettings?.wallet?.rightClickAction
+  // rightClickAction: 0 不打开, 1 新tab打开
+  const url = `/address/${props.address}/${props.chain}`
+  if (rightClickAction === 1) {
+    window.open(url, '_blank')
+  }
+}
+
+// 右键点击事件处理
+function handleClick(e: MouseEvent) {
   e.preventDefault()
   const clickAction = globalStore.audioSettings?.wallet?.clickAction
   // rightClickAction: 0 不打开, 1 新tab打开
