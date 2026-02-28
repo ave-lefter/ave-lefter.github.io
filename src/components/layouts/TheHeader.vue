@@ -40,14 +40,14 @@
       </span>
     </a>
     <div class="flex-1" />
-    <div
+    <!-- <div
     class="ml-8px bg-[--main-input-button-bg] rounded-4px p-8px h-32px flex items-center text-12px cursor-pointer hover:opacity-80"
       @click="toReferrer"
     >
       <img v-show="showAnimation" src="@/assets/images/refer.gif" height="20" alt="">
       <img v-show="!showAnimation" src="@/assets/images/refer.png" height="20" alt="">
       <span style="word-break: keep-all">{{ $t('refer') }}</span>
-    </div>
+    </div> -->
     <ClipboardToken />
     <el-button
       v-if="!botStore.evmAddress && !walletStore.address"
