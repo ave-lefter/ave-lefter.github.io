@@ -25,6 +25,7 @@ export const useTokenStore = defineStore('token', () => {
   const tokenInfoExtra = shallowRef<null | TokenInfoExtra>(null)
   const twitterType = ref<0 | 1 | 2 | 3>(0)
   const { $i18n } = useNuxtApp()
+  const globalStore = useGlobalStore()
   const tokenWarningObj = useLocalStorage<Record<string, boolean>>(
     'tokenWarningNotice',
     {}
@@ -85,10 +86,25 @@ export const useTokenStore = defineStore('token', () => {
     if (val) {
       if (route.fullPath?.includes?.('/token')) {
         // useHead({ title: '$' + formatNumber(val, 4) + ' ' + token.value?.symbol + ' | Ave' })
-        document.title = '$' + formatNumber(val, 4) + ' ' + token.value?.symbol + ' | Ave'
+        if (globalStore.showMarket) {
+          document.title = '$' + formatNumber(marketCap.value, 2) + ' ' + token.value?.symbol + ' | Ave'
+        } else {
+          document.title = '$' + formatNumber(val, 4) + ' ' + token.value?.symbol + ' | Ave'
+        }
       }
     }
   })
+ watch(()=>globalStore.showMarket, (val) => {
+    if (route.fullPath?.includes?.('/token')) {
+      // useHead({ title: '$' + formatNumber(val, 4) + ' ' + token.value?.symbol + ' | Ave' })
+      if (val) {
+        document.title =
+          '$' + formatNumber(marketCap.value, 2) + ' ' + token.value?.symbol + ' | Ave'
+      } else {
+        document.title = '$' + formatNumber(price.value || 0, 4) + ' ' + token.value?.symbol + ' | Ave'
+      }
+    }
+ })
   const centerTopHeight = shallowRef(DefaultHeight.KLINE)
   const {height} = useWindowSize()
   const commonHeight = computed(() => height.value - centerTopHeight.value)
