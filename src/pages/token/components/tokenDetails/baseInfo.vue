@@ -71,6 +71,19 @@ function init() {
 }
 
 // 右键点击事件处理
+function handleClick(e: MouseEvent, row: any) {
+  e.preventDefault()
+  const rightClickAction = globalStore.audioSettings?.wallet?.clickAction
+  // rightClickAction: 0 不打开, 1 新tab打开
+  const url = `/address/${row.user_address}/${row.tokenInfo.chain}`
+  if (rightClickAction === 1) {
+    window.open(url, '_blank')
+  } else{
+    window.open(url)
+  }
+}
+
+// 右键点击事件处理
 function handleContextMenu(e: MouseEvent, row: any) {
   e.preventDefault()
   const rightClickAction = globalStore.audioSettings?.wallet?.rightClickAction
@@ -80,6 +93,7 @@ function handleContextMenu(e: MouseEvent, row: any) {
     window.open(url, '_blank')
   }
 }
+
 
 function resetListStatus() {
   listQuery.value.pageNO = 1
@@ -333,6 +347,7 @@ const collect = async () => {
           <div class="flex items-center gap-6px">
             <span
               class="text-12px color-[--secondary-text]"
+              @click.stop="handleClick($event, tokenDetailStore)"
               @contextmenu.stop="handleContextMenu($event, tokenDetailStore)"
             >{{
                 tokenDetailStore.user_address.slice(0, 4)
