@@ -188,9 +188,12 @@ const tokenAllPair = computed(() => {
 })
 
 function switchPair(item: any) {
-  if (tokenStore.pairAddress === item.pair && (!tokenStore.selectedToken || !tokenAllPair)){
+  if (tokenStore.pairAddress === item.pair && (!tokenStore.selectedToken && tokenAllPair.value)){
     tokenStore.switchPair(true)
   } else {
+    if (tokenStore.pairAddress === item.pair && !tokenAllPair.value){
+      return
+    }
     tokenStore.switchPair(item.pair)
   }
 }

@@ -191,7 +191,6 @@ export function useKlineMarks() {
         onDataCallback(marks || [])
         return
       }
-      console.log('no dddd')
       if(profilingMarksCache.has(id) && markTabsChecked.value?.[v.id]) {
         const res = touchCache(profilingMarksCache, id) || []
         const marks = formatProfilingToMarks(res, interval, v.id, v.name)
