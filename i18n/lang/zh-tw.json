@@ -1989,5 +1989,7 @@
   "DEVBurn": "DEV燒幣",
   "filterBot": "過濾機器人刷量",
   "filterDevBot": "過濾開發者刷量",
-  "filterMouse": "過濾老鼠倉刷量"
+  "filterMouse": "過濾老鼠倉刷量",
+  "QuoteTokens":"报价代币",
+  "clearPumpFilter":"清空篩選"
 }

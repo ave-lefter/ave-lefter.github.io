@@ -162,8 +162,10 @@
             :tableList="list1 || []"
             :quickBuyValue="quickBuyValue"
             :loading="pumpV3[activeChain]['new']['loading']"
+            :hasFilter="getFilterNumber(pumpStore.pumpV3[activeChain].new.pumpFilter || {}) > 0"
             @mouseover="isPausedObj.new = true"
             @mouseleave="isPausedObj.new = false"
+            @clearFilter="handleClearFilter('new')"
           />
         </div>
       </el-col>
@@ -232,8 +234,10 @@
             :quickBuyValue="quickBuyValue"
             :loading="pumpV3[activeChain]['soon']['loading']"
             isSoon
+            :hasFilter="getFilterNumber(pumpStore.pumpV3[activeChain].soon.pumpFilter || {}) > 0"
             @mouseover="isPausedObj.soon = true"
             @mouseleave="isPausedObj.soon = false"
+            @clearFilter="handleClearFilter('soon')"
           />
         </div>
       </el-col>
@@ -303,8 +307,10 @@
             :quickBuyValue="quickBuyValue"
             :loading="pumpV3[activeChain]['graduated']['loading']"
             isOut
+            :hasFilter="getFilterNumber(pumpStore.pumpV3[activeChain].graduated.pumpFilter || {}) > 0"
             @mouseover="isPausedObj.graduated = true"
             @mouseleave="isPausedObj.graduated = false"
+            @clearFilter="handleClearFilter('graduated')"
           />
         </div>
       </el-col>
@@ -316,6 +322,7 @@
       :activeChain="activeChain"
       :activeFilterType="activeFilterType"
       :platformsList="platformsList"
+      :baseTokens="baseTokenMap.values().toArray()"
       @update:filterData="handlerFilterConfirm"
     />
 
@@ -526,6 +533,7 @@ const list1 = computed(() => {
   }
   const list1 = (wsTableList.value || [])?.filter(i => i.state === 'new' && i.chain === activeChain.value)
   const pumpFilter = pumpStore.pumpV3[activeChain.value].new.pumpFilter
+  list = filterHistoryData(list,pumpFilter)
   const wsList = getFilterData(list1, pumpFilter)
   const wsList1 = wsList?.filter((i: { pair: string }) => !list?.some(j => j.pair === i.pair))
   let filterList = [...wsList1, ...list].map(i => {
@@ -597,6 +605,7 @@ const list2 = computed(() => {
   }
   const list1 = (wsTableList.value || [])?.filter(i => (i.state === 'migrating') && i.chain === activeChain.value)
   const pumpFilter = pumpStore.pumpV3[activeChain.value].soon.pumpFilter
+  list = filterHistoryData(list,pumpFilter)
   const wsList = getFilterData(list1, pumpFilter)
   const wsList1 = wsList?.filter((i: { pair: string }) => !list?.some(j => j.pair === i.pair))
   let filterList = [...wsList1, ...list].map(i => {
@@ -676,6 +685,7 @@ if (pumpSetting.value.isBlacklist && pumpBlackList.value?.length > 0) {
 }
   const list1 = (wsTableList.value || [])?.filter(i => i.state === 'migrated' && i.chain === activeChain.value)
   const pumpFilter = pumpStore.pumpV3[activeChain.value].graduated.pumpFilter
+  list = filterHistoryData(list,pumpFilter)
   const wsList = getFilterData(list1, pumpFilter)
   const wsList1 = wsList?.filter((i: { pair: string }) => !list?.some(j => j.pair === i.pair))
   let filterList = [...wsList1, ...list].map(i => {
@@ -1392,6 +1402,37 @@ function parseDate(dateStr?: string | number, toSeconds = false) {
   const ms = new Date(dateStr).getTime()
   return toSeconds ? ms / 1000 : ms
 }
+function filterHistoryData(list: PumpObj[], conditions: any) {
+  conditions = conditions || {}
+  const urlCount = new Map<string, number>()
+  if (conditions?.no_repeat_social_media && list?.length) {
+    list.forEach((i) => {
+      if (Array.isArray(i?.medias)) {
+        const urls = [...new Set(i.medias.map((m: { url?: string }) => m?.url).filter(Boolean) as string[])]
+        urls.forEach((url) => urlCount.set(url, (urlCount.get(url) ?? 0) + 1))
+      }
+    })
+  }
+  const duplicateUrls = new Set<string>([...urlCount.entries()].filter(([, n]) => n > 1).map(([url]) => url))
+  return list?.filter((i) => {
+    let pass = true
+    if (conditions?.dev_sale_out) {
+      if(conditions?.dev_sale_out === 1){
+        pass = pass && !Number(i?.dev_balance_ratio_cur)
+      } else if(conditions?.dev_sale_out === 2){
+        pass = pass && !!Number(i?.dev_balance_ratio_cur)
+      }
+    }
+    if (conditions?.no_repeat_social_media && Array.isArray(i?.medias)) {
+      const urls = i.medias.map((m: { url?: string }) => m?.url).filter(Boolean) as string[]
+      const hasRepeatedUrl = urls.some((url) => duplicateUrls.has(url))
+      if (hasRepeatedUrl) {
+        pass = false
+      }
+    }
+    return pass
+  })
+}
 function getFilterData(list: PumpObj[], conditions: any) {
   conditions = conditions || {}
   return list?.filter((i) => {
@@ -1401,7 +1442,19 @@ function getFilterData(list: PumpObj[], conditions: any) {
       pass = pass && arr?.findIndex(y=> i.target_token == y || i.name == y || i.symbol == y) !== -1
     }
     if (conditions?.dev_sale_out) {
-      pass = pass && !Number(i?.dev_balance_ratio_cur)
+      if(conditions?.dev_sale_out === 1){
+        pass = pass && !Number(i?.dev_balance_ratio_cur)
+      } else if(conditions?.dev_sale_out === 2){
+        pass = pass && !!Number(i?.dev_balance_ratio_cur)
+      }
+    }
+    if(conditions?.base_tokens){
+      const baseHash =
+        i.target_token === i.token0_address
+          ? i.token1_address
+          : i.token0_address
+      const baseToken = baseTokenMap.value.get(baseHash)
+      pass = pass && conditions?.base_tokens?.includes?.(baseToken?.token)
     }
     if (conditions?.progress_min) {
       pass = pass && i.progress >= Number(conditions.progress_min)
@@ -1697,6 +1750,11 @@ function mergeLogo(prev: any, next: any) {
     logo_url: next.logo_url || prev.logo_url,
     appendix: next.appendix || prev.appendix,
   }
+}
+function handleClearFilter(type: 'new' | 'soon' | 'graduated') {
+  const platformsString = pumpConfig.value?.find(i => i.chain === activeChain.value)?.platforms?.map(i => i.platform)?.join?.(',') || ''
+  pumpStore.pumpV3[activeChain.value][type].pumpFilter = {...pumpFilterDefault.value,platforms:platformsString}
+  getPumpList(true)
 }
 </script>
 

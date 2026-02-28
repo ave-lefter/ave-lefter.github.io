@@ -2005,5 +2005,7 @@
   "DEVBurn": "DEV Burn",
   "filterBot": "Filter Bot",
   "filterDevBot": "Filter Dev Bot",
-  "filterMouse": "Filter Mouse"
+  "filterMouse": "Filter Mouse",
+  "QuoteTokens":"Quote Tokens",
+  "clearPumpFilter":"Clear Filter"
 }

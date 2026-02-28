@@ -24,12 +24,14 @@
       <el-form ref="formRef" class="scrollbar-hide w-pumpFilter" :model="form" label-width="auto" autocomplete="off"
         label-position="left" size="small" @submit.prevent>
         <el-scrollbar view-class="filter-height">
-          <div class="px-16px border pb-12px">
+          <div class="px-16px pb-12px">
             <div class="flex justify-between items-center w-full mb-16px">
               <span class="text-12px">{{ $t('platform') }}</span>
               <span class="text-12px w-48px lh-24px rounded-4px bg-[--pump-filter-bg] text-center cursor-pointer"
-                @click="form.platforms = platformsList.map(platform => platform.platform).join(',')">{{ $t('all1')
-                }}</span>
+                @click="form.platforms = platformsList.map(platform => platform.platform).join(',')">
+                {{ $t('all1')
+                }}
+                </span>
             </div>
             <el-checkbox-group size="default" @change="(val) => form.platforms = val.join(',')"
               :model-value="form.platforms.split(',')" class="grid grid-cols-2 gap-12px flex-1">
@@ -43,6 +45,28 @@
                     'signals/'
                   )}`" />
                   {{ platform.platform_show }}
+                </span>
+              </el-checkbox>
+            </el-checkbox-group>
+          </div>
+          <div class="px-16px border pb-12px">
+            <div class="flex justify-between items-center w-full mb-16px">
+              <span class="text-12px">{{ $t('QuoteTokens') }}</span>
+              <span class="text-12px w-48px lh-24px rounded-4px bg-[--pump-filter-bg] text-center cursor-pointer" @click="form.base_tokens = baseTokens.map(token => token.token).join(',')">{{ $t('all1')
+                }}</span>
+            </div>
+            <el-checkbox-group size="default" @change="(val) => form.base_tokens = val.join(',')"
+              :model-value="form.base_tokens?.split?.(',') || []" class="grid grid-cols-2 gap-12px flex-1">
+              <el-checkbox v-for="platform in baseTokens" :key="platform.token" :label="platform.token"
+                class="[&&]:mr-0 [&&]:[--el-checkbox-height:28px]">
+                <span
+                  class="flex items-center gap-8px rounded-30px py-6px px-12px border-1px border-solid color-[--main-text]"
+                  :style="{ borderColor: PlatformColors[platform.token] }">
+                  <el-image class="rounded w-14px" :src="`${configStore.token_logo_url}${platform.logo_url?.replace(
+                    '/signals/',
+                    'signals/'
+                  )}`" />
+                  {{ platform.symbol }}
                 </span>
               </el-checkbox>
             </el-checkbox-group>
@@ -64,23 +88,23 @@
           </div>
           <div v-show="tabs2Active === Tabs2Enum.indicator"
             class="grid grid-cols-2 gap-12px flex-1 px-16px py-12px border">
-            <el-checkbox size="default" :model-value="form.dev_sale_out"
-               @change="(val) => form.dev_sale_out = val">
+            <el-checkbox size="default" :model-value="form.dev_sale_out === 1"
+               @change="(val) => form.dev_sale_out = val ? 1 : 0">
                <span class="color-[--secondary-text]">
                 {{ t('devClose') }}
               </span>
             </el-checkbox>
-            <!-- <el-checkbox size="default" :model-value="!form.dev_sale_out" @change="(val) => form.dev_sale_out = !val">
+            <el-checkbox size="default" :model-value="form.dev_sale_out === 2" @change="(val) => form.dev_sale_out = val ? 2 : 0">
                <span class="color-[--secondary-text]">
                 {{ t('devNotClose') }}
               </span>
-            </el-checkbox> -->
-            <!-- <el-checkbox size="default" v-model="form[indicate.value]" v-for="indicate in indicatorArr"
+            </el-checkbox>
+            <el-checkbox size="default" v-model="form[indicate.value]" v-for="indicate in indicatorArr"
               :key="indicate.value" :label="indicate.label" class="[&&]:mr-0 [&&]:[--el-checkbox-height:16px]">
               <span class="color-[--secondary-text]">
                 {{ indicate.label }}
               </span>
-            </el-checkbox> -->
+            </el-checkbox>
           </div>
           <el-form-item v-if="!storage.value?.includes('_graduated') && tabs2Active===Tabs2Enum.indicator" :label="`${t('progress')}(%)`"
             class="mt-12px px-16px columns-form-item">
@@ -195,6 +219,10 @@ const props = defineProps({
     type: Array<any>,
     default: () => []
   },
+  baseTokens:{
+    type:Array<any>,
+    default:() => []
+  }
 })
 
 const emit = defineEmits(['update:filterData', 'update:visible'])
@@ -204,6 +232,7 @@ const configStore = useConfigStore()
 const { isDark } = storeToRefs(globalStore)
 const { t } = useI18n()
 const activeTab = ref(props.activeFilterType)
+watch(()=>props.activeFilterType,val=>activeTab.value = val)
 const storage = computed(() => `pumpFilter_${props.activeChain}_${activeTab.value}`)
 const topTabs = computed(() => {
   return [
@@ -322,7 +351,11 @@ const PlatformColors = {
   "bankr.bot": '#9472ff',
   "base.app": '#3679ff',
   "zoracreator": '#5a81f1',
-  "zoracontent": '#5a81f1'
+  "zoracontent": '#5a81f1',
+  'So11111111111111111111111111111111111111112':'#A357E6',
+  "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB":"#00D62B",
+  "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v":"#2775C9",
+  "USD1ttGY1N17NEEHLmELoaybftRBUSErhqYiQzvEmuB":"#E78C19"
 }
 const localVisible = computed({
   get: () => props.visible,
@@ -569,6 +602,7 @@ function handleConfirm() {
     if (valid) {
       const form1 = { ...form.value }
       tableFilter = { ...form1 }
+      pumpStore.pumpV3[props.activeChain][props.activeFilterType].pumpFilter = { ...form1 }
       console.log('----------form1-------------', form1)
       emit('update:filterData', { ...form1 }, storage.value)
     } else {
@@ -583,8 +617,9 @@ function reset() {
   if (formRef.value) {
     formRef.value.resetFields()  // 重置表单字段
   }
-  const form = { ...initForm }
-  tableFilter = { ...form }  // 更新过滤器数据
+  const form = { ...initForm,platforms:props.platformsList.map(platform => platform.platform).join(',') }
+  tableFilter = { ...form }
+  pumpStore.pumpV3[props.activeChain][props.activeFilterType].pumpFilter = { ...form }  // 更新过滤器数据
   // 触发更新事件
   emit('update:filterData', { ...form }, storage.value)
 }
@@ -646,8 +681,8 @@ function switchForm(f: any) {
 const isArray = _isArray
 const isString = _isString
 const getItemFilterNumber = value => {
-  if (value === activeTab.value) return getFilterNumber(form.value)
-  return getFilterNumber(pumpStore.pumpV3[props.activeChain][props.activeFilterType]?.pumpFilter || {})
+  if (value === props.activeFilterType) return getFilterNumber(form.value)
+  return getFilterNumber(pumpStore.pumpV3[props.activeChain][value]?.pumpFilter || {})
 }
 </script>
 

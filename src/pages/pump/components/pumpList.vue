@@ -713,6 +713,9 @@ class="flex-start mr-8px bg-btn"
           </li>
       </div>
        <AveEmpty v-if="tableList?.length == 0 && !loading" class="mt-200px" />
+       <div class="flex justify-center">
+        <el-button class="w-266px mt-20px" v-if="hasFilter && tableList?.length == 0 && !loading" @click="handleClearFilter">{{ $t('clearPumpFilter') }}</el-button>
+       </div>
     </ul>
     <transition name="fade">
       <span v-if="showBackTop" class="back-top text-12px flex items-center bg-[--main-bg] cursor-pointer" @click="scrollToTop">
@@ -794,13 +797,20 @@ const props = defineProps({
     type: String,
     default: () => '',
   },
+  hasFilter: {
+    type: Boolean,
+    default: () => false,
+  },
 })
 
 // const showPop = ref(false)
 // const selected = ref<PumpObj | null>(null)
 // const btnRefs = ref<Record<string, HTMLElement | null>>({})
 // const currentBtnRef = ref<HTMLElement | null>(null)
-
+const emit = defineEmits(['clearFilter'])
+const handleClearFilter = () => {
+  emit('clearFilter')
+} 
 const { quickBuyValue, loading, isOut, isSoon , type} = toRefs(props)
 const tableList = shallowRef<PumpObj[]>(props.tableList || [])
 
