@@ -2,7 +2,11 @@
   <div class="flex w-full mb-12px items-center gap-12px">
     <!-- 时间：日历 icon + 左右箭头 + 月份 -->
     <div class="flex items-center gap-6px text-12px h-24px">
-      <Icon name="ri:calendar-line" class="color-[--third-text] text-14px shrink-0" />
+      <div
+        class="w-24px h-24px flex items-center justify-center shrink-0 rounded-4px border border-solid border-[--d-FFFFFF14-l-00000014]"
+      >
+        <Icon name="ri:calendar-line" class="color-[--third-text] text-14px" />
+      </div>
       <Icon
         name="ri:arrow-left-s-line"
         class="color-[--third-text] text-14px cursor-pointer shrink-0"
