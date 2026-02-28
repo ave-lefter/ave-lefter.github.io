@@ -2044,5 +2044,7 @@
   "twitterTracker2": "News",
   "onlyTitle": "Only Title",
   "ViewFullText": "View full text",
-  "socialMediaTracker": "Media Tracker"
+  "socialMediaTracker": "Media Tracker",
+  "followers": "Followers",
+  "following": "Following"
 }

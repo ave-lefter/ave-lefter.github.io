@@ -446,7 +446,7 @@
                         formatNumber(row?.dev_migrated_count || 0, 2)}}/{{formatNumber(row?.dev_total_count || 0, 2)}}
                       </span>
                     </div>
-                    <HolderRank
+                    <!-- <HolderRank
                       v-if="route.name === 'index'"
                       class="flex mr-8px bg-btn"
                       :tokenId="(row?.token || row?.target_token) + '-' + row?.chain"
@@ -463,19 +463,34 @@
                             formatNumber(row?.co_holders_count || 0, 2)}}
                           </span>
                         </div>
-                    </HolderRank>
+                    </HolderRank> -->
                   </div>
-                  <div class="mt-5px flex-start text-11px">
-                    <PumpPop
-                        v-if="row?.medias?.some(i=> i.icon === 'twitter') && route.name === 'index'"
-                        :tokenId="(row.token + '-' + row.chain)"
-                        :type="2"
-                      >
-                    <a v-for="(item, index) in row?.medias?.filter(i => i.icon === 'twitter')" :key="index"
-                      :href="item.url" target="_blank" class="!color-#009EF7" @click.stop>
+                  <div class="mt-5px text-11px"  v-if="row?.medias?.some(i=> i.icon === 'twitter') && route.name === 'index'">
+                    <div class="flex-start items-center" v-for="(item, index) in row?.medias?.filter(i => i.icon === 'twitter')" :key="index">
+                      <PumpPop
+                          v-if="row?.medias?.some(i=> i.icon === 'twitter') && route.name === 'index'"
+                          :tokenId="(row.token + '-' + row.chain)"
+                          :type="2"
+                        >
+                        <a :href="item.url" target="_blank" class="!color-#009EF7" @click.stop>
                           {{ formatXUser(item?.url) }}
                         </a>
-                    </PumpPop>
+                      </PumpPop>
+                      <template v-if="formatXUser(item?.url)">
+                        <div v-if="row?.followers" class=" ml-8px color-[--x-blue] flex-start leading-10px cursor-pointer" v-tooltip="$t('followers')">
+                            <Icon
+                              class="iconfont icon-rug mr-4px text-10px"
+                              name="custom:followers"
+                            />{{ formatNumber(row?.followers || 0, {locale: 'en'}) }}
+                        </div>
+                        <div v-if="row?.following" class="color-[--x-blue] ml-8px flex-start leading-10px cursor-pointer" v-tooltip="$t('following')">
+                          <Icon
+                            class="iconfont icon-rug mr-4px text-10px"
+                            name="custom:following"
+                          />{{ formatNumber(row?.following || 0, {locale: 'en'}) }}
+                        </div>
+                      </template>
+                    </div>
                   </div>
                   <div class="flex-start text-12px absolute bottom--2px z-1 mt-5px">
                     <div
