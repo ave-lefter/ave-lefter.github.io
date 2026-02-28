@@ -79,7 +79,7 @@ function handleClick(e: MouseEvent, row: any) {
   if (rightClickAction === 1) {
     window.open(url, '_blank')
   } else{
-    window.open(url)
+    window.open(url, '_self')
   }
 }
 
@@ -369,7 +369,7 @@ const collect = async () => {
       </div>
       <NuxtLink
         v-if="$route.path.indexOf('/address/') == -1"
-        :target="globalStore.audioSettings?.wallet?.clickAction == 1  ? '_blank' : ''"
+        :target="globalStore.audioSettings?.wallet?.clickAction == 1  ? '_blank' : '_self'"
         :to="`/address/${tokenDetailStore.user_address}/${tokenDetailStore.tokenInfo!.chain}`" class="py-7px px-8px bg-[--border] rounded-4px color-[--main-text] text-12px"
         @click.stop="tokenDetailStore.drawerVisible = false"
       >

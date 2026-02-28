@@ -191,13 +191,13 @@ function sendRemarkToServer(remark: string) {
 // 右键点击事件处理
 function handleContextMenu(e: MouseEvent) {
   e.preventDefault()
-  const rightClickAction = globalStore.audioSettings?.wallet?.clickAction
+  const clickAction = globalStore.audioSettings?.wallet?.clickAction
   // rightClickAction: 0 不打开, 1 新tab打开
   const url = `/address/${props.address}/${props.chain}`
-  if (rightClickAction === 1) {
+  if (clickAction === 1) {
     window.open(url, '_blank')
   } else {
-    window.open(url)
+    window.open(url, '_self')
   }
 }
 </script>

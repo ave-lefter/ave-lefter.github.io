@@ -869,7 +869,7 @@ function openMarkerTooltip(row: IGetSimpleTxsResponse & { senderProfile: Profile
 
 function goBrowser(row: IGetSimpleTxsResponse) {
   const rightClickAction = globalStore.audioSettings?.wallet?.clickAction
-  let targe = ''
+  let targe = '_self'
   if (rightClickAction === 1) {
     targe ='_blank'
   }
