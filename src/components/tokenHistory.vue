@@ -66,6 +66,7 @@ watch(()=>[botStore.evmAddress,walletStore.address,walletStore.walletSignature[w
 function _getUserBalance() {
   console.log('------userIds.value[0]---------', userIds.value[0])
   if(userIds.value[0] === '-'){
+    positionList.value.length = 0
     return
   }
   getUserBalance({

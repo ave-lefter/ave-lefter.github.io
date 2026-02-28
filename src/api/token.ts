@@ -116,7 +116,11 @@ export function getKlineHistoryData(data: {
     time: number
     volume: number
   }>
- pair: string
+  pair: string
+  extra_data?: {
+    migrate_time?: number
+    migrate_uprice: string
+  }
 }> {
   const [pair, chain1] = getAddressAndChainFromId(data?.pair_id || '', 1)
   const [token, chain2] = getAddressAndChainFromId(data?.token_id || '', 1)
@@ -149,7 +153,8 @@ export function getKlineHistoryData(data: {
         volume: i.vol,
         tag: i.tag
       })),
-      pair: res?.pair || pair || ''
+      pair: res?.pair || pair || '',
+      extra_data: res?.extra_data
     }
   }).catch(async () => {
     return {
@@ -176,11 +181,15 @@ export function getTokenKlineHistory(data: {
     volume: number
   }>
   pair?: string
+  extra_data?: {
+    migrate_time?: number
+    migrate_uprice: string
+  }
 }> {
   const [token, chain] = getAddressAndChainFromId(data?.token_id || '', 1)
   if (!token || !chain) {
     return Promise.resolve({
-      kline_data: []
+      kline_data: [],
     })
   }
   const { $api } = useNuxtApp()
@@ -193,27 +202,40 @@ export function getTokenKlineHistory(data: {
       from: data.from,
       to: data.to,
       category: 'u',
-      limit_count: 300
-    }
-  }).then(async(res) => {
-    return {
-      kline_data: (res?.kline_data || []).map((i: { t: number; o: number; h: number; l: number; c: number; vol: number; tag: string }) => ({
-        time: i.t,
-        open: i.o,
-        high: i.h,
-        low: i.l,
-        close: i.c,
-        volume: i.vol,
-        tag: i.tag
-      })),
-      pair: res?.pair || ''
-    }
-  }).catch(async () => {
-    return {
-      kline_data: [],
-      pair: ''
-    }
+      limit_count: 300,
+    },
   })
+    .then(async (res) => {
+      return {
+        kline_data: (res?.kline_data || []).map(
+          (i: {
+            t: number
+            o: number
+            h: number
+            l: number
+            c: number
+            vol: number
+            tag: string
+          }) => ({
+            time: i.t,
+            open: i.o,
+            high: i.h,
+            low: i.l,
+            close: i.c,
+            volume: i.vol,
+            tag: i.tag,
+          })
+        ),
+        pair: res?.pair || '',
+        extra_data: res?.extra_data,
+      }
+    })
+    .catch(async () => {
+      return {
+        kline_data: [],
+        pair: '',
+      }
+    })
 }
 
 // 画像描点接口 用户交易
@@ -221,25 +243,27 @@ export function getUserKlineTxTags(data: {
   interval: string
   from: number
   to: number
-  pair: string
   token_address: string
+  pair: string
   user_address?: string
-}): Promise<Array<{
-  sell?: {
-    amount: number
-    txns: number
-    volume: number
-  }
-  buy?: {
-    amount: number
-    txns: number
-    volume: number
-  }
-  time: number
-}>> {
+}): Promise<
+  Array<{
+    sell?: {
+      amount: number
+      txns: number
+      volume: number
+    }
+    buy?: {
+      amount: number
+      txns: number
+      volume: number
+    }
+    time: number
+  }>
+> {
   const { $api } = useNuxtApp()
   const user_address = data?.user_address
-  if (!user_address || !data?.pair) {
+  if (!user_address) {
     return Promise.resolve([])
   }
   return $api(`/v1api/v4/pairs/${data?.pair}/kline_tx_tags`, {
@@ -247,7 +271,7 @@ export function getUserKlineTxTags(data: {
     query: {
       ...data,
       user_address,
-    }
+    },
   }).catch(() => {
     return Promise.resolve([])
   })
@@ -311,11 +335,12 @@ export function getKlineProfilingTagsV2(data:{
   from: number
   to: number
   type: string
-  pair_id: string
+  pair_id?: string
+  token_id?: string
 }):Promise<IGetKlineProfilingTagsV2Item[]>{
-  if (!data?.pair_id) {
-    return Promise.resolve([])
-  }
+  // if (!data?.pair_id) {
+  //   return Promise.resolve([])
+  // }
   const { $api } = useNuxtApp()
   return $api('/v2api/token_info/v1/kline/profiling_tags', {
     method: 'get',

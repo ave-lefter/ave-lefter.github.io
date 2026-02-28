@@ -16,6 +16,10 @@ export interface PumpConfig {
 }
 
 export interface PumpObj {
+  headline_en: string
+  headline_cn: string
+  headline_en: string
+  headline_cn: string
   co_holders_count: string
   buy_tax: any
   sell_tax: any

@@ -95,7 +95,7 @@
         </div>
         <el-checkbox class="[--el-checkbox-height:14px]"  v-model="onlyTitle" :label="t('onlyTitle')"/>
       </div>
-     <NewsList  :dataSource="dataSource2" @endReached="debouncedGetList2" :onlyTitle="onlyTitle"  @stop="val => isPaused2 = val"/>
+     <NewsList v-if="shouldRenderChild" :total="total2" :dataSource="dataSource2" @endReached="debouncedGetList2" :onlyTitle="onlyTitle"  @stop="val => isPaused2 = val"/>
     </template>
     <div v-else>null</div>
     <AudioPopover v-if="audioButtonRef" :buttonRef="audioButtonRef" type="twitter"/>
@@ -123,6 +123,7 @@ const newsAudio = useTemplateRef('newsAudio')
 const trackerStore = useTwitterTrackerStore()
 const v2WsStore = useV2WSStore()
 const globalStore = useGlobalStore()
+const {lang} = storeToRefs(useGlobalStore())
 const botStore = useBotStore()
 const activeTab = ref(1)
 const activeParentTab = ref(1)
@@ -136,7 +137,7 @@ const audioButtonRef2 = ref()
 const twitterAudio = useTemplateRef('twitterAudio')
 const followIds = useStorage('twFollowIds', [])
 
-const {dataSource: dataSource2, getList:getList2} = useNews({newsAudio,activeParentTab,isPaused:isPaused2})
+const {dataSource: dataSource2, getList:getList2,total:total2} = useNews({newsAudio,activeParentTab,isPaused:isPaused2})
 const query = ref({ ...trackerStore.query })
 // defineProps({
 //   scrollHeight: {
@@ -302,7 +303,19 @@ watch(() => followAuthorIds.value, () => {
     })
   }
 })
+const shouldRenderChild = shallowRef(true)
 
+const reCreateChild = () => {
+  shouldRenderChild.value = false
+  // 确保 DOM更新
+  nextTick(() => {
+    shouldRenderChild.value = true
+  })
+}
+
+watch([() => lang.value.includes('zh'), () => onlyTitle.value], () => {
+  reCreateChild()
+})
 useVisibilityChange(() => {
   trackerStore.list = []
   query.value.page_token = ''

@@ -8,6 +8,7 @@
         {{ uSymbol }}{{ total_balance }} {{ main_token_symbol }}
       </strong>
       <el-switch
+        style="--el-color-white:transparent;"
         :model-value="globalStore.isUSDT"
         class="custom-switch"
         :inactive-value="true"
@@ -176,4 +177,5 @@ const getBalance = async () => {
 getBalance()
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+</style>

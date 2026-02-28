@@ -3,7 +3,7 @@
     <div  class="w-[100%]">
       <div class="flex gap-10px items-center ml-12px">
         <div class="font-400 text-12px lh-16px color-[--third-text]">{{ $t('liquidity') }}</div>
-        <el-radio-group v-model="activeTime" class="m-radio-group" size="small" fill="var(--tab-active-bg)" :text-color="isDark?'#F5F5F5':'#FFF'" @change="init1">
+        <el-radio-group v-model="activeTime" class="m-radio-group [--el-text-color-regular:var(--d-F5F5F5-l-A9B0BC)]" size="small" fill="var(--tab-active-bg)" :text-color="isDark?'#F5F5F5':'#000'" @change="init1">
           <el-radio-button label="7D" :value="7" />
           <el-radio-button label="1M" :value="30" />
         </el-radio-group>
@@ -420,7 +420,7 @@ function init2() {
   width: 100%;
   height: 3px;
   display: flex;
-  background: #222;
+  background: var(--main-divider);
   border-radius: 1.5px;
   margin-top: 5px;
   margin-bottom: 3px;

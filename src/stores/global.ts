@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { useStorage } from '@vueuse/core'
+import { useStorage, useLocalStorage } from '@vueuse/core'
 import type { pumpBlack, pumpObjColor } from '@/api/types/pump'
 import { _getFollowsNum } from '@/api/follow'
 import type { MonitorChainType } from '~/utils/types'
@@ -173,7 +173,7 @@ export const useGlobalStore = defineStore('global', () => {
     {key:'+8h',value:'UTC+8, 00:00'},
   ]
   })
-
+  const showMarket = useLocalStorage('tv_showMarket', false)
   watch(
     () => themeStore.isDark,
     () => {
@@ -203,7 +203,7 @@ export const useGlobalStore = defineStore('global', () => {
     sort: 'created_timestamp',
     sort_dir: 'DESC',
   })
-  const audioSettings = useStorage('audioSettings-v3',{
+  const audioSettings = useStorage('audioSettings-v4',{
     active:'',
     notice:{
       monitor:true,
@@ -241,7 +241,7 @@ export const useGlobalStore = defineStore('global', () => {
   })
 
   // 预留一个全局变量，用于控制 token 历史的显示
-  const tokenHistoryVisible = true
+  const tokenHistoryVisible = useStorage('tokenHistoryVis',false)
   const klineSettingPop = ref({
     visible:false,
     position:[] as number[]
@@ -416,6 +416,7 @@ export const useGlobalStore = defineStore('global', () => {
     batchRemarkFormData,
     klineSettingPop,
     zone,
-    zoneList
+    zoneList,
+    showMarket
   }
 })

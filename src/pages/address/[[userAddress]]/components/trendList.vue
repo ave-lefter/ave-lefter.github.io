@@ -12,7 +12,7 @@
       @row-click="jumpTokenDetail"
     >
       <template #empty>
-        <AveEmpty v-if="!loading && tableData.length === 0" class="[pt-40px]" />
+        <AveEmpty v-if="!loading && tableData.length === 0" class="pt-40px" />
         <span v-else />
       </template>
       <TokenColumn
