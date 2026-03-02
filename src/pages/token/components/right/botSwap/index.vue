@@ -9,7 +9,7 @@
     </div>
     <div v-if="botStore?.userInfo?.evmAddress && botStore?.isSupportChains?.includes(chain)" class="flex items-center h-40px">
       <div class="tabs-1 mr-5px">
-        <button v-for="item in BotSettingsArr" :key="item.value" class="hover:bg-[--tab-active-bg]! hover:text-[--main-text]!" :class="{'active': item.value === botSettingStore?.botSettings?.[chain]?.[activeTab]?.selected}" type="button" @click.stop="onSelectBotSwapSet(item.value)" @mouseenter="showPopover(item.value)"
+        <button v-for="item in BotSettingsArr" :key="item.value" class="hover:bg-[--tab-active-bg]! hover:text-[--main-text1]!" :class="{'active': item.value === botSettingStore?.botSettings?.[chain]?.[activeTab]?.selected}" type="button" @click.stop="onSelectBotSwapSet(item.value)" @mouseenter="showPopover(item.value)"
           @mouseleave="visible = false" :ref="setBtnRef" :id="item.value"
         >{{ item.label }}</button>
         <!-- <button v-for="item in BotSettingsArr" :key="item.value" :class="{'active': item.value === botSettingStore?.botSettings?.[chain]?.selected}" type="button" @click.stop="onSelectBotSwapSet(item.value)">{{ item.label }}</button> -->
@@ -329,7 +329,7 @@ function getEstimatedGas() {
         --el-text-color-primary: var(--third-text);
         cursor: pointer;
         &.is-active {
-          color: var(--main-text);
+          color: var(--main-text1);
         }
         &:hover:not(.is-active) {
           color: var(--third-text);
@@ -340,7 +340,7 @@ function getEstimatedGas() {
       }
       .el-tabs__active-bar {
         height: 2px;
-        background-color: var(--main-text);
+        background-color: var(--main-text1);
       }
       .el-tabs__nav-wrap::after {
         height: 0.5px;

@@ -12,8 +12,8 @@
       <template #reference>
         <div class="flex item-center clickable">
           <Icon name="ri:wallet-fill" class="color-[--secondary-text] text-14px" />
-          <span class="text-12px color-[--main-text] mx-3px">{{ botSwapStore.botSwapSelectedWallets?.length }}</span>
-          <Icon name="prime:sort-down-fill" class="color-[--main-text] text-14px transition-all-300" :class="{ 'rotate-180': selectWalletVisible }" />
+          <span class="text-12px color-[--main-text1] mx-3px">{{ botSwapStore.botSwapSelectedWallets?.length }}</span>
+          <Icon name="prime:sort-down-fill" class="color-[--main-text1] text-14px transition-all-300" :class="{ 'rotate-180': selectWalletVisible }" />
         </div>
       </template>
       <template #default>
@@ -39,18 +39,18 @@
                 <div class="flex items-center" style="flex: 1.5">
                   <el-checkbox :key="item.evmAddress" class="[&&]:[--el-checkbox-disabled-checked-icon-color:#FFF] [&&]:[--el-checkbox-disabled-checked-input-fill:#3F80F7] [&&]:[--el-checkbox-disabled-checked-input-border-color:#3F80F7] batch-checkbox" :value="item.evmAddress" :disabled="item.evmAddress === botStore.evmAddress" :checked="item.evmAddress === botStore.evmAddress" />
                   <div class="text-12px lh-14px" @click.stop>
-                    <div class="color-[--main-text] overflow-hidden text-ellipsis whitespace-nowrap max-w-100px" :title="item.name">{{ item.name }}</div>
+                    <div class="color-[--main-text1] overflow-hidden text-ellipsis whitespace-nowrap max-w-100px" :title="item.name">{{ item.name }}</div>
                     <div class="color-[--third-text] flex items-center" >
                       <span>{{ getAddressFromChain(chain, item.addresses)?.address?.replace(new RegExp('(.{6})(.+)(.{4})'), '$1...$3') }}</span>
                       <Icon v-copy="getAddressFromChain(chain, item.addresses)?.address" name="bxs:copy" class="clickable ml-5px text-12px" />
                     </div>
                   </div>
                 </div>
-                <div class="ml-auto lh-14px flex items-center color-[--main-text] text-12px flex-1 justify-end">
+                <div class="ml-auto lh-14px flex items-center color-[--main-text1] text-12px flex-1 justify-end">
                   <img :src="`${configStore.token_logo_url}${tokenStore.swap.payToken?.logo_url}`" class="rd-50% mr-2px" height="12" alt="" srcset="" >
                   <span>{{ formatNumber(getAddressFromChainBalance(chain, item.addresses, tokenStore.swap.payToken?.address) || 0) }}</span>
                 </div>
-                <div class="ml-auto lh-14px flex items-center color-[--main-text] text-12px flex-1 justify-end">
+                <div class="ml-auto lh-14px flex items-center color-[--main-text1] text-12px flex-1 justify-end">
                   <img :src="`${configStore.token_logo_url}${tokenStore.swap.token?.logo_url}`" class="rd-50% mr-2px" height="12" alt="" srcset="" >
                   <span>{{ formatNumber(getAddressFromChainBalance(chain, item.addresses, tokenStore.swap.token?.address) || 0) }}</span>
                 </div>
@@ -62,7 +62,7 @@
     </el-popover>
     <div class="border-l-solid border-l-1px border-l-[--icon-color] h-8px mx-8px" />
     <img :src="`${configStore.token_logo_url}${tokenStore.swap.payToken?.logo_url}`" class="rd-50% mr-2px" height="12" alt="" srcset="" >
-    <span class="text-12px color-[--main-text]">{{ formatNumber(totalSelectWalletBalance || 0) }}</span>
+    <span class="text-12px color-[--main-text1]">{{ formatNumber(totalSelectWalletBalance || 0) }}</span>
   </div>
 </template>
 
