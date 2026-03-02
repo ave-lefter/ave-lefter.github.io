@@ -45,11 +45,13 @@ const filteredAmmList = computed(()=>{
 const filterNumber = computed(() => {
   return 0
 })
-const modelColumns = computed(() => storeColumns.value?.filter((item: any) =>item.children || item.isVisible))
-const dexVisible = computed(() => modelColumns.value?.find((item: any) => item.key === 'dex')?.isVisible)
+let modelColumns = computed(() => storeColumns.value?.filter((item: any) =>item.children || item.isVisible))
+let dexVisible = computed(() => modelColumns.value?.find((item: any) => item.key === 'dex')?.isVisible)
 
 watch(() => props.storageKey, () => {
   storeColumns = useStorage(props.storageKey, props.getDefaultColumns(t))
+  modelColumns = computed(() => storeColumns.value?.filter((item: any) =>item.children || item.isVisible))
+  dexVisible = computed(() => modelColumns.value?.find((item: any) => item.key === 'dex')?.isVisible)
 })
 watch(visible,()=>{
   // 打开弹窗同步所有筛选条件
@@ -322,6 +324,27 @@ function handleBlur(props2: string[], val: string, index: number) {
                 :placeholder="$t('max1')"
                 clearable
                 @blur="(val) => handleBlur(['sniper_tx_count_min', 'sniper_tx_count_max'], val, 1)"
+              />
+            </div>
+          </div>
+          <!-- 开盘人数 -->
+          <div v-if="item.key === 'rusher_tx_count' && item.isVisible" :key="item.key" class="flex items-center justify-between text-12px py-6px mb-8px">
+            <span class="color-[--secondary-text]">{{ $t('snipers_1m') }}</span>
+            <div class="flex items-center gap-8px">
+              <el-input
+                v-model.trim.number="tempFilter.rusher_tx_count_min"
+                class="w-106px"
+                :placeholder="$t('minor')"
+                clearable
+                @blur="(val) => handleBlur(['rusher_tx_count_min', 'rusher_tx_count_max'], val, 0)"
+              />
+              <span class="color-[--third-text]">~</span>
+              <el-input
+                v-model.trim.number="tempFilter.rusher_tx_count_max"
+                class="w-106px"
+                :placeholder="$t('max1')"
+                clearable
+                @blur="(val) => handleBlur(['rusher_tx_count_min', 'rusher_tx_count_max'], val, 1)"
               />
             </div>
           </div>
