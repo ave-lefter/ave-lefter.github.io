@@ -39,11 +39,8 @@
                 </div>
                 <div v-if="index !== -1" class="gap-8px flex items-center">
                     <div class="w-24px h-24px bg-[--main-list-hover] rounded-4px flex items-center justify-center cursor-pointer"
-                        @click="item.author.follow_status === 1 ? _unfollowKol(item.author.author_id, index) : _followKol(item.author.author_id, index)">
-                        <Icon :name="item.author.follow_status === 1
-                            ? 'custom:twitter-collect'
-                            : 'custom:twitter-uncollect'
-                            " class="text-12px" />
+                        @click="followIdArray.includes(item.author.author_id) ? _unfollowKol(item.author.author_id, index) : _followKol(item.author.author_id, index)">
+                        <Icon :name="followIdArray.includes(item.author.author_id) ? 'custom:twitter-collect' : 'custom:twitter-uncollect'" class="text-12px" />
                     </div>
                     <div class="flex items-center gap-4px py-6px px-4px rounded-4px text-12px"
                     :style="{background: map[item.type]?.bg, color: map[item.type]?.color}"
@@ -164,6 +161,9 @@ const isContentOverflow = ref(false)
 const followIds = useStorage('twFollowIds', [])
 const translationVisible = ref(false)
 
+const followIdArray = computed(() => {
+    return followIds.value.map(el => el.author_id)
+})
 const showTranslation = computed(() => {
     const {lang} = props.item || {}
     const key = lang === 'en' ? 'content_zh' : 'content_en'
