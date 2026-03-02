@@ -19,7 +19,7 @@
         @click.stop="handleClick"
         @mouseover.stop="mouseoverAddress"
       >
-        22{{ remark1 }}
+        {{ remark1 }}
       </span>
       <span
         v-else
@@ -27,10 +27,9 @@
         :class="addressClass"
         :style="addressStyle"
         :title="showAddressTitle ? remark2 : undefined"
-        @contextmenu.stop ="handleContextMenu"
         @click.stop="handleClick"
       >
-       11{{ remark1 }}
+       {{ remark1 }}
       </span>
     </template>
 
