@@ -18,6 +18,8 @@ import BigNumber from 'bignumber.js'
 //   }
 // })
 let timerArr=[null,null,null] as Array<null | ReturnType<typeof setTimeout>>
+// const {  refreshTokenBalance: refreshTokenBalance0 } = useBotSwap(0, true)
+// const {  refreshTokenBalance: refreshTokenBalance1 } = useBotSwap(1, true)
 
 const botStore = useBotStore()
 const walletStore = useWalletStore()
@@ -148,10 +150,13 @@ const getWalletTxData = async () => {
 }
 
 function getTxHistoryForEvm() {
-  const timeoutArr = [6000, 9000, 12000]
-  timerArr = timeoutArr.map((time, index) => setTimeout(() => {
-    unifiedRef.value?.getTxHistory()
-  }, time * (index + 1)))
+  const delays = [5000, 7000, 9000]; // 定义延迟时间数组
+  for (let i = 0; i < delays.length; i++) {
+      timerArr[i] = setTimeout(() => {
+          unifiedRef.value?.getTxHistory();
+          // isBuy?refreshTokenBalance0():refreshTokenBalance1();
+      }, delays[i]);
+  }
 }
 
 
@@ -177,6 +182,7 @@ watch(() => wsStore.wsResult[WSEventType.TGBOT], (val) => {
   }, 3000)
   if(val.chain && isEvmChain(val.chain)){
     getTxHistoryForEvm()
+    // getTxHistoryForEvm(val.swapType===1)
   }
   if (!timer) {
     timer = setInterval(() => {

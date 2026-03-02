@@ -554,7 +554,7 @@ function onWsKline(resolution: string, onTick: SubscribeBarsCallback, ws = perpW
 
 // 拖动缩放
 let isMask = false
-const kHeight = useStorage('kHeightPerp',  Math.max(DefaultHeight.KLINE, 500))
+const kHeight = useStorage('kHeightPerp-v1',  Math.max(DefaultHeight.KLINE, 564))
 const wHeight = useWindowSize().height
 const dom = useTemplateRef('kline')
 function drag(e: MouseEvent) {
