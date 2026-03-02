@@ -353,7 +353,7 @@ const collect = async () => {
                 tokenDetailStore.user_address.slice(0, 4)
               }}...{{ tokenDetailStore.user_address.slice(-4) }}</span>
             <Icon
-              v-copy="tokenDetailStore.user_address"`
+              v-copy="tokenDetailStore.user_address"
               name="bxs:copy"
               class="cursor-pointer color-[--third-text] text-10px"
             />
