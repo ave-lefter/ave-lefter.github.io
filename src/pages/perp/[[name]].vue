@@ -1,7 +1,7 @@
 <template>
   <div
     class="flex bg-[--main-divider] gap-1px flex min-w-0 w-full"
-    style="min-height: calc(100vh - 92px - 64px)"
+    style="min-height: calc(100vh - 92px)"
   >
     <WithdrawAlert />
     <div class="flex-1 min-w-0 relative">
@@ -12,24 +12,31 @@
       >
         <Icon name="material-symbols:arrow-forward-ios" class="text-12px" />
       </div>
+      <div
+        v-show="!show2"
+        class="absolute bg-[--main-list-hover] w-10px h-32px z-11 cursor-pointer flex items-center justify-center right-0 hover:w-30px hover:h-36px transition-all rounded-tl-4px rounded-bl-4px color-[--third-text] hover:color-[--main-text]"
+        @click="show2=true"
+      >
+        <Icon name="material-symbols:arrow-back-ios-new-rounded" class="text-12px" />
+      </div>
+      <div
+        v-show="!show1&&!show2"
+        class="absolute bg-[--main-list-hover] w-10px h-32px z-1 cursor-pointer flex items-center justify-center right-0 hover:w-30px hover:h-36px transition-all rounded-tl-4px rounded-bl-4px color-[--third-text] hover:color-[--main-text]"
+        @click="show1=true"
+      >
+        <Icon name="material-symbols:arrow-back-ios-new-rounded" class="text-12px" />
+      </div>
       <Top/>
       <div class="flex gap-1px mt-1px">
         <div class="flex-1 hide-scrollbar min-w-0 relative">
           <div
-            v-show="!show1"
+            v-show="!show1&&show2"
             class="absolute bg-[--main-list-hover] w-10px h-32px z-1 cursor-pointer flex items-center justify-center right-0 hover:w-30px hover:h-36px transition-all rounded-tl-4px rounded-bl-4px color-[--third-text] hover:color-[--main-text]"
             @click="show1=true"
           >
             <Icon name="material-symbols:arrow-back-ios-new-rounded" class="text-12px" />
           </div>
           <el-scrollbar :height="scrollbarHeight">
-            <div
-              v-show="!show2"
-              class="absolute bg-[--main-list-hover] w-10px h-32px z-11 cursor-pointer flex items-center justify-center right-0 hover:w-30px hover:h-36px transition-all rounded-tl-4px rounded-bl-4px color-[--third-text] hover:color-[--main-text]"
-              @click="show2=true"
-            >
-              <Icon name="material-symbols:arrow-back-ios-new-rounded" class="text-12px" />
-            </div>
             <div
               :class="show2 ? 'grid gap-1px' : 'grid grid-cols-1'"
               :style="{ gridTemplateColumns: show2 ? `1fr 1px ${orderBookWidth}px` :  '1fr 1px auto' }
@@ -85,9 +92,9 @@ const show1 = useStorage('perpShow1', true, sessionStorage)
 const show2 = useStorage('perpShow2', true, sessionStorage)
 const scrollbarHeight = computed(() => {
   if (isCanNormalWithdrawableAmount.value) {
-    return 'calc(100vh - 110px)'
+    return 'calc(100vh - 174px)'
   }
-  return 'calc(100vh - 95px)'
+  return 'calc(100vh - 159px)'
 })
 const height = computed(() => {
   return tokenStore.commonHeight - 160
