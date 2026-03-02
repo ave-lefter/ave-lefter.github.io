@@ -1,6 +1,6 @@
 <template>
   <div ref="bot-swap-container" class="bot-swap-container">
-    <Holding  :isForceShow="true"/>
+    <Holding  :isForceShow="true"  v-model:walletTokenInfo="walletTokenInfo"/>
     <BestToken/>
     <div class="tabs">
       <button v-for="(item, index) in tabs" :key="index" class="tab-item" :class="{ active: item.value === activeTab, [`tab-${item.value}`]: true }" type="button" @click="activeTab = item.value">
@@ -86,6 +86,7 @@ import { useBotSwap } from '~/composables/botSwap'
 import Holding from './holding.vue'
 import BatchWallet from './batchWallet.vue'
 import BestToken from '../bestToken.vue'
+import type { WalletTokenInfo } from '~/api/types/token'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -104,6 +105,8 @@ const visible = ref(false)
 const selected = ref<BotSettingKey>('s1')
 const btnRefs = ref<Record<string, HTMLElement | null>>({})
 const currentBtnRef = ref<HTMLElement | null>(null)
+
+const walletTokenInfo=ref<WalletTokenInfo | null>(null)
 
 const { getTokenBalance } = useBotSwap()
 
