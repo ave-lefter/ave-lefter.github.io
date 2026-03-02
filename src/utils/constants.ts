@@ -128,7 +128,22 @@ export const SupportFullDataChain = ['solana', 'bsc','eth','base','xlayer','fsc'
 export const SupportMonitorChain = ['solana', 'bsc', 'xlayer']
 
 export const SupportTokenKlineChains = ['juchain', 'arbitrum', 'optimism']
-export const SupportTokenKlineLaunchpad = ['bsc-four.meme', 'bsc-flap.sh', 'solana-pump.fun']
+export const SupportTokenKlineLaunchpad = [
+  'bsc-four.meme',
+  'bsc-flap.sh',
+  'solana-dexscreener.com',
+  'solana-pump.fun',
+  'solana-time.fun',
+  'solana-raydium.io',
+  'solana-meteora.ag',
+  'solana-letsbonk.fun',
+  'solana-boop.fun',
+  'solana-believe.app',
+  'solana-moonshot.com',
+  'solana-jup.ag',
+  'solana-bags.fm',
+  'solana-cooking.city'
+]
 export const SupportCopyTradeChain = ['solana', 'bsc', 'eth', 'base']
 
 export const defaultPaginationParams = {
