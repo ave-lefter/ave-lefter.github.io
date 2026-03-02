@@ -17,6 +17,7 @@ import BigNumber from 'bignumber.js'
 //     default: ''
 //   }
 // })
+let timerArr=[null,null,null] as Array<null | ReturnType<typeof setTimeout>>
 
 const botStore = useBotStore()
 const walletStore = useWalletStore()
@@ -146,11 +147,22 @@ const getWalletTxData = async () => {
   walletTxData.value = txInfo[0]
 }
 
+function getTxHistoryForEvm() {
+  const timeoutArr = [6000, 9000, 12000]
+  timerArr = timeoutArr.map((time, index) => setTimeout(() => {
+    unifiedRef.value?.getTxHistory()
+  }, time * (index + 1)))
+}
+
+
+
+
 let timer: null | ReturnType<typeof setInterval> = null
 let lastUpdateTime = 0
 const maxUpdateNum = 15
 
 watch(() => wsStore.wsResult[WSEventType.TGBOT], (val) => {
+  console.log('wsStore.wsResult[WSEventType.TGBOT]', val)
   if(!val){
     return
   }
@@ -163,6 +175,9 @@ watch(() => wsStore.wsResult[WSEventType.TGBOT], (val) => {
   setTimeout(() => {
     unifiedRef.value?.getTxHistory()
   }, 3000)
+  if(val.chain && isEvmChain(val.chain)){
+    getTxHistoryForEvm()
+  }
   if (!timer) {
     timer = setInterval(() => {
       if (lastUpdateTime >= maxUpdateNum) {
@@ -182,14 +197,12 @@ watch(() => wsStore.wsResult[WSEventType.TGBOT], (val) => {
 },{immediate:true})
 
 watch([() => route.params.id], () => {
+
   const chain = getAddressAndChainFromId(String(route.params.id))?.chain
   if (tabs.value.find(i => i?.chain === chain)) {
     activeTab.value = chain
   }
-  if (timer) {
-    clearInterval(timer)
-    timer = null
-  }
+  clearIntervalAll()
   refreshData()
 })
 
@@ -203,6 +216,8 @@ function refreshData() {
 
 watch(userAddress, () => {
   getWalletTxData()
+
+  clearIntervalAll()
 })
 
 onMounted(() => {
@@ -214,12 +229,21 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
+  clearIntervalAll()
+})
+
+function clearIntervalAll() {
   if (timer) {
     clearInterval(timer)
     timer = null
   }
-})
-
+  timerArr.forEach((timerId) => {
+    if (timerId) {
+      clearInterval(timerId)
+      timerId = null
+    }
+  })
+}
 // onActivated(() => {
 //    refreshData()
 // })
