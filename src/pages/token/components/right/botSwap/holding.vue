@@ -87,7 +87,27 @@ const walletTokenInfo = computed({
 //   emit('update:walletTokenInfo', val)
 // })
 
+function getPlusSign(){
+  switch (true) {
+    case Number(walletTokenInfo?.value?.total_profit || 0) > 0:
+      return '+'
+    case Number(walletTokenInfo?.value?.total_profit || 0) < 0:
+      return '-'
+    default:
+      return ''
+  }
+}
 
+function getColor(){
+  switch (true) {
+    case Number(walletTokenInfo?.value?.total_profit || 0) > 0:
+      return 'color-#12B886'
+    case Number(walletTokenInfo?.value?.total_profit || 0) < 0:
+      return 'color-#F6465D'
+    default:
+      return 'color-[--third-text]'
+  }
+}
 useSwapUpdate(walletTokenInfo)
 async function getWalletTxData() {
   const [token, chain] = getAddressAndChainFromId(route.params?.id as string, 1)
