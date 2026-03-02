@@ -14,7 +14,11 @@
     <ul>
       <li class="flex items-center justify-between mb-8px">
         <span class="color-[--secondary-text]">{{ $t('devWallet') }}</span>
-        <a class="color-[--main-text] ml-auto clickable visited:color-[--main-text]"  :href="`/address/${info?.wallet_address}/${chain}`" target="_blank">{{ info?.wallet_address?.replace(new RegExp('(.{4})(.+)(.{4}$)'), '$1...$3') }}</a>
+        <a
+          class="color-[--main-text] ml-auto clickable visited:color-[--main-text]"
+          @contextmenu.stop="handleContextMenu($event, info)"
+          @click.stop="handleClick($event, info)"
+        >{{ info?.wallet_address?.replace(new RegExp('(.{4})(.+)(.{4}$)'), '$1...$3') }}</a>
         <a class="ml-5px color-[--third-text] visited:color-[--third-text] clickable flex items-center" :href="formatExplorerUrl(chain, info.wallet_address, 'address')" target="_blank"><Icon name="custom:browser" /></a>
       </li>
       <li class="flex items-center justify-between mb-8px">
@@ -58,7 +62,10 @@
 </template>
 
 <script setup lang='ts'>
+const globalStore = useGlobalStore()
+const router = useRouter()
 import type { _getDevInfo } from '~/api/pump'
+
 type DevInfo = Awaited<ReturnType<typeof _getDevInfo>>
 const props = defineProps({
   info: {
@@ -77,6 +84,29 @@ const props = defineProps({
 
 const chain = computed(() => getAddressAndChainFromId(props.tokenId)?.chain)
 
+const handleClick = (e:MouseEvent, row:any) => {
+  const clickAction = globalStore.audioSettings?.wallet?.clickAction
+  // rightClickAction: 0 不打开, 1 新tab打开
+  const routeData = router.resolve({
+    path: `/address/${row.wallet_address}/${chain.value}`
+  })
+  if (clickAction === 1) {
+    window.open(routeData.href, '_blank')
+  } else {
+    window.open(routeData.href, '_self')
+  }
+}
+
+// 右键点击事件处理
+function handleContextMenu(e: MouseEvent, row:any) {
+  e.preventDefault()
+  const rightClickAction = globalStore.audioSettings?.wallet?.rightClickAction
+  // rightClickAction: 0 不打开, 1 新tab打开
+  if (rightClickAction === 1) {
+    const url = `/address/${row.wallet_address}/${chain.value}`
+    window.open(url, '_blank')
+  }
+}
 </script>
 
 <style scoped lang="scss">

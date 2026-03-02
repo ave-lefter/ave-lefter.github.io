@@ -6,7 +6,7 @@ import { formatNumber2 } from '~/utils/formatNumber'
 import { getRemarksDetail } from '~/api/fav'
 // import { deleteAttention, updateWhaleRemark, addAttention, addAddressMonitor, favUsersPauseMonitor } from '~/api/attention'
 import { deleteAttention, updateWhaleRemark, addAttentionNew, addAddressMonitor, favUsersPauseMonitor } from '~/api/attention'
-
+const globalStore = useGlobalStore()
 const { updateNum3 } = storeToRefs(useFollowStore())
 const botStore = useBotStore()
 const walletStore = useWalletStore()
@@ -134,8 +134,17 @@ const handleRemarkGroup = async (row: any) => {
   getList()
 }
 
-const tableRowClick = (row: any) => {
-  router.push(`/address/${row.user_address}/${row.user_chain}`)
+function tableRowClick(row: { user_address: string; user_chain: string }) {
+  const clickAction = globalStore.audioSettings?.wallet?.clickAction
+  // rightClickAction: 0 不打开, 1 新tab打开
+  const routeData = router.resolve({
+    path: `/address/${row.user_address}/${row.user_chain}`,
+  })
+  if (clickAction === 1) {
+    window.open(routeData.href, '_blank')
+  } else {
+    window.open(routeData.href, '_self')
+  }
 }
 
 // 处理表格排序

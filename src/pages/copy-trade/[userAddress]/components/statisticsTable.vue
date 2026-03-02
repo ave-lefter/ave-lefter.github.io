@@ -103,6 +103,7 @@ const tabs = computed(() => {
     { title: $t('copyToken'), id: 'token' },
     { title: $t('copyCompleted'), id: 'success' },
     { title: $t('copyFailed'), id: 'failed' },
+    // { title: $t('invalidTransactions'), id: 'invalid' },
   ]
   return commonTabs
 })
@@ -135,6 +136,8 @@ const switchTab = (item) => {
     getFollowTokens()
   } else if (activeTab.value == 'success') {
     getSuccessFollowTxs()
+  } else if(activeTab.value == 'invalid') {
+    getFailFollowTxs()
   } else {
     getFailFollowTxs()
   }
@@ -145,6 +148,8 @@ function onLoad() {
     getFollowTokens()
   } else if (activeTab.value == 'success') {
     getSuccessFollowTxs()
+  } else if(activeTab.value == 'invalid') {
+    getFailFollowTxs()
   } else {
     getFailFollowTxs()
   }
@@ -163,6 +168,7 @@ const getFollowTokens = async () => {
     return
   }
   tableData.value.loading = true
+
   const data = {
     walletAddress: props.address,
     followAddress: props.followAddress,

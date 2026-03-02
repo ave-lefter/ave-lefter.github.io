@@ -2016,6 +2016,12 @@
   "availableLiquidity": "Available Liquidity",
   "googleAuthNotBoundTip": "Google Authenticator not detected. To protect your account, please bind Google Authenticator before deleting wallet address.",
   "goToBind": "Go to Bind",
+  "walletPageSettings": "Wallet Page Settings",
+  "walletSettings": "Wallet Settings",
+  "clickWalletAddress": "Click Address",
+  "rightClickWalletAddress": "Right Click Address",
+  "openInNewTab": "New Tab",
+  "invalidTransactions": "Invalid Transactions",
   "migratedTo": "Migrated",
   "migratedPrice": "Migrated Price",
   "migratedAt": "Migrated At",
@@ -2044,5 +2050,7 @@
   "twitterTracker2": "News",
   "onlyTitle": "Only Title",
   "ViewFullText": "View full text",
-  "socialMediaTracker": "Media Tracker"
+  "socialMediaTracker": "Media Tracker",
+  "sellInits": "Sell Inits.",
+  "confirmSellAlTips": "Cashing out now will empty one wallet's holdings and may cause a loss. Proceed with breakeven?"
 }

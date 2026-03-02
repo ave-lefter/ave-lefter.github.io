@@ -39,16 +39,25 @@ import { useEventBus } from '@vueuse/core'
 import { bot_getAddressAllBalances } from '@/api/bot'
 import { useSwapUpdate } from '~/composables/useSwapUpdate'
 
-defineProps({
+const props = defineProps({
   isForceShow: {
     type: Boolean,
     default: false
+  },
+  walletTokenInfo: {
+    type: Object as () => WalletTokenInfo | null,
+    default: null
   }
 })
+
+const emit = defineEmits(['update:walletTokenInfo'])
 const route = useRoute()
 const botStore = useBotStore()
 const tokenStore = useTokenStore()
 const isShow = ref(false)
+const token = computed(() => {
+  return getAddressAndChainFromId(route.params?.id as string)?.address || ''
+})
 const userAddress = computed(() => {
   const [token, chain] = getAddressAndChainFromId(route.params?.id as string, 1)
   if (!token || !chain) {
@@ -57,29 +66,7 @@ const userAddress = computed(() => {
   return botStore.userInfo?.addresses?.find?.(i => i?.chain === chain)?.address
 })
 
-function getPlusSign(){
-  switch (true) {
-    case Number(walletTokenInfo?.value?.total_profit || 0) > 0:
-      return '+'
-    case Number(walletTokenInfo?.value?.total_profit || 0) < 0:
-      return '-'
-    default:
-      return ''
-  }
-}
-
-function getColor(){
-  switch (true) {
-    case Number(walletTokenInfo?.value?.total_profit || 0) > 0:
-      return 'color-#12B886'
-    case Number(walletTokenInfo?.value?.total_profit || 0) < 0:
-      return 'color-#F6465D'
-    default:
-      return 'color-[--third-text]'
-  }
-}
-
-watch(userAddress, (val) => {
+watch([userAddress, token], (val) => {
   isShow.value = false
   if (val) {
     avgPrice.value = 0
@@ -88,9 +75,19 @@ watch(userAddress, (val) => {
   }
 })
 
+const walletTokenInfo = computed({
+  get() {
+    return props.walletTokenInfo
+  },
+  set(val) {
+    emit('update:walletTokenInfo', val)
+  }
+})
+// watch(walletTokenInfo, (val) => {
+//   emit('update:walletTokenInfo', val)
+// })
 
 
-const walletTokenInfo = ref<WalletTokenInfo | null>(null)
 useSwapUpdate(walletTokenInfo)
 async function getWalletTxData() {
   const [token, chain] = getAddressAndChainFromId(route.params?.id as string, 1)
@@ -170,10 +167,15 @@ watch(() => route.params.id, () => {
   _bot_getAddressAllBalances()
 })
 
-watch(() => tokenStore.placeOrderSuccess, () => {
+watch(() => tokenStore.placeOrderSuccess, async () => {
   isShow.value = true
-  getWalletTxDataPoll()
   _bot_getAddressAllBalances()
+  if (pollTimer) {
+    clearTimeout(pollTimer)
+    pollTimer = null
+  }
+  await sleep(5000)
+  getWalletTxDataPoll()
 })
 
 // watch(() => tokenStore.pairAddress, (val) => {
@@ -217,6 +219,11 @@ onUnmounted(() => {
   if (klineDataReadyOff) {
     klineDataReadyOff()
   }
+})
+
+onMounted(() => {
+  getWalletTxData()
+  _bot_getAddressAllBalances()
 })
 
 </script>

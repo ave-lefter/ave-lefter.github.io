@@ -37,6 +37,7 @@
         style="--el-switch-on-color: #3c6cf6;zoom: 0.9;height: 14px;"
       />
     </template>
+    <slot name="default"/>
   </div>
 </template>
 
