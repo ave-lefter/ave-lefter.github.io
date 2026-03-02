@@ -85,7 +85,7 @@ export const usePumpStore = defineStore('pumpStore', () => {
   const pumpFilterDefault = {
     q: '',
     dev_sale_out: 0,
-    platforms: 'pump,moonshot',
+    platforms: '',
     progress_min: '', //进度
     progress_max: '',
 

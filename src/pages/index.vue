@@ -149,7 +149,7 @@
             <AudioSelect activeTab="new" :chain="activeChain"/>
             <PumpFilterButton
               :key="`pumpFilterButton_${activeChain}_new`"
-              :filterNumber="getFilterNumber(pumpStore.pumpV3[activeChain].new.pumpFilter || {})"
+              :filterNumber="getFilterNumber(pumpStore.pumpV3[activeChain].new.pumpFilter || {},platforms,baseTokensAllStr)"
               :visible="filterVisible && activeFilterType === 'new'"
               @update:visible="(val) => handleFilterVisibleChange(val, 'new')"
             />
@@ -162,7 +162,7 @@
             :tableList="list1 || []"
             :quickBuyValue="quickBuyValue"
             :loading="pumpV3[activeChain]['new']['loading']"
-            :hasFilter="getFilterNumber(pumpStore.pumpV3[activeChain].new.pumpFilter || {}) > 0"
+            :hasFilter="getFilterNumber(pumpStore.pumpV3[activeChain].new.pumpFilter || {},platforms,baseTokensAllStr) > 0"
             @mouseover="isPausedObj.new = true"
             @mouseleave="isPausedObj.new = false"
             @clearFilter="handleClearFilter('new')"
@@ -221,7 +221,7 @@
             <AudioSelect activeTab="soon" :chain="activeChain"/>
             <PumpFilterButton
               :key="`pumpFilterButton_${activeChain}_soon`"
-               :filterNumber="getFilterNumber(pumpStore.pumpV3[activeChain].soon.pumpFilter || {})"
+               :filterNumber="getFilterNumber(pumpStore.pumpV3[activeChain].soon.pumpFilter || {},platforms,baseTokensAllStr)"
               :visible="filterVisible && activeFilterType === 'soon'"
               @update:visible="(val) => handleFilterVisibleChange(val, 'soon')"
             />
@@ -234,7 +234,7 @@
             :quickBuyValue="quickBuyValue"
             :loading="pumpV3[activeChain]['soon']['loading']"
             isSoon
-            :hasFilter="getFilterNumber(pumpStore.pumpV3[activeChain].soon.pumpFilter || {}) > 0"
+            :hasFilter="getFilterNumber(pumpStore.pumpV3[activeChain].soon.pumpFilter || {},platforms,baseTokensAllStr) > 0"
             @mouseover="isPausedObj.soon = true"
             @mouseleave="isPausedObj.soon = false"
             @clearFilter="handleClearFilter('soon')"
@@ -294,7 +294,7 @@
             <AudioSelect activeTab="graduated" :chain="activeChain"/>
             <PumpFilterButton
               :key="`pumpFilterButton_${activeChain}_graduated`"
-               :filterNumber="getFilterNumber(pumpStore.pumpV3[activeChain].graduated.pumpFilter || {})"
+               :filterNumber="getFilterNumber(pumpStore.pumpV3[activeChain].graduated.pumpFilter || {},platforms,baseTokensAllStr)"
               :visible="filterVisible && activeFilterType === 'graduated'"
               @update:visible="(val) => handleFilterVisibleChange(val, 'graduated')"
             />
@@ -307,7 +307,7 @@
             :quickBuyValue="quickBuyValue"
             :loading="pumpV3[activeChain]['graduated']['loading']"
             isOut
-            :hasFilter="getFilterNumber(pumpStore.pumpV3[activeChain].graduated.pumpFilter || {}) > 0"
+            :hasFilter="getFilterNumber(pumpStore.pumpV3[activeChain].graduated.pumpFilter || {},platforms,baseTokensAllStr) > 0"
             @mouseover="isPausedObj.graduated = true"
             @mouseleave="isPausedObj.graduated = false"
             @clearFilter="handleClearFilter('graduated')"
@@ -492,7 +492,7 @@ const platformsList = computed(() => {
   )
 })
 const platforms = computed(() => {
-    return pumpV3.value?.[activeChain.value]?.platforms?.join(',')
+    return pumpV3.value?.[activeChain.value]?.platforms?.filter?.(Boolean).join(',')
 })
 const baseTokenMap = computed(() => {
   const list =
@@ -504,6 +504,7 @@ const baseTokenMap = computed(() => {
     logo_url: item.logo_url
   }]))
 })
+const baseTokensAllStr = computed(() => baseTokenMap.value.values().toArray().map((i: any) => i.token).join(','))
 const tabsList = computed(() => {
   return [
     {
@@ -1455,6 +1456,11 @@ function getFilterData(list: PumpObj[], conditions: any) {
           : i.token0_address
       const baseToken = baseTokenMap.value.get(baseHash)
       pass = pass && conditions?.base_tokens?.includes?.(baseToken?.token)
+    }
+    // 搜索推特账号
+    if (conditions?.twitter_usernames) {
+      const twitterUsernames = conditions?.twitter_usernames.split(',')
+      pass = pass && twitterUsernames?.findIndex(y=> formatXUser(i.medias?.filter(i => i.icon === 'twitter')?.[0]?.url).replace('@', '') == y) !== -1
     }
     if (conditions?.progress_min) {
       pass = pass && i.progress >= Number(conditions.progress_min)

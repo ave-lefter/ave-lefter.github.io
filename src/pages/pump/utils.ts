@@ -33,9 +33,18 @@ export function useSimilarTokenPopup() {
     return {onEnter,hide:()=>$tooltip.hide()}
   }
 
-  export function getFilterNumber(form:Record<string, any>) {
+  export function getFilterNumber(form:Record<string, any>, allPlatformsValue?: string, allBaseTokensValue?: string) {
       let filterList = Object.keys(form).filter((key) => form[key] !== null && form[key] !== undefined && form[key] !== '' && form[key] !== 0 && (form[key]?.length > 0 || form[key] == 1 || form[key] === 2))
       filterList = Array.from(new Set(filterList.map(key => key.replace(/_min|_max$/g, ''))))
+      console.log(filterList, 'filterList')
+      // platforms 全选则不统计
+      if (allPlatformsValue !== undefined && filterList.includes('platforms') && form.platforms === allPlatformsValue) {
+        filterList = filterList.filter(i => i !== 'platforms')
+      }
+      // 报价代币全选则不统计
+      if (allBaseTokensValue !== undefined && filterList.includes('base_tokens') && form.base_tokens === allBaseTokensValue) {
+        filterList = filterList.filter(i => i !== 'base_tokens')
+      }
       
       if (filterList.includes('has_sm') && filterList.includes('sm_list')) {
         const index = filterList.indexOf('sm_list')
@@ -100,6 +109,5 @@ export function useSimilarTokenPopup() {
         }
       }
     
-      // filterList = filterList?.filter(i => i !== 'platforms')
       return filterList?.length || 0
   }

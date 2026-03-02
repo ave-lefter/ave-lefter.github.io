@@ -61,7 +61,7 @@
                 class="[&&]:mr-0 [&&]:[--el-checkbox-height:28px]">
                 <span
                   class="flex items-center gap-8px rounded-30px py-6px px-12px border-1px border-solid color-[--main-text]"
-                  :style="{ borderColor: PlatformColors[platform.token] }">
+                  :style="{ borderColor: PlatformColors[platform.symbol] }">
                   <el-image class="rounded w-14px" :src="`${configStore.token_logo_url}${platform.logo_url?.replace(
                     '/signals/',
                     'signals/'
@@ -71,14 +71,24 @@
               </el-checkbox>
             </el-checkbox-group>
           </div>
-          <el-form-item label-position="top" :label="$t('searchTip')" :prop="form.q"
-            class="border px-16px py-12px w-full">
-            <div class="formItem inputRange">
-              <el-input size="large" v-model.trim="form.q" class="search-input1" clearable placeholder="abc,abc,abc"
-                @input="(val) => form.q = val.replace(/\s/g, '')" />
-            </div>
+          <div class="flex border px-16px py-12px mb-18px inline-form">
+              <el-form-item label-position="top" :label="$t('searchTip')" :prop="form.q"
+              class="w-full mr-8px">
+              <div class="formItem inputRange">
+                <el-input size="large" v-model.trim="form.q" class="search-input1" clearable placeholder="abc,abc,abc"
+                  @input="(val) => form.q = val.replace(/\s/g, '')" />
+              </div>
 
-          </el-form-item>
+            </el-form-item>
+            <el-form-item label-position="top" :label="$t('searchXAccount')" :prop="form.twitter_usernames"
+              class="w-full">
+              <div class="formItem inputRange">
+                <el-input size="large" v-model.trim="form.twitter_usernames" class="search-input1" clearable placeholder="abc,abc,abc"
+                  @input="(val) => form.twitter_usernames = val.replace(/\s/g, '')" />
+              </div>
+
+            </el-form-item>
+          </div>
           <div class="mx-16px p-2px border-1px border-solid border-[--main-divider] flex items-center rounded-6px">
             <div class="flex-1 rounded-6px text-center lh-28px cursor-pointer" v-for="item in tabs2"
               :class="tabs2Active === item.id ? 'bg-[--pump-filter-bg] color-[--main-text]' : 'color-[--secondary-text]'"
@@ -344,18 +354,30 @@ const PlatformColors = {
   heaven: '#e5e5e6',
   fourmeme: '#7ce660',
   web3binance: '#7ce660',
-  flapsh: '#967aff',
+  'flap.sh': '#967aff',
   dyorswap: '#32C9FF',
   flap: '#967aff',
-  "clanker.world": '#8a63d2',
-  "bankr.bot": '#9472ff',
-  "base.app": '#3679ff',
+  'web3.binance.com':"#7ce660",
+  "clanker": '#8a63d2',
+  "bankr": '#9472ff',
+  "baseapp": '#3679ff',
   "zoracreator": '#5a81f1',
   "zoracontent": '#5a81f1',
   'So11111111111111111111111111111111111111112':'#A357E6',
   "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB":"#00D62B",
   "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v":"#2775C9",
-  "USD1ttGY1N17NEEHLmELoaybftRBUSErhqYiQzvEmuB":"#E78C19"
+  "USD1ttGY1N17NEEHLmELoaybftRBUSErhqYiQzvEmuB":"#E78C19",
+  "OKB":"#363636",
+  "USDT":"#52d48f",
+  "ETH":"#4d84f7",
+  "USDC":"#2fc0f1",
+  "VIRTUAL":"#3ab7b8",
+  "ZORA":"#5a81f1",
+  "BNB":"#fed15c",
+  "ASTER":"#fed15c",
+  "CAKE":"#d1884f",
+  "U":"#d1b95c",
+  "USD1":"#fed15c"
 }
 const localVisible = computed({
   get: () => props.visible,
@@ -401,6 +423,12 @@ const setCheckedPlatforms = () => {
     }
     form.value = { ...tableFilter, platforms: platforms }
 }
+const setCheckedBaseTokens = () => {
+  const baseTokensAll = props.baseTokens.map((i: any) => i.token).join(',')
+  if (!('base_tokens' in tableFilter)) {
+    form.value.base_tokens = baseTokensAll
+  }
+}
 watch(() => props.platformsList, (val, oldValue) => {
   if (isEqual(val, oldValue)) return
   setCheckedPlatforms()
@@ -409,6 +437,7 @@ watch(() => props.platformsList, (val, oldValue) => {
 watch(() => props.visible, (val) => {
   if (val) {
    setCheckedPlatforms()
+   setCheckedBaseTokens()
   }
 })
 watch(activeTab,()=>{
@@ -680,9 +709,11 @@ function switchForm(f: any) {
 
 const isArray = _isArray
 const isString = _isString
+const platformsAllStr = computed(() => props.platformsList.filter(Boolean).map((i: any) => i.platform).join(','))
+const baseTokensAllStr = computed(() => props.baseTokens.map((i: any) => i.token).join(','))
 const getItemFilterNumber = value => {
-  if (value === props.activeFilterType) return getFilterNumber(form.value)
-  return getFilterNumber(pumpStore.pumpV3[props.activeChain][value]?.pumpFilter || {})
+  if (value === props.activeFilterType) return getFilterNumber(form.value, platformsAllStr.value, baseTokensAllStr.value)
+  return getFilterNumber(pumpStore.pumpV3[props.activeChain][value]?.pumpFilter || {}, platformsAllStr.value, baseTokensAllStr.value)
 }
 </script>
 
@@ -877,6 +908,16 @@ const getItemFilterNumber = value => {
         color: var(--third-text);
       }
     }
+  }
+}
+.inline-form{
+  :deep(.el-form-item){
+    margin-bottom: 0;
+  }
+  :deep(.el-form-item__label){
+    margin-bottom: 10px;
+    line-height: 16px;
+    height: 16px;
   }
 }
 </style>

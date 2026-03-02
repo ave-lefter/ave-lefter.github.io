@@ -2007,5 +2007,6 @@
   "filterDevBot": "Filter Dev Bot",
   "filterMouse": "Filter Mouse",
   "QuoteTokens":"Quote Tokens",
-  "clearPumpFilter":"Clear Filter"
+  "clearPumpFilter":"Clear Filter",
+  "searchXAccount":"Search X Account(max 3)"
 }
