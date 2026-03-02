@@ -1456,6 +1456,8 @@ function getFilterData(list: PumpObj[], conditions: any) {
           : i.token0_address
       const baseToken = baseTokenMap.value.get(baseHash)
       pass = pass && conditions?.base_tokens?.includes?.(baseToken?.token)
+    } else {
+      return false
     }
     // 搜索推特账号
     if (conditions?.twitter_usernames) {
