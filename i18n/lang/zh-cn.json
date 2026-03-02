@@ -2045,5 +2045,7 @@
   "twitterTracker2": "最新快讯",
   "onlyTitle": "只看标题",
   "ViewFullText": "查看全文",
-  "socialMediaTracker": "社媒监控"
+  "socialMediaTracker": "社媒监控",
+  "sellInits": "回本",
+  "confirmSellAlTips": "当前回本将会导致1个钱包清仓持有的代币,可能会产生亏损,确认继续要回本吗?"
 }
