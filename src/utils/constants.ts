@@ -68,7 +68,8 @@ export const WSPerpEventType = {
 
 export const MAX_UINT_AMOUNT = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
 
-export const MIN_BALANCE: Record<string, number> = {
+type NumRecord = Record<string, number>
+export const MIN_BALANCE: NumRecord = {
   bsc: 0.002,
   arbitrum: 0.001,
   core: 0.01,
