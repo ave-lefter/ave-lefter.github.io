@@ -1,14 +1,14 @@
 <template>
-  <div v-if="(Number(walletTokenInfo?.balance_usd || 0) > 0 && Number(tokenStore.swap?.token?.balance || 0) > 0) || isShow || isForceShow" class="max-h-54px flex items-start justify-between color-[--main-text] text-center bg-[--main-list-hover] mb-12px py-10px rd-4px">
-    <div class="flex-1">
+  <div v-if="(Number(walletTokenInfo?.balance_usd || 0) > 0 && Number(tokenStore.swap?.token?.balance || 0) > 0) || isShow || isForceShow" class="max-h-54px flex items-start justify-between color-[--main-text] text-center border-[--main-list-hover] border-1px border-solid mb-12px py-10px rd-4px">
+    <div class="flex-1 border-r-[--main-divider] border-r-1px border-r-solid">
       <div class="text-11px color-[--third-text]">{{ $t('bought') }}</div>
       <div class="text-12px mt-5px color-#12B886">${{ formatNumber(walletTokenInfo?.total_purchase_usd || 0, 2) }}</div>
     </div>
-    <div class="flex-1">
+    <div class="flex-1 border-r-[--main-divider] border-r-1px border-r-solid">
       <div class="text-11px color-[--third-text]">{{ $t('sold') }}</div>
       <div class="text-12px mt-5px" :class="[Number(walletTokenInfo?.total_sold_usd || 0) > 0 ? 'color-#F6465D' : 'color-[--third-text]']">${{ formatNumber(walletTokenInfo?.total_sold_usd || 0, 2) }}</div>
     </div>
-    <div class="flex-1">
+    <div class="flex-1 border-r-[--main-divider] border-r-1px border-r-solid">
       <div class="text-11px color-[--third-text]">{{ $t('holding') }}</div>
       <div class="text-12px  mt-5px">${{ formatNumber(walletTokenInfo?.balance_usd || 0, 2) }}</div>
     </div>
@@ -17,16 +17,16 @@
         <span>{{ $t('profit2') }}</span>
         <Icon name="custom:price" class="text-11px clickable ml-5px" :class="[isShowB ? 'color-[--third-text]' : 'color-[--secondary-text]']" @click.stop="isShowB=!isShowB" @mousedown.stop @mouseup.stop />
       </div>
-      <div class="text-12px mt-5px" :class="[Number(walletTokenInfo?.total_profit || 0) > 0 ? 'color-#12B886' : 'color-#F6465D']">
+      <div class="text-12px mt-5px" :class="getColor()">
         <template v-if="!isShowB">
-           {{ Number(walletTokenInfo?.total_profit || 0) > 0 ? '' : '-' }}${{ formatNumber(Math.abs(Number(walletTokenInfo?.total_profit) || 0), 2) }}
+           {{ getPlusSign() }}${{ formatNumber(Math.abs(Number(walletTokenInfo?.total_profit) || 0), 2) }}
         </template>
          <template v-else>
            {{ formatNumber(Number(walletTokenInfo?.total_profit || 0) / Number(walletTokenInfo?.main_token_price || 1), 2) }} {{ walletTokenInfo?.main_token_symbol || '' }}
         </template>
 
       </div>
-      <div class="text-8px" :class="[Number(walletTokenInfo?.total_profit_ratio || 0) > 0 ? 'color-#12B886' : 'color-#F6465D']">({{ formatNumber(Number(walletTokenInfo?.total_profit_ratio || 0) * 100, 2) }}%)</div>
+      <div class="text-8px" :class="getColor()">({{ formatNumber(Number(walletTokenInfo?.total_profit_ratio || 0) * 100, 2) }}%)</div>
     </div>
   </div>
 </template>
@@ -87,7 +87,27 @@ const walletTokenInfo = computed({
 //   emit('update:walletTokenInfo', val)
 // })
 
+function getPlusSign(){
+  switch (true) {
+    case Number(walletTokenInfo?.value?.total_profit || 0) > 0:
+      return '+'
+    case Number(walletTokenInfo?.value?.total_profit || 0) < 0:
+      return '-'
+    default:
+      return ''
+  }
+}
 
+function getColor(){
+  switch (true) {
+    case Number(walletTokenInfo?.value?.total_profit || 0) > 0:
+      return 'color-#12B886'
+    case Number(walletTokenInfo?.value?.total_profit || 0) < 0:
+      return 'color-#F6465D'
+    default:
+      return 'color-[--third-text]'
+  }
+}
 useSwapUpdate(walletTokenInfo)
 async function getWalletTxData() {
   const [token, chain] = getAddressAndChainFromId(route.params?.id as string, 1)
