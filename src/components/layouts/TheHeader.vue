@@ -179,13 +179,13 @@
           <Icon name="ep:arrow-right"/>
         </div>
         <div class="flex flex-col">
-          <div class="flex items-center justify-between mb-16px cursor-pointer" @click="globalStore.audioSettings.active = 'notice'">
+          <!-- <div class="flex items-center justify-between mb-16px cursor-pointer" @click="globalStore.audioSettings.active = 'notice'">
            <div class="flex items-center gap-8px">
             <Icon name="custom:alert" class="text-16px"/>
             {{ $t('pushSettings') }}
            </div>
             <Icon name="ep:arrow-right"/>
-          </div>
+          </div> -->
           <div class="flex items-center justify-between mb-16px cursor-pointer">
            <div class="flex items-center gap-8px">
             <Icon name="custom:side-bar-fill" class="text-16px"/>
