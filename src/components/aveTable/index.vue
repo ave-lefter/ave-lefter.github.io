@@ -36,6 +36,10 @@ const slots = useSlots()
 const attrs = useAttrs()
 const themeStore = useThemeStore()
 const tableRef = useTemplateRef<TableV2Instance>('tableRef')
+const _currentScrollTop = ref(0)
+function onTableScroll({scrollTop}: {scrollTop: number}) {
+  _currentScrollTop.value = scrollTop
+}
 defineExpose({
   scrollTo: (...args: Parameters<TableV2Instance['scrollTo']>) => {
     tableRef.value?.scrollTo?.(...args)
@@ -48,6 +52,11 @@ defineExpose({
   },
   scrollToRow: (...args: Parameters<TableV2Instance['scrollToRow']>) => {
     tableRef.value?.scrollToRow?.(...args)
+  },
+  getScrollTop: () => _currentScrollTop.value,
+  scrollBy: (delta: number) => {
+    const next = Math.max(0, _currentScrollTop.value + delta)
+    tableRef.value?.scrollToTop?.(next)
   }
 })
 const {width: elTableWidth} = useElementSize(tableRef)
@@ -126,6 +135,7 @@ function calculateColumnWidths() {
         :row-height='rowHeight'
         :row-class="rowClass"
         @end-reached="remainDistance=> emits('endReached', remainDistance)"
+        @scroll="onTableScroll"
       >
         <template v-for="(slotFn, slotName) in defaultSlots" #[slotName]="slotProps">
           <slot :name="slotName" v-bind="slotProps"/>

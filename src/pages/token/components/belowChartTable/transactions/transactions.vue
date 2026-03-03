@@ -879,6 +879,20 @@ function goBrowser(row: IGetSimpleTxsResponse) {
 }
 
 const tabsContainer = ref<HTMLElement | null>(null)
+
+const SCROLL_STEP = 80
+function onKeyDown(e: KeyboardEvent) {
+  if (e.key !== 'ArrowUp' && e.key !== 'ArrowDown') return
+  if (!isHoverTable.value) return
+  e.preventDefault()
+  aveTableRef.value?.scrollBy(e.key === 'ArrowDown' ? SCROLL_STEP : -SCROLL_STEP)
+}
+onMounted(() => {
+  window.addEventListener('keydown', onKeyDown)
+})
+onUnmounted(() => {
+  window.removeEventListener('keydown', onKeyDown)
+})
 function setActiveTab(val: string,index:number) {
   if(val===activeTab.value) return
   activeTab.value = val
