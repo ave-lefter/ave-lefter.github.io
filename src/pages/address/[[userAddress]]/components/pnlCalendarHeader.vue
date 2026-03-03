@@ -1,18 +1,20 @@
 <template>
   <div class="flex w-full mb-12px items-center gap-12px">
     <!-- 时间：日历 icon + 左右箭头 + 月份 -->
-    <div class="flex items-center gap-6px text-12px h-24px">
-      <div
-        class="w-24px h-24px flex items-center justify-center shrink-0 rounded-4px border border-solid border-[--d-FFFFFF14-l-00000014]"
-      >
-        <Icon name="ri:calendar-line" class="color-[--third-text] text-14px" />
-      </div>
+    <div class="flex items-center gap-2px text-12px h-24px">
+     
       <Icon
         name="ri:arrow-left-s-line"
         class="color-[--third-text] text-14px cursor-pointer shrink-0"
         @click="goPrevMonth"
       />
-      <span class="min-w-72px text-center font-500 color-[--main-text]">{{ monthLabel }}</span>
+      <!-- <div
+        class="flex items-center justify-center shrink-0 rounded-4px border-0 border-solid border-[--d-FFFFFF14-l-00000014]"
+      >
+    </div> -->
+      <Icon name="ic:sharp-date-range" class="color-[--main-text] text-14px mt--2px" />
+      <!-- <span class="min-w-72px text-center font-500 color-[--main-text]">{{ selectedDate.value? dayjs(selectedDate.value).format('MMM YYYY') :  dayjs().format('MMM YYYY') }}</span> -->
+      <span class="text-center font-500 color-[--main-text]">{{ monthLabel }}</span>
       <Icon
         name="ri:arrow-right-s-line"
         class="text-14px shrink-0"
@@ -33,10 +35,16 @@
     <div class="flex items-center gap-6px p-2px bg-[--main-input-button-bg] rounded-4px ml-auto">
         <Icon
           class="cursor-pointer text-14px p-2px rounded-3px"
-          :class="isChartView ? 'color-[--main-text] bg-[--secondary-bg]' : 'color-[--third-text]'"
+          :class="isChartView ? 'color-[--third-text] opacity-50' : 'color-[--third-text]'"
           name="custom:chart"
           @click="isChartView = !isChartView"
         />
+        <!-- <Icon
+          class="cursor-pointer text-14px p-2px rounded-3px"
+          :class="'color-[--third-text]'"
+          :name="!isChartView?'custom:chart':'ic:sharp-date-range'"
+          @click="isChartView = !isChartView"
+        /> -->
         <Icon
           class="cursor-pointer text-14px color-[--third-text] p-2px"
           name="ic:outline-share"
@@ -63,10 +71,10 @@ const props = defineProps({
     required: true,
   },
 })
-
+const {lang} = storeToRefs(useGlobalStore())
 const monthLabel = computed(() => {
-  const d = selectedDate.value || dayjs().format('YYYY-MM-DD')
-  return dayjs(d).format('MMM YYYY')
+  const lang1= lang.value.includes('zh') ? 'zh' : 'en'
+  return selectedDate.value? dayjs(selectedDate.value).locale(lang1).format('MMM YYYY') :  dayjs().locale(lang1).format('MMM YYYY')
 })
 
 /** 当月盈亏数字颜色：盈利绿、亏损红、零为白 */

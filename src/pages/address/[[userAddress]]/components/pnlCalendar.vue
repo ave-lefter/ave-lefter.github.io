@@ -1,5 +1,6 @@
 <template>
   <div ref="shareDom">
+    <!-- isChartView: {{ isChartView }} -->
     <el-calendar
       v-show="!isChartView"
       :key="calendarMonthKey"
@@ -34,6 +35,7 @@
         <span v-else />
       </template>
     </el-calendar>
+
     <div v-show="isChartView" class="flex flex-col justify-between h-full">
       <PnlCalendarHeader
         v-model:selectedDate="selectedDate"
@@ -60,18 +62,31 @@
       <div ref="shareCardDom" class="share-card bg-[--secondary-bg] rounded-8px p-12px">
         <div class="text-14px lh-20px color-[--main-text] mb-8px">{{ t('pnlCalendar') }}</div>
         <div class="flex items-center justify-center gap-4px text-12px color-[--main-text] mb-12px select-none">
-          <Icon
-            name="ri:arrow-left-s-line"
+          <!-- <Icon
+            name="custom:arrow-l"
             class="text-14px color-[--main-text] cursor-pointer"
             @click="shareCardPrevMonth"
-          />
-          <span class="font-500">{{ shareCardMonthLabel }} UTC+0</span>
-          <Icon
-            name="ri:arrow-right-s-line"
+          /> -->
+          <div class="text-14px color-[--main-text] cursor-pointer"
+            @click="shareCardPrevMonth">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M6.44307 6.99949L9.04182 9.59824L8.29947 10.3406L4.95837 6.99949L8.29947 3.65839L9.04182 4.40074L6.44307 6.99949Z" fill="currentColor"/>
+            </svg>
+          </div>
+          <span class="font-500">{{ monthLabel }}</span>
+          <!-- <Icon
+            name="custom:arrow-r"
             class="text-14px"
             :class="shareCardNextDisabled ? 'color-[--main-text] opacity-50 cursor-not-allowed' : 'color-[--main-text] cursor-pointer'"
             @click="shareCardNextMonth"
-          />
+          /> -->
+          <div class="text-14px"
+            :class="shareCardNextDisabled ? 'color-[--main-text] opacity-50 cursor-not-allowed' : 'color-[--main-text] cursor-pointer'"
+            @click="shareCardNextMonth">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M7.55693 6.99949L4.95818 9.59824L5.70053 10.3406L9.04163 6.99949L5.70053 3.65839L4.95818 4.40074L7.55693 6.99949Z" fill="currentColor"/>
+            </svg>
+          </div>
         </div>
         <div class="text-12px mb-8px" :class="getColor(summary?.month_total_profit ?? 0).color">
           {{ addSign(summary?.month_total_profit ?? 0) }}${{
@@ -93,21 +108,36 @@
           </div>
         </div>
         <el-calendar
-          :range="shareCardRange"
+          :key="calendarMonthKey"
+          :model-value="calendarDisplayDate"
           class="share-card-calendar [&&]:[--el-calendar-cell-width:44px] [&&]:[--el-fill-color-blank:transparent]"
         >
           <template #header>
-            <span />
+            <span/>
           </template>
           <template #date-cell="{ data }">
-            <template v-if="dayjs(data.date).isSame(dayjs(selectedDate), 'month')">
+            <!-- <template v-if="dayjs(data.date).isSame(dayjs(selectedDate), 'month')">
               <div class="text-center h-full" :class="getColor(getPnl(data.date)).bg">
                 <span class="text-12px color-[--main-text] lh-14px">{{ dayjs(data.date).format('DD') }}</span>
                 <div
                   class="text-12px lh-14px mt-2px"
-                  :class="getPnl(data.date) === 0 ? 'color-[--main-text]' : getColor(getPnl(data.date)).color"
+                  :class="getColor(getPnl(data.date)).color"
                 >
                   {{ addSign(getPnl(data.date)) }}${{ formatNumber(Math.abs(getPnl(data.date)), { decimals: 1, limit: 4 }) }}
+                </div>
+              </div>
+            </template> -->
+            <template v-if="data.type === 'current-month'">
+              <div
+                class="text-center h-full"
+                :class="[getColor(getPnl(data.date)).bg, 'cursor-pointer']"
+                @click="clickDay(data.date, $event)"
+              >
+                <span class="text-12px color-[--third-text] lh-14px">{{
+                  dayjs(data.date).format('DD')
+                }}</span>
+                <div class="text-12px lh-14px mt-2px" :class="getColor(getPnl(data.date)).color">
+                  {{ addSign(getPnl(data.date)) }}${{ formatNumber(Math.abs(getPnl(data.date)),{decimals:1,limit:4}) }}
                 </div>
               </div>
             </template>
@@ -127,7 +157,7 @@
       </div>
 
       <div class="flex justify-end mt-12px">
-        <el-button type="primary" class="min-w-92px" @click="copySharePoster">复制图片</el-button>
+        <el-button type="primary" class="min-w-92px" @click="copySharePoster">{{ t('copyImg') }}</el-button>
       </div>
     </el-dialog>
 
@@ -186,6 +216,13 @@ const calendarMonthKey = computed(() => dayjs(selectedDate.value).format('YYYY-M
 const calendarDisplayDate = computed(() =>
   dayjs(selectedDate.value).startOf('month').toDate()
 )
+
+
+const {lang} = storeToRefs(useGlobalStore())
+const monthLabel = computed(() => {
+  const lang1= lang.value.includes('zh') ? 'zh' : 'en'
+  return selectedDate.value? dayjs(selectedDate.value).locale(lang1).format('MMM YYYY') :  dayjs().locale(lang1).format('MMM YYYY')
+})
 // Element Plus range 要求：周一开始、周日结束；否则会导致跨月日期错位
 const shareCardRange = computed(() => {
   const monthStart = dayjs(selectedDate.value).startOf('month')
