@@ -107,7 +107,7 @@
                 width="24"
                 alt=""
               >
-              <span class="color-[--d-F2F2F2-l-333] text-14px">{{ $t('new1') }}</span>
+              <span class="color-[--d-E0E0E0-l-333] text-14px">{{ $t('new1') }}</span>
             </template>
             <div v-else class="tabs single" >
               <button
@@ -209,7 +209,7 @@
                 width="24"
                 alt=""
               >
-              <span class="color-[--d-F2F2F2-l-333] text-14px">{{ $t('soon') }}</span>
+              <span class="color-[--d-E0E0E0-l-333] text-14px">{{ $t('soon') }}</span>
             </template>
             <div v-else class="tabs single" >
               <button
@@ -310,7 +310,7 @@
                 width="24"
                 alt=""
               >
-              <span class="color-[--d-F2F2F2-l-333] text-14px">{{ $t('graduated') }}</span>
+              <span class="color-[--d-E0E0E0-l-333] text-14px">{{ $t('graduated') }}</span>
             </template>
             <div v-else class="tabs single" >
               <button
