@@ -14,7 +14,7 @@
           <div class="w-[360px] bg-[#191a1a] rounded-xl p-6">
             <h2 class="text-3xl font-black text-[#1e41ea] mb-4">1.</h2>
             <p class="text-base">
-              {{ $t("click") }} "<a href='https://www.avedownload.com/app/ave.ai.2.3.07.c.apk' class="text-#1e41ea!" @click.stop.prevent="trackRefDownload('Android apk', $event)">{{ $t("Android") }}</a>"
+              {{ $t("click") }} "<a href='https://www.avedownload.com/app/ave.ai.2.3.17.apk' class="text-#1e41ea!" @click.stop.prevent="trackRefDownload('Android apk', $event)">{{ $t("Android") }}</a>"
               {{ $t("helpTip1") }}
             </p>
           </div>
