@@ -486,33 +486,63 @@ const isRotate = ref(false)
 const { pump_notice, pumpV3, pumpFilterDefault, pump_query } = storeToRefs(usePumpStore())
 const pumpAudio = useTemplateRef('pumpAudio')
 const visible_platforms = shallowRef(false)
-const fourmemeListObj = reactive<Record<ChainKey, Record<CategoryKey, PumpObj[]>>>({
-  bsc: {
-    new: [],
-    soon: [],
-    graduated: [],
-  },
-  solana: {
-    new: [],
-    soon: [],
-    graduated: [],
-  },
-  xlayer: {
-    new: [],
-    soon: [],
-    graduated: [],
-  },
-  monad: {
-    new: [],
-    soon: [],
-    graduated: [],
-  },
-  base: {
-    new: [],
-    soon: [],
-    graduated: [],
-  },
-})
+const pumpState = useState('pumpState', () => ({
+  fourmemeListObj: {
+    bsc: {
+      new: [],
+      soon: [],
+      graduated: [],
+    },
+    solana: {
+      new: [],
+      soon: [],
+      graduated: [],
+    },
+    xlayer: {
+      new: [],
+      soon: [],
+      graduated: [],
+    },
+    monad: {
+      new: [],
+      soon: [],
+      graduated: [],
+    },
+    base: {
+      new: [],
+      soon: [],
+      graduated: [],
+    },
+  }
+}))
+const fourmemeListObj = reactive(pumpState.value.fourmemeListObj)
+// const fourmemeListObj = reactive<Record<ChainKey, Record<CategoryKey, PumpObj[]>>>({
+//   bsc: {
+//     new: [],
+//     soon: [],
+//     graduated: [],
+//   },
+//   solana: {
+//     new: [],
+//     soon: [],
+//     graduated: [],
+//   },
+//   xlayer: {
+//     new: [],
+//     soon: [],
+//     graduated: [],
+//   },
+//   monad: {
+//     new: [],
+//     soon: [],
+//     graduated: [],
+//   },
+//   base: {
+//     new: [],
+//     soon: [],
+//     graduated: [],
+//   },
+// })
 
 const isPausedObj = ref({
   new: false,
@@ -885,15 +915,27 @@ const playGraduatedAudio = useThrottleFn((val) => {
 }, 300)
 const stopWatchList1 = watch(
   () => list1.value?.[0]?.target_token,
-  playNewAudio
+  (newValue, oldValue)=>{
+    if (oldValue) {
+      playNewAudio(newValue)
+    }
+  }
 )
 const stopWatchList2 = watch(
   () => list2.value?.[0]?.target_token,
-  playSoonAudio
+  (newValue, oldValue)=>{
+    if (oldValue) {
+      playSoonAudio(newValue)
+    }
+  }
 )
 const stopWatchList3 = watch(
   () => list3.value?.[0]?.target_token,
-  playGraduatedAudio
+  (newValue, oldValue)=>{
+    if (oldValue) {
+      playGraduatedAudio(newValue)
+    }
+  }
 )
 
 let onCanPlayHandler: (() => void) | null = null
