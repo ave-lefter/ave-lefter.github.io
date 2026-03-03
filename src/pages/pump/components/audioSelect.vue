@@ -14,7 +14,7 @@ const pumpStore = usePumpStore()
         class="bg-[--main-input-button-bg] py-5px px-8px rounded-4px mr-8px color-[--third-text] cursor-pointer  hover:color-[--d-F5F5F5-l-333] flex items-center justify-center min-h-28px"
         :class="{
           'color-[--main-text]': pumpStore.pump_notice?.[chain]?.[activeTab],
-        }">
+        }">11111
         <Icon :name="pumpStore.pump_notice?.[chain]?.[activeTab] ? 'custom:ad' : 'custom:admute'" class="text-14px" />
       </div>
     </template>
