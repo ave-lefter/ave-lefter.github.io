@@ -24,7 +24,7 @@
           </el-dropdown>
         </template>
       </el-input>
-   
+
       <div class="tabs mt-1px">
         <button v-for="(item, index) in tabs1" :key="index" class="tab-item" type="button"  @click.stop="handleAmount(item, 'buy')">
           <!-- <img class="mr-5px" :src="`${configStore.token_logo_url}${tokenStore.swap.payToken?.logo_url}`" style="border-radius: 50%;" height="14"  alt="" srcset="" > -->
@@ -985,7 +985,7 @@ async function submitBotSwap() {
     const { gasTip1List, gasTip2List } = formatBotGasTips(botSwapStore.gasTip, chain)
     const gasTips = mev ? gasTip1List : gasTip2List
     const settings = mev ? botSettings?.gas[0] : botSettings?.gas[1]
-    const gasPrice = !settings?.customFee ? '0' : (settings?.customFee || gasTips?.[settings?.level] || '3')
+    const gasPrice = settings?.customFee == '0' ? '0' : (settings?.customFee || gasTips?.[settings?.level || 0] || '3')
     const gasTip = Number(new BigNumber(gasPrice).times(10 ** 9).toFixed(0))
     const ft = isBuy ? tokenStore.swap.payToken : tokenStore.swap.token
     const tt = isBuy ? tokenStore.swap.token : tokenStore.swap.payToken
@@ -1252,15 +1252,9 @@ function submitBotLimit() {
               if (txInfo1?.success) {
                 ElNotification({ type: 'success', message: txInfo1?.walletName + ' ' + t('tradeSuccess') })
                 updateTxV2({...txInfo1, chain: subscribeResult?.chain}, txInfo?.id || '')
-                if (isPromptTx) {
-                  finishPromptSuccess(txInfo1)
-                }
               } else {
                 const msg = formatBotError(txInfo1?.failMessage) || 'swap error'
                 handleBotError(txInfo1?.walletName + ' ' + msg, ElNotification)
-                if (isPromptTx) {
-                  finishPromptFail()
-                }
               }
               unwatch()
               loadingSwap.value = false
@@ -1270,7 +1264,6 @@ function submitBotLimit() {
       }
     }).catch(err => {
       handleBotError(err || 'swap error', ElNotification)
-      finishPromptFail()
       loadingSwap.value = false
     })
   } else if (isEvmChain(chain)) {

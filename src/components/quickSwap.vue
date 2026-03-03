@@ -129,7 +129,7 @@ async function submitSwap(amount: string) {
     }
     data.priorityFee = new BigNumber(priorityFee).times(10 ** 9).toFixed(0)
   } else if (chain !== 'ton') {
-    const gasPrice = Number(settings?.customFee) === 0 ? '0' : (settings?.customFee || gasTips?.[settings?.level as number] || '3')
+    const gasPrice = settings?.customFee == '0' ? '0' : (settings?.customFee || gasTips?.[settings?.level as number] || '3')
     data.gasTip = Number(new BigNumber(gasPrice).times(10 ** 9).toFixed(0))
     data.contractType = 0
     data.chain = chain

@@ -501,7 +501,7 @@ async function submitBotSwap(amount1: string | number, type: 'buy' | 'sell', ind
     const { gasTip1List, gasTip2List } = formatBotGasTips(botSwapStore.gasTip, chain)
     const gasTips = mev ? gasTip1List : gasTip2List
     const settings = mev ? botSetting?.gas[0] : botSetting?.gas[1]
-    const gasPrice = !settings?.customFee ? '0' : (settings?.customFee || gasTips?.[settings?.level] || '3')
+    const gasPrice = settings?.customFee == '0' ? '0' : (settings?.customFee || gasTips?.[settings?.level || 0] || '3')
     const gasTip = Number(new BigNumber(gasPrice).times(10 ** 9).toFixed(0))
     const batchId = Date.now().toString()
     const data = {
