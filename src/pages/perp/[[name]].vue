@@ -1,70 +1,72 @@
 <template>
   <div
     class="flex bg-[--main-divider] gap-1px flex min-w-0 w-full"
-    style="min-height: calc(100vh - 92px - 64px)"
+    style="min-height: calc(100vh - 92px)"
   >
-    <div class="flex-1 max-w-100vw">
-      <WithdrawAlert />
-      <div class="flex flex-1">
-        <div class="flex-1 min-w-0">
-          <div class="flex gap-1px">
-            <div class="flex-1 hide-scrollbar min-w-0 relative">
-              <div
-                v-show="show1"
-                class="absolute bg-[--main-list-hover] w-10px h-32px z-1 cursor-pointer flex items-center justify-center left-100% hover:w-30px hover:h-36px transition-all rounded-tr-4px rounded-br-4px color-[--third-text] hover:color-[--main-text]"
-                @click="show1=false"
-              >
-                <Icon name="material-symbols:arrow-forward-ios" class="text-12px" />
-              </div>
-              <div
-                v-show="!show1"
-                class="absolute bg-[--main-list-hover] w-10px h-32px z-1 cursor-pointer flex items-center justify-center right-0 hover:w-30px hover:h-36px transition-all rounded-tl-4px rounded-bl-4px color-[--third-text] hover:color-[--main-text]"
-                @click="show1=true"
-              >
-                 <Icon name="material-symbols:arrow-back-ios-new-rounded" class="text-12px" />
-              </div>
-              <el-scrollbar :height="scrollbarHeight">
-                <div
-                  class="grid gap-1px last:[:nth-child(2)]:grid-cols-[1fr_1px]"
-                  :style="{ gridTemplateColumns: show2 ? `1fr 1px ${orderBookWidth}px` :  '1fr 1px auto' }
-                  "
-                >
-                  <div class="relative">
-                    <div
-                      v-show="show2"
-                      class="absolute bg-[--main-list-hover] w-10px h-32px z-11 cursor-pointer flex items-center justify-center left-100% hover:w-30px hover:h-36px transition-all rounded-tr-4px rounded-br-4px color-[--third-text] hover:color-[--main-text]"
-                      @click="show2=false"
-                    >
-                      <Icon name="material-symbols:arrow-forward-ios" class="text-12px" />
-                    </div>
-                    <div
-                      v-show="!show2"
-                      class="absolute bg-[--main-list-hover] w-10px h-32px z-11 cursor-pointer flex items-center justify-center right-0 hover:w-30px hover:h-36px transition-all rounded-tl-4px rounded-bl-4px color-[--third-text] hover:color-[--main-text]"
-                      @click="show2=true"
-                    >
-                      <Icon name="material-symbols:arrow-back-ios-new-rounded" class="text-12px" />
-                    </div>
-                    <Top />
-                    <Kline ref="klineContainer" />
-                  </div>
-                  <!-- 订单簿拖动条 -->
-                  <div
-                    class="cursor-col-resize bg-[--d-222-l-F2F2F2] hover:bg-[--d-666-l-CCC] flex flex-col items-center justify-center gap-1px w-1px"
-                    @mousedown.stop.prevent="dragOrderBook"
-                  >
-                    <span v-for="i in 4" :key="i" class="bg-[--d-444-l-999] w-2px h-2px rounded-full"/>
-                  </div>
-                  <OrderBook v-show="show2" :kline-height="klineHeight + 64" />
-                </div>
-
-                <Bottom class="rounded-4px bg-[--d-000-l-F6F6F6]" :style="{ minHeight: height + 'px' }"/>
-              </el-scrollbar>
-            </div>
+    <WithdrawAlert />
+    <div class="flex-1 min-w-0 relative">
+      <div
+        v-show="show1"
+        class="absolute bg-[--main-list-hover] w-10px h-32px z-1 cursor-pointer flex items-center justify-center left-100% hover:w-30px hover:h-36px transition-all rounded-tr-4px rounded-br-4px color-[--third-text] hover:color-[--main-text]"
+        @click="show1=false"
+      >
+        <Icon name="material-symbols:arrow-forward-ios" class="text-12px" />
+      </div>
+      <div
+        v-show="!show2"
+        class="absolute bg-[--main-list-hover] w-10px h-32px z-11 cursor-pointer flex items-center justify-center right-0 hover:w-30px hover:h-36px transition-all rounded-tl-4px rounded-bl-4px color-[--third-text] hover:color-[--main-text]"
+        @click="show2=true"
+      >
+        <Icon name="material-symbols:arrow-back-ios-new-rounded" class="text-12px" />
+      </div>
+      <div
+        v-show="!show1&&!show2"
+        class="absolute bg-[--main-list-hover] w-10px h-32px z-1 cursor-pointer flex items-center justify-center right-0 hover:w-30px hover:h-36px transition-all rounded-tl-4px rounded-bl-4px color-[--third-text] hover:color-[--main-text]"
+        @click="show1=true"
+      >
+        <Icon name="material-symbols:arrow-back-ios-new-rounded" class="text-12px" />
+      </div>
+      <Top/>
+      <div class="flex gap-1px mt-1px">
+        <div class="flex-1 hide-scrollbar min-w-0 relative">
+          <div
+            v-show="!show1&&show2"
+            class="absolute bg-[--main-list-hover] w-10px h-32px z-1 cursor-pointer flex items-center justify-center right-0 hover:w-30px hover:h-36px transition-all rounded-tl-4px rounded-bl-4px color-[--third-text] hover:color-[--main-text]"
+            @click="show1=true"
+          >
+            <Icon name="material-symbols:arrow-back-ios-new-rounded" class="text-12px" />
           </div>
+          <el-scrollbar :height="scrollbarHeight">
+            <div
+              :class="show2 ? 'grid gap-1px' : 'grid grid-cols-1'"
+              :style="{ gridTemplateColumns: show2 ? `1fr 1px ${orderBookWidth}px` :  '1fr 1px auto' }
+              "
+            >
+              <div  class="relative">
+                <div
+                  v-show="show2"
+                  class="absolute bg-[--main-list-hover] w-10px h-32px z-11 cursor-pointer flex items-center justify-center top--1px left-100% hover:w-30px hover:h-36px transition-all rounded-tr-4px rounded-br-4px color-[--third-text] hover:color-[--main-text]"
+                  @click="show2=false"
+                >
+                  <Icon name="material-symbols:arrow-forward-ios" class="text-12px" />
+                </div>
+                <Kline ref="klineContainer"/>
+              </div>
+              <!-- 订单簿拖动条 -->
+              <div
+                class="cursor-col-resize bg-[--d-222-l-F2F2F2] hover:bg-[--d-666-l-CCC] flex flex-col items-center justify-center gap-1px w-1px"
+                @mousedown.stop.prevent="dragOrderBook"
+              >
+                <span v-for="i in 4" :key="i" class="bg-[--d-444-l-999] w-2px h-2px rounded-full"/>
+              </div>
+              <OrderBook v-show="show2" :kline-height="klineHeight" />
+            </div>
+            <Bottom class="rounded-4px bg-[--d-000-l-F6F6F6]" :style="{ minHeight: height + 'px' }"/>
+          </el-scrollbar>
         </div>
-        <TokenRight v-show="show1 && show2" class="w-334px flex-shrink-0" />
       </div>
     </div>
+    <TokenRight v-show="show1 && show2" class="w-334px flex-shrink-0" />
   </div>
 </template>
 
@@ -90,9 +92,9 @@ const show1 = useStorage('perpShow1', true, sessionStorage)
 const show2 = useStorage('perpShow2', true, sessionStorage)
 const scrollbarHeight = computed(() => {
   if (isCanNormalWithdrawableAmount.value) {
-    return 'calc(100vh - 110px)'
+    return 'calc(100vh - 174px)'
   }
-  return 'calc(100vh - 95px)'
+  return 'calc(100vh - 159px)'
 })
 const height = computed(() => {
   return tokenStore.commonHeight - 160
@@ -113,7 +115,7 @@ const klineDateFilter = ref<string[]>([])
 provide(ProvideType.KLINE_DATE_FILTER, klineDateFilter)
 
 // KLine 高度监听
-const klineHeight = useStorage('kHeightPerp', Math.max(DefaultHeight.KLINE, 500))
+const klineHeight = useStorage('kHeightPerp-v1', Math.max(DefaultHeight.KLINE, 564))
 // 订单簿宽度管理
 const DEFAULT_ORDERBOOK_WIDTH = 300
 const MAX_ORDERBOOK_WIDTH = 400

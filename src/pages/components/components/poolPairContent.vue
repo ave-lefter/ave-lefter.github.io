@@ -113,6 +113,7 @@ async function collect(newGroupId?:number) {
 }
 
 function removeTokenFavorite(row) {
+  row.is_fav = false
   removeFavorite(`${row.token}-${row.chain}`, walletAddress.value)
     .then(() => {
       ElMessage.success(t('cancelled1'))
@@ -124,6 +125,7 @@ function removeTokenFavorite(row) {
 }
 
 function addTokenFavorite(row, newGroupId: number) {
+  row.is_fav = true
   addFavorite(`${row.token}-${row.chain}`, walletAddress.value, newGroupId)
     .then(() => {
       ElMessage.success(t('collected'))
