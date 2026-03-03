@@ -258,7 +258,7 @@
                         :width="12"
                         style="border-radius: 100%"
                       >
-                      <a
+                      <!-- <a
                       v-if="
                         summaryList(
                           lang == 'zh-cn' || lang == 'zh-tw'
@@ -285,7 +285,21 @@
                       class="media-item clickable mr-5px"
                     >
                       <Icon name="custom:ai2" class="text-12px color-[--primary-color]" />
-                    </a>
+                    </a> -->
+
+                    <AiPop
+                      v-if="
+                        summaryList(
+                          lang == 'zh-cn' || lang == 'zh-tw'
+                            ? row?.headline_cn || ''
+                            : row?.headline_en || ''
+                        )?.length
+                      "
+                      :summary="lang == 'zh-cn' || lang == 'zh-tw'? row?.headline_cn || '': row?.headline_en || ''"
+                      :score="row.summary_score"
+                    >
+                      <Icon name="custom:ai2" class="text-12px color-[--primary-color] clickable mr-5px" />
+                  </AiPop>
                     <div
                       v-if="
                         row?.medias?.length > 0 && pumpSetting?.define?.some((i) => i === 'media')
@@ -487,14 +501,14 @@
                             <Icon
                               class="iconfont icon-rug mr-4px text-10px"
                               name="custom:followers"
-                            />{{ formatNumber(row?.followers || 0, {locale: 'en'}) }}
+                            />{{ formatNumber(row?.followers || 0, {decimals: 2, l: 4, limit: 3, locale: 'en'}) }}
                         </div>
-                        <div v-if="row?.following" class="color-[--x-blue] ml-8px flex-start leading-10px cursor-pointer" v-tooltip="$t('following')">
+                        <!-- <div v-if="row?.following" class="color-[--x-blue] ml-8px flex-start leading-10px cursor-pointer" v-tooltip="$t('following')">
                           <Icon
                             class="iconfont icon-rug mr-4px text-10px"
                             name="custom:following"
-                          />{{ formatNumber(row?.following || 0, {locale: 'en'}) }}
-                        </div>
+                          />{{ formatNumber(row?.following || 0, {decimals: 2, l: 4, limit: 3, locale: 'en'}) }}
+                        </div> -->
                       </template>
                     </div>
                   </div>
@@ -828,7 +842,7 @@ import PumpPop from './pumpPop/index.vue'
 import HolderRank from './holderRank/index.vue'
 import { useSimilarTokenPopup } from '../utils'
 import { windowEndpoint } from 'comlink'
-import AiPop from './aiPop'
+import AiPop from './aiPop/index.vue'
 const props = defineProps({
   tableList: {
     type: Array<PumpObj>,

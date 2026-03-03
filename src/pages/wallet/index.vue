@@ -1,7 +1,7 @@
 <template>
   <div
     class="bg-[--secondary-bg] flex-1 w-100% px-200px pt-40px overflow-y-auto bot-manage"
-    style="height: calc(100vh - 150px)"
+    style="height: calc(100vh - 90px)"
   >
     <div class="mb-8px flex-between items-center">
       <span class="text-16px font-500">{{ $t('walletList') }}</span>

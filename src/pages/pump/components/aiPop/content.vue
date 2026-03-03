@@ -1,5 +1,5 @@
 <template>
-  <div class="w-308px color-[--main-text]">
+  <div class="color-[--main-text]">
     <div class="flex-between text-14px">
       <Icon
         name="custom:ai2"
@@ -16,13 +16,14 @@
 
     <template v-if="summary && summaryList(summary).length">
       <div
+        class="text-12px"
         v-for="(item, index) in summaryList(summary)"
         :key="index"
       >
         {{ item }}
       </div>
     </template>
-    <div class="text-10px color-[--third-text]">
+    <div class="text-12px color-[--third-text] mt-8px">
         {{ $t('aiSummaryTip') }}
     </div>
   </div>
