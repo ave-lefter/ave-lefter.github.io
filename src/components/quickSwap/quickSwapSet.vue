@@ -20,7 +20,7 @@
           /* --el-input-bg-color: var(--d-151A22-l-E8F1FF); */
           /* --el-input-border-color: var(--d-151A22-l-E8F1FF);
           --el-input-hover-border-color: #3F80F7; */
-          --el-input-text-color: var(--main-text);
+          --el-input-text-color: var(--main-text1);
           border-radius: 4px;
           width: 88px;
           height: 28px;
@@ -58,7 +58,7 @@
           :key="item.value"
           :ref="setBtnRef"
           class="cursor-pointer border-none font-400 rounded-4px min-w-36px py-5px px-10px text-center"
-          :class="`${item.value === botSettingStore.botSettings?.[chain]?.buy?.selected?'color-[--main-text] bg-[--tab-active-bg]':'color-[--secondary-text] bg-transparent'}`"
+          :class="`${item.value === botSettingStore.botSettings?.[chain]?.buy?.selected?'color-[--main-text1] bg-[--tab-active-bg]':'color-[--secondary-text] bg-transparent'}`"
           type="button"
           @click.stop="botSettingStore.botSettings[chain]!.buy!.selected = item.value"
           @mouseenter="showPopover(item.value)"

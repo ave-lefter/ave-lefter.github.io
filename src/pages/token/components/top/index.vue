@@ -93,9 +93,9 @@
         </el-tooltip>
         <div class="ml-8px">
           <div class="flex items-center">
-            <span class="text-16px leading-[1.25] color-[--main-text] font-500 ellipsis max-w-260px tokenName1">{{ token?.symbol }}
+            <span class="text-16px leading-[1.25] color-[--main-text1] font-500 ellipsis max-w-260px tokenName1">{{ token?.symbol }}
             </span>
-            <span class="text-16px leading-[1.25] color-[--main-text] font-500 ellipsis max-w-260px tokenName2" v-tooltip="token?.symbol">{{ token?.symbol }}
+            <span class="text-16px leading-[1.25] color-[--main-text1] font-500 ellipsis max-w-260px tokenName2" v-tooltip="token?.symbol">{{ token?.symbol }}
             </span>
             <span class="ml-8px text-12px font-500 mr-8px ellipsis" style="max-width: 60px" v-tooltip="token?.name">{{
               token?.name
@@ -670,7 +670,7 @@
         />
       </div>
       <div class="item ml-24px items-end!">
-        <span class="text-20px color-[--main-text]">
+        <span class="text-20px color-[--main-text1]">
           ${{ showMarket? formatNumber(marketCap, 2) : formatNumber(price || 0, { decimals: 4, limit: 6 }) }}</span
         >
         <span
@@ -687,13 +687,13 @@
       </div>
       <div v-if="!showMarket" class="item ml-24px ">
         <span>{{ $t('mcap') }}</span>
-        <span class="block mt-8px color-[--main-text]"
+        <span class="block mt-8px color-[--main-text1]"
           >${{ formatNumber(marketCap, 2) }}</span
         >
       </div>
       <div v-else class="item ml-24px ">
         <span>{{ $t('price') }}</span>
-        <span class="block mt-8px color-[--main-text]"
+        <span class="block mt-8px color-[--main-text1]"
           >${{ formatNumber(price || 0, { decimals: 4, limit: 6 }) }}</span
         >
       </div>
@@ -701,7 +701,7 @@
         <template #reference>
           <div class="ml-24px cursor-pointer">
             <span class="border-dotted border-0 border-b-1 inline-block leading-none">{{ $t('liquidity3') }}</span>
-            <span class="block mt-8px color-[--main-text]">
+            <span class="block mt-8px color-[--main-text1]">
               ${{ formatNumber(tokenStore.token?.main_pair_tvl || 0, 1) }}
             </span>
           </div>
@@ -764,20 +764,20 @@
       </div> -->
       <div class="item ml-24px">
         <span>{{ $t('24Volume') }}</span>
-        <span class="block mt-8px color-[--main-text]"
+        <span class="block mt-8px color-[--main-text1]"
           >${{ formatNumber(volume24, 2) }}</span
         >
       </div>
       <div class="item ml-24px">
         <span>{{ $t('holders') }}</span>
-        <span class="block mt-8px color-[--main-text]">{{
+        <span class="block mt-8px color-[--main-text1]">{{
           formatNumber(token?.holders || 0, { limit: 10 })
         }}</span>
       </div>
       <div class="item ml-24px">
         <span>DEV</span>
         <span
-          class="block mt-8px color-[--main-text]"
+          class="block mt-8px color-[--main-text1]"
           :style="{
             color:
               Number(token?.dev_balance_ratio_cur || 0) * 100 < 0.1

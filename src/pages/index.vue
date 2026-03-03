@@ -107,7 +107,7 @@
                 width="24"
                 alt=""
               >
-              <span class="color-[--d-F5F5F5-l-333] text-14px">{{ $t('new1') }}</span>
+              <span class="color-[--d-E0E0E0-l-333] text-14px">{{ $t('new1') }}</span>
             </template>
             <div v-else class="tabs single" >
               <button
@@ -209,7 +209,7 @@
                 width="24"
                 alt=""
               >
-              <span class="color-[--d-F5F5F5-l-333] text-14px">{{ $t('soon') }}</span>
+              <span class="color-[--d-E0E0E0-l-333] text-14px">{{ $t('soon') }}</span>
             </template>
             <div v-else class="tabs single" >
               <button
@@ -310,7 +310,7 @@
                 width="24"
                 alt=""
               >
-              <span class="color-[--d-F5F5F5-l-333] text-14px">{{ $t('graduated') }}</span>
+              <span class="color-[--d-E0E0E0-l-333] text-14px">{{ $t('graduated') }}</span>
             </template>
             <div v-else class="tabs single" >
               <button
@@ -1922,7 +1922,7 @@ function hitBlacklist(item:PumpObj, black: pumpBlack) {
     letter-spacing: 0px;
 
     &.active {
-      color: var(--main-text);
+      color: var(--main-text1);
       background: var(--tab-active-bg);
       opacity: 1;
     }
