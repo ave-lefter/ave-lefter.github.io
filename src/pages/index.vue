@@ -1766,7 +1766,8 @@ function mergeLogo(prev: any, next: any) {
 }
 function handleClearFilter(type: 'new' | 'soon' | 'graduated') {
   const platformsString = pumpConfig.value?.find(i => i.chain === activeChain.value)?.platforms?.map(i => i.platform)?.join?.(',') || ''
-  pumpStore.pumpV3[activeChain.value][type].pumpFilter = {...pumpFilterDefault.value,platforms:platformsString}
+  const baseTokensString = baseTokenMap.value.values().toArray().map((i: any) => i.token).join(',') || ''
+  pumpStore.pumpV3[activeChain.value][type].pumpFilter = {...pumpFilterDefault.value,platforms:platformsString,base_tokens:baseTokensString}
   getPumpList(true)
 }
 </script>

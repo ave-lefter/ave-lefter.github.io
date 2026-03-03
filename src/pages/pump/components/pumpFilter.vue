@@ -626,6 +626,15 @@ const columns = computed(() => {
 })
 
 function handleConfirm() {
+  // 如果关键词或者推特大于 3 个报错提示
+  if(form.value.q && form.value.q.split(',').length > 3){
+    ElMessage.error(t('keywordsError'))
+    return false
+  }
+  if(form.value.twitter_usernames && form.value?.twitter_usernames?.split?.(',')?.length > 3){
+    ElMessage.error(t('twitterError'))
+    return false
+  }
   localVisible.value = false
   // 使用 ref 来访问表单实例，并进行验证
   formRef.value?.validate((valid: boolean) => {
@@ -852,7 +861,7 @@ const getItemFilterNumber = value => {
 }
 
 :deep().el-form-item__label {
-  color: var(--secondary-text);
+  color: var(--main-text);
   height: 36px;
   line-height: 36px;
 }

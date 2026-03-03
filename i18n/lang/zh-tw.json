@@ -1992,5 +1992,7 @@
   "filterMouse": "過濾老鼠倉刷量",
   "QuoteTokens":"报价代币",
   "clearPumpFilter":"清空篩選",
-  "searchXAccount":"搜索X账号(最多三個)"
+  "searchXAccount":"搜索X账号(最多三個)",
+  "keywordsError":"關鍵詞不能超過3個",
+  "twitterError":"推特不能超過3個"
 }
