@@ -2056,5 +2056,6 @@
   "followers": "粉丝数",
   "following": "关注数",
   "sellInits": "回本",
-  "confirmSellAlTips": "当前回本将会导致1个钱包清仓持有的代币,可能会产生亏损,确认继续要回本吗?"
+  "confirmSellAlTips": "当前回本将会导致1个钱包清仓持有的代币,可能会产生亏损,确认继续要回本吗?",
+  "aiSummaryTip": "注意：数据来源于网络，Ave.ai无法保证其准确性，仅供参考。"
 }

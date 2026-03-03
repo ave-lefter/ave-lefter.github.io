@@ -16,6 +16,7 @@ export interface PumpConfig {
 }
 
 export interface PumpObj {
+  summary_score: number | undefined
   following: number
   followers: number
   headline_en: string

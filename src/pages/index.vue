@@ -594,6 +594,7 @@ type StatisticsItem = {
   headline_cn: string
   followers: number
   following: number
+  summary_score: number
 }
 let portraitTimer: ReturnType<typeof setTimeout> | null = null
 let isPortraitSubscribed = false
@@ -1754,7 +1755,7 @@ const DIRECT_MAP: [keyof StatisticsItem, keyof PumpObj][] = [
   ['age_seconds', 'dev_age_seconds'],
   ['headline_cn', 'headline_cn'],
   ['headline_en', 'headline_en'],
-
+  ['summary_score', 'summary_score'],
   ['followers', 'followers'],
   ['following', 'following']
 ]
@@ -1888,7 +1889,8 @@ const MERGE_KEYS = [
   'headline_en',
   'headline_cn',
   'followers',
-  'following'
+  'following',
+  'summary_score'
 ] as const
 
 function mergeStatistics(prev: any, next: any) {

@@ -174,28 +174,6 @@
                       v-copy="row.name"
                       class="name text-12px font-500 mr-5px color-[--third-text] symbol-ellipsis ellipsis-auto block"
                       >{{ row.name }}</span>
-                    <a
-                      v-if="
-                        summaryList(
-                          lang == 'zh-cn' || lang == 'zh-tw'
-                            ? row?.headline_cn || ''
-                            : row?.headline_en || ''
-                        )?.length
-                      "
-                      v-tooltip.raw="{
-                        content: buildTooltipContent(
-                          lang == 'zh-cn' || lang == 'zh-tw'
-                            ? row?.headline_cn || ''
-                            : row?.headline_en || ''
-                        ),
-                        props: {
-                          placement: 'top-start',
-                        },
-                      }"
-                      class="media-item clickable mr-5px"
-                    >
-                      <Icon name="custom:ai" class="text-14px" />
-                    </a>
                     <span
                       v-if="row.buy_tax && row.sell_tax"
                     >
@@ -280,6 +258,34 @@
                         :width="12"
                         style="border-radius: 100%"
                       >
+                      <a
+                      v-if="
+                        summaryList(
+                          lang == 'zh-cn' || lang == 'zh-tw'
+                            ? row?.headline_cn || ''
+                            : row?.headline_en || ''
+                        )?.length
+                      "
+                      v-tooltip="{
+                        content: {
+                          is: AiPop,
+                          props: {
+                            summary: lang == 'zh-cn' || lang == 'zh-tw'
+                            ? row?.headline_cn || ''
+                              : row?.headline_en || '',
+                            score: row.summary_score
+                          }
+                        },
+                        props: {
+                          placement: 'bottom',
+                          trigger: 'hover',
+                          'popper-class': 'new-popover',
+                        }
+                      }"
+                      class="media-item clickable mr-5px"
+                    >
+                      <Icon name="custom:ai2" class="text-12px color-[--primary-color]" />
+                    </a>
                     <div
                       v-if="
                         row?.medias?.length > 0 && pumpSetting?.define?.some((i) => i === 'media')
@@ -822,7 +828,7 @@ import PumpPop from './pumpPop/index.vue'
 import HolderRank from './holderRank/index.vue'
 import { useSimilarTokenPopup } from '../utils'
 import { windowEndpoint } from 'comlink'
-
+import AiPop from './aiPop'
 const props = defineProps({
   tableList: {
     type: Array<PumpObj>,
@@ -1006,17 +1012,22 @@ function summaryList(summary: string): string[] {
   }
   return [summary.trim()]
 }
-
-function buildTooltipContent(summary: string): string {
+function buildTooltipContent(summary: string, summary_score?: number): string {
   const items = summaryList(summary)
   return items?.length > 0
     ? `
     <div class="max-w-[400px]">
+      <div class="flex-between font-14px">
+        <Icon name="custom:ai2" class="text-14px color-[--primary-color]" />AI叙事
+        <span class="flex-1"></span>
+        <el-rate v-model="summary_score" />
+      </div>
       ${items.map((item) => `<div>${item}</div>`).join('')}
     </div>
   `
     : ''
 }
+
 function showBubbleTooltip(row: PumpObj, e: MouseEvent) {
   $tooltip.show({
     content: `<iframe
