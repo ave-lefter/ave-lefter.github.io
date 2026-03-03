@@ -6,7 +6,7 @@ export async function getReferralInfo() {
       method: 'get'
     })
 }
-  
+
   // 获取邀请码
   // /referral/getRefCode
   export async function getRefCode() {
@@ -157,3 +157,31 @@ export async function getWithdrawRecordList() {
       method: 'get'
     })
   }
+
+
+// 获取各等级分佣信息
+export async function getLevelsReferralInfo(): Promise<{
+  userName: string
+  vip: string
+  l1: {
+    rate: number
+    refFee: string
+    invited: number
+    swapValue: string
+  }
+  l2: {
+    rate: number
+    refFee: string
+    invited: number
+    swapValue: string
+  }
+  other: {
+    rate: number
+    refFee: string
+    invited: number
+    swapValue: string
+  }
+}> {
+  const { $api } = useNuxtApp()
+  return $api('/botapi/referral/getLevelsReferralInfo')
+}
