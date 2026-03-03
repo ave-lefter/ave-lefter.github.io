@@ -89,7 +89,7 @@
               <Icon name="material-symbols:chevron-right-rounded" class="text-16px mr--5px" />
             </div>
           </li>
-          <li class="flex justify-between h-40px px-20px clickable" @click.stop="toReferrer">
+          <!-- <li class="flex justify-between h-40px px-20px clickable" @click.stop="toReferrer">
             <div class="color-[--main-text] flex items-center gap-8px">
               <Icon name="custom:gift" class="text-16px" />
               <span class="font-500 text-14px">{{ t('refer') }}</span>
@@ -99,7 +99,7 @@
               </span>
               <Icon name="material-symbols:chevron-right-rounded" class="text-16px mr--5px" />
             </div>
-          </li>
+          </li> -->
           <li class="flex justify-between h-40px px-20px clickable"
             @click="router.push('/safe');tgWalletVisible = false">
             <div class="color-[--main-text] flex items-center gap-8px">
