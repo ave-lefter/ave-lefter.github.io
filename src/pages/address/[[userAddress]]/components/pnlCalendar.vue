@@ -1,45 +1,48 @@
 <template>
-  <div>
+  <div ref="shareDom">
+    <!-- isChartView: {{ isChartView }} -->
     <el-calendar
       v-show="!isChartView"
-      :model-value="new Date()"
+      :key="calendarMonthKey"
+      :model-value="calendarDisplayDate"
       class="[&&]:[--el-calendar-cell-width:44px] [&&]:[--el-fill-color-blank:transparent]"
     >
       <template #header>
         <PnlCalendarHeader
-          v-model:dialogCalendarVis="dialogCalendarVis"
+          v-model:selectedDate="selectedDate"
           v-model:isChartView="isChartView"
-          :date="selectedDate"
           :getColor="getColor"
           :summary="summary"
           @update:isChartView="updateIsChartView"
+          @share="openShareDialog"
         />
       </template>
-      <template #date-cell="{ data: { date } }">
-        <template v-if="dayjs(date).isSame(dayjs(selectedDate), 'month')">
+      <template #date-cell="{ data }">
+        <template v-if="data.type === 'current-month'">
           <div
             class="text-center h-full"
-            :class="[getColor(getPnl(date)).bg, 'cursor-pointer']"
-            @click="clickDay(date, $event)"
+            :class="[getColor(getPnl(data.date)).bg, 'cursor-pointer']"
+            @click="clickDay(data.date, $event)"
           >
             <span class="text-12px color-[--third-text] lh-14px">{{
-              dayjs(date).format('DD')
+              dayjs(data.date).format('DD')
             }}</span>
-            <div class="text-12px lh-14px mt-2px" :class="getColor(getPnl(date)).color">
-              {{ addSign(getPnl(date)) }}${{ formatNumber(Math.abs(getPnl(date)),{decimals:1,limit:4}) }}
+            <div class="text-12px lh-14px mt-2px" :class="getColor(getPnl(data.date)).color">
+              {{ addSign(getPnl(data.date)) }}${{ formatNumber(Math.abs(getPnl(data.date)),{decimals:1,limit:4}) }}
             </div>
           </div>
         </template>
         <span v-else />
       </template>
     </el-calendar>
+
     <div v-show="isChartView" class="flex flex-col justify-between h-full">
       <PnlCalendarHeader
-        v-model:dialogCalendarVis="dialogCalendarVis"
+        v-model:selectedDate="selectedDate"
         v-model:isChartView="isChartView"
-        :date="selectedDate"
         :summary="summary"
         :getColor="getColor"
+        @share="openShareDialog"
       />
       <div ref="chartContainer" class="w-414px h-231px" />
     </div>
@@ -50,6 +53,114 @@
       :userChain="userChain"
       :formatterTooltip="formatterTooltip"
     />
+
+    <el-dialog v-model="shareDialogVisible" width="560px" append-to-body destroy-on-close>
+      <template #header>
+        <div class="text-14px lh-20px color-[--main-text]">{{ t('pnlCalendar') }}</div>
+      </template>
+
+      <div ref="shareCardDom" class="share-card bg-[--secondary-bg] rounded-8px p-12px">
+        <div class="text-14px lh-20px color-[--main-text] mb-8px">{{ t('pnlCalendar') }}</div>
+        <div class="flex items-center justify-center gap-4px text-12px color-[--main-text] mb-12px select-none">
+          <!-- <Icon
+            name="custom:arrow-l"
+            class="text-14px color-[--main-text] cursor-pointer"
+            @click="shareCardPrevMonth"
+          /> -->
+          <div class="text-14px color-[--main-text] cursor-pointer"
+            @click="shareCardPrevMonth">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M6.44307 6.99949L9.04182 9.59824L8.29947 10.3406L4.95837 6.99949L8.29947 3.65839L9.04182 4.40074L6.44307 6.99949Z" fill="currentColor"/>
+            </svg>
+          </div>
+          <span class="font-500">{{ monthLabel }}</span>
+          <!-- <Icon
+            name="custom:arrow-r"
+            class="text-14px"
+            :class="shareCardNextDisabled ? 'color-[--main-text] opacity-50 cursor-not-allowed' : 'color-[--main-text] cursor-pointer'"
+            @click="shareCardNextMonth"
+          /> -->
+          <div class="text-14px"
+            :class="shareCardNextDisabled ? 'color-[--main-text] opacity-50 cursor-not-allowed' : 'color-[--main-text] cursor-pointer'"
+            @click="shareCardNextMonth">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M7.55693 6.99949L4.95818 9.59824L5.70053 10.3406L9.04163 6.99949L5.70053 3.65839L4.95818 4.40074L7.55693 6.99949Z" fill="currentColor"/>
+            </svg>
+          </div>
+        </div>
+        <div class="text-12px mb-8px" :class="getColor(summary?.month_total_profit ?? 0).color">
+          {{ addSign(summary?.month_total_profit ?? 0) }}${{
+            formatNumber(Math.abs(summary?.month_total_profit ?? 0), 1)
+          }}
+        </div>
+        <div class="flex gap-2px mb-8px">
+          <div class="h-4px rounded-2px bg-[--up-color]" :style="`width:${shareCardPercent.profit}%`" />
+          <div class="h-4px rounded-2px bg-[--down-color]" :style="`width:${shareCardPercent.loss}%`" />
+        </div>
+        <div class="flex justify-between text-12px lh-16px mb-12px color-[--main-text]">
+          <div>
+            <span class="color-[--up-color]">{{ summary?.win_days_count ?? 0 }} / </span>
+            <span class="color-[--up-color]">${{ formatNumber(summary?.total_profit_on_win_days ?? 0, 1) }}</span>
+          </div>
+          <div>
+            <span class="color-[--down-color]">{{ summary?.loss_days_count ?? 0 }} / </span>
+            <span class="color-[--down-color]">${{ formatNumber(Math.abs(summary?.total_profit_on_loss_days ?? 0), 1) }}</span>
+          </div>
+        </div>
+        <el-calendar
+          :key="calendarMonthKey"
+          :model-value="calendarDisplayDate"
+          class="share-card-calendar [&&]:[--el-calendar-cell-width:44px] [&&]:[--el-fill-color-blank:transparent]"
+        >
+          <template #header>
+            <span/>
+          </template>
+          <template #date-cell="{ data }">
+            <!-- <template v-if="dayjs(data.date).isSame(dayjs(selectedDate), 'month')">
+              <div class="text-center h-full" :class="getColor(getPnl(data.date)).bg">
+                <span class="text-12px color-[--main-text] lh-14px">{{ dayjs(data.date).format('DD') }}</span>
+                <div
+                  class="text-12px lh-14px mt-2px"
+                  :class="getColor(getPnl(data.date)).color"
+                >
+                  {{ addSign(getPnl(data.date)) }}${{ formatNumber(Math.abs(getPnl(data.date)), { decimals: 1, limit: 4 }) }}
+                </div>
+              </div>
+            </template> -->
+            <template v-if="data.type === 'current-month'">
+              <div
+                class="text-center h-full"
+                :class="[getColor(getPnl(data.date)).bg, 'cursor-pointer']"
+                @click="clickDay(data.date, $event)"
+              >
+                <span class="text-12px color-[--third-text] lh-14px">{{
+                  dayjs(data.date).format('DD')
+                }}</span>
+                <div class="text-12px lh-14px mt-2px" :class="getColor(getPnl(data.date)).color">
+                  {{ addSign(getPnl(data.date)) }}${{ formatNumber(Math.abs(getPnl(data.date)),{decimals:1,limit:4}) }}
+                </div>
+              </div>
+            </template>
+            <span v-else />
+          </template>
+        </el-calendar>
+        <div class="mt-12px flex items-center justify-between text-12px color-[--main-text]">
+          <div class="flex gap-16px">
+            <span v-if="shareCardIsCurrentMonth">{{ t('currentStreak') }}: {{ summary?.current_win_streak ?? 0 }}d</span>
+            <span>{{ t('maxStreak') }}({{ shareCardMonthShort }}): {{ summary?.max_consecutive_win_days ?? 0 }}d</span>
+          </div>
+          <div class="flex items-center gap-4px">
+            <img height="18" src="~/assets/images/avedex_mobile_logo.png" alt="Ave" class="h-18px w-auto">
+            <span class="font-600 color-[--main-text] text-12px">Ave.ai</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-end mt-12px">
+        <el-button type="primary" class="min-w-92px" @click="copySharePoster">{{ t('copyImg') }}</el-button>
+      </div>
+    </el-dialog>
+
     <el-popover
       ref="popoverRef"
       :virtual-ref="buttonRef"
@@ -66,8 +177,10 @@
 </template>
 
 <script setup>
+import BigNumber from 'bignumber.js'
 import * as echarts from 'echarts'
 import dayjs from 'dayjs'
+import html2canvas from 'html2canvas'
 import { getProfitCalendar } from '~/api/wallet'
 import PnlCalendarHeader from './pnlCalendarHeader.vue'
 import PnlDialog from './pnlDialog.vue'
@@ -90,10 +203,101 @@ const summary = ref({})
 const isChartView = ref(false)
 let chartInstance = null
 const chartContainer = useTemplateRef('chartContainer')
+const shareDom = useTemplateRef('shareDom')
+const shareCardDom = useTemplateRef('shareCardDom')
 const buttonRef = ref(null)
 const popVisible = ref(false)
 const tooltipDate = ref('')
 const dialogCalendarVis = ref(false)
+const shareDialogVisible = ref(false)
+
+/** 主日历展示的月份，随 selectedDate 切换 */
+const calendarMonthKey = computed(() => dayjs(selectedDate.value).format('YYYY-MM'))
+const calendarDisplayDate = computed(() =>
+  dayjs(selectedDate.value).startOf('month').toDate()
+)
+
+
+const {lang} = storeToRefs(useGlobalStore())
+const monthLabel = computed(() => {
+  const lang1= lang.value.includes('zh') ? 'zh' : 'en'
+  return selectedDate.value? dayjs(selectedDate.value).locale(lang1).format('MMM YYYY') :  dayjs().locale(lang1).format('MMM YYYY')
+})
+// Element Plus range 要求：周一开始、周日结束；否则会导致跨月日期错位
+const shareCardRange = computed(() => {
+  const monthStart = dayjs(selectedDate.value).startOf('month')
+  const monthEnd = dayjs(selectedDate.value).endOf('month')
+  const startDow = monthStart.day() // 0 Sun ... 6 Sat
+  const endDow = monthEnd.day()
+  const daysSinceMonday = (startDow + 6) % 7 // Monday=0 ... Sunday=6
+  const daysToSunday = 6 - ((endDow + 6) % 7)
+  const rangeStart = monthStart.subtract(daysSinceMonday, 'day')
+  const rangeEnd = monthEnd.add(daysToSunday, 'day')
+  return [rangeStart.toDate(), rangeEnd.toDate()]
+})
+const shareCardMonthLabel = computed(() => dayjs(selectedDate.value).format('MMM YYYY'))
+const shareCardMonthShort = computed(() => {
+  const lang1= lang.value.includes('zh') ? 'zh' : 'en'
+  return dayjs(selectedDate.value).locale(lang1).format('MMM')
+})
+const shareCardIsCurrentMonth = computed(
+  () => dayjs(selectedDate.value).format('YYYY-MM') === dayjs().format('YYYY-MM')
+)
+const shareCardNextDisabled = computed(() => {
+  const d = selectedDate.value || dayjs().format('YYYY-MM-DD')
+  return (
+    dayjs(d).startOf('month').isAfter(dayjs().startOf('month')) ||
+    dayjs(d).startOf('month').isSame(dayjs().startOf('month'))
+  )
+})
+
+function shareCardPrevMonth() {
+  const d = dayjs(selectedDate.value || dayjs().format('YYYY-MM-DD')).subtract(1, 'month')
+  selectedDate.value = d.format('YYYY-MM-DD')
+}
+
+function shareCardNextMonth() {
+  if (shareCardNextDisabled.value) return
+  const d = dayjs(selectedDate.value).add(1, 'month')
+  selectedDate.value = d.format('YYYY-MM-DD')
+}
+const shareCardPercent = computed(() => {
+  const win = summary.value?.total_profit_on_win_days ?? 0
+  const loss = Math.abs(summary.value?.total_profit_on_loss_days ?? 0)
+  const total = new BigNumber(win).plus(loss)
+  if (total.isZero()) {
+    return { profit: 50, loss: 50 }
+  }
+  const profit = +formatNumber(new BigNumber(win).div(total).multipliedBy(100).toString(), 1)
+  const lossPct = +formatNumber(new BigNumber(loss).div(total).multipliedBy(100).toString(), 1)
+  return { profit, loss: lossPct }
+})
+
+const chartDates = computed(() => {
+  const start = dayjs(selectedDate.value).startOf('month')
+  const end = dayjs(selectedDate.value).endOf('month')
+  const days = []
+  let cur = start
+  while (cur.isBefore(end) || cur.isSame(end, 'day')) {
+    days.push(cur.format('YYYY-MM-DD'))
+    cur = cur.add(1, 'day')
+  }
+  return days
+})
+
+const chartSource = computed(() => {
+  return chartDates.value.map((date) => {
+    const item = dateMapToPnl.value[date]
+    return {
+      date,
+      profit: item?.profit ?? 0,
+      total_buy_count: item?.total_buy_count ?? 0,
+      total_sell_count: item?.total_sell_count ?? 0,
+      buy_volume: item?.buy_volume ?? 0,
+      sell_volume: item?.sell_volume ?? 0,
+    }
+  })
+})
 
 const getColor = (value) => {
   if (value === 0) {
@@ -112,7 +316,7 @@ const getColor = (value) => {
     return {
       bg: 'bg-#12B8864D',
       color: 'color-[--up-color]',
-      cssColor: getCssVariable('color-[--up-color]'),
+      cssColor: getCssVariable('--up-color'),
     }
   } else {
     return {
@@ -129,10 +333,17 @@ const _getProfitCalendar = async () => {
     user_chain: props.userChain,
     date: selectedDate.value,
   })
+  dateMapToPnl.value = {}
   ;(res.days || []).forEach((item) => {
     dateMapToPnl.value[item.date] = item
   })
   summary.value = res.summary || {}
+
+  if (isChartView.value) {
+    setTimeout(() => {
+      initOrUpdateChart()
+    }, 20)
+  }
 }
 
 const getPnl = (date) => {
@@ -183,7 +394,7 @@ const initOrUpdateChart = () => {
     },
     xAxis: {
       type: 'category',
-      data: Object.keys(dateMapToPnl.value),
+      data: chartDates.value,
       splitLine: {
         show: false,
       },
@@ -234,13 +445,20 @@ const initOrUpdateChart = () => {
       type: 'bar',
       barMaxWidth: 10,
       itemStyle: {
-        color: (value) => {
-          return getColor(value.value.profit).cssColor
+        color: (params) => {
+          const profit = params?.data?.profit ?? 0
+          if (profit < 0) return getCssVariable('--down-color')
+          if (profit > 0) return getCssVariable('--up-color')
+          return getCssVariable('--third-text')
         },
+      },
+      encode: {
+        x: 'date',
+        y: 'profit',
       },
     },
     dataset: {
-      source: Object.values(dateMapToPnl.value),
+      source: chartSource.value,
       dimensions: ['date', 'profit'],
     },
     tooltip: {
@@ -250,7 +468,7 @@ const initOrUpdateChart = () => {
       borderWidth: 0,
       padding: 12,
       appendTo: 'body',
-      formatter: formatterTooltip,
+      formatter: (params) => formatterTooltip({ value: params?.data || {} }),
     },
   }
   chartInstance.setOption(option)
@@ -272,6 +490,45 @@ const clickDay = (date, $event) => {
     tooltipDate.value = dayjs(date).format('YYYY-MM-DD')
   }
 }
+
+const openShareDialog = () => {
+  shareDialogVisible.value = true
+}
+
+const copySharePoster = async () => {
+  if (!shareCardDom.value) return
+  const canvas = await html2canvas(shareCardDom.value, {
+    backgroundColor: null,
+    scale: 2,
+    allowTaint: true,
+    useCORS: true,
+    scrollY: 0,
+    scrollX: 0,
+  })
+
+  canvas.toBlob(async (blob) => {
+    if (!blob) {
+      ElMessage.error(t('success'))
+      return
+    }
+
+    try {
+      const item = new ClipboardItem({ 'image/png': blob })
+      await navigator.clipboard.write([item])
+      ElMessage.success(t('success'))
+    } catch (err) {
+      console.error('无法复制图片: ', err)
+      ElMessage.error(t('fail'))
+    }
+  }, 'image/png')
+}
+
+watch(
+  () => selectedDate.value,
+  () => {
+    _getProfitCalendar()
+  }
+)
 
 watch(
   () => themeStore.isDark,
@@ -333,5 +590,27 @@ onUnmounted(() => {
 }
 :global(.el-calendar-table .el-calendar-day:hover) {
   cursor: default;
+}
+
+.share-card :deep(.el-calendar__header) {
+  padding: 0;
+  border-bottom: 0 none;
+}
+.share-card :deep(.el-calendar__body) {
+  padding: 0;
+}
+.share-card :deep(.el-calendar-table tr td) {
+  border: 0 none !important;
+}
+.share-card :deep(.el-calendar-table .el-calendar-day) {
+  padding: 2px;
+  --el-calendar-selected-bg-color: transparent;
+}
+.share-card :deep(.el-calendar-table thead th) {
+  padding: 0;
+  padding-bottom: 11px;
+  font-size: 12px;
+  line-height: 20px;
+  color: var(--main-text);
 }
 </style>
