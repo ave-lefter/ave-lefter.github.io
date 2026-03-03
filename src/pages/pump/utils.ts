@@ -36,7 +36,6 @@ export function useSimilarTokenPopup() {
   export function getFilterNumber(form:Record<string, any>, allPlatformsValue?: string, allBaseTokensValue?: string) {
       let filterList = Object.keys(form).filter((key) => form[key] !== null && form[key] !== undefined && form[key] !== '' && form[key] !== 0 && (form[key]?.length > 0 || form[key] == 1 || form[key] === 2))
       filterList = Array.from(new Set(filterList.map(key => key.replace(/_min|_max$/g, ''))))
-      console.log(filterList, 'filterList')
       // platforms 全选则不统计
       if (allPlatformsValue !== undefined && filterList.includes('platforms') && form.platforms === allPlatformsValue) {
         filterList = filterList.filter(i => i !== 'platforms')

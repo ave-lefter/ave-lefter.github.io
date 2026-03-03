@@ -1418,10 +1418,11 @@ function filterHistoryData(list: PumpObj[], conditions: any) {
   return list?.filter((i) => {
     let pass = true
     if (conditions?.dev_sale_out) {
+      const isSellOut = i.max_dev_ratio!==0 &&i.dev_balance_ratio_cur===0
       if(conditions?.dev_sale_out === 1){
-        pass = pass && !Number(i?.dev_balance_ratio_cur)
+        pass = pass && isSellOut
       } else if(conditions?.dev_sale_out === 2){
-        pass = pass && !!Number(i?.dev_balance_ratio_cur)
+        pass = pass && !isSellOut
       }
     }
     if (conditions?.no_repeat_social_media && Array.isArray(i?.medias)) {
@@ -1430,6 +1431,9 @@ function filterHistoryData(list: PumpObj[], conditions: any) {
       if (hasRepeatedUrl) {
         pass = false
       }
+    }
+    if(!conditions?.base_tokens){
+      return false
     }
     return pass
   })
@@ -1443,10 +1447,11 @@ function getFilterData(list: PumpObj[], conditions: any) {
       pass = pass && arr?.findIndex(y=> i.target_token == y || i.name == y || i.symbol == y) !== -1
     }
     if (conditions?.dev_sale_out) {
+      const isSellOut = i.max_dev_ratio!==0 &&i.dev_balance_ratio_cur===0
       if(conditions?.dev_sale_out === 1){
-        pass = pass && !Number(i?.dev_balance_ratio_cur)
+        pass = pass && isSellOut
       } else if(conditions?.dev_sale_out === 2){
-        pass = pass && !!Number(i?.dev_balance_ratio_cur)
+        pass = pass && !isSellOut
       }
     }
     if(conditions?.base_tokens){

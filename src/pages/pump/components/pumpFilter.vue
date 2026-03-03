@@ -386,7 +386,7 @@ const localVisible = computed({
 const formRef = ref()
 type FormType = typeof initForm
 const form = ref<FormType>(initForm)
-let tableFilter = pumpStore.pumpV3[props.activeChain][props.activeFilterType]?.pumpFilter
+let tableFilter = pumpStore.pumpV3[props.activeChain][activeTab.value]?.pumpFilter
 
 const tabs2Active = ref('indicator')
 const Tabs2Enum = {
@@ -441,8 +441,9 @@ watch(() => props.visible, (val) => {
   }
 })
 watch(activeTab,()=>{
- tableFilter = pumpStore.pumpV3[props.activeChain][props.activeFilterType]?.pumpFilter
+ tableFilter = pumpStore.pumpV3[props.activeChain][activeTab.value]?.pumpFilter
   setCheckedPlatforms()
+  setCheckedBaseTokens()
 })
 // watch(() => storage.value, (val) => {
 //     tableFilter.value = usePumpTableDataFetching(val)
@@ -631,7 +632,7 @@ function handleConfirm() {
     if (valid) {
       const form1 = { ...form.value }
       tableFilter = { ...form1 }
-      pumpStore.pumpV3[props.activeChain][props.activeFilterType].pumpFilter = { ...form1 }
+      pumpStore.pumpV3[props.activeChain][activeTab.value].pumpFilter = { ...form1 }
       console.log('----------form1-------------', form1)
       emit('update:filterData', { ...form1 }, storage.value)
     } else {
@@ -646,9 +647,9 @@ function reset() {
   if (formRef.value) {
     formRef.value.resetFields()  // 重置表单字段
   }
-  const form = { ...initForm,platforms:props.platformsList.map(platform => platform.platform).join(',') }
+  const form = { ...initForm,platforms:props.platformsList.map(platform => platform.platform).join(','),base_tokens:baseTokensAllStr.value }
   tableFilter = { ...form }
-  pumpStore.pumpV3[props.activeChain][props.activeFilterType].pumpFilter = { ...form }  // 更新过滤器数据
+  pumpStore.pumpV3[props.activeChain][activeTab.value].pumpFilter = { ...form }  // 更新过滤器数据
   // 触发更新事件
   emit('update:filterData', { ...form }, storage.value)
 }
@@ -712,7 +713,7 @@ const isString = _isString
 const platformsAllStr = computed(() => props.platformsList.filter(Boolean).map((i: any) => i.platform).join(','))
 const baseTokensAllStr = computed(() => props.baseTokens.map((i: any) => i.token).join(','))
 const getItemFilterNumber = value => {
-  if (value === props.activeFilterType) return getFilterNumber(form.value, platformsAllStr.value, baseTokensAllStr.value)
+  if (value === activeTab.value) return getFilterNumber(form.value, platformsAllStr.value, baseTokensAllStr.value)
   return getFilterNumber(pumpStore.pumpV3[props.activeChain][value]?.pumpFilter || {}, platformsAllStr.value, baseTokensAllStr.value)
 }
 </script>
