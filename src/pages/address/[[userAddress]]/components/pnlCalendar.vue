@@ -147,7 +147,7 @@
         <div class="mt-12px flex items-center justify-between text-12px color-[--main-text]">
           <div class="flex gap-16px">
             <span v-if="shareCardIsCurrentMonth">{{ t('currentStreak') }}: {{ summary?.current_win_streak ?? 0 }}d</span>
-            <span>{{ shareCardMonthShort }} {{ t('maxStreak') }}: {{ summary?.max_consecutive_win_days ?? 0 }}d</span>
+            <span>{{ t('maxStreak') }}({{ shareCardMonthShort }}): {{ summary?.max_consecutive_win_days ?? 0 }}d</span>
           </div>
           <div class="flex items-center gap-4px">
             <img height="18" src="~/assets/images/avedex_mobile_logo.png" alt="Ave" class="h-18px w-auto">
@@ -236,7 +236,10 @@ const shareCardRange = computed(() => {
   return [rangeStart.toDate(), rangeEnd.toDate()]
 })
 const shareCardMonthLabel = computed(() => dayjs(selectedDate.value).format('MMM YYYY'))
-const shareCardMonthShort = computed(() => dayjs(selectedDate.value).format('MMM'))
+const shareCardMonthShort = computed(() => {
+  const lang1= lang.value.includes('zh') ? 'zh' : 'en'
+  return dayjs(selectedDate.value).locale(lang1).format('MMM')
+})
 const shareCardIsCurrentMonth = computed(
   () => dayjs(selectedDate.value).format('YYYY-MM') === dayjs().format('YYYY-MM')
 )
@@ -505,17 +508,17 @@ const copySharePoster = async () => {
 
   canvas.toBlob(async (blob) => {
     if (!blob) {
-      ElMessage.error('复制失败')
+      ElMessage.error(t('success'))
       return
     }
 
     try {
       const item = new ClipboardItem({ 'image/png': blob })
       await navigator.clipboard.write([item])
-      ElMessage.success('复制成功')
+      ElMessage.success(t('success'))
     } catch (err) {
       console.error('无法复制图片: ', err)
-      ElMessage.error('复制失败')
+      ElMessage.error(t('fail'))
     }
   }, 'image/png')
 }
