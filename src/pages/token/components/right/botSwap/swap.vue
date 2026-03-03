@@ -24,15 +24,8 @@
           </el-dropdown>
         </template>
       </el-input>
-      <div class="flex items-center mt-10px text-12px">
-        <span class="color-[--main-text]">≈{{  formatNumber(amountNativeOut || 0) }} {{ tokenInfo?.symbol }}</span>
-        <Icon name="ri:wallet-fill" class="color-[--third-text] text-14px ml-auto" />
-        <span class="text-12px color-[--third-text] mx-3px">{{ botSwapStore.botSwapSelectedWallets?.length }}</span>
-        <div class="color-[--third-text]" :class="{ 'clickable': botSwapStore.botSwapSelectedWallets?.length <= 1 }" @click.stop="handleMax(tokenStore.swap.payToken?.balance || 0, 'buy')">{{ $t('balance1') }}: <span>{{ formatNumber(totalSelectWalletBalance || 0) }}</span> {{ tokenStore.swap.payToken?.symbol || '' }}
-        </div>
-        <RefreshBalance class="color-[--third-text]" :type="0" isPayToken isBatch />
-      </div>
-      <div class="tabs mt-10px">
+   
+      <div class="tabs mt-1px">
         <button v-for="(item, index) in tabs1" :key="index" class="tab-item" type="button"  @click.stop="handleAmount(item, 'buy')">
           <!-- <img class="mr-5px" :src="`${configStore.token_logo_url}${tokenStore.swap.payToken?.logo_url}`" style="border-radius: 50%;" height="14"  alt="" srcset="" > -->
           <span v-if="!editMode">{{ item.name }}</span>
@@ -48,6 +41,16 @@ size="small"
           <Icon :name="editMode ? 'custom:select' : 'custom:remark'"/>
         </button>
       </div>
+      <div class="flex items-center mt-10px text-12px">
+        <!-- <Icon name="ri:wallet-fill" class="color-[--third-text] text-14px ml-auto" />
+        <span class="text-12px color-[--third-text] mx-3px">{{ botSwapStore.botSwapSelectedWallets?.length }}</span>
+        <div class="color-[--third-text]" :class="{ 'clickable': botSwapStore.botSwapSelectedWallets?.length <= 1 }" @click.stop="handleMax(tokenStore.swap.payToken?.balance || 0, 'buy')">{{ $t('balance1') }}: <span>{{ formatNumber(totalSelectWalletBalance || 0) }}</span> {{ tokenStore.swap.payToken?.symbol || '' }}
+        </div>
+        <RefreshBalance class="color-[--third-text]" :type="0" isPayToken isBatch /> -->
+        <AutoSellSet v-if="activeTab === 'buy' && swapType==='market' && chain !=='ton'" class="w-full">
+          <span class="color-[--third-text]">≈{{  formatNumber(amountNativeOut || 0) }} {{ tokenInfo?.symbol }}</span>
+        </AutoSellSet>
+      </div>
     </template>
     <template v-else-if="activeTab === 'sell'">
       <el-input v-if="botSwapStore.botSwapSelectedWallets?.length > 1"  v-model="amountSellTokenPercent" clearable class="input-number mt-10px" size="large"  input-style="text-align:right"  placeholder="0" @update:model-value="value => {amountSellTokenPercent = value?.replace?.(/\-|[^\d.]/g, '');watchAmount('sell')}">
@@ -55,7 +58,7 @@ size="small"
           <span class="text-12px color-[--secondary-text]">{{ tokenInfo?.symbol }}</span>
         </template>
         <template #append>
-           <span class="text-12px color-[--main-text]">%</span>
+          <span class="text-12px color-[--main-text]">%</span>
         </template>
       </el-input>
       <el-input v-else v-model="amountToken" clearable class="input-number mt-10px" size="large"  input-style="text-align:right"  placeholder="0.0" @update:model-value="value => {amountToken = value?.replace?.(/\-|[^\d.]/g, '');watchAmount('sell')}">
@@ -66,6 +69,11 @@ size="small"
            <span class="text-12px color-[--main-text]">{{ tokenInfo?.symbol  }}</span>
         </template>
       </el-input>
+      <div class="tabs mt-1px">
+        <button v-for="(item, index) in tabs2" :key="index" class="tab-item" type="button" @click.stop="handleAmount(item, 'sell')">
+          <span>{{ item.name }}</span>
+        </button>
+      </div>
       <div class="flex items-center mt-10px text-12px">
         <div class="color-[--main-text] flex items-center"><span>≈{{ formatNumber(amountTokenOut || 0) }}</span>
           <el-dropdown placement="bottom" trigger="click" @visible-change="visible => show = visible">
@@ -83,15 +91,10 @@ size="small"
             </template>
           </el-dropdown>
         </div>
-        <Icon name="ri:wallet-fill" class="color-[--third-text] text-14px ml-auto" />
+        <!-- <Icon name="ri:wallet-fill" class="color-[--third-text] text-14px ml-auto" />
         <span class="text-12px color-[--third-text] mx-3px">{{ botSwapStore.botSwapSelectedWallets?.length }}</span>
         <span class="color-[--third-text]" :class="{ 'clickable': botSwapStore.botSwapSelectedWallets?.length <= 1 }" @click.stop="handleMax(tokenStore.swap.token?.balance || 0, 'sell')">{{ $t('balance1') }}: <span >{{ formatNumber(totalSelectWalletBalance1 || 0) }}</span> {{ tokenInfo?.symbol }}</span>
-        <RefreshBalance class="color-[--third-text]" :type="1" isPayToken isBatch />
-      </div>
-      <div class="tabs mt-10px">
-        <button v-for="(item, index) in tabs2" :key="index" class="tab-item" type="button" @click.stop="handleAmount(item, 'sell')">
-          <span>{{ item.name }}</span>
-        </button>
+        <RefreshBalance class="color-[--third-text]" :type="1" isPayToken isBatch /> -->
       </div>
     </template>
     <template v-if="swapType === 'limit'">
@@ -121,7 +124,6 @@ size="small"
         </el-input>
       </div>
     </template>
-    <AutoSellSet v-if="activeTab === 'buy' && swapType==='market' && chain !=='ton'" class="mt-15px" />
     <template v-if="isSupportSwap">
       <el-button v-if="!isApprove" :color="swapButtonColor" class="submit-btn" native-type="button" :loading="loadingApprove || loadingSwap || loadingAllowance" :disabled="Number(fromToken.balance) < Number(fromAmount)" @click.stop="approve">{{ Number(fromToken.balance) === 0 || Number(fromToken.balance) < Number(fromAmount) ? (checkAmountMessage() || $t('approve')) : $t('approve') }}</el-button>
 
@@ -1618,7 +1620,7 @@ onMounted(() => {
       padding: 0 10px;
     }
     :deep() .el-input-group__prepend {
-      --el-fill-color-light: var(--border);
+      // --el-fill-color-light: var(--border);
       min-width: 70px;
       padding: 0 12px;
     }

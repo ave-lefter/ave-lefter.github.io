@@ -92,10 +92,18 @@
             </li>
           </ul>
 
-          <BottomSetting activeTab="sell" :gasPrice="tokenStore.gasPrice" @mousedown.stop />
+          <BottomSetting activeTab="sell" :gasPrice="tokenStore.gasPrice" @mousedown.stop>
+            <button v-if="!isCanSellInits" class="bg-[--border] color-[--third-text] border-none px-5px py-2px text-11px ml-auto rd-2px cursor-not-allowed" disabled>{{ $t('sellInits') }}</button>
+            <button v-else class="bg-[#F6465D1A] color-[--down-color] border-none px-5px py-2px text-11px ml-auto clickable rd-2px flex items-center flex-nowrap " @click.stop="sellInits">
+              <i v-if="loadingSwapSell[20]" class="el-icon is-loading mr-2px">
+                <Loading />
+              </i>
+              <span>{{ $t('sellInits') }}</span>
+            </button>
+          </BottomSetting>
         </div>
 
-        <Holding v-show="isEnablePnL" isForceShow class="b-t-solid b-t-1px b-color-[--dialog-divider] mt-10px rd-0! pb-0! mb-0! gap-8px bg-transparent!" />
+        <Holding v-show="isEnablePnL" v-model:walletTokenInfo="walletTokenInfo" isForceShow class="b-t-solid b-t-1px b-color-[--dialog-divider] mt-10px rd-0! pb-0! mb-0! gap-8px bg-transparent!" />
         <!-- 拖拽放大手柄：下、右、上、左、四角斜向 -->
         <div class="resize-handle resize-handle-b" @mousedown.stop="e => onResizeMouseDown(e, 'b')"/>
         <div class="resize-handle resize-handle-r" @mousedown.stop="e => onResizeMouseDown(e, 'r')"/>
@@ -128,6 +136,9 @@ import { recordTxV2, updateTxV2 } from '~/api/tracking'
 import Holding from './holding.vue'
 import BottomSetting from './bottomSetting.vue'
 import { useTransactionPrompt } from '@/composables/useTransactionPrompt'
+import type { WalletTokenInfo } from '~/api/types/token'
+import { Loading } from '@element-plus/icons-vue'
+import ConfirmSellAll from './confirmSellAll.vue'
 
 const botStore = useBotStore()
 const tokenStore = useTokenStore()
@@ -168,6 +179,63 @@ const nativePrice = computed(() => {
 const tokenPrice = computed(() => {
   return tokenStore.price || tokenStore.swap.token?.price || 0
 })
+
+const walletTokenInfo = ref<WalletTokenInfo | null>(null)
+
+const isCanSellInits = computed(() => {
+  if (!walletTokenInfo.value) return false
+  const hasPosition = new BigNumber(Number(tokenStore.swap.token?.balance) || Number(walletTokenInfo.value?.balance_amount) || 0).gt(0)
+  // 买入成本 > 卖出收益
+  // const isUnrealizedProfitGt0 = new BigNumber(walletTokenInfo.value?.unrealized_profit || 0).gt(0)
+  const buyCost = new BigNumber(Number(walletTokenInfo.value?.total_purchase_usd) || 0).minus(new BigNumber(Number(walletTokenInfo.value?.total_sold_usd) || 0))
+  return hasPosition && buyCost.gt(0.001)
+})
+
+function sellInits() {
+  if (!botStore.userInfo?.evmAddress || !botStore.accessToken) {
+    botStore.changeConnectVisible(true)
+    return
+  }
+  if (isCanSellInits.value) {
+    const fromToken = tokenStore.swap.token
+    const holding = new BigNumber(fromToken?.balance || Number(walletTokenInfo.value?.balance_amount) || 0)
+    const buyCost = new BigNumber(Number(walletTokenInfo.value?.total_purchase_usd) || 0).minus(new BigNumber(Number(walletTokenInfo.value?.total_sold_usd) || 0))
+    const price = tokenPrice.value
+    let sellAmount = buyCost.div(price)
+    if (sellAmount.gt(holding)) {
+      sellAmount = holding
+      const { $dialog } = useNuxtApp()
+      $dialog.show({
+        content: {
+          is: ConfirmSellAll,
+          props: {
+            'onSuccess': () => {
+              $dialog.hide()
+              submitBotSwap(sellAmount.toFixed(), 'sell', 20)
+            },
+            'onCancel': () => {
+              $dialog.hide()
+            },
+          }
+        },
+        props: {
+          width: '420px',
+          class: 'perp-dialog',
+          title: t('soldAll'),
+          'onOpened': () => {
+            console.log('open')
+          },
+          'onClosed': () => {
+            console.log('close')
+          }
+        }
+      })
+      return
+    }
+
+    submitBotSwap(sellAmount.toFixed(), 'sell', 20)
+  }
+}
 
 const hoverBuyAmount = ref('')
 
@@ -256,7 +324,7 @@ async function submitBotSwap(amount1: string | number, type: 'buy' | 'sell', ind
   }
   const chain = getChain()
   const promptCreatorAddress = botStore.getWalletAddress?.(chain) || botStore.evmAddress || ''
-  let promptStartTime = Date.now()
+  const promptStartTime = Date.now()
   let promptTimer: ReturnType<typeof setInterval> | null = null
   let promptAutoCloseTimer: ReturnType<typeof setTimeout> | null = null
   let promptDone = false
@@ -396,6 +464,8 @@ async function submitBotSwap(amount1: string | number, type: 'buy' | 'sell', ind
             if (subscribeResult?.txList?.[0]?.success) {
               const txInfo = subscribeResult?.txList?.[0]
               updateTxV2({...txInfo, chain: subscribeResult?.chain}, batchIdObj?.[_batchId] || '')
+              const _amount = isBuy ? new BigNumber(txInfo?.outAmount || 0).shiftedBy(-1 * (txInfo?.outDecimals || txInfo?.outTokenDecimals || 0)).toFixed() : new BigNumber(txInfo?.inAmount || 0).shiftedBy(-1 * (txInfo?.inDecimals || txInfo?.inTokenDecimals || 0)).toFixed()
+              updateWalletTokenInfo(_amount, isBuy)
               finishPromptSuccess(txInfo)
             } else {
               handleBotError(subscribeResult?.txList?.[0]?.failMessage || 'swap error')
@@ -407,10 +477,10 @@ async function submitBotSwap(amount1: string | number, type: 'buy' | 'sell', ind
             } else {
               loadingSwapSell.value[index] = false
             }
-            setTimeout(() => {
-              getTokenBalance()
-            }, 1000)
           }
+          setTimeout(() => {
+            getTokenBalance()
+          }, 1000)
         })
       }
     }).catch(err => {
@@ -503,11 +573,10 @@ async function submitBotSwap(amount1: string | number, type: 'buy' | 'sell', ind
             tokenStore.placeOrderSuccess++
             if (subscribeResult?.txList?.[0]?.success) {
               unwatch()
-              setTimeout(() => {
-                getTokenBalance()
-              }, 1000)
               const txInfo = subscribeResult?.txList?.[0]
               updateTxV2({...txInfo, chain: subscribeResult?.chain}, batchIdObj?.[_batchId] || '')
+              const _amount = isBuy ? new BigNumber(txInfo?.outAmount || txInfo?.outputAmount || 0).shiftedBy(-1 * (toToken?.decimals || 0)).toFixed() : amount
+              updateWalletTokenInfo(_amount, isBuy)
               updateBalanceFromWs({
                 chain: data.chain,
                 inTokenAddress: data.inTokenAddress,
@@ -526,6 +595,9 @@ async function submitBotSwap(amount1: string | number, type: 'buy' | 'sell', ind
               loadingSwapSell.value[index] = false
             }
           }
+          setTimeout(() => {
+            getTokenBalance()
+          }, 1000)
         })
       }
     }).catch(err => {
@@ -537,6 +609,37 @@ async function submitBotSwap(amount1: string | number, type: 'buy' | 'sell', ind
         loadingSwapSell.value[index] = false
       }
     })
+  }
+}
+
+function updateWalletTokenInfo(amount: string, isBuy: boolean) {
+  if (walletTokenInfo.value === null) {
+    walletTokenInfo.value = {
+      balance_amount: '0',
+      balance_usd: '0',
+      total_purchase_usd: '0',
+      total_sold_usd: '0',
+      total_profit: '0',
+      total_profit_ratio: '0'
+    } as any
+  }
+  console.log('updateWalletTokenInfo', amount, isBuy, walletTokenInfo.value)
+  if (isBuy) {
+    walletTokenInfo.value = {
+      ...walletTokenInfo.value,
+      balance_amount: new BigNumber(Number(walletTokenInfo.value?.balance_amount) || 0).plus(amount || 0).toFixed(),
+      total_purchase_usd: new BigNumber(Number(walletTokenInfo.value?.total_purchase_usd) || 0).plus(new BigNumber(amount || 0).times(tokenPrice.value)).toFixed(),
+    }
+  } else {
+    let balance_amount = new BigNumber(Number(tokenStore.swap?.token?.balance) || Number(walletTokenInfo.value?.balance_amount) || 0).minus(amount || 0)
+    if (balance_amount.lt(0)) {
+      balance_amount = new BigNumber(0)
+    }
+    walletTokenInfo.value = {
+      ...walletTokenInfo.value,
+      balance_amount: balance_amount.toFixed(),
+      total_sold_usd: new BigNumber(Number(walletTokenInfo.value?.total_sold_usd) || 0).plus(new BigNumber(amount || 0).times(tokenPrice.value)).toFixed()
+    }
   }
 }
 

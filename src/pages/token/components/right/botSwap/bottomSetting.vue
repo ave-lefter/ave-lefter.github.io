@@ -1,5 +1,5 @@
 <template>
-  <div class="mt-10px flex items-center text-11px color-[--main-text]">
+  <div class="mt-10px flex items-center text-11px color-[--secondary-text]">
     <template v-if="botSettings[chain || ''] && isCanMev">
       <span class=" color-[--third-text] mr-4px cursor-pointer">{{ $t('mev') }}</span>
       <el-switch
@@ -37,6 +37,7 @@
         style="--el-switch-on-color: #3c6cf6;zoom: 0.9;height: 14px;"
       />
     </template>
+    <slot name="default"/>
   </div>
 </template>
 

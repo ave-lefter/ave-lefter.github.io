@@ -13,7 +13,7 @@
             @contextmenu="handleContextMenu($event, row)"
           >
             <div class="w-full relative" :class="getAnimClass(row)">
-              <div class="flex-start items-start relative z-2">
+              <div class="flex-start items-start relative">
                 <div class="mr-12px relative">
                   <div class="black-container">
                     <span

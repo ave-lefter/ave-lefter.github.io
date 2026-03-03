@@ -36,7 +36,7 @@ export const useTokenStore = defineStore('token', () => {
   const token = computed(() => tokenInfo.value?.token)
   const pairs = computed(() => tokenInfo.value?.pairs)
   const pairAddress = useSessionStorage('token_pairAddress', '')
-  const selectedToken =  useSessionStorage('token_selectedToken', false)
+  const selectedToken =  useSessionStorage('token_selectedToken', true)
   const pair = computed(() => {
     if (pairAddress.value) {
       return pairs.value?.find(pair => pair.pair === pairAddress.value) || null

@@ -51,7 +51,7 @@ function getFavoriteList(group = -1, pageNO = 1, address: string,sort_dir = '',s
       address: address,
       group: group,
       pageNO: pageNO,
-      pageSize: 100,
+      pageSize: 300,
       sort_dir,
       sort:sort_dir&&sort
     }

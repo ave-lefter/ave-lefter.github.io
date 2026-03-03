@@ -259,10 +259,12 @@ function _getTokenInfo() {
     .then((res) => {
       tokenStore.tokenInfo = res
       tokenStore.pairAddress = res?.pairs?.[0].pair || ''
-      const isSupportTokenKlineLaunchpad = SupportTokenKlineLaunchpad?.includes?.(res?.token.chain + '-' + (res?.token?.launchpad || ''))
-      const isTokenKline = (SupportTokenKlineChains?.includes?.(res?.token.chain || '') || isSupportTokenKlineLaunchpad)
+      const isSupportTokenKlineLaunchpad = SupportTokenKlineLaunchpad?.includes?.(res?.token?.chain + '-' + (res?.token?.launchpad || ''))
+      const isTokenKline = (SupportTokenKlineChains?.includes?.(res?.token?.chain || '') || isSupportTokenKlineLaunchpad)
       if (isTokenKline) {
-        tokenStore.selectedToken = true
+        // tokenStore.selectedToken = true
+      } else {
+        tokenStore.selectedToken = false
       }
     })
     .finally(() => {
@@ -310,7 +312,6 @@ function visibilitychangeFn() {
 }
 
 onBeforeMount(() => {
-  tokenStore.pairAddress = ''
   init()
   subscribePortrait()
   document.addEventListener('visibilitychange', visibilitychangeFn)

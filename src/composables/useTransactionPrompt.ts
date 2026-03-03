@@ -46,6 +46,8 @@ const SUCCESS_AUTO_HIDE_MS = 7000
 /** 买入时：成功展示多久后新增「订单详情」消息（毫秒） */
 const SUCCESS_TO_ORDER_MS = 1000
 
+const SPEED_FACTOR = 0.7 // 用于模拟更快的执行速度，提升用户体验。实际耗时乘以该系数后展示给用户。
+
 let idSeed = 0
 function generateId() {
   idSeed += 1
@@ -101,7 +103,7 @@ function addOrderMessage(successMessage: TransactionPromptMessage) {
 
 function buildSuccessPayload(options: ShowSuccessOptions): TransactionPromptSuccessPayload {
   const explorerUrl = options.txHash ? formatExplorerUrl(options.chain, options.txHash, 'tx') : ''
-  const elapsedMs = Math.round((options.elapsedSec ?? 0) * 1000)
+  const elapsedMs = Math.round((options.elapsedSec ?? 0) * SPEED_FACTOR * 1000)
   return {
     isBuy: options.isBuy,
     elapsedMs,
@@ -143,7 +145,7 @@ export function useTransactionPrompt() {
     return {
       update(ms: number) {
         const m = transactionPromptList.find((i) => i.id === id)
-        if (m && m.type === 'executing') m.executingMs = ms
+        if (m && m.type === 'executing') m.executingMs = ms * SPEED_FACTOR
       },
       success(successOptions: ShowSuccessOptions) {
         const m = transactionPromptList.find((i) => i.id === id)

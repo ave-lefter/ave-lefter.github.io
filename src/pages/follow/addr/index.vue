@@ -573,6 +573,7 @@ const isMonitor=ref(false)
 const conditions=computed(() => {
   return isMonitor.value?addressConditions2.value:addressConditions.value
 })
+const globalStore = useGlobalStore()
 
 const defaultSort=computed(() => {
   return { prop: conditions.value?.sort||'', order: conditions.value?.sort_dir==='desc'?'descending':'ascending' }
@@ -902,14 +903,16 @@ const getTableList = throttle(function() {
 
 // Add missing tableRowClick method
 function tableRowClick(row: { user_address: string; user_chain: string }) {
-  // $router.push({
-  //   name: 'Balance',
-  //   params: { userAddress: row.wallet_address, chain: row.chain },
-  // })
-
-  $router.push({
+  const clickAction = globalStore.audioSettings?.wallet?.clickAction
+  // rightClickAction: 0 不打开, 1 新tab打开
+  const routeData = $router.resolve({
     path: `/address/${row.user_address}/${row.user_chain}`,
   })
+  if (clickAction === 1) {
+    window.open(routeData.href, '_blank')
+  } else {
+    window.open(routeData.href, '_self')
+  }
 }
  function safeBigNumber(value:string|number) {
   try {

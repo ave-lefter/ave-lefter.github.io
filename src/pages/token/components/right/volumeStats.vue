@@ -25,9 +25,9 @@
       </div>
     </div>
   </div>
-  <div class="flex mt-8px">
-    <span class="bg-#12B886 h-4px rounded-2px" :style="{ width: bugProgress }" />
-    <span class="flex-1 bg-#F6465D h-4px rounded-2px ml-2px" />
+  <div class="flex mt-10px">
+    <span class="bg-#12B886 h-2px rounded-2px" :style="{ width: bugProgress }" />
+    <span class="flex-1 bg-#F6465D h-2px rounded-2px ml-2px" />
   </div>
 </template>
 

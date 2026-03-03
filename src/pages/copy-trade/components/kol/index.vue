@@ -189,7 +189,7 @@
                       </template>
                     </TimerCount>
                   </div>
-                  {{ row.wallet_address.slice(0, 4) }}...{{ row.wallet_address.slice(-4) }}
+                  <span @contextmenu.stop="(e) => handleContextMenu(e, row)">{{ row.wallet_address.slice(0, 4) }}...{{ row.wallet_address.slice(-4) }}</span>
                   <Icon
                     v-copy="row.wallet_address"
                     name="bxs:copy"
@@ -848,6 +848,7 @@ const toolTipTagContent = shallowRef('')
 
 const { height } = useWindowSize()
 const wHeight = height
+const globalStore = useGlobalStore()
 const { mode } = useGlobalStore()
 const shouldRenderChild = shallowRef(true)
 
@@ -860,6 +861,16 @@ const scrollbarHeight = computed(()=>{
   return useGlobalStore().tokenHistoryVisible ? 'calc(100vh - 182px)' : 'calc(100vh - 150px)'
 })
 
+// 右键点击事件处理
+function handleContextMenu(e: MouseEvent, row:any) {
+  e.preventDefault()
+  const rightClickAction = globalStore.audioSettings?.wallet?.rightClickAction
+  // rightClickAction: 0 不打开, 1 新tab打开
+  if (rightClickAction === 1) {
+    const url = `/address/${row.wallet_address}/${row.chain}`
+    window.open(url, '_blank')
+  }
+}
 
 function goLink1 (url: string) {
   if (url) {
@@ -921,10 +932,16 @@ const collect = async (row: any,index:number) => {
   })
 }
 function tableRowClick(row:KolObj) {
+  const clickAction = globalStore.audioSettings?.wallet?.clickAction
+  // rightClickAction: 0 不打开, 1 新tab打开
   const routeData = router.resolve({
     path: `/address/${row.wallet_address}/${row.chain}`
   })
-  window.open(routeData.href, '_blank')
+  if (clickAction === 1) {
+    window.open(routeData.href, '_blank')
+  } else {
+    window.open(routeData.href, '_self')
+  }
 }
 const emit = defineEmits(['handleSortChange'])
 type SortValue = 0 | -1 | 1
