@@ -562,6 +562,8 @@ type StatisticsItem = {
   buys_tx_24h_count: number
   headline_en: string
   headline_cn: string
+  followers: number
+  following: number
 }
 let portraitTimer: ReturnType<typeof setTimeout> | null = null
 let isPortraitSubscribed = false
@@ -1042,7 +1044,7 @@ watchPortraitStatsUnwatch = watch(
   (val) => {
     if (!Array.isArray(val) || !val.length ) return
     val.forEach((item) => {
-      setLRUStatistics(mapStatistics.value, item.token, item, 100)
+      setLRUStatistics(mapStatistics.value, item.token, item, 500)
     })
     flushStatistics()
   }
@@ -1709,7 +1711,10 @@ const DIRECT_MAP: [keyof StatisticsItem, keyof PumpObj][] = [
   ['first_transfer_in_from_label', 'dev_first_transfer_in_from_label'],
   ['age_seconds', 'dev_age_seconds'],
   ['headline_cn', 'headline_cn'],
-  ['headline_en', 'headline_en']
+  ['headline_en', 'headline_en'],
+
+  ['followers', 'followers'],
+  ['following', 'following']
 ]
 const NUMBER_MAP: [keyof StatisticsItem, keyof PumpObj][] = [
   ['holder_count', 'holders'],//dev_holder_count
@@ -1840,6 +1845,8 @@ const MERGE_KEYS = [
   'age_seconds',
   'headline_en',
   'headline_cn',
+  'followers',
+  'following'
 ] as const
 
 function mergeStatistics(prev: any, next: any) {

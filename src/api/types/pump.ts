@@ -16,6 +16,8 @@ export interface PumpConfig {
 }
 
 export interface PumpObj {
+  following: number
+  followers: number
   headline_en: string
   headline_cn: string
   headline_en: string
