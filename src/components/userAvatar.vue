@@ -80,7 +80,7 @@ const chainStyle = computed(() => ({
   borderRadius: '50%',
   position: 'absolute',
   right: '-1px',
-  bottom: '-1px',
+  bottom: '0px',
   margin: '0'
 }))
 </script>

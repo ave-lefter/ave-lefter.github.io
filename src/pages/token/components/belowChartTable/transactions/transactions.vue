@@ -868,14 +868,19 @@ function openMarkerTooltip(row: IGetSimpleTxsResponse & { senderProfile: Profile
 }
 
 function goBrowser(row: IGetSimpleTxsResponse) {
+  const rightClickAction = globalStore.audioSettings?.wallet?.clickAction
+  let targe = '_self'
+  if (rightClickAction === 1) {
+    targe ='_blank'
+  }
   window.open(
-    formatExplorerUrl(row.chain, row.transaction, 'tx')
+    formatExplorerUrl(row.chain, row.transaction, 'tx'), targe
   )
 }
 
 const tabsContainer = ref<HTMLElement | null>(null)
 function setActiveTab(val: string,index:number) {
-  if(val===activeTab.value) return 
+  if(val===activeTab.value) return
   activeTab.value = val
   // if (val === '-100' && !followStore.currentAddress) {
   //   return
@@ -1017,14 +1022,14 @@ onUnmounted(() => {
           v-tooltip="holdersTooltip(t)[item.type]"
           href="javascript:;"
           :class="`decoration-none shrink-0 text-12px lh-16px text-center px-12px py-4px rounded-4px
-         ${activeTab === item.value ? 'bg-[--border] color-[--main-text]' : 'color-[--third-text]'}`" @click="setActiveTab(item.value,index)">
+         ${activeTab === item.value ? 'bg-[--border] color-[--main-text1]!' : 'color-[--third-text]'}`" @click="setActiveTab(item.value,index)">
           {{ item.label }}
         </a>
         <a
           v-else
           href="javascript:;"
           :class="`decoration-none shrink-0 text-12px lh-16px text-center px-12px py-4px rounded-4px
-         ${activeTab === item.value ? 'bg-[--border] color-[--main-text]' : 'color-[--third-text]'}`" @click="setActiveTab(item.value,index)">
+         ${activeTab === item.value ? 'bg-[--border] color-[--main-text1]!' : 'color-[--third-text]'}`" @click="setActiveTab(item.value,index)">
           {{ item.label }}
         </a>
       </template>

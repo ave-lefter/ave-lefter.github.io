@@ -107,7 +107,7 @@
                 width="24"
                 alt=""
               >
-              <span class="color-[--d-F5F5F5-l-333] text-14px">{{ $t('new1') }}</span>
+              <span class="color-[--d-E0E0E0-l-333] text-14px">{{ $t('new1') }}</span>
             </template>
             <div v-else class="tabs single" >
               <button
@@ -209,7 +209,7 @@
                 width="24"
                 alt=""
               >
-              <span class="color-[--d-F5F5F5-l-333] text-14px">{{ $t('soon') }}</span>
+              <span class="color-[--d-E0E0E0-l-333] text-14px">{{ $t('soon') }}</span>
             </template>
             <div v-else class="tabs single" >
               <button
@@ -310,7 +310,7 @@
                 width="24"
                 alt=""
               >
-              <span class="color-[--d-F5F5F5-l-333] text-14px">{{ $t('graduated') }}</span>
+              <span class="color-[--d-E0E0E0-l-333] text-14px">{{ $t('graduated') }}</span>
             </template>
             <div v-else class="tabs single" >
               <button
@@ -560,6 +560,10 @@ type StatisticsItem = {
   phishing_ratio: string,
   sells_tx_24h_count:number
   buys_tx_24h_count: number
+  headline_en: string
+  headline_cn: string
+  followers: number
+  following: number
 }
 let portraitTimer: ReturnType<typeof setTimeout> | null = null
 let isPortraitSubscribed = false
@@ -844,8 +848,8 @@ const mergedBaseList = computed(() => {
   return [...list1.value, ...list2.value, ...list3.value]
 })
 const scrollHeight = computed(()=>{
-  return 'calc(100vh - 215px)'
-  // return globalStore.tokenHistoryVisible ? 'calc(100vh - 248px)':'calc(100vh - 215px)'
+  // return 'calc(100vh - 215px)'
+  return globalStore.tokenHistoryVisible ? 'calc(100vh - 248px)':'calc(100vh - 215px)'
 })
 
 
@@ -1040,7 +1044,7 @@ watchPortraitStatsUnwatch = watch(
   (val) => {
     if (!Array.isArray(val) || !val.length ) return
     val.forEach((item) => {
-      setLRUStatistics(mapStatistics.value, item.token, item, 100)
+      setLRUStatistics(mapStatistics.value, item.token, item, 500)
     })
     flushStatistics()
   }
@@ -1706,6 +1710,11 @@ const DIRECT_MAP: [keyof StatisticsItem, keyof PumpObj][] = [
   ['first_transfer_in_from', 'dev_first_transfer_in_from'],
   ['first_transfer_in_from_label', 'dev_first_transfer_in_from_label'],
   ['age_seconds', 'dev_age_seconds'],
+  ['headline_cn', 'headline_cn'],
+  ['headline_en', 'headline_en'],
+
+  ['followers', 'followers'],
+  ['following', 'following']
 ]
 const NUMBER_MAP: [keyof StatisticsItem, keyof PumpObj][] = [
   ['holder_count', 'holders'],//dev_holder_count
@@ -1751,7 +1760,6 @@ function mergeStatisticsList(
       return i
     }
     const next = { ...i }
-
     /** progress（特殊处理） */
     if (obj.progress != null) {
       const p = Number(obj.progress)
@@ -1834,7 +1842,11 @@ const MERGE_KEYS = [
   'smart_wallet_ratio',
   'first_transfer_in_from',
   'first_transfer_in_from_label',
-  'age_seconds'
+  'age_seconds',
+  'headline_en',
+  'headline_cn',
+  'followers',
+  'following'
 ] as const
 
 function mergeStatistics(prev: any, next: any) {
@@ -1910,7 +1922,7 @@ function hitBlacklist(item:PumpObj, black: pumpBlack) {
     letter-spacing: 0px;
 
     &.active {
-      color: var(--main-text);
+      color: var(--main-text1);
       background: var(--tab-active-bg);
       opacity: 1;
     }

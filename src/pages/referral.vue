@@ -160,12 +160,12 @@
           <!-- <img width="28" height="28" src="@/assets/images/referral/data.svg" alt="" srcset="" > -->
           <span>{{ $t('myRecord') }}</span>
         </div>
-        <div class="mt-20px">
+        <div class="mt-20px relative">
           <div class="tabs mb-20px">
             <button v-for="item in tabs" :key="item.value" class="tab-item" :class="{ active: activeTab === item.value }" @click.stop="activeTab = item.value">{{ item.label }}</button>
           </div>
           <div v-if="activeTab === 1">
-            <div v-if="referralInfo?.startTime || referralInfo?.endTime" class="text-right text-12px color-#697F95">({{ $t('statisticalPeriod') }}:
+            <div v-if="referralInfo?.startTime || referralInfo?.endTime" class="text-right text-12px color-#697F95 absolute right-0 top-5px">({{ $t('statisticalPeriod') }}:
             {{ referralInfo.startTime ? formatDate(referralInfo.startTime, 'YYYY.MM.DD') : '' }}-{{
               referralInfo.endTime ? formatDate(referralInfo.endTime, 'YYYY.MM.DD') : ''
             }})</div>
@@ -174,7 +174,7 @@
               row-class-name="[--el-table-border:1px_solid_#1F242A]"
               :header-row-style="{ fontSize: '12px', color: '#697F95' }"
               style="width: 100%"
-              class="table-list"
+              class="table-list mt-0!"
             >
               <el-table-column prop="time" :label="$t('swapToken')">
                 <template #default="{ row }">

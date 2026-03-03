@@ -164,13 +164,34 @@
         </div>
       </template>
       <template #default>
+        <div class="flex items-center justify-between mb-16px cursor-pointer" @click="globalStore.audioSettings.active = 'notice'">
+         <div class="flex items-center gap-8px">
+          <Icon name="custom:alert" class="text-16px"/>
+          {{ $t('pushSettings') }}
+         </div>
+          <Icon name="ep:arrow-right"/>
+        </div>
+        <div class="flex items-center justify-between mb-16px cursor-pointer" @click="globalStore.audioSettings.active = 'wallet'">
+          <div class="flex items-center gap-8px">
+            <Icon name="custom:wallet-fill" class="text-16px"/>
+            <span>{{ $t('walletSettings') }}</span>
+          </div>
+          <Icon name="ep:arrow-right"/>
+        </div>
         <div class="flex flex-col">
-          <div class="flex items-center justify-between mb-16px cursor-pointer" @click="globalStore.audioSettings.active = 'notice'">
+          <!-- <div class="flex items-center justify-between mb-16px cursor-pointer" @click="globalStore.audioSettings.active = 'notice'">
            <div class="flex items-center gap-8px">
             <Icon name="custom:alert" class="text-16px"/>
             {{ $t('pushSettings') }}
            </div>
             <Icon name="ep:arrow-right"/>
+          </div> -->
+          <div class="flex items-center justify-between mb-16px cursor-pointer">
+           <div class="flex items-center gap-8px">
+            <Icon name="custom:side-bar-fill" class="text-16px"/>
+              {{ $t('topBar') }}
+           </div>
+           <el-switch class="[&&]:h-20px" v-model="globalStore.tokenHistoryVisible"></el-switch>
           </div>
           <el-dropdown
   :persistent="false"
@@ -210,12 +231,12 @@
           >
             <div class="flex flex-1 items-center justify-between mb-16px cursor-pointer  gap-24px">
                 <div class="flex items-center gap-8px">
-                  <Icon name="ri:wallet-fill" class="text-16px"/>
+                  <Icon name="custom:locale" class="text-16px"/>
                   <span class="mt--2px flex items-center gap-2px">
                     {{ $t('priceChangeZoonSetting') }}
                     <el-tooltip
                       placement="bottom-start"  :persistent="false"
-                    > 
+                    >
                       <template #content> <div v-html="$t('priceChangeZoonSettingTip')" class="max-w-224px"></div></template>
                       <Icon name="ri:error-warning-line" class='rotate-180 text-16px text-[--third-text]' />
                     </el-tooltip>
@@ -447,7 +468,7 @@ header {
       text-align: center;
       padding: 4px 8px;
       border-radius: 8px;
-      color: var(--main-text);
+      color: var(--main-text1);
       // margin-right: 8px;
       text-decoration: none;
 

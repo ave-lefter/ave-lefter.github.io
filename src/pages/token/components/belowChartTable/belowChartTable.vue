@@ -171,7 +171,7 @@ onUnmounted(() => {
     <div class="flex items-center px-12px gap-20px border-b-1px border-b-solid border-b-[--main-divider] mb-12px">
       <a
         v-for="(item) in tabsList" :key="item.component" href="javascript:;"
-         :class="`flex items-center decoration-none text-12px lh-20px text-center ${activeTab === item.component ? 'color-[--main-text] b-b-[--main-text] font-500' : 'b-b-transparent color-[--third-text]'}`"
+         :class="`flex items-center decoration-none text-12px lh-20px text-center ${activeTab === item.component ? 'color-[--main-text1] b-b-[--main-text] font-500' : 'b-b-transparent color-[--third-text]'}`"
         @click="activeTab = item.component">
         <div v-if="item.component == 'Orders'" class="w-1px h-20px bg-[var(--custom-br-1-color)] mr-20px mb-8px"/>
         <div
@@ -200,9 +200,11 @@ onUnmounted(() => {
         </div>
       </a>
       <div class="flex-1" />
-      <OrderBookButton v-model="orderBookVisible" />
-      <OneClick />
-      <Bubble />
+      <div class="flex  gap-20px mt--12px items-stretch">
+        <OrderBookButton v-model="orderBookVisible"/>
+        <OneClick/>
+        <Bubble/>
+      </div>
     </div>
     <OrdersTab v-show="activeTab === 'Orders'" :currentActiveTab="activeTab"/>
     <!-- <DevTokens v-show="activeTab === 'DevTokens'"/> -->

@@ -450,7 +450,7 @@ function updateVisible(value: boolean) {
     //   margin-left: 8px;
     // }
     &.active {
-      color: var(--main-text);
+      color: var(--main-text1);
       background: var(--border);
     }
     .swap {
@@ -477,7 +477,7 @@ function updateVisible(value: boolean) {
   color: var(--secondary-text);
   &.active,
   &:hover {
-    color: var(--main-text);
+    color: var(--main-text1);
   }
 }
 .item {
@@ -486,7 +486,7 @@ function updateVisible(value: boolean) {
     border-bottom: 1px solid var(--border);
   }
   li {
-    color: var(--main-text);
+    color: var(--main-text1);
     margin-top: 20px;
     cursor: pointer;
     display: flex;

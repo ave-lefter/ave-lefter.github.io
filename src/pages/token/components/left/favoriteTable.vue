@@ -203,9 +203,9 @@ watch(
   () => sort.value,
   (val) => {
     console.log('sort changed', val)
-    if(val.sortBy==="price_change"){
+    if(val.sortBy==="price_change" || val.sortBy==="price_change_v2"){
         sortParam.sort_dir=['asc', '', 'desc'][(val.activeSort||0)+1]
-        sortParam.sort='price_change'
+        sortParam.sort=val.sortBy
        
     }else{
       sortParam.sort_dir=''
@@ -401,7 +401,7 @@ function toggleMode(mode: string) {
             :to="`/token/${row.token}-${row.chain}`"
           >
             <div class="flex items-center flex-1">
-              <TokenImg class="mr-8px" :row="row" v-tooltip="{
+              <TokenImg class="mr-8px" :row="{...row,issue_platform:''}" v-tooltip="{
                 content:{
                   is:TokenImg,
                   props:{

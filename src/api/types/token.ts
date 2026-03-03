@@ -190,5 +190,6 @@ export interface WalletTokenInfo {
   current_price_usd: string
   bought: string
   sold: string
+  _price?: string
 }
 

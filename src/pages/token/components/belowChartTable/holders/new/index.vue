@@ -14,7 +14,7 @@
             :class="`decoration-none shrink-0 text-12px lh-16px text-center px-12px py-4px rounded-4px
             ${
               activeTab === item.value
-                ? 'bg-[--tab-active-bg] color-[--main-text]'
+                ? 'bg-[--tab-active-bg] color-[--main-text1]!'
                 : 'color-[--third-text]'
             }`"
             @click="setActiveTab(item.value as typeof activeTab)"
@@ -27,7 +27,7 @@
             :class="`decoration-none shrink-0 text-12px lh-16px text-center px-12px py-4px rounded-4px
             ${
               activeTab === item.value
-                ? 'bg-[--tab-active-bg] color-[--main-text]'
+                ? 'bg-[--tab-active-bg] color-[--main-text1]!'
                 : 'color-[--third-text]'
             }`"
             @click="setActiveTab(item.value as typeof activeTab)"

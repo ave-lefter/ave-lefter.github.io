@@ -1,8 +1,8 @@
 <template>
-  <div class="flex items-center justify-between text-12px mt-10px rounded-4px">
+  <div class="flex items-center justify-between text-12px mt-4px rounded-4px">
     <div>
       <div class="color-[--third-text]">{{ tabActiveName }} {{ $t('vol') }}</div>
-      <div class="color-[--main-text] mt-5px">
+      <div class="color-[--main-text1] mt-5px">
         <!-- {{ formatNumber(pair?.[`tx_${tabActive}_count` as TxCount] || 0, 1) }}<span
           class="color-[--third-text]">/</span> -->
           ${{ formatNumber(pair?.[`volume_u_${tabActive}` as VolumeU] || 0,
@@ -25,9 +25,9 @@
       </div>
     </div>
   </div>
-  <div class="flex mt-8px">
-    <span class="bg-#12B886 h-4px rounded-2px" :style="{ width: bugProgress }" />
-    <span class="flex-1 bg-#F6465D h-4px rounded-2px ml-2px" />
+  <div class="flex mt-10px">
+    <span class="bg-#12B886 h-2px rounded-2px" :style="{ width: bugProgress }" />
+    <span class="flex-1 bg-#F6465D h-2px rounded-2px ml-2px" />
   </div>
 </template>
 

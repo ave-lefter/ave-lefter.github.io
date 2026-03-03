@@ -68,7 +68,8 @@ export const WSPerpEventType = {
 
 export const MAX_UINT_AMOUNT = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
 
-export const MIN_BALANCE: Record<string, number> = {
+type NumRecord = Record<string, number>
+export const MIN_BALANCE: NumRecord = {
   bsc: 0.002,
   arbitrum: 0.001,
   core: 0.01,
@@ -127,6 +128,22 @@ export const SupportFullDataChain = ['solana', 'bsc','eth','base','xlayer','fsc'
 export const SupportMonitorChain = ['solana', 'bsc', 'xlayer']
 
 export const SupportTokenKlineChains = ['juchain', 'arbitrum', 'optimism']
+export const SupportTokenKlineLaunchpad = [
+  'bsc-four.meme',
+  'bsc-flap.sh',
+  'solana-dexscreener.com',
+  'solana-pump.fun',
+  'solana-time.fun',
+  'solana-raydium.io',
+  'solana-meteora.ag',
+  'solana-letsbonk.fun',
+  'solana-boop.fun',
+  'solana-believe.app',
+  'solana-moonshot.com',
+  'solana-jup.ag',
+  'solana-bags.fm',
+  'solana-cooking.city'
+]
 export const SupportCopyTradeChain = ['solana', 'bsc', 'eth', 'base']
 
 export const defaultPaginationParams = {

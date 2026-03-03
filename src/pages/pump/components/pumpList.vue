@@ -13,12 +13,12 @@
             @contextmenu="handleContextMenu($event, row)"
           >
             <div class="w-full relative" :class="getAnimClass(row)">
-              <div class="flex-start items-start relative z-2">
+              <div class="flex-start items-start relative">
                 <div class="mr-12px relative">
                   <div class="black-container">
                     <span
                       v-tooltip="$t('BlackListToken')"
-                      class="bg-[--d-000-l-FFF] px-2px py-2px color-[--third-text] block rounded-2px hover:color-[--secondary-text] w-16px h-16px flex items-center justify-center"
+                      class="bg-[--d-000-l-FFF] px-2px py-2px color-[--third-text1] block rounded-2px hover:color-[--secondary-text] w-16px h-16px flex items-center justify-center"
                     >
                       <Icon
                         v-if="
@@ -42,7 +42,7 @@
                     </span>
                     <span
                       v-tooltip="$t('BlackListDev')"
-                      class="bg-[--d-000-l-FFF] px-2px py-2px color-[--third-text] block rounded-2px mt-4px hover:color-[--secondary-text] w-16px h-16px flex items-center justify-center"
+                      class="bg-[--d-000-l-FFF] px-2px py-2px color-[--third-text1] block rounded-2px mt-4px hover:color-[--secondary-text] w-16px h-16px flex items-center justify-center"
                     >
                       <Icon
                         v-if="
@@ -65,7 +65,7 @@
                     <span
                       v-if="row?.medias?.filter?.(i => i.icon === 'twitter')?.length > 0 && row?.medias?.filter?.(i => i.icon === 'twitter')?.[0] && formatXUser(row?.medias?.filter?.(i => i.icon === 'twitter')?.[0]?.url)"
                       v-tooltip="$t('BlackListTwitter')"
-                      class="bg-[--d-000-l-FFF] px-2px py-2px color-[--third-text] block rounded-2px mt-4px hover:color-[--secondary-text] w-16px h-16px flex items-center justify-center"
+                      class="bg-[--d-000-l-FFF] px-2px py-2px color-[--third-text1] block rounded-2px mt-4px hover:color-[--secondary-text] w-16px h-16px flex items-center justify-center"
                     >
                       <Icon
                         v-if="
@@ -158,45 +158,44 @@
                   </div>
                   <div
                       v-copy="row.token"
-                      class="color-[--third-text] text-12px hover:color-[--main-text]"
+                      class="color-[--third-text1] text-12px hover:color-[--main-text1]"
                       :class="pumpSetting.Progress_isCircle == 'horizontal' ? 'mt-20px' : 'mt-10px'">
                       {{row.token?.slice(0, 4) + '...' + row.token?.slice(-4)}}
                   </div>
                 </div>
                 <div class="flex flex-col self-stretch relative">
                   <div class="flex-start">
-                    <span v-tooltip="row.symbol" v-copy="row.token" class="text-16px font-500 mr-5px symbol-ellipsis ellipsis-auto block">{{
+                    <span v-tooltip="row.symbol" v-copy="row.token" class="text-16px font-500 mr-5px symbol-ellipsis ellipsis-auto block color-[--d-F2F2F2-l-000]">{{
                       row.symbol
                     }}</span>
                     <span
                       v-if="pumpSetting?.define?.some((i) => i === 'name')"
                       v-tooltip="row.name"
                       v-copy="row.name"
-                      class="name text-12px font-500 mr-5px color-[--third-text] symbol-ellipsis ellipsis-auto block"
+                      class="name text-12px font-500 mr-5px color-[--third-text1] symbol-ellipsis ellipsis-auto block"
                       >{{ row.name }}</span>
                     <a
                       v-if="
                         summaryList(
                           lang == 'zh-cn' || lang == 'zh-tw'
-                            ? row?.summary_cn || ''
-                            : row?.summary || ''
-                        )?.length && isOut
+                            ? row?.headline_cn || ''
+                            : row?.headline_en || ''
+                        )?.length
                       "
                       v-tooltip.raw="{
                         content: buildTooltipContent(
                           lang == 'zh-cn' || lang == 'zh-tw'
-                            ? row?.summary_cn || ''
-                            : row?.summary || ''
+                            ? row?.headline_cn || ''
+                            : row?.headline_en || ''
                         ),
                         props: {
                           placement: 'top-start',
                         },
                       }"
-                      class="media-item clickable"
+                      class="media-item clickable mr-5px"
                     >
                       <Icon name="custom:ai" class="text-14px" />
                     </a>
-
                     <span
                       v-if="row.buy_tax && row.sell_tax"
                     >
@@ -249,8 +248,9 @@
                           <TimerCount
                             v-if="row?.created_at || row?.time"
                             :key="row.pair + '-' + row.chain"
-                            :timestamp="row.created_at || row.time"
+                            :timestamp="Number(row.created_at || row.time || 0)"
                             :end-time="60"
+                            mode="count-up"
                           >
                             <template #default="{ seconds }">
                               <span>
@@ -291,7 +291,7 @@
                           <span v-if="item.name === 'QQ'" v-tooltip="item.url" class="mr-8px">
                             <Icon
                               :name="`custom-media:${item.icon}`"
-                              class="text-[--third-text] h-12px"
+                              class="text-[--third-text1] h-12px"
                             />
                           </span>
                           <XPopup
@@ -313,7 +313,7 @@
                               <Icon
                                 v-else
                                 :name="`custom-media:${item.icon}`"
-                                class="text-[--third-text] text-12px"
+                                class="text-[--third-text1] text-12px"
                               />
                             </a>
                           </XPopup>
@@ -334,7 +334,7 @@
                               v-else
                               :name="`custom-media:${item.icon}`"
                               :class="`h-12px ${
-                                (item.icon === 'github') ? 'text-[--github-color]' : 'text-[--third-text]'}`"
+                                (item.icon === 'github') ? 'text-[--github-color]' : 'text-[--third-text1]'}`"
                             />
                           </a>
                         </template>
@@ -350,7 +350,7 @@
                       @mouseleave="showPopSearch = false"
                       @click.stop.prevent
                     >
-                      <Icon class="text-[--third-text] h-12px w-12px mr-8px" name="custom:search" />
+                      <Icon class="text-[--third-text1] h-12px w-12px mr-8px" name="custom:search" />
                     </a>
                     <div
                       v-show="pumpSetting?.define?.some((i) => i === 'holder')"
@@ -363,18 +363,18 @@
                       class="flex mr-8px items-center"
                     >
                       <Icon
-                        class="iconfont icon-rug mr-4px text-12px vertical-middle color-[--third-text]"
+                        class="iconfont icon-rug mr-4px text-12px vertical-middle color-[--third-text1]"
                         name="custom:holders"
                       />
-                      <span v-if="Number(row?.holders) === 0 || row?.holders == null" class="color-[--secondary-text]" >0</span>
-                      <span v-else class="color-[--main-text]" :style="{ color: getDataColor('holders',row.holders) }">
+                      <span v-if="Number(row?.holders) === 0 || row?.holders == null" class="color-[--third-text1]" >0</span>
+                      <span v-else class="color-[--main-text1]" :style="{ color: getDataColor('holders',row.holders) }">
                         {{ formatNumber(row?.holders || 0, 2) }}
                       </span>
                     </div>
                     <div
                       v-show="pumpSetting?.define?.some((i) => i === 'markers')"
                       v-tooltip.raw="{
-                        content: `<div class='max-w-[400px] color-[--secondary-text]'>${$t('markersBuy')}/${$t('markersSell')}: <span class='color-#12B886'>${formatNumber(row?.buyers_24h || 0, 2)}</span><span class='color-[--third-text]'>/</span><span class='color-#F6465D'>${formatNumber(row?.sellers_24h || 0, 2)}</span></div>`,
+                        content: `<div class='max-w-[400px] color-[--secondary-text]'>${$t('markersBuy')}/${$t('markersSell')}: <span class='color-#12B886'>${formatNumber(row?.buyers_24h || 0, 2)}</span><span class='color-[--third-text1]'>/</span><span class='color-#F6465D'>${formatNumber(row?.sellers_24h || 0, 2)}</span></div>`,
                         props: {
                           placement: 'top-start',
                         },
@@ -382,11 +382,11 @@
                       class="flex mr-8px items-center"
                     >
                       <Icon
-                        class="iconfont icon-rug mr-4px text-12px vertical-middle color-[--third-text] hover:color-#3F80F7"
+                        class="iconfont icon-rug mr-4px text-12px vertical-middle color-[--third-text1] hover:color-#3F80F7"
                         name="custom:wallets"
                       />
-                      <span v-if="Number(row?.makers_24h) === 0 || row?.makers_24h == null" class="color-[--secondary-text]" >0</span>
-                      <span v-else class="color-[--main-text]">{{
+                      <span v-if="Number(row?.makers_24h) === 0 || row?.makers_24h == null" class="color-[--third-text1]" >0</span>
+                      <span v-else class="color-[--main-text1]">{{
                         formatNumber(row?.makers_24h || 0, 2)
                       }}</span>
                     </div>
@@ -399,12 +399,12 @@
                     >
                       <div class="flex items-center">
                         <Icon
-                          class="iconfont icon-rug mr-4px text-10px vertical-middle color-[--third-text]"
+                          class="iconfont icon-rug mr-4px text-10px vertical-middle color-[--third-text1]"
                           name="custom:kol2"
-                          :style="{color: row?.kol_tag_count> 0 ?'var(--yellow)' : 'var(--third-text)'}"
+                          :style="{color: row?.kol_tag_count> 0 ?'var(--yellow)' : 'var(--third-text1)'}"
                         />
-                        <span v-if="Number(row?.kol_tag_count) === 0 || row?.kol_tag_count == null" class="color-[--secondary-text]" >0</span>
-                        <span v-else class="color-[--main-text]">
+                        <span v-if="Number(row?.kol_tag_count) === 0 || row?.kol_tag_count == null" class="color-[--third-text1]" >0</span>
+                        <span v-else class="color-[--main-text1]">
                           {{ formatNumber(row?.kol_tag_count || 0, 2) }}</span>
                       </div>
                     </HolderRank>
@@ -415,14 +415,14 @@
                       type="smart"
                       :ratio="Number(row?.smart_wallet_ratio || 0)"
                       >
-                      <div class="flex items-center color-[--third-text]">
+                      <div class="flex items-center color-[--third-text1]">
                           <Icon
                             class="iconfont icon-rug mr-4px text-10px vertical-middle "
                             name="custom:smart-plain"
-                            :style="{color: Number(formatNumber(row?.smart_wallet_tag_count || 0, 2) || 0) > 0 ?'var(--yellow)' : 'var(--third-text)'}"
+                            :style="{color: Number(formatNumber(row?.smart_wallet_tag_count || 0, 2) || 0) > 0 ?'var(--yellow)' : 'var(--third-text1)'}"
                           />
-                          <span v-if="Number(row?.smart_wallet_tag_count) === 0 || row?.smart_wallet_tag_count == null" class="color-[--secondary-text]" >0</span>
-                          <span v-else class="color-[--main-text]">{{ formatNumber(row?.smart_wallet_tag_count || 0, 2) }}</span>
+                          <span v-if="Number(row?.smart_wallet_tag_count) === 0 || row?.smart_wallet_tag_count == null" class="color-[--third-text1]" >0</span>
+                          <span v-else class="color-[--main-text1]">{{ formatNumber(row?.smart_wallet_tag_count || 0, 2) }}</span>
                         </div>
                     </HolderRank>
                     <div
@@ -439,14 +439,14 @@
                       <Icon
                         class="iconfont icon-rug mr-4px text-10px vertical-middle "
                         name="custom:top2"
-                        :style="{color: Number(row?.dev_migrated_count || 0)> 0 ?'var(--yellow)' : 'var(--third-text)'}"
+                        :style="{color: Number(row?.dev_migrated_count || 0)> 0 ?'var(--yellow)' : 'var(--third-text1)'}"
                       />
-                      <span v-if="(Number(row?.dev_migrated_count) == 0 || row?.dev_migrated_count == null) && (Number(row?.dev_total_count) == 0 || row?.dev_total_count == null) " class="color-[--secondary-text]" >0</span>
-                      <span v-else class="color-[--main-text]" >{{
+                      <span v-if="(Number(row?.dev_migrated_count) == 0 || row?.dev_migrated_count == null) && (Number(row?.dev_total_count) == 0 || row?.dev_total_count == null) " class="color-[--third-text1]" >0</span>
+                      <span v-else class="color-[--main-text1]" >{{
                         formatNumber(row?.dev_migrated_count || 0, 2)}}/{{formatNumber(row?.dev_total_count || 0, 2)}}
                       </span>
                     </div>
-                    <HolderRank
+                    <!-- <HolderRank
                       v-if="route.name === 'index'"
                       class="flex mr-8px bg-btn"
                       :tokenId="(row?.token || row?.target_token) + '-' + row?.chain"
@@ -456,26 +456,41 @@
                           <Icon
                             class="iconfont icon-rug mr-4px text-10px vertical-middle "
                             name="custom:holder-rank"
-                            :style="{color: Number(row?.co_holders_count || 0)> 0 ?'var(--yellow)' : 'var(--third-text)'}"
+                            :style="{color: Number(row?.co_holders_count || 0)> 0 ?'var(--yellow)' : 'var(--third-text1)'}"
                           />
-                          <span v-if="(Number(row?.co_holders_count) == 0 || row?.co_holders_count == null) && (Number(row?.co_holders_count) == 0 || row?.co_holders_count == null) " class="color-[--secondary-text]" >0</span>
-                          <span v-else class="color-[--main-text]" >{{
+                          <span v-if="(Number(row?.co_holders_count) == 0 || row?.co_holders_count == null) && (Number(row?.co_holders_count) == 0 || row?.co_holders_count == null) " class="color-[--third-text1]" >0</span>
+                          <span v-else class="color-[--main-text1]" >{{
                             formatNumber(row?.co_holders_count || 0, 2)}}
                           </span>
                         </div>
-                    </HolderRank>
+                    </HolderRank> -->
                   </div>
-                  <div class="mt-5px flex-start text-11px">
-                    <PumpPop
-                        v-if="row?.medias?.some(i=> i.icon === 'twitter') && route.name === 'index'"
-                        :tokenId="(row.token + '-' + row.chain)"
-                        :type="2"
-                      >
-                    <a v-for="(item, index) in row?.medias?.filter(i => i.icon === 'twitter')" :key="index"
-                      :href="item.url" target="_blank" class="!color-#009EF7" @click.stop>
+                  <div class="mt-5px text-11px"  v-if="row?.medias?.some(i=> i.icon === 'twitter') && route.name === 'index'">
+                    <div class="flex-start items-center" v-for="(item, index) in row?.medias?.filter(i => i.icon === 'twitter')" :key="index">
+                      <PumpPop
+                          v-if="row?.medias?.some(i=> i.icon === 'twitter') && route.name === 'index'"
+                          :tokenId="(row.token + '-' + row.chain)"
+                          :type="2"
+                        >
+                        <a :href="item.url" target="_blank" class="!color-#009EF7" @click.stop>
                           {{ formatXUser(item?.url) }}
                         </a>
-                    </PumpPop>
+                      </PumpPop>
+                      <template v-if="formatXUser(item?.url)">
+                        <div v-if="row?.followers" class=" ml-8px color-[--x-blue] flex-start leading-10px cursor-pointer" v-tooltip="$t('followers')">
+                            <Icon
+                              class="iconfont icon-rug mr-4px text-10px"
+                              name="custom:followers"
+                            />{{ formatNumber(row?.followers || 0, {locale: 'en'}) }}
+                        </div>
+                        <div v-if="row?.following" class="color-[--x-blue] ml-8px flex-start leading-10px cursor-pointer" v-tooltip="$t('following')">
+                          <Icon
+                            class="iconfont icon-rug mr-4px text-10px"
+                            name="custom:following"
+                          />{{ formatNumber(row?.following || 0, {locale: 'en'}) }}
+                        </div>
+                      </template>
+                    </div>
                   </div>
                   <div class="flex-start text-12px absolute bottom--2px z-1 mt-5px">
                     <div
@@ -483,7 +498,7 @@
 class="flex-start mr-8px bg-btn"
                       :style="{
                           background:Number(formatNumber(row?.holders_top10_ratio || 0, 1))==0? '': (Number(row?.holders_top10_ratio) > 30 ? '#f6465d1a' : '#12b8861a'),
-                          color:Number(formatNumber(row?.holders_top10_ratio || 0, 1))==0? 'var(--third-text)': (Number(row?.holders_top10_ratio) > 30 ? '#F6465D' : '#12B886'),
+                          color:Number(formatNumber(row?.holders_top10_ratio || 0, 1))==0? 'var(--third-text1)': (Number(row?.holders_top10_ratio) > 30 ? '#F6465D' : '#12B886'),
                       }"
 @mouseover.stop="(e) => showBubbleTooltip(row, e)"
                     >
@@ -502,7 +517,7 @@ class="flex-start mr-8px bg-btn"
                       class="flex mr-8px bg-btn"
                       :style="{
                         background: Number(formatNumber(row?.dev_balance_ratio_cur || 0, 1)) == 0 ? '' : (Number(row?.dev_balance_ratio_cur) > 5 ? '#f6465d1a' : '#12b8861a'),
-                        color:Number(formatNumber(row?.dev_balance_ratio_cur || 0, 1))==0? 'var(--third-text)': (Number(row?.dev_balance_ratio_cur) > 5 ? '#F6465D' : '#12B886')
+                        color:Number(formatNumber(row?.dev_balance_ratio_cur || 0, 1))==0? 'var(--third-text1)': (Number(row?.dev_balance_ratio_cur) > 5 ? '#F6465D' : '#12B886')
                       }"
                       :tokenId="(row?.token || row?.target_token) + '-' + row?.chain">
                       <template v-if="row?.max_dev_ratio !==null && row?.max_dev_ratio !== undefined && Number(row?.max_dev_ratio)!== 0 && Number(row?.dev_balance_ratio_cur)== 0">
@@ -542,7 +557,7 @@ class="flex-start mr-8px bg-btn"
                       v-tooltip="$t('sniper2')"
                       class="flex mr-8px bg-btn"
                       :style="{
-                        color: Number(formatNumber(row?.sniper_balance_ratio_cur || 0, 1))==0? 'var(--third-text)' : (Number(row?.sniper_balance_ratio_cur) > 5 ? '#F6465D' : '#12B886'),
+                        color: Number(formatNumber(row?.sniper_balance_ratio_cur || 0, 1))==0? 'var(--third-text1)' : (Number(row?.sniper_balance_ratio_cur) > 5 ? '#F6465D' : '#12B886'),
                         background: Number(formatNumber(row?.sniper_balance_ratio_cur || 0, 1))==0? '' : (Number(row?.sniper_balance_ratio_cur) > 5 ? '#f6465d1a' : '#12b8861a'),
                       }"
                     >
@@ -559,7 +574,7 @@ class="flex-start mr-8px bg-btn"
                       v-tooltip="$t('insider_balance_ratio_cur_tips')"
                       class="flex mr-8px bg-btn"
                       :style="{
-                        color: Number(formatNumber(row?.insider_balance_ratio_cur || 0, 1))==0? 'var(--third-text)' : (Number(row?.insider_balance_ratio_cur) > 5 ? '#F6465D' : '#12B886'),
+                        color: Number(formatNumber(row?.insider_balance_ratio_cur || 0, 1))==0? 'var(--third-text1)' : (Number(row?.insider_balance_ratio_cur) > 5 ? '#F6465D' : '#12B886'),
                         background: Number(formatNumber(row?.insider_balance_ratio_cur || 0, 1))==0? '' : (Number(row?.insider_balance_ratio_cur) > 5 ? '#f6465d1a' : '#12b8861a'),
                       }"
                     >
@@ -582,7 +597,7 @@ class="flex-start mr-8px bg-btn"
                       v-tooltip="$t('phishing1')"
                       class="flex mr-8px bg-btn"
                       :style="{
-                        color: Number(formatNumber(row?.phishing_ratio || 0, 1))==0? 'var(--third-text)' : (Number(row?.phishing_ratio) > 5 ? '#F6465D' : '#12B886'),
+                        color: Number(formatNumber(row?.phishing_ratio || 0, 1))==0? 'var(--third-text1)' : (Number(row?.phishing_ratio) > 5 ? '#F6465D' : '#12B886'),
                         background: Number(formatNumber(row?.phishing_ratio || 0, 1))==0? '' : (Number(row?.phishing_ratio) > 5 ? '#f6465d1a' : '#12b8861a'),
                       }"
                     >
@@ -599,7 +614,7 @@ class="flex-start mr-8px bg-btn"
                     <div
                       v-tooltip="$t('Bundle')"
                       :style="{
-                        color: Number(formatNumber(row?.address_binding_ratio || 0, 1))==0? 'var(--third-text)' : (Number(row?.address_binding_ratio) > 5 ? '#F6465D' : '#12B886'),
+                        color: Number(formatNumber(row?.address_binding_ratio || 0, 1))==0? 'var(--third-text1)' : (Number(row?.address_binding_ratio) > 5 ? '#F6465D' : '#12B886'),
                         background: Number(formatNumber(row?.address_binding_ratio || 0, 1))==0? '' : (Number(row?.address_binding_ratio) > 5 ? '#f6465d1a' : '#12b8861a'),
                       }"
                       class="flex mr-8px bg-btn"
@@ -641,20 +656,20 @@ class="flex-start mr-8px bg-btn"
                   </template>
                   <template v-else>
                     <template v-if="pumpSetting?.define?.some((i) => i === 'vol')">
-                      <div class="mr-5px color-[--third-text]" :style="{ 'font-size': pumpSetting.fontSize_mc }">V</div>
-                      <span v-if="Number(row?.volume_u_24h) === 0 || row?.volume_u_24h == null" class="color-[--secondary-text]" >0</span>
-                      <div v-else class="color-[--main-text]" :style="{ color: getDataColor('vol',row.volume_u_24h),'font-size': pumpSetting.fontSize_mc  }">
+                      <div class="mr-5px color-[--third-text1]" :style="{ 'font-size': pumpSetting.fontSize_mc }">V</div>
+                      <span v-if="Number(row?.volume_u_24h) === 0 || row?.volume_u_24h == null" class="color-[--third-text1]" >0</span>
+                      <div v-else class="color-[--main-text1]" :style="{ color: getDataColor('vol',row.volume_u_24h),'font-size': pumpSetting.fontSize_mc  }">
                         ${{ pumpSetting.isInt ? formatNumber(row.volume_u_24h || 0, { decimals: 0, l: 4, limit: 3, locale: 'en' }) : formatNumber(row.volume_u_24h || 0, {decimals: 1, l: 4, limit: 3, locale: 'en' }) }}
                       </div>
                     </template>
                     <template v-if="pumpSetting?.define?.some((i) => i === 'mcap')">
                       <div
-                        class="color-[--third-text] mr-5px ml-5px"
+                        class="color-[--third-text1] mr-5px ml-5px"
                         :style="{ 'font-size': pumpSetting.fontSize_mc }"
                       >
                         MC
                       </div>
-                      <span v-if="Number(row?.market_cap) === 0 || row?.market_cap == null" class="color-[--secondary-text]" >0</span>
+                      <span v-if="Number(row?.market_cap) === 0 || row?.market_cap == null" class="color-[--third-text1]" >0</span>
                       <span
                         v-else
                         :style="{ 'font-size': pumpSetting.fontSize_mc, color: getDataColor('mc',row.market_cap) }"
@@ -673,10 +688,10 @@ class="flex-start mr-8px bg-btn"
                           placement: 'top-start',
                         },
                       }" class="flex-end">
-                    <div class="mr-5px color-[--third-text] ml-5px">N</div>
-                    <span v-if="Number(row?.net_flow_vol) === 0 || row?.net_flow_vol == null" class="color-[--secondary-text]" >0</span>
-                    <div v-else class="color-[--main-text]">
-                      <ave-data-number :value="row?.net_flow_vol" :signVisible="true" classZero="color-[--main-text]">
+                    <div class="mr-5px color-[--third-text1] ml-5px">N</div>
+                    <span v-if="Number(row?.net_flow_vol) === 0 || row?.net_flow_vol == null" class="color-[--third-text1]" >0</span>
+                    <div v-else class="color-[--main-text1]">
+                      <ave-data-number :value="row?.net_flow_vol" :signVisible="true" classZero="color-[--main-text1]">
                        {{ formatNumber(Math.abs(row?.net_flow_vol ?? 0), { decimals: 2, l: 4, limit: 3, locale: 'en' }) }}
                       </ave-data-number>
                     </div>
@@ -692,9 +707,9 @@ class="flex-start mr-8px bg-btn"
                       props: { 'raw-content': true, 'popper-class': 'pump-tooltip' }
                     }"
                     class="relative flex-end">
-                    <div class="mr-5px color-[--third-text] ml-5px">Txs</div>
-                    <span v-if="Number(row?.tx_24h_count) === 0 || row?.tx_24h_count == null" class="color-[--secondary-text]" >0</span>
-                    <div v-else class="color-[--main-text]">
+                    <div class="mr-5px color-[--third-text1] ml-5px">Txs</div>
+                    <span v-if="Number(row?.tx_24h_count) === 0 || row?.tx_24h_count == null" class="color-[--third-text1]" >0</span>
+                    <div v-else class="color-[--main-text1]">
                       {{ formatNumber(row.tx_24h_count || 0, { decimals: 0, l: 4, limit: 3, locale: 'en' })}}
                     </div>
                     <el-progress
@@ -751,7 +766,7 @@ class="flex-start mr-8px bg-btn"
     <transition name="fade">
       <span v-if="showBackTop" class="back-top text-12px flex items-center bg-[--main-bg] cursor-pointer" @click="scrollToTop">
           <Icon
-          class="mr-4px text-14px color-[--third-text]"
+          class="mr-4px text-14px color-[--third-text1]"
           name="material-symbols-light:arrow-circle-up-rounded"
         />
         {{ $t('backToTop') }}
@@ -766,22 +781,22 @@ class="flex-start mr-8px bg-btn"
       popper-class="[--el-popover-bg-color:--border]"
     >
     <div class="py-4px [&&]:m--12px flex flex-col">
-      <a :href="`https://x.com/search?q=${currentRow?.target_token}`" target="_blank" class="text-12px py-4px px-8px color-[--main-text] hover:bg-[--dialog-tab-active]">
+      <a :href="`https://x.com/search?q=${currentRow?.target_token}`" target="_blank" class="text-12px py-4px px-8px color-[--main-text1] hover:bg-[--dialog-tab-active]">
         {{ $t('tweetSearchContractAddress') }}
       </a>
-      <a :href="`https://x.com/search?q=$${currentRow?.symbol}`" target="_blank" class="text-12px py-4px px-8px color-[--main-text] hover:bg-[--dialog-tab-active]">
+      <a :href="`https://x.com/search?q=$${currentRow?.symbol}`" target="_blank" class="text-12px py-4px px-8px color-[--main-text1] hover:bg-[--dialog-tab-active]">
         {{ $t('tweetSearchContractAddress2') }}
       </a>
-      <!-- <a :href="`https://www.google.com/search?q=${currentRow?.symbol}&tbm=nws`" target="_blank" class="text-12px py-4px px-8px color-[--main-text] hover:bg-[--dialog-tab-active]">
+      <!-- <a :href="`https://www.google.com/search?q=${currentRow?.symbol}&tbm=nws`" target="_blank" class="text-12px py-4px px-8px color-[--main-text1] hover:bg-[--dialog-tab-active]">
         {{ $t('tweetSearchContractAddress3') }}
       </a> -->
-      <a :href="`https://www.tiktok.com/search?q=${currentRow?.symbol}`" target="_blank" class="text-12px py-4px px-8px color-[--main-text] hover:bg-[--dialog-tab-active]">
+      <a :href="`https://www.tiktok.com/search?q=${currentRow?.symbol}`" target="_blank" class="text-12px py-4px px-8px color-[--main-text1] hover:bg-[--dialog-tab-active]">
         {{ $t('TikTokSearchName') }}
       </a>
-      <a :href="`https://www.google.com/search?q=${currentRow?.symbol}&tbm=nws`" target="_blank" class="text-12px py-4px px-8px color-[--main-text] hover:bg-[--dialog-tab-active]">
+      <a :href="`https://www.google.com/search?q=${currentRow?.symbol}&tbm=nws`" target="_blank" class="text-12px py-4px px-8px color-[--main-text1] hover:bg-[--dialog-tab-active]">
         {{ $t('GoogleSearchName') }}
       </a>
-      <span class="text-12px py-4px px-8px color-[--main-text] hover:bg-[--dialog-tab-active] cursor-pointer" @click="handleSearchTokenName">{{ $t('tweetSearchContractAddress4') }}</span>
+      <span class="text-12px py-4px px-8px color-[--main-text1] hover:bg-[--dialog-tab-active] cursor-pointer" @click="handleSearchTokenName">{{ $t('tweetSearchContractAddress4') }}</span>
     </div>
   </el-popover>
   </div>
@@ -977,8 +992,19 @@ function addOrRemoveBlaclList(item: { token: string , medias: any[]}, type: 'ca'
 //   isPaused.value = false
 // }
 
+// function summaryList(summary: string): string[] {
+//   return summary?.match(/\d\.[^0-9]*/g) || []
+// }
 function summaryList(summary: string): string[] {
-  return summary?.match(/\d\.[^0-9]*/g) || []
+  if (!summary) return []
+  const regex = /\d+\.\s*[\s\S]*?(?=\d+\.|$)/g
+
+  const matches = summary.match(regex)
+
+  if (matches && matches.length > 0) {
+    return matches.map(i => i.trim())
+  }
+  return [summary.trim()]
 }
 
 function buildTooltipContent(summary: string): string {
@@ -1139,7 +1165,7 @@ function getLiqTooltip(row: PumpObj) {
   return `
     <div class="flex-start" style="color:var(--secondary-text)">
       ${t('pair')}
-      <span class="color-[--main-text] text-12px ml-5px">
+      <span class="color-[--main-text1] text-12px ml-5px">
         ${formatNumber(value || 0, { decimals: 2, l: 4, locale: 'en' })}
         <span class="text-11px ml-4px">
           ${row.baseToken?.symbol ?? ''}
@@ -1437,7 +1463,7 @@ function getLiqTooltip(row: PumpObj) {
 }
 .progress-bar-disabled{
   :deep() .el-progress-bar__outer {
-    --el-border-color-lighter: var(--third-text);
+    --el-border-color-lighter: var(--third-text1);
   }
 }
 </style>

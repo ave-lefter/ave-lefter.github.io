@@ -223,7 +223,7 @@
           width="130"
         >
           <template #default="{ row }">
-            <div style="padding: 0 5px">
+            <div style="padding: 0">
               <div v-if="row?.main_token_balance_amount > 0" :class="!row?.main_token_balance_amount ? 'color-text-zero' : ''">
                 {{ formatNumber2(row?.main_token_balance_amount || 0, 2) }}&nbsp;{{row.main_token_symbol}}
               </div>
@@ -244,7 +244,7 @@
         width="130"
       >
         <template #default="{ row }">
-          <div style="padding: 0 5px">
+          <div style="padding: 0">
             <div v-if="row?.total_balance > 0" :class="!row?.total_balance ? 'color-text-zero' : ''">
               ${{formatNumber2(row?.total_balance || 0, 1)}}
             </div>
@@ -264,7 +264,7 @@
         min-width="100px"
       >
         <template #default="{ row }">
-          <div style="padding: 0 5px">
+          <div style="padding: 0">
             <div v-if="row?.total_profit !== 0" :class="row?.total_profit == 0 ? 'color-text-zero' : ''">
               {{row?.total_profit && row?.total_profit < 0 ? '-':''}}${{formatNumber2(Math.abs(row?.total_profit) || 0, 0)}}
             </div>
@@ -313,7 +313,7 @@
         min-width="130px"
       >
         <template #default="{ row }">
-          <div style="padding: 0 5px">
+          <div style="padding: 0">
             <div v-if="Number(row?.total_txs_usd) > 0" :class="!row?.total_txs_usd ? 'color-text-zero' : ''">
               ${{
                 row?.total_txs_usd > 0 ? formatNumber2(row?.total_txs_usd || 0, 2, 4, 10 ** 4) : 0
@@ -342,7 +342,7 @@
         min-width="100px"
       >
         <template #default="{ row }">
-          <div style="padding: 0 5px">
+          <div style="padding: 0">
             <div v-if="row?.total_txs > 0" :class="!row?.total_txs ? 'color-text-zero' : ''">
               {{
                 row?.total_txs > 0 ? formatNumber2(row.total_txs || 0, 2, 4, 10 ** 4) : 0
@@ -573,6 +573,7 @@ const isMonitor=ref(false)
 const conditions=computed(() => {
   return isMonitor.value?addressConditions2.value:addressConditions.value
 })
+const globalStore = useGlobalStore()
 
 const defaultSort=computed(() => {
   return { prop: conditions.value?.sort||'', order: conditions.value?.sort_dir==='desc'?'descending':'ascending' }
@@ -902,14 +903,16 @@ const getTableList = throttle(function() {
 
 // Add missing tableRowClick method
 function tableRowClick(row: { user_address: string; user_chain: string }) {
-  // $router.push({
-  //   name: 'Balance',
-  //   params: { userAddress: row.wallet_address, chain: row.chain },
-  // })
-
-  $router.push({
+  const clickAction = globalStore.audioSettings?.wallet?.clickAction
+  // rightClickAction: 0 不打开, 1 新tab打开
+  const routeData = $router.resolve({
     path: `/address/${row.user_address}/${row.user_chain}`,
   })
+  if (clickAction === 1) {
+    window.open(routeData.href, '_blank')
+  } else {
+    window.open(routeData.href, '_self')
+  }
 }
  function safeBigNumber(value:string|number) {
   try {
@@ -1455,6 +1458,7 @@ a.trade {
 :deep() .el-table{
   --el-table-text-color: var(--secondary-text);
   .caret-wrapper{
+    width: 16px;
     height: 10px;
     .sort-caret{
       border-width: 4px;

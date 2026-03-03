@@ -75,11 +75,11 @@ onMounted(() => {
   align-items: center;
   font-size: 12px;
   // font-weight: 500;
-  color: var(--main-text);
+  color: var(--main-text1);
   // color: var(--d-999-l-666);
   border: 1px solid transparent;
   &.active {
-    color: var(--main-text);
+    color: var(--main-text1);
     border: 1px solid #3F80F7;
   }
 }
