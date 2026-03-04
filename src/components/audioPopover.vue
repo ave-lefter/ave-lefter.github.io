@@ -5,7 +5,8 @@
     <ul class="el-select-dropdown__list group">
       <li
         v-for="item in audioList"
-        :key="item" class="el-select-dropdown__item text-[--main-text] flex-between hover:bg-[--secondary-bg]"
+        :key="item"
+        class="el-select-dropdown__item text-[--main-text] flex-between hover:bg-[--border]"
         :class="audioSettings.audio?.[type] === item ? 'text-[--primary-color]!' : ''"
         @click="() => handleAudioSelect(item)"
         @mouseenter="() => handleMouseEnter(item)"
@@ -44,14 +45,26 @@ function stopPreview() {
   }
 }
 
+function playWithRetry(audio: HTMLAudioElement, retries = 5, interval = 300) {
+  if (previewAudio.value !== audio) return
+  if (audio.readyState >= 3) {
+    audio.play().catch(() => {})
+    return
+  }
+  if (retries <= 0) return
+  audio.load()
+  setTimeout(() => playWithRetry(audio, retries - 1, interval), interval)
+}
+
 function handleMouseEnter(item: string) {
   stopPreview()
   if (!item) return
   hoverTimer.value = setTimeout(() => {
     const src = audioNameToResource[item as keyof typeof audioNameToResource]
     if (src) {
-      previewAudio.value = new Audio(src)
-      previewAudio.value.play()
+      const audio = new Audio(src)
+      previewAudio.value = audio
+      playWithRetry(audio)
     }
   }, 500)
 }
