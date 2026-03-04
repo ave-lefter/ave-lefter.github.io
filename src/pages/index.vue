@@ -1446,6 +1446,9 @@ function filterHistoryData(list: PumpObj[], conditions: any) {
     if(!conditions?.base_tokens){
       return false
     }
+    if(!conditions?.platforms){
+      return false
+    }
     return pass
   })
 }
@@ -1526,6 +1529,8 @@ function getFilterData(list: PumpObj[], conditions: any) {
     }
     if (conditions?.platforms) {
       pass = pass && conditions?.platforms?.includes?.(i.platform_id)
+    } else {
+      return false
     }
     // console.log('conditions', conditions.platforms)
     if (conditions?.holder_min) {

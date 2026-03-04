@@ -39,6 +39,8 @@ export function useSimilarTokenPopup() {
       // platforms 全选则不统计
       if (allPlatformsValue !== undefined && filterList.includes('platforms') && form.platforms === allPlatformsValue) {
         filterList = filterList.filter(i => i !== 'platforms')
+      } else if(!form.platforms){
+        filterList.push('platforms')
       }
       // 报价代币全选则不统计
       if (allBaseTokensValue !== undefined && filterList.includes('base_tokens') && form.base_tokens === allBaseTokensValue) {

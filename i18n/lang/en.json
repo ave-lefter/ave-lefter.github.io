@@ -2010,5 +2010,6 @@
   "clearPumpFilter":"Clear Filter",
   "searchXAccount":"Search X Account(max 3)",
   "keywordsError":"Keywords cannot exceed 3",
-  "twitterError":"Twitter cannot exceed 3"
+  "twitterError":"Twitter cannot exceed 3",
+  "cancelAllSelected":"Cancel All"
 }

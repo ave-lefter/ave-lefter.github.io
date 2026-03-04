@@ -28,9 +28,9 @@
             <div class="flex justify-between items-center w-full mb-16px">
               <span class="text-12px">{{ $t('platform') }}</span>
               <!-- 全选时增加取消全选 -->
-              <span v-if="form.platforms === platformsList.map(platform => platform.platform).join(',')" class="text-12px w-48px lh-24px rounded-4px bg-[--pump-filter-bg] text-center cursor-pointer"
+              <span v-if="form.platforms === platformsList.map(platform => platform.platform).join(',')" class="text-12px w-60px lh-24px rounded-4px bg-[--pump-filter-bg] text-center cursor-pointer"
                 @click="form.platforms = ''">
-                {{ $t('cancelAll') }}
+                {{ $t('cancelAllSelected') }}
               </span>
               <span v-else class="text-12px w-48px lh-24px rounded-4px bg-[--pump-filter-bg] text-center cursor-pointer"
                 @click="form.platforms = platformsList.map(platform => platform.platform).join(',')">
@@ -56,8 +56,8 @@
           <div class="px-16px border pb-12px">
             <div class="flex justify-between items-center w-full mb-16px">
               <span class="text-12px">{{ $t('QuoteTokens') }}</span>
-              <span v-if="form.base_tokens === baseTokens.map(token => token.token).join(',')" class="text-12px w-48px lh-24px rounded-4px bg-[--pump-filter-bg] text-center cursor-pointer" @click="form.base_tokens = ''">
-                {{ $t('cancelAll')
+              <span v-if="form.base_tokens === baseTokens.map(token => token.token).join(',')" class="text-12px w-60px lh-24px rounded-4px bg-[--pump-filter-bg] text-center cursor-pointer" @click="form.base_tokens = ''">
+                {{ $t('cancelAllSelected')
                 }}
                 </span>
               <span v-else class="text-12px w-48px lh-24px rounded-4px bg-[--pump-filter-bg] text-center cursor-pointer" @click="form.base_tokens = baseTokens.map(token => token.token).join(',')">{{ $t('all1')

@@ -2011,5 +2011,6 @@
   "clearPumpFilter":"清空筛选",
   "searchXAccount":"搜索X账号(最多3个)",
   "keywordsError":"关键词不能超过3个",
-  "twitterError":"推特不能超过3个"
+  "twitterError":"推特不能超过3个",
+  "cancelAllSelected":"取消全选"
 }
