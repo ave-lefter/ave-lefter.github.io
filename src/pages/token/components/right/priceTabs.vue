@@ -67,7 +67,7 @@ const mouseLeave = () => {
       cursor: pointer;
       border: none;
       // background: var(--main-list-hover);
-      color: var(--main-text);
+      color: var(--main-text1);
       flex: 1;
       min-height: 44px;
       &:first-child {

@@ -468,7 +468,7 @@ header {
       text-align: center;
       padding: 4px 8px;
       border-radius: 8px;
-      color: var(--main-text);
+      color: var(--main-text1);
       // margin-right: 8px;
       text-decoration: none;
 

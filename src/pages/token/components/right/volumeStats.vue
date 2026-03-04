@@ -2,7 +2,7 @@
   <div class="flex items-center justify-between text-12px mt-4px rounded-4px">
     <div>
       <div class="color-[--third-text]">{{ tabActiveName }} {{ $t('vol') }}</div>
-      <div class="color-[--main-text] mt-5px">
+      <div class="color-[--main-text1] mt-5px">
         <!-- {{ formatNumber(pair?.[`tx_${tabActive}_count` as TxCount] || 0, 1) }}<span
           class="color-[--third-text]">/</span> -->
           ${{ formatNumber(pair?.[`volume_u_${tabActive}` as VolumeU] || 0,

@@ -3,7 +3,7 @@
     v-if="bestToken"
     class="flex items-center py-11px px-8px text-12px justify-between bg-[--dialog-bg] rounded-4px mb-12px"
   >
-    {{ $t('devBestToken') }}
+    <span class="color-[--main-text1]">{{ $t('devBestToken') }}</span> 
     <div class="flex items-center color-[--secondary-text] cursor-pointer" @click="tokenClick">
       <TokenImg
         class="mr-4px"
@@ -17,11 +17,11 @@
       />
       <span
         v-tooltip="bestToken.symbol"
-        class="font-500 color-[--main-text] mr-2px max-w-60px truncate"
+        class="font-500 color-[--main-text1] mr-2px max-w-60px truncate"
         >{{ bestToken.symbol }}</span
       >
       (ATH MC
-      <span class="color-[--main-text] ml-2px mr-2px"
+      <span class="color-[--main-text1] ml-2px mr-2px"
         >${{ formatNumber(bestToken.all_time_high, 0) }}</span
       >)
     </div>

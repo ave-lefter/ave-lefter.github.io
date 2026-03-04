@@ -251,7 +251,7 @@ function switchPair(item: any) {
         // background: var(--tab-active-bg);
       }
       .main {
-        color: var(--main-text);
+        color: var(--main-text1);
         &.red{
           color:#F6465D
         }

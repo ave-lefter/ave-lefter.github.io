@@ -1971,7 +1971,7 @@ function hitBlacklist(item:PumpObj, black: pumpBlack) {
     letter-spacing: 0px;
 
     &.active {
-      color: var(--main-text);
+      color: var(--main-text1);
       background: var(--tab-active-bg);
       opacity: 1;
     }
