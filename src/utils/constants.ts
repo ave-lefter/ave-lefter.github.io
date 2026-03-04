@@ -131,6 +131,7 @@ export const SupportTokenKlineChains = ['juchain', 'arbitrum', 'optimism']
 export const SupportTokenKlineLaunchpad = [
   'bsc-four.meme',
   'bsc-flap.sh',
+  'bsc-four_agent_meme',
   'solana-dexscreener.com',
   'solana-pump.fun',
   'solana-time.fun',
@@ -142,7 +143,7 @@ export const SupportTokenKlineLaunchpad = [
   'solana-moonshot.com',
   'solana-jup.ag',
   'solana-bags.fm',
-  'solana-cooking.city'
+  'solana-cooking.city',
 ]
 export const SupportCopyTradeChain = ['solana', 'bsc', 'eth', 'base']
 
