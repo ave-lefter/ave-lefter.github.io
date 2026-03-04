@@ -2012,5 +2012,7 @@
   "searchXAccount":"搜索X账号(最多3个)",
   "keywordsError":"关键词不能超过3个",
   "twitterError":"推特不能超过3个",
-  "cancelAllSelected":"取消全选"
+  "cancelAllSelected":"取消全选",
+  "keywordsPlaceholder":"关键词1,关键词2,关键词...",
+  "twitterPlaceholder":"推特1,推特2,推特..."
 }

@@ -37,13 +37,15 @@ export function useSimilarTokenPopup() {
       let filterList = Object.keys(form).filter((key) => form[key] !== null && form[key] !== undefined && form[key] !== '' && form[key] !== 0 && (form[key]?.length > 0 || form[key] == 1 || form[key] === 2))
       filterList = Array.from(new Set(filterList.map(key => key.replace(/_min|_max$/g, ''))))
       // platforms 全选则不统计
-      if (allPlatformsValue !== undefined && filterList.includes('platforms') && form.platforms === allPlatformsValue) {
+      // 将 platforms 转为数组，判断数组是否相等，如果相等则不统计
+      if (allPlatformsValue !== undefined && filterList.includes('platforms') && form.platforms.split(',').sort().join(',') === allPlatformsValue.split(',').sort().join(',')) {
         filterList = filterList.filter(i => i !== 'platforms')
       } else if(!form.platforms){
         filterList.push('platforms')
       }
       // 报价代币全选则不统计
-      if (allBaseTokensValue !== undefined && filterList.includes('base_tokens') && form.base_tokens === allBaseTokensValue) {
+      // 将 base_tokens 转为数组，判断数组是否相等，如果相等则不统计
+      if (allBaseTokensValue !== undefined && filterList.includes('base_tokens') && form.base_tokens.split(',').sort().join(',') === allBaseTokensValue.split(',').sort().join(',')) {
         filterList = filterList.filter(i => i !== 'base_tokens')
       } else if(!form.base_tokens){
         filterList.push('base_tokens')

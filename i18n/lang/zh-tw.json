@@ -1995,5 +1995,7 @@
   "searchXAccount":"搜索X账号(最多三個)",
   "keywordsError":"關鍵詞不能超過3個",
   "twitterError":"推特不能超過3個",
-  "cancelAllSelected":"取消全選"
+  "cancelAllSelected":"取消全選",
+  "keywordsPlaceholder":"關鍵詞1,關鍵詞2,關鍵詞...",
+  "twitterPlaceholder":"推特1,推特2,推特..."
 }

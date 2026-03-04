@@ -356,6 +356,7 @@ import type {
 import AutoSellSetting from '@/components/autoSellSetting/index.vue'
 import AudioSelect from './pump/components/audioSelect.vue'
 import { getFilterNumber } from './pump/utils'
+
 defineOptions({
   name: 'pump' // 显式命名
 })
@@ -509,7 +510,7 @@ const baseTokenMap = computed(() => {
     token: item.hash,
     logo_url: item.logo_url
   }]))
-  map.set('other', { symbol: t('other'), token: 'other', logo_url: '' })
+  map.set('other', { symbol: t('other'), token: 'other', logo_url:'' })
   return map
 })
 const baseTokensAllStr = computed(() => baseTokenMap.value.values().toArray().map((i: any) => i.token).join(','))
@@ -541,10 +542,8 @@ const list1 = computed(() => {
     )
   }
   const list1 = (wsTableList.value || [])?.filter(i => i.state === 'new' && i.chain === activeChain.value)
-  const pumpFilter = pumpStore.pumpV3[activeChain.value].new.pumpFilter
-  list = filterHistoryData(list,pumpFilter)
-  const wsList = getFilterData(list1, pumpFilter)
-  const wsList1 = wsList?.filter((i: { pair: string }) => !list?.some(j => j.pair === i.pair))
+  
+  const wsList1 = list1?.filter((i: { pair: string }) => !list?.some(j => j.pair === i.pair))
   let filterList = [...wsList1, ...list].map(i => {
   const baseHash =
     i.target_token === i.token0_address
@@ -596,7 +595,9 @@ const list1 = computed(() => {
     })
   }
   if (filterList?.length) {
+    const pumpFilter = pumpStore.pumpV3[activeChain.value].new.pumpFilter
     filterList = mergeStatisticsList(mapStatistics.value, filterList)
+    filterList = getFilterData(filterList,pumpFilter)
     fourmemeListObj[activeChain.value].new = filterList?.slice?.(0, 100) || []
   }
   return filterList?.slice?.(0, 100)
@@ -613,10 +614,7 @@ const list2 = computed(() => {
     )
   }
   const list1 = (wsTableList.value || [])?.filter(i => (i.state === 'migrating') && i.chain === activeChain.value)
-  const pumpFilter = pumpStore.pumpV3[activeChain.value].soon.pumpFilter
-  list = filterHistoryData(list,pumpFilter)
-  const wsList = getFilterData(list1, pumpFilter)
-  const wsList1 = wsList?.filter((i: { pair: string }) => !list?.some(j => j.pair === i.pair))
+  const wsList1 = list1?.filter((i: { pair: string }) => !list?.some(j => j.pair === i.pair))
   let filterList = [...wsList1, ...list].map(i => {
   const baseHash =
     i.target_token === i.token0_address
@@ -628,48 +626,49 @@ const list2 = computed(() => {
     baseToken: baseTokenMap.value.get(baseHash)
   }
 })
-    if (logoList.value?.length && filterList?.length) {
-      const logoMap = new Map(
-        logoList.value.map(item => [item.token, item])
-      )
-      filterList = filterList.map(i => {
-        const obj = logoMap.get(i.target_token)
-        if (!obj) return i
-        return {
-          ...i,
-          ...(obj.logo_url
-            ? {
-                logo_url: obj.logo_url
-              }
-            : {}
-          ),
-          ...(obj.buy_tax
-            ? {
-                buy_tax: obj.buy_tax
-              }
-            : {}
-          ),
-          ...(obj.sell_tax
-            ? {
-                sell_tax: obj.sell_tax
-              }
-            : {}
-          ),
-          name: obj.name,
-          symbol: obj.symbol,
-          ...(obj.appendix
-            ? {
-                medias: getMedias(obj.appendix),
-                twitter_type: obj.twitter_type
-              }
-            : {}
-          )
-        }
-      })
-    }
-    if (filterList?.length) {
-      filterList = mergeStatisticsList(mapStatistics.value, filterList)
-    }
+  if (logoList.value?.length && filterList?.length) {
+    const logoMap = new Map(
+      logoList.value.map(item => [item.token, item])
+    )
+    filterList = filterList.map(i => {
+      const obj = logoMap.get(i.target_token)
+      if (!obj) return i
+      return {
+        ...i,
+        ...(obj.logo_url
+          ? {
+              logo_url: obj.logo_url
+            }
+          : {}
+        ),
+        ...(obj.buy_tax
+          ? {
+              buy_tax: obj.buy_tax
+            }
+          : {}
+        ),
+        ...(obj.sell_tax
+          ? {
+              sell_tax: obj.sell_tax
+            }
+          : {}
+        ),
+        name: obj.name,
+        symbol: obj.symbol,
+        ...(obj.appendix
+          ? {
+              medias: getMedias(obj.appendix),
+              twitter_type: obj.twitter_type
+            }
+          : {}
+        )
+      }
+    })
+  }
+  if (filterList?.length) {
+    const pumpFilter = pumpStore.pumpV3[activeChain.value].soon.pumpFilter
+    filterList = mergeStatisticsList(mapStatistics.value, filterList)
+    filterList = getFilterData(filterList, pumpFilter)
     const tokenSet = new Set(
       list3.value?.map(j => j.target_token)
     )
@@ -677,10 +676,10 @@ const list2 = computed(() => {
       (i: { target_token: string }) =>
         !tokenSet.has(i.target_token)
     )
-
-     fourmemeListObj[activeChain.value].soon = filterList?.slice?.(0, 100) || []
-    return filterList?.slice?.(0, 100)
-  })
+    fourmemeListObj[activeChain.value].soon = filterList?.slice?.(0, 100) || []
+  }
+  return filterList?.slice?.(0, 100)
+})
 const list3 = computed(() => {
 let list = fourmemeListObj?.[activeChain.value]?.graduated || []
 if (pumpSetting.value.isBlacklist && pumpBlackList.value?.length > 0) {
@@ -693,10 +692,7 @@ if (pumpSetting.value.isBlacklist && pumpBlackList.value?.length > 0) {
   )
 }
   const list1 = (wsTableList.value || [])?.filter(i => i.state === 'migrated' && i.chain === activeChain.value)
-  const pumpFilter = pumpStore.pumpV3[activeChain.value].graduated.pumpFilter
-  list = filterHistoryData(list,pumpFilter)
-  const wsList = getFilterData(list1, pumpFilter)
-  const wsList1 = wsList?.filter((i: { pair: string }) => !list?.some(j => j.pair === i.pair))
+  const wsList1 = list1?.filter((i: { pair: string }) => !list?.some(j => j.pair === i.pair))
   let filterList = [...wsList1, ...list].map(i => {
   const baseHash =
       i.target_token === i.token0_address
@@ -748,7 +744,9 @@ if (pumpSetting.value.isBlacklist && pumpBlackList.value?.length > 0) {
     })
   }
   if (filterList?.length) {
+    const pumpFilter = pumpStore.pumpV3[activeChain.value].graduated.pumpFilter
     filterList = mergeStatisticsList(mapStatistics.value, filterList)
+    filterList = getFilterData(filterList, pumpFilter)
     fourmemeListObj[activeChain.value].graduated = filterList?.slice?.(0, 100) || []
   }
   return filterList?.slice?.(0, 100)
@@ -1416,7 +1414,7 @@ function parseDate(dateStr?: string | number, toSeconds = false) {
   const ms = new Date(dateStr).getTime()
   return toSeconds ? ms / 1000 : ms
 }
-function filterHistoryData(list: PumpObj[], conditions: any) {
+function getFilterData(list: PumpObj[], conditions: any) {
   conditions = conditions || {}
   const urlCount = new Map<string, number>()
   if (conditions?.no_repeat_social_media && list?.length) {
@@ -1430,6 +1428,10 @@ function filterHistoryData(list: PumpObj[], conditions: any) {
   const duplicateUrls = new Set<string>([...urlCount.entries()].filter(([, n]) => n > 1).map(([url]) => url))
   return list?.filter((i) => {
     let pass = true
+    if (conditions?.q) {
+      const arr = conditions?.q.split(',')
+      pass = pass && arr?.findIndex(y=> i.target_token == y || i.name == y || i.symbol == y) !== -1
+    }
     if (conditions?.dev_sale_out) {
       const isSellOut = i.max_dev_ratio!==0 &&i.dev_balance_ratio_cur===0
       if(conditions?.dev_sale_out === 1){
@@ -1443,31 +1445,6 @@ function filterHistoryData(list: PumpObj[], conditions: any) {
       const hasRepeatedUrl = urls.some((url) => duplicateUrls.has(url))
       if (hasRepeatedUrl) {
         pass = false
-      }
-    }
-    if(!conditions?.base_tokens){
-      return false
-    }
-    if(!conditions?.platforms){
-      return false
-    }
-    return pass
-  })
-}
-function getFilterData(list: PumpObj[], conditions: any) {
-  conditions = conditions || {}
-  return list?.filter((i) => {
-    let pass = true
-    if (conditions?.q) {
-      const arr = conditions?.q.split(',')
-      pass = pass && arr?.findIndex(y=> i.target_token == y || i.name == y || i.symbol == y) !== -1
-    }
-    if (conditions?.dev_sale_out) {
-      const isSellOut = i.max_dev_ratio!==0 &&i.dev_balance_ratio_cur===0
-      if(conditions?.dev_sale_out === 1){
-        pass = pass && isSellOut
-      } else if(conditions?.dev_sale_out === 2){
-        pass = pass && !isSellOut
       }
     }
     if(conditions?.base_tokens){
@@ -1531,16 +1508,19 @@ function getFilterData(list: PumpObj[], conditions: any) {
       pass = pass && i.tvl <= Number(conditions.tvl_max)
     }
     if (conditions?.platforms) {
-      pass = pass && conditions?.platforms?.includes?.(i.platform_id)
+      pass = pass && (
+        conditions?.platforms?.includes?.(i.platform_id)
+        || conditions?.platforms?.includes?.(i.platform)
+      )
     } else {
       return false
     }
     // console.log('conditions', conditions.platforms)
     if (conditions?.holder_min) {
-      pass = pass && (i?.holder_count || 0) >= Number(conditions.holder_min)
+      pass = pass && (i?.holders || 0) >= Number(conditions.holder_min)
     }
     if (conditions?.holder_max) {
-      pass = pass && (i?.holder_count || 0) <= Number(conditions.holder_max)
+      pass = pass && (i?.holders || 0) <= Number(conditions.holder_max)
     }
 
     if (conditions?.volume_u_24h_min) {
@@ -1562,16 +1542,16 @@ function getFilterData(list: PumpObj[], conditions: any) {
       pass = pass && ((i.smart_money_sell_count_24h || 0) + (i?.smart_money_buy_count || 0)) <= Number(conditions.smart_money_tx_count_24h_max)
     }
     if(conditions?.lsnip) {
-      pass = pass && i.sniper_ratio >= Number(conditions.lsnip)
+      pass = pass && i.sniper_balance_ratio_cur >= Number(conditions.lsnip)
     }
     if(conditions?.rsnip) {
-      pass = pass && i.sniper_ratio <= Number(conditions.rsnip)
+      pass = pass && i.sniper_balance_ratio_cur <= Number(conditions.rsnip)
     }
     if(conditions?.lins) {
-      pass = pass && i.rat_ratio >= Number(conditions.lins)
+      pass = pass && i.insider_balance_ratio_cur >= Number(conditions.lins)
     }
     if(conditions?.rins) {
-      pass = pass && i.rat_ratio <= Number(conditions.rins)
+      pass = pass && i.insider_balance_ratio_cur <= Number(conditions.rins)
     }
     return pass
   })

@@ -29,7 +29,7 @@
               <span class="text-12px">{{ $t('platform') }}</span>
               <!-- 全选时增加取消全选 -->
               <span v-if="form.platforms === platformsList.map(platform => platform.platform).join(',')" class="text-12px w-60px lh-24px rounded-4px bg-[--pump-filter-bg] text-center cursor-pointer"
-                @click="form.platforms = ''">
+                @click="form.platforms = platformsList[0]?.platform">
                 {{ $t('cancelAllSelected') }}
               </span>
               <span v-else class="text-12px w-48px lh-24px rounded-4px bg-[--pump-filter-bg] text-center cursor-pointer"
@@ -38,7 +38,7 @@
               </span>
             </div>
             <el-checkbox-group size="default" @change="(val) => form.platforms = val.join(',')"
-              :model-value="form.platforms.split(',')" class="grid grid-cols-2 gap-12px flex-1">
+              :model-value="form.platforms? form.platforms.split(',') : []" class="grid grid-cols-2 gap-12px flex-1">
               <el-checkbox v-for="platform in platformsList" :key="platform.platform" :label="platform.platform"
                 class="[&&]:mr-0 [&&]:[--el-checkbox-height:28px]">
                 <span
@@ -56,7 +56,7 @@
           <div class="px-16px border pb-12px">
             <div class="flex justify-between items-center w-full mb-16px">
               <span class="text-12px">{{ $t('QuoteTokens') }}</span>
-              <span v-if="form.base_tokens === baseTokens.map(token => token.token).join(',')" class="text-12px w-60px lh-24px rounded-4px bg-[--pump-filter-bg] text-center cursor-pointer" @click="form.base_tokens = ''">
+              <span v-if="form.base_tokens === baseTokens.map(token => token.token).join(',')" class="text-12px w-60px lh-24px rounded-4px bg-[--pump-filter-bg] text-center cursor-pointer" @click="form.base_tokens = baseTokens[0]?.token">
                 {{ $t('cancelAllSelected')
                 }}
                 </span>
@@ -64,16 +64,16 @@
                 }}</span>
             </div>
             <el-checkbox-group size="default" @change="(val) => form.base_tokens = val.join(',')"
-              :model-value="form.base_tokens?.split?.(',') || []" class="grid grid-cols-2 gap-12px flex-1">
+              :model-value="form.base_tokens ? form.base_tokens.split(',') : []" class="grid grid-cols-2 gap-12px flex-1">
               <el-checkbox v-for="platform in baseTokens" :key="platform.token" :label="platform.token"
                 class="[&&]:mr-0 [&&]:[--el-checkbox-height:28px]">
                 <span
                   class="flex items-center gap-8px rounded-30px py-6px px-12px border-1px border-solid color-[--main-text]"
                   :style="{ borderColor: PlatformColors[platform.symbol] }">
-                  <el-image class="rounded w-14px" :src="`${configStore.token_logo_url}${platform.logo_url?.replace(
+                  <el-image class="rounded w-14px" :src="platform.logo_url ? `${configStore.token_logo_url}${platform.logo_url?.replace(
                     '/signals/',
                     'signals/'
-                  )}`" />
+                  )}` : qsImage" />
                   {{ platform.symbol }}
                 </span>
               </el-checkbox>
@@ -83,7 +83,7 @@
               <el-form-item label-position="top" :label="$t('searchTip')" :prop="form.q"
               class="w-full mr-8px">
               <div class="formItem inputRange">
-                <el-input size="large" v-model.trim="form.q" class="search-input1" clearable placeholder="abc,abc,abc"
+                <el-input size="large" v-model.trim="form.q" class="search-input1" clearable :placeholder="$t('keywordsPlaceholder')"
                   @input="(val) => form.q = val.replace(/\s/g, '')" />
               </div>
 
@@ -91,7 +91,7 @@
             <el-form-item label-position="top" :label="$t('searchXAccount')" :prop="form.twitter_usernames"
               class="w-full">
               <div class="formItem inputRange">
-                <el-input size="large" v-model.trim="form.twitter_usernames" class="search-input1" clearable placeholder="abc,abc,abc"
+                <el-input size="large" v-model.trim="form.twitter_usernames" class="search-input1" clearable :placeholder="$t('twitterPlaceholder')"
                   @input="(val) => form.twitter_usernames = val.replace(/\s/g, '')" />
               </div>
 
@@ -219,6 +219,7 @@ import { handleError } from 'vue'
 import { _isArray, _isString } from '@/utils/index.js'
 import { getFilterNumber } from '../utils'
 import { isEqual } from 'lodash-es'
+import qsImage from '@/assets/images/pump/qs.svg'
 
 const props = defineProps({
   activeChain: {
@@ -419,18 +420,18 @@ const indicatorArr = computed(() => {
     // { label: t('filterMouse'), value: 'filter_mouse' }
   ]
 })
-const setCheckedPlatforms = () => {
-   const platformsAll = props.platformsList.map((i: any) => i.platform).join(',')
-    let platforms = platformsAll
-    if (tableFilter?.platforms) {
-      let platformsArr = tableFilter?.platforms?.split?.(',')
-      platformsArr = platformsArr.filter(el => {
-        return props.platformsList.some((i: any) => i.platform === el)
-      })
-      platforms = platformsArr.join(',')
-    }
-    form.value = { ...tableFilter, platforms: platforms }
-}
+// const setCheckedPlatforms = () => {
+//    const platformsAll = props.platformsList.map((i: any) => i.platform).join(',')
+//     let platforms = platformsAll
+//     if (!('platforms' in tableFilter)) {
+//       let platformsArr = tableFilter?.platforms?.split?.(',')
+//       platformsArr = platformsArr.filter(el => {
+//         return props.platformsList.some((i: any) => i.platform === el)
+//       })
+//       platforms = platformsArr.join(',')
+//     }
+//     form.value = { ...tableFilter, platforms: platforms }
+// }
 const setCheckedBaseTokens = () => {
   const baseTokensAll = props.baseTokens.map((i: any) => i.token).join(',')
   if (!('base_tokens' in tableFilter)) {
@@ -439,19 +440,19 @@ const setCheckedBaseTokens = () => {
 }
 watch(() => props.platformsList, (val, oldValue) => {
   if (isEqual(val, oldValue)) return
-  setCheckedPlatforms()
+  form.value = {...tableFilter}
   emit('update:filterData', { ...form.value }, storage.value)
 })
 watch(() => props.visible, (val) => {
   if (val) {
   tableFilter = pumpStore.pumpV3[props.activeChain][activeTab.value]?.pumpFilter
-   setCheckedPlatforms()
+   form.value = {...tableFilter}
    setCheckedBaseTokens()
   }
 })
 watch(activeTab,()=>{
  tableFilter = pumpStore.pumpV3[props.activeChain][activeTab.value]?.pumpFilter
-  setCheckedPlatforms()
+  form.value = {...tableFilter}
   setCheckedBaseTokens()
 })
 // watch(() => storage.value, (val) => {
