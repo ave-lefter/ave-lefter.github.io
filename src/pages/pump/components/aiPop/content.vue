@@ -10,20 +10,20 @@
       <el-rate
         :model-value="score"
         :max="3"
+        size="small"
         disabled
       />
     </div>
-
     <template v-if="summary && summaryList(summary).length">
       <div
-        class="text-12px"
+        class="text-12px mt-8px"
         v-for="(item, index) in summaryList(summary)"
         :key="index"
       >
         {{ item }}
       </div>
     </template>
-    <div class="text-12px color-[--third-text] mt-8px">
+    <div class="text-10px mt-8px color-[--third-text]">
         {{ $t('aiSummaryTip') }}
     </div>
   </div>

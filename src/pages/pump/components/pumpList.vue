@@ -497,7 +497,7 @@
                         </a>
                       </PumpPop>
                       <template v-if="formatXUser(item?.url)">
-                        <div v-if="row?.followers" class=" ml-8px color-[--x-blue] flex-start leading-10px cursor-pointer" v-tooltip="$t('followers')">
+                        <div v-if="row?.followers" class=" ml-8px color-[--third-text1] flex-start leading-10px cursor-pointer" v-tooltip="$t('followers')">
                             <Icon
                               class="iconfont icon-rug mr-4px text-10px"
                               name="custom:followers"
