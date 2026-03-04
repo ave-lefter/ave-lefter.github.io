@@ -6,15 +6,24 @@
       <li
         v-for="item in audioList"
         :key="item"
-        class="el-select-dropdown__item text-[--main-text] flex-between hover:bg-[--border]"
+        class="el-select-dropdown__item text-[--main-text] flex-between hover:text-[--secondary-text]"
         :class="audioSettings.audio?.[type] === item ? 'text-[--primary-color]!' : ''"
         @click="() => handleAudioSelect(item)"
         @mouseenter="() => handleMouseEnter(item)"
         @mouseleave="handleMouseLeave"
       >
-        <span>{{ item ? item : $t('close') }}</span>
-        <Icon v-if="audioSettings.audio?.[type] === item" name="material-symbols:check"
-          class="text-16px color-[--main-text]" />
+        <div class="flex gap-4px items-center">
+          <span>{{ item ? item : $t('close') }}</span>
+          <svg v-if="item" width="9" height="8" viewBox="0 0 9 8" fill="none" xmlns="http://www.w3.org/2000/svg"
+          class="mt-2px transition-opacity duration-200 text-[--secondary-text]" :class="playingItem === item ? 'opacity-100' : 'opacity-0'">
+            <path d="M7 1.5V6.5H6V1.5H7ZM3 1.5V6.5H2V1.5H3ZM1 3V5H0V3H1ZM9 3V5H8V3H9ZM5 0V8H4V0H5Z" fill="currentColor"/>
+          </svg>
+        </div>
+        <Icon
+          v-if="audioSettings.audio?.[type] === item"
+          name="material-symbols:check"
+          class="text-16px color-[--main-text]"
+        />
       </li>
     </ul>
   </el-popover>
@@ -32,6 +41,7 @@ const { audioSettings } = storeToRefs(useGlobalStore())
 const audioPopoverRef = ref<PopoverInstance>()
 const hoverTimer = ref<ReturnType<typeof setTimeout> | null>(null)
 const previewAudio = ref<HTMLAudioElement | null>(null)
+const playingItem = ref<string>('')
 
 function stopPreview() {
   if (hoverTimer.value) {
@@ -43,17 +53,20 @@ function stopPreview() {
     previewAudio.value.currentTime = 0
     previewAudio.value = null
   }
+  playingItem.value = ''
 }
 
-function playWithRetry(audio: HTMLAudioElement, retries = 5, interval = 300) {
+function playWithRetry(audio: HTMLAudioElement, item: string, retries = 5, interval = 300) {
   if (previewAudio.value !== audio) return
   if (audio.readyState >= 3) {
     audio.play().catch(() => {})
+    playingItem.value = item
+    audio.addEventListener('ended', () => { playingItem.value = '' }, { once: true })
     return
   }
   if (retries <= 0) return
   audio.load()
-  setTimeout(() => playWithRetry(audio, retries - 1, interval), interval)
+  setTimeout(() => playWithRetry(audio, item, retries - 1, interval), interval)
 }
 
 function handleMouseEnter(item: string) {
@@ -64,7 +77,7 @@ function handleMouseEnter(item: string) {
     if (src) {
       const audio = new Audio(src)
       previewAudio.value = audio
-      playWithRetry(audio)
+      playWithRetry(audio, item)
     }
   }, 500)
 }
