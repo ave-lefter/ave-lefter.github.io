@@ -86,7 +86,6 @@ export function tgLogin() {
     'pro.ave.ai',
     'pro.avesp.xyz',
     'pro0.ave.ai',
-    'pro0.ave.ai',
   ]
   const domain = window.location.hostname
   const index = domains.indexOf(domain) + 1
