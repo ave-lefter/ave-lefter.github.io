@@ -2056,5 +2056,6 @@
   "followers": "Followers",
   "following": "Following",
   "sellInits": "Sell Inits.",
-  "confirmSellAlTips": "Cashing out now will empty one wallet's holdings and may cause a loss. Proceed with breakeven?"
+  "confirmSellAlTips": "Cashing out now will empty one wallet's holdings and may cause a loss. Proceed with breakeven?",
+  "aiSummaryTip": "Attention: The data is sourced from the internet and Ave.ai cannot guarantee its accuracy. It is for reference only."
 }

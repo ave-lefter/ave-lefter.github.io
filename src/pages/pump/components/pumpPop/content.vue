@@ -3,7 +3,7 @@
     <div class="p-16px">
       <div class="color-[--main-text]">@{{ info.username }}</div>
       <div class="flex items-center color-[--third-text]">
-        <span>{{ formatNumber(info.followers, {locale: 'en'}) }} {{ $t('follows') }}</span>
+        <span>{{ formatNumber(info.followers, {decimals: 2, l: 4, limit: 3, locale: 'en'}) }} {{ $t('follows') }}</span>
         <el-divider direction="vertical" />
         <span>{{ $t('joined') }} {{ dayjs(info.date_joined).locale('en').format('MMM YYYY')  }}</span>
       </div>
