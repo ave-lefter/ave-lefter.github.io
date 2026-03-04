@@ -504,11 +504,13 @@ const baseTokenMap = computed(() => {
   const list =
     pumpConfig?.value?.find(i => i?.chain === activeChain.value)
       ?.base_tokens || []
-  return new Map(list.map(item => [item.hash, {
+  const map = new Map(list.map(item => [item.hash, {
     symbol: item.name,
     token: item.hash,
     logo_url: item.logo_url
   }]))
+  map.set('other', { symbol: t('other'), token: 'other', logo_url: '' })
+  return map
 })
 const baseTokensAllStr = computed(() => baseTokenMap.value.values().toArray().map((i: any) => i.token).join(','))
 const tabsList = computed(() => {
@@ -1192,7 +1194,7 @@ function getPumpConfig() {
             return y.platform || ''
           }
         }) || []
-        const platformsString = platforms.join(',')
+        const platformsString = platforms.filter(Boolean).join(',')
         pumpV3.value[i.chain] = {
           ...(pumpV3.value[i.chain] || {}),
           platforms,
@@ -1474,7 +1476,8 @@ function getFilterData(list: PumpObj[], conditions: any) {
           ? i.token1_address
           : i.token0_address
       const baseToken = baseTokenMap.value.get(baseHash)
-      pass = pass && conditions?.base_tokens?.includes?.(baseToken?.token)
+      const isOtherBase = !baseToken
+      pass = pass && (conditions?.base_tokens?.includes?.(baseToken?.token) || (isOtherBase && conditions?.base_tokens?.includes?.('other')))
     } else {
       return false
     }
@@ -1793,7 +1796,7 @@ function mergeLogo(prev: any, next: any) {
   }
 }
 function handleClearFilter(type: 'new' | 'soon' | 'graduated') {
-  const platformsString = pumpConfig.value?.find(i => i.chain === activeChain.value)?.platforms?.map(i => i.platform)?.join?.(',') || ''
+  const platformsString = pumpConfig.value?.find(i => i.chain === activeChain.value)?.platforms?.map(i => i.platform)?.filter(i=>i!=='believe').join?.(',') || ''
   const baseTokensString = baseTokenMap.value.values().toArray().map((i: any) => i.token).join(',') || ''
   pumpStore.pumpV3[activeChain.value][type].pumpFilter = {...pumpFilterDefault.value,platforms:platformsString,base_tokens:baseTokensString}
   getPumpList(true)
