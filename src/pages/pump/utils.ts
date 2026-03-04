@@ -43,6 +43,8 @@ export function useSimilarTokenPopup() {
       // 报价代币全选则不统计
       if (allBaseTokensValue !== undefined && filterList.includes('base_tokens') && form.base_tokens === allBaseTokensValue) {
         filterList = filterList.filter(i => i !== 'base_tokens')
+      } else if(!form.base_tokens){
+        filterList.push('base_tokens')
       }
       
       if (filterList.includes('has_sm') && filterList.includes('sm_list')) {

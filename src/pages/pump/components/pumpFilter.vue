@@ -27,11 +27,15 @@
           <div class="px-16px pb-12px">
             <div class="flex justify-between items-center w-full mb-16px">
               <span class="text-12px">{{ $t('platform') }}</span>
-              <span class="text-12px w-48px lh-24px rounded-4px bg-[--pump-filter-bg] text-center cursor-pointer"
+              <!-- 全选时增加取消全选 -->
+              <span v-if="form.platforms === platformsList.map(platform => platform.platform).join(',')" class="text-12px w-48px lh-24px rounded-4px bg-[--pump-filter-bg] text-center cursor-pointer"
+                @click="form.platforms = ''">
+                {{ $t('cancelAll') }}
+              </span>
+              <span v-else class="text-12px w-48px lh-24px rounded-4px bg-[--pump-filter-bg] text-center cursor-pointer"
                 @click="form.platforms = platformsList.map(platform => platform.platform).join(',')">
-                {{ $t('all1')
-                }}
-                </span>
+                {{ $t('all1') }}
+              </span>
             </div>
             <el-checkbox-group size="default" @change="(val) => form.platforms = val.join(',')"
               :model-value="form.platforms.split(',')" class="grid grid-cols-2 gap-12px flex-1">
@@ -52,7 +56,11 @@
           <div class="px-16px border pb-12px">
             <div class="flex justify-between items-center w-full mb-16px">
               <span class="text-12px">{{ $t('QuoteTokens') }}</span>
-              <span class="text-12px w-48px lh-24px rounded-4px bg-[--pump-filter-bg] text-center cursor-pointer" @click="form.base_tokens = baseTokens.map(token => token.token).join(',')">{{ $t('all1')
+              <span v-if="form.base_tokens === baseTokens.map(token => token.token).join(',')" class="text-12px w-48px lh-24px rounded-4px bg-[--pump-filter-bg] text-center cursor-pointer" @click="form.base_tokens = ''">
+                {{ $t('cancelAll')
+                }}
+                </span>
+              <span v-else class="text-12px w-48px lh-24px rounded-4px bg-[--pump-filter-bg] text-center cursor-pointer" @click="form.base_tokens = baseTokens.map(token => token.token).join(',')">{{ $t('all1')
                 }}</span>
             </div>
             <el-checkbox-group size="default" @change="(val) => form.base_tokens = val.join(',')"
@@ -436,6 +444,7 @@ watch(() => props.platformsList, (val, oldValue) => {
 })
 watch(() => props.visible, (val) => {
   if (val) {
+  tableFilter = pumpStore.pumpV3[props.activeChain][activeTab.value]?.pumpFilter
    setCheckedPlatforms()
    setCheckedBaseTokens()
   }

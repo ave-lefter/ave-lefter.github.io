@@ -156,6 +156,7 @@
           </div>
 
           <PumpList
+            ref="pumpListRefNew"
             class="pump-item_list-new"
             :scrollHeight="scrollHeight"
             type="new"
@@ -227,6 +228,7 @@
             />
           </div>
           <PumpList
+            ref="pumpListRefSoon"
             class="pump-item_list-soon"
             :scrollHeight="scrollHeight"
             type="soon"
@@ -300,6 +302,7 @@
             />
           </div>
           <PumpList
+          ref="pumpListRefGraduated"
             class="pump-item_list-graduated"
             :scrollHeight="scrollHeight"
             :tableList="list3 || []"
@@ -369,6 +372,9 @@ const Timer: {
 }
 const { width } = useWindowSize()
 const activeTab = shallowRef('new')
+const pumpListRefNew = useTemplateRef('pumpListRefNew')
+const pumpListRefSoon = useTemplateRef('pumpListRefSoon')
+const pumpListRefGraduated = useTemplateRef('pumpListRefGraduated')
 const route = useRoute()
 const { t } = useI18n()
 const wsv2Store = useV2WSStore()
@@ -1236,8 +1242,6 @@ function handlerFilterConfirm(
   val: { progress_min?: string; progress_max?: string; chain: ChainKey; platforms: string; has_sm?: boolean},
   type: string
 ) {
-
-  console.log('handlerFilterConfirm', val, type)
   let params = null
   if (type?.includes('new')) {
     params = {
@@ -1344,6 +1348,13 @@ async function getPump(rawParams: {
 
 
   try {
+    if(isFilter){
+      ;({
+      new: pumpListRefNew.value,
+      soon: pumpListRefSoon.value,
+      graduated: pumpListRefGraduated.value,
+    })[finalParams.category as keyof typeof isInitObj]?.scrollToTop?.()
+    }
     const res = await _getPumpList(finalParams)
 
     // 5. 数据转换
@@ -1383,7 +1394,7 @@ async function getPump(rawParams: {
         isInitObj[finalParams.category as keyof typeof isInitObj] = false
       }
     }
-
+   
   } catch (err) {
     console.error('Fetch pump list failed:', err)
   } finally {
@@ -1467,7 +1478,7 @@ function getFilterData(list: PumpObj[], conditions: any) {
     // 搜索推特账号
     if (conditions?.twitter_usernames) {
       const twitterUsernames = conditions?.twitter_usernames.split(',')
-      pass = pass && twitterUsernames?.findIndex(y=> formatXUser(i.medias?.filter(i => i.icon === 'twitter')?.[0]?.url).replace('@', '') == y) !== -1
+      pass = pass && twitterUsernames?.findIndex?.(y=> formatXUser(i.medias?.filter?.(i => i.icon === 'twitter')?.[0]?.url)?.replace?.('@', '') == y) !== -1
     }
     if (conditions?.progress_min) {
       pass = pass && i.progress >= Number(conditions.progress_min)
@@ -1518,10 +1529,10 @@ function getFilterData(list: PumpObj[], conditions: any) {
     }
     // console.log('conditions', conditions.platforms)
     if (conditions?.holder_min) {
-      pass = pass && (i?.holder || 0) >= Number(conditions.holder_min)
+      pass = pass && (i?.holder_count || 0) >= Number(conditions.holder_min)
     }
     if (conditions?.holder_max) {
-      pass = pass && (i?.holder || 0) <= Number(conditions.holder_max)
+      pass = pass && (i?.holder_count || 0) <= Number(conditions.holder_max)
     }
 
     if (conditions?.volume_u_24h_min) {
@@ -1541,6 +1552,18 @@ function getFilterData(list: PumpObj[], conditions: any) {
     }
     if (conditions?.smart_money_tx_count_24h_max) {
       pass = pass && ((i.smart_money_sell_count_24h || 0) + (i?.smart_money_buy_count || 0)) <= Number(conditions.smart_money_tx_count_24h_max)
+    }
+    if(conditions?.lsnip) {
+      pass = pass && i.sniper_ratio >= Number(conditions.lsnip)
+    }
+    if(conditions?.rsnip) {
+      pass = pass && i.sniper_ratio <= Number(conditions.rsnip)
+    }
+    if(conditions?.lins) {
+      pass = pass && i.rat_ratio >= Number(conditions.lins)
+    }
+    if(conditions?.rins) {
+      pass = pass && i.rat_ratio <= Number(conditions.rins)
     }
     return pass
   })

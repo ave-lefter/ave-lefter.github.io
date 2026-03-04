@@ -2009,7 +2009,7 @@
   "filterMouse": "过滤老鼠仓刷量",
   "QuoteTokens":"报价代币",
   "clearPumpFilter":"清空筛选",
-  "searchXAccount":"搜索X账号(最多三个)",
+  "searchXAccount":"搜索X账号(最多3个)",
   "keywordsError":"关键词不能超过3个",
   "twitterError":"推特不能超过3个"
 }

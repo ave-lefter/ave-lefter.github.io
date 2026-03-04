@@ -144,17 +144,17 @@ export const usePumpStore = defineStore('pumpStore', () => {
             new: {
               count: 0,
               loading: false,
-              pumpFilter: pumpFilterDefault,
+              pumpFilter: {...pumpFilterDefault},
             },
             soon: {
               count: 0,
               loading: false,
-              pumpFilter: pumpFilterDefault,
+              pumpFilter: {...pumpFilterDefault},
             },
             graduated: {
               count: 0,
               loading: false,
-              pumpFilter: pumpFilterDefault,
+              pumpFilter: {...pumpFilterDefault},
             },
           }
 
@@ -184,17 +184,17 @@ export const usePumpStore = defineStore('pumpStore', () => {
         new: {
           count: 0,
           loading: false,
-          pumpFilter: pumpFilterDefault,
+          pumpFilter: {...pumpFilterDefault},
         },
         soon: {
           count: 0,
           loading: false,
-          pumpFilter: pumpFilterDefault,
+          pumpFilter: {...pumpFilterDefault},
         },
         graduated: {
           count: 0,
           loading: false,
-          pumpFilter: pumpFilterDefault,
+          pumpFilter: {...pumpFilterDefault},
         },
       },
       bsc: {
@@ -202,17 +202,17 @@ export const usePumpStore = defineStore('pumpStore', () => {
         new: {
           count: 0,
           loading: false,
-          pumpFilter: pumpFilterDefault,
+          pumpFilter: {...pumpFilterDefault},
         },
         soon: {
           count: 0,
           loading: false,
-          pumpFilter: pumpFilterDefault,
+          pumpFilter: {...pumpFilterDefault},
         },
         graduated: {
           count: 0,
           loading: false,
-          pumpFilter: pumpFilterDefault,
+          pumpFilter: {...pumpFilterDefault},
         },
       },
       xlayer: {
@@ -220,17 +220,17 @@ export const usePumpStore = defineStore('pumpStore', () => {
         new: {
           count: 0,
           loading: false,
-          pumpFilter: pumpFilterDefault,
+          pumpFilter: {...pumpFilterDefault},
         },
         soon: {
           count: 0,
           loading: false,
-          pumpFilter: pumpFilterDefault,
+          pumpFilter: {...pumpFilterDefault},
         },
         graduated: {
           count: 0,
           loading: false,
-          pumpFilter: pumpFilterDefault,
+          pumpFilter: {...pumpFilterDefault},
         },
       },
       monad: {
@@ -238,17 +238,17 @@ export const usePumpStore = defineStore('pumpStore', () => {
         new: {
           count: 0,
           loading: false,
-          pumpFilter: pumpFilterDefault,
+          pumpFilter: {...pumpFilterDefault},
         },
         soon: {
           count: 0,
           loading: false,
-          pumpFilter: pumpFilterDefault,
+          pumpFilter: {...pumpFilterDefault},
         },
         graduated: {
           count: 0,
           loading: false,
-          pumpFilter: pumpFilterDefault,
+          pumpFilter: {...pumpFilterDefault},
         },
       },
       base: {
@@ -256,17 +256,17 @@ export const usePumpStore = defineStore('pumpStore', () => {
         new: {
           count: 0,
           loading: false,
-          pumpFilter: pumpFilterDefault,
+          pumpFilter: {...pumpFilterDefault},
         },
         soon: {
           count: 0,
           loading: false,
-          pumpFilter: pumpFilterDefault,
+          pumpFilter: {...pumpFilterDefault},
         },
         graduated: {
           count: 0,
           loading: false,
-          pumpFilter: pumpFilterDefault,
+          pumpFilter: {...pumpFilterDefault},
         },
       },
     },

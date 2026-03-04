@@ -1088,6 +1088,10 @@ function getLiqTooltip(row: PumpObj) {
     </div>
   `
 }
+
+defineExpose({
+  scrollToTop
+})
 </script>
 
 <style lang="scss" scoped>
