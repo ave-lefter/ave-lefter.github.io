@@ -2033,5 +2033,6 @@
   "followers": "粉絲數",
   "following": "關注數",
   "sellInits": "回本",
-  "confirmSellAlTips": "當前回本將會導致1個錢包清倉持有的代幣,可能會產生虧損,確認繼續要回本嗎?"
+  "confirmSellAlTips": "當前回本將會導致1個錢包清倉持有的代幣,可能會產生虧損,確認繼續要回本嗎?",
+  "similarPic": "圖片重複"
 }
