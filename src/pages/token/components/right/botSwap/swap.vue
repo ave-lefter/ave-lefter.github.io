@@ -1,7 +1,7 @@
 <template>
   <div>
     <template v-if="activeTab === 'buy'">
-      <el-input v-model="amountNative" placeholder="0.0" size="large"  clearable class="input-number mt-10px" input-style="text-align:right"  @update:model-value="value => {amountNative = value?.replace?.(/\-|[^\d.]/g, '');watchAmount('buy')}">
+      <el-input v-model="amountNative" placeholder="0.0" size="large"  :clearable="false" class="input-number mt-10px" input-style="text-align:right"  @update:model-value="value => {amountNative = value?.replace?.(/\-|[^\d.]/g, '');watchAmount('buy')}">
         <template #prepend>
           <span class="text-12px color-[--secondary-text]">{{ $t('amount') }}</span>
         </template>
@@ -53,7 +53,7 @@ size="small"
       </div>
     </template>
     <template v-else-if="activeTab === 'sell'">
-      <el-input v-if="botSwapStore.botSwapSelectedWallets?.length > 1"  v-model="amountSellTokenPercent" clearable class="input-number mt-10px" size="large"  input-style="text-align:right"  placeholder="0" @update:model-value="value => {amountSellTokenPercent = value?.replace?.(/\-|[^\d.]/g, '');watchAmount('sell')}">
+      <el-input v-if="botSwapStore.botSwapSelectedWallets?.length > 1"  v-model="amountSellTokenPercent" :clearable="false" class="input-number mt-10px" size="large"  input-style="text-align:right"  placeholder="0" @update:model-value="value => {amountSellTokenPercent = value?.replace?.(/\-|[^\d.]/g, '');watchAmount('sell')}">
         <template #prepend>
           <span class="text-12px color-[--secondary-text]">{{ tokenInfo?.symbol }}</span>
         </template>
@@ -61,7 +61,7 @@ size="small"
           <span class="text-12px color-[--main-text]">%</span>
         </template>
       </el-input>
-      <el-input v-else v-model="amountToken" clearable class="input-number mt-10px" size="large"  input-style="text-align:right"  placeholder="0.0" @update:model-value="value => {amountToken = value?.replace?.(/\-|[^\d.]/g, '');watchAmount('sell')}">
+      <el-input v-else v-model="amountToken" :clearable="true" class="input-number mt-10px" size="large"  input-style="text-align:right"  placeholder="0.0" @update:model-value="value => {amountToken = value?.replace?.(/\-|[^\d.]/g, '');watchAmount('sell')}">
         <template #prepend>
           <span class="text-12px color-[--secondary-text]">{{ $t('amount') }}</span>
         </template>
@@ -98,7 +98,7 @@ size="small"
       </div>
     </template>
     <template v-if="swapType === 'limit'">
-      <el-input v-model="priceLimit" placeholder="0.0" size="large"  clearable class="input-number mt-10px" input-style="text-align:right" @update:model-value="value => priceLimit = value?.replace?.(/\-|[^\d.]/g, '')">
+      <el-input v-model="priceLimit" placeholder="0.0" size="large"  :clearable="true" class="input-number mt-10px" input-style="text-align:right" @update:model-value="value => priceLimit = value?.replace?.(/\-|[^\d.]/g, '')">
         <template #prepend>
           <span class="text-12px color-[--secondary-text]">{{ isPriceLimit ? $t('price') : 'MC' }}</span>
           <Icon name="iconamoon:synchronize-fill" class="clickable ml-5px text-12px color-[--main-text]" @click.stop="isPriceLimit = !isPriceLimit"/>
@@ -1537,6 +1537,12 @@ function handleEdit(value: Ref<Array<{value: string}>>,type: string) {
   botSettingStore.botSettings[chain.value][type][botSetting?.selected || 's1'].buyValueList = value.map(el=>el.value)
 }
 
+// 使用 defineExpose 暴露方法
+defineExpose({
+  handleMax,
+  totalSelectWalletBalance,
+  totalSelectWalletBalance1
+});
 // 生命周期钩子
 onMounted(() => {
   initPriceLimit()

@@ -18,8 +18,33 @@
       <BatchWallet :chain="chain" :boundary="boundary"/>
     </div>
     <div class="select-box">
-      <el-tabs v-model="swapType" class="select-tabs">
+      <el-tabs v-model="swapType" class="select-tabs m-tabs">
         <el-tab-pane v-for="(item, index) in types" :key="index" :label="item.name" :name="item.value"/>
+        <el-tab-pane disabled>
+          <template #label>
+            <div class="w-100% h-100%" />
+          </template>
+        </el-tab-pane>
+        <el-tab-pane disabled>
+          <template #label>
+            <div class="m-op flex-end w-100% h-100%">
+              <template v-if="activeTab==='buy'">
+                <Icon name="ri:wallet-fill" class="color-[--third-text] text-14px ml-auto" />
+                <span class="text-12px color-[--third-text] mx-3px">{{ botSwapStore.botSwapSelectedWallets?.length }}</span>
+                <div class="color-[--third-text]" :class="{ 'clickable': botSwapStore.botSwapSelectedWallets?.length <= 1 }" @click.stop="handleMax(tokenStore.swap.payToken?.balance || 0, 'buy')">{{ $t('balance1') }}: <span>{{ formatNumber(totalSelectWalletBalance || 0,2) }}</span> {{ tokenStore.swap.payToken?.symbol || '' }}
+                </div>
+                <RefreshBalance class="color-[--third-text]" :type="0" isPayToken isBatch />
+              </template>
+              <template v-else-if="activeTab==='sell'">
+                <Icon name="ri:wallet-fill" class="color-[--third-text] text-14px ml-auto" />
+                <span class="text-12px color-[--third-text] mx-3px">{{ botSwapStore.botSwapSelectedWallets?.length }}</span>
+                <span class="color-[--third-text]" :class="{ 'clickable': botSwapStore.botSwapSelectedWallets?.length <= 1 }" @click.stop="handleMax(tokenStore.swap.token?.balance || 0, 'sell')">{{ $t('balance1') }}: <span >{{ formatNumber(totalSelectWalletBalance1 || 0,2) }}</span> {{ tokenInfo?.symbol }}</span>
+                <RefreshBalance class="color-[--third-text]" :type="1" isPayToken isBatch />
+              </template>
+              <div v-else></div>
+            </div>
+          </template>
+        </el-tab-pane>
       </el-tabs>
       <!-- <div v-if="botStore?.userInfo?.evmAddress && botStore?.isSupportChains?.includes(chain)" class="inline-flex items-center absolute top-50% right-0 transform -translate-y-1/2">
         <div class="tabs-1 mr-5px">
@@ -28,7 +53,7 @@
         <SlippageSet :canSetAuto="true" :isAutoSell="swapType === 'market'" :chain="(tokenStore.tokenInfo?.token?.chain as BotChain)" :setting="botSettingStore?.botSettings[chain]" :initSwapType="activeTab" />
       </div> -->
     </div>
-    <Swap :activeTab="activeTab" :swapType="swapType" :tabs1="tabs1" :tabs2="tabs2" @getTokenBalance="getTokenBalance"/>
+    <Swap ref="swap" :activeTab="activeTab" :swapType="swapType" :tabs1="tabs1" :tabs2="tabs2" @getTokenBalance="getTokenBalance"/>
     <el-popover
       v-model:visible="visible"
       popper-class="new-popover"
@@ -86,8 +111,11 @@ import { useBotSwap } from '~/composables/botSwap'
 import Holding from './holding.vue'
 import BatchWallet from './batchWallet.vue'
 import BestToken from '../bestToken.vue'
+import RefreshBalance from './refreshBalance.vue'
 import type { WalletTokenInfo } from '~/api/types/token'
 
+// 创建对子组件的引用
+const swap = ref(null);
 const { t } = useI18n()
 const route = useRoute()
 const botSettingStore = useBotSettingStore()
@@ -159,6 +187,8 @@ const types = computed(() => {
     { value: 'limit', name: t('limitT') },
   ] as const
 })
+
+const tokenInfo = computed(() => tokenStore.token)
 
 watch(types, (val) => {
   if (val.every(i => i.value !== swapType.value)) {
@@ -269,6 +299,18 @@ function getEstimatedGas() {
   return 0
 }
 
+const totalSelectWalletBalance= computed(() => {
+  return swap.value?.totalSelectWalletBalance
+})
+const totalSelectWalletBalance1= computed(() => {
+  return swap.value?.totalSelectWalletBalance1
+})
+
+const handleMax = (balance: string | number, type: 'buy' | 'sell') => {
+  if(swap.value){
+    swap.value?.handleMax(balance, type)
+  }
+}
 </script>
 <style lang="scss" scoped>
   .tabs {
@@ -374,5 +416,50 @@ function getEstimatedGas() {
       }
     }
   }
-
+.m-tabs{
+  :deep() .el-tabs__header{
+    // --el-border-color-light:var(--dialog-list-hover);
+    // --el-color-primary:var(--main-text);
+    // --el-text-color-primary:var(--third-text);
+  }
+  // --el-tabs-header-height:44px;
+  :deep() .el-tabs__item{
+    // font-weight: 400;
+    &:hover{
+      // color:var(--third-text);
+      &.is-active{
+        // color:var(--main-text);
+      }
+    }
+    &.is-disabled{
+      cursor:default;
+    }
+  }
+  :deep() .el-tabs__header{
+    margin-bottom: 0;
+  }
+  :deep() .el-tabs__nav-wrap::after,:deep() .el-tabs__active-bar{
+    height: 1px;
+  }
+  :deep() .el-tabs__nav.is-top{
+    width:100%;
+    .el-tabs__item{
+      padding: 0 12px;
+      &:nth-child(2),&:nth-child(3),&:nth-child(5){
+        flex-shrink: 0;
+        flex-grow: 0;
+        flex-basis: auto;
+      }
+      &:nth-child(4){
+        flex:1;
+        padding: 0;
+      }
+      &:last-child{
+        padding: 0;
+        justify-content: flex-end;
+        color:inherit;
+      }
+    }
+  }
+}
 </style>
