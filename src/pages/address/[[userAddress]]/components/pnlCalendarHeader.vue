@@ -1,37 +1,67 @@
 <template>
-  <div class="flex justify-between w-full mb-12px">
-    <div class="flex items-center gap-4px text-12px h-16px">
-      {{ date }}
-      <div class="flex items-center gap-2px p-2px bg-[--main-input-button-bg] rounded-2px">
+  <div class="flex w-full mb-12px items-center gap-12px">
+    <!-- 时间：日历 icon + 左右箭头 + 月份 -->
+    <div class="flex items-center gap-2px text-12px h-24px">
+     
+      <Icon
+        name="ri:arrow-left-s-line"
+        class="color-[--third-text] text-14px cursor-pointer shrink-0"
+        @click="goPrevMonth"
+      />
+      <!-- <div
+        class="flex items-center justify-center shrink-0 rounded-4px border-0 border-solid border-[--d-FFFFFF14-l-00000014]"
+      >
+    </div> -->
+      <Icon name="ic:sharp-date-range" class="color-[--main-text] text-14px mt--2px" />
+      <!-- <span class="min-w-72px text-center font-500 color-[--main-text]">{{ selectedDate.value? dayjs(selectedDate.value).format('MMM YYYY') :  dayjs().format('MMM YYYY') }}</span> -->
+      <span class="text-center font-500 color-[--main-text]">{{ monthLabel }}</span>
+      <Icon
+        name="ri:arrow-right-s-line"
+        class="text-14px shrink-0"
+        :class="nextDisabled ? 'color-[--third-text] opacity-50 cursor-not-allowed' : 'color-[--third-text] cursor-pointer'"
+        @click="goNextMonth"
+      />
+    </div>
+    <!-- 当月盈亏（紧接在时间后面）：红/绿/白 -->
+    <div class="text-12px color-[--main-text]">
+      {{ $t('monthTotalPnl') }}:
+      <span :class="monthPnlColorClass">
+        {{ addSign(summary?.month_total_profit || 0) }}${{
+          formatNumber(Math.abs(summary?.month_total_profit || 0), 1)
+        }}
+      </span>
+    </div>
+    <!-- 右侧两个 icon -->
+    <div class="flex items-center gap-6px p-2px bg-[--main-input-button-bg] rounded-4px ml-auto">
         <Icon
-          class="cursor-pointer"
-          :class="isChartView ? 'color-[--main-text] bg-[-icon-color]' : 'color-[--third-text]'"
+          class="cursor-pointer text-14px p-2px rounded-3px"
+          :class="isChartView ? 'color-[--third-text] opacity-50' : 'color-[--third-text]'"
           name="custom:chart"
           @click="isChartView = !isChartView"
         />
-      </div>
-    </div>
-    <div class="text-12px cursor-pointer" @click="dialogCalendarVis = true">
-      {{ $t('totalPnl') }}:
-      <span :class="getColor(summary.month_total_profit).color">
-        {{ addSign(summary.month_total_profit) }}${{
-          formatNumber(Math.abs(summary.month_total_profit), 1)
-        }}
-      </span>
+        <!-- <Icon
+          class="cursor-pointer text-14px p-2px rounded-3px"
+          :class="'color-[--third-text]'"
+          :name="!isChartView?'custom:chart':'ic:sharp-date-range'"
+          @click="isChartView = !isChartView"
+        /> -->
+        <Icon
+          class="cursor-pointer text-14px color-[--third-text] p-2px"
+          name="ic:outline-share"
+          @click="emit('share')"
+        />
     </div>
   </div>
 </template>
 <script setup>
 import dayjs from 'dayjs'
 
-const localeStore = useLocaleStore()
 const isChartView = defineModel('isChartView')
-const dialogCalendarVis = defineModel('dialogCalendarVis')
+const selectedDate = defineModel('selectedDate')
+
+const emit = defineEmits(['share'])
+
 const props = defineProps({
-  date: {
-    type: String,
-    required: true,
-  },
   getColor: {
     type: Function,
     required: true,
@@ -41,10 +71,35 @@ const props = defineProps({
     required: true,
   },
 })
-
-const date = computed(() => {
-  return localeStore.locale === 'zh-cn'
-    ? dayjs(props.date).format('YYYY-MM')
-    : dayjs(props.date).format('MMM YYYY')
+const {lang} = storeToRefs(useGlobalStore())
+const monthLabel = computed(() => {
+  const lang1= lang.value.includes('zh') ? 'zh' : 'en'
+  return selectedDate.value? dayjs(selectedDate.value).locale(lang1).format('MMM YYYY') :  dayjs().locale(lang1).format('MMM YYYY')
 })
+
+/** 当月盈亏数字颜色：盈利绿、亏损红、零为白 */
+const monthPnlColorClass = computed(() => {
+  const v = props.summary?.month_total_profit ?? 0
+  if (v === 0) return 'color-[--main-text]'
+  return props.getColor(v).color
+})
+
+const nextDisabled = computed(() => {
+  const d = selectedDate.value || dayjs().format('YYYY-MM-DD')
+  return (
+    dayjs(d).startOf('month').isAfter(dayjs().startOf('month')) ||
+    dayjs(d).startOf('month').isSame(dayjs().startOf('month'))
+  )
+})
+
+function goPrevMonth() {
+  const d = dayjs(selectedDate.value || dayjs().format('YYYY-MM-DD')).subtract(1, 'month')
+  selectedDate.value = d.format('YYYY-MM-DD')
+}
+
+function goNextMonth() {
+  if (nextDisabled.value) return
+  const d = dayjs(selectedDate.value).add(1, 'month')
+  selectedDate.value = d.format('YYYY-MM-DD')
+}
 </script>

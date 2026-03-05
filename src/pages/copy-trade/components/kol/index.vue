@@ -661,12 +661,12 @@
           <template #default="{ row }">
            <div class="flex-end" @click.stop >
               <a v-if="judgeIsCopyTrade(row)" href="" class="trade" @click.stop.prevent="jumpCopyTrade(row)">
-                <img src="@/assets/images/tg1.png" alt="" :width="12">
+                <Icon  name="custom:wallet-fill" class="text-12px mr-4px" />
                  {{ $t('copiedTrade') }}
               </a>
               <a v-else href="" class="trade" @click.stop.prevent="copyTrade(row)">
                 <Icon v-if="botStore.evmAddress" name="custom:wallet-fill" class="mr-4px text-12px"/>
-                <img v-else src="@/assets/images/tg1.png" alt="" :width="12">
+                <img class="mr-4px" v-else src="@/assets/images/tg1.png" alt="" :width="12">
                   {{ $t('copyTrade1') }}
               </a>
             </div>

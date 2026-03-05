@@ -81,7 +81,7 @@ export const useGlobalStore = defineStore('global', () => {
     >
     jump: 'close' | 'open' | 'open_jump'
     border: string
-  }>('pumpSetting8', {
+  }>('pumpSetting9', {
     fontSize_mc: '12px',
     size_swap: '12px',
     Progress_isCircle: 'circle',
@@ -110,21 +110,21 @@ export const useGlobalStore = defineStore('global', () => {
     data: {
       mc: {
         minSize: 30000,
-        minColor: getCssVariable('--main-text'),
+        minColor: getCssVariable('--main-text1'),
         middleSize: 100000,
         middleColor: '#FFA622',
         maxColor: '#12B886',
       },
       vol: {
         minSize: 1000,
-        minColor: getCssVariable('--main-text'),
+        minColor: getCssVariable('--main-text1'),
         middleSize: 50000,
         middleColor: '#FFA622',
         maxColor: '#12B886',
       },
       holders: {
         minSize: 100,
-        minColor: getCssVariable('--main-text'),
+        minColor: getCssVariable('--main-text1'),
         middleSize: 500,
         middleColor: '#FFA622',
         maxColor: '#12B886',
@@ -177,9 +177,9 @@ export const useGlobalStore = defineStore('global', () => {
   watch(
     () => themeStore.isDark,
     () => {
-      pumpSetting.value.data.mc.minColor = getCssVariable('--main-text')
-      pumpSetting.value.data.vol.minColor = getCssVariable('--main-text')
-      pumpSetting.value.data.holders.minColor = getCssVariable('--main-text')
+      pumpSetting.value.data.mc.minColor = getCssVariable('--main-text1')
+      pumpSetting.value.data.vol.minColor = getCssVariable('--main-text1')
+      pumpSetting.value.data.holders.minColor = getCssVariable('--main-text1')
     },
     {immediate: true}
   )

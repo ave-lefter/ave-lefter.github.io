@@ -1553,6 +1553,7 @@
   "score2": "My Points",
   "todayVolume": "Today Volume",
   "totalPnl": "Total PnL",
+  "monthTotalPnl": "Month Total PnL",
   "maxDrawdown": "Max Drawdown (30D)",
   "accountBalance": "Account Balance",
   "fundingRate": "Funding Rate",
@@ -2046,6 +2047,7 @@
   "BlackListTwitter": "BlackList Twitter",
   "tOPSameAddress": "TOP Same Address",
   "twitter": "Twitter",
+  "copyImg": "Copy Picture",
   "topBar": "TopBar",
   "twitterTracker2": "News",
   "onlyTitle": "Only Title",
@@ -2054,5 +2056,6 @@
   "followers": "Followers",
   "following": "Following",
   "sellInits": "Sell Inits.",
-  "confirmSellAlTips": "Cashing out now will empty one wallet's holdings and may cause a loss. Proceed with breakeven?"
+  "confirmSellAlTips": "Cashing out now will empty one wallet's holdings and may cause a loss. Proceed with breakeven?",
+  "aiSummaryTip": "Attention: The data is sourced from the internet and Ave.ai cannot guarantee its accuracy. It is for reference only."
 }

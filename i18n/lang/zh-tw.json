@@ -1534,6 +1534,7 @@
   "score2": "積分",
   "todayVolume": "今日交易量",
   "totalPnl": "總盈虧",
+  "monthTotalPnl": "當月總盈虧",
   "maxDrawdown": "最大回撤 (30D)",
   "accountBalance": "賬戶餘額",
   "fundingRate": "資金費率",
@@ -2023,6 +2024,7 @@
   "BlackListTwitter": "拉黑推特号",
   "tOPSameAddress": "TOP同车地址",
   "twitter": "推特號",
+  "copyImg": "複製圖片",
   "topBar": "顶部栏",
   "twitterTracker2": "快訊",
   "onlyTitle": "只看標題",
@@ -2031,5 +2033,6 @@
   "followers": "粉絲數",
   "following": "關注數",
   "sellInits": "回本",
-  "confirmSellAlTips": "當前回本將會導致1個錢包清倉持有的代幣,可能會產生虧損,確認繼續要回本嗎?"
+  "confirmSellAlTips": "當前回本將會導致1個錢包清倉持有的代幣,可能會產生虧損,確認繼續要回本嗎?",
+  "aiSummaryTip": "注意：數據來源於網絡，Ave.ai無法保證其準確性，僅供參考。"
 }
