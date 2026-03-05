@@ -243,7 +243,7 @@
   "trending": "인기 토큰",
   "filterTip": "{address}의 {count}건 거래 필터",
   "swapT": "시장가 거래",
-  "limitT": "지정가 거래(매수/매도)",
+  "limitT": "제한 주문",
   "slow": "느림",
   "normal": "보통",
   "fast": "빠름",

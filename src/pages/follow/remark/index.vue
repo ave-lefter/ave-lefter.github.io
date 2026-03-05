@@ -420,7 +420,7 @@ v-if="pageData.total > 1" v-model:current-page="pageData.page"
       <div>
         <div>{{ t('editRemark') }}</div>
         <el-input
-v-model="remarkValue" clearable maxlength="20" show-word-limit :placeholder="t('enterRemark')"
+v-model="remarkValue"  maxlength="20" show-word-limit :placeholder="t('enterRemark')"
           class="mt-8px w-100%" />
         <div class="flex items-center justify-between mt-12px gap-12px">
           <div

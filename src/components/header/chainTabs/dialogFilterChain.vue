@@ -15,7 +15,7 @@
         class="searchChain"
         :placeholder="$t('searchChain')"
         size="large"
-        clearable
+        
         @input="goFilterChain"
       >
       <template #prefix>

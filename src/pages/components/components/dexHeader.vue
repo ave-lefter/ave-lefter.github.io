@@ -66,7 +66,7 @@ watch(popoverVisible,()=>{
                     v-model="searchKey"
                     class="[--el-border-color:transparent]"
                     :placeholder="$t('search')"
-                    clearable
+                    
                 >
                     <template #prefix>
                     <Icon name="hugeicons:search-01" />

@@ -6,7 +6,7 @@
         v-model.trim="query"
         class="search-input px-20px"
         :placeholder="$t('search')"
-        clearable
+        
         autofocus
         size="large"
       >

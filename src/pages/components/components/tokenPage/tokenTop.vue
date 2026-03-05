@@ -403,7 +403,7 @@ function handleReset() {
                   <el-input
                     v-model.trim="remark2"
                     :placeholder="remark"
-                    clearable
+                    
                   />
                 </div>
                 <div class="mt-20px flex-center">
