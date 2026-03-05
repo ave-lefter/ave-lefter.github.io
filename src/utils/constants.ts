@@ -8,6 +8,7 @@ import Pop from '@/assets/audio/pop.wav'
 import Bar from '@/assets/audio/bar.mp3'
 import Message from '@/assets/audio/message.wav'
 import Bong from '@/assets/audio/bong.mp3'
+import Kaching from '@/assets/audio/kaching.mp3'
 import Coin from '@/assets/audio/Coin.wav'
 export const NATIVE_TOKEN = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'
 export const SOLANA_NATIVE_TOKEN = 'So11111111111111111111111111111111111111112'
@@ -214,6 +215,7 @@ export const audioList = [
   'Bar',
   'Message',
   'Bong',
+  'Kaching',
   'Coin'
 ] as const
 export const audioNameToResource = {
@@ -227,6 +229,7 @@ export const audioNameToResource = {
   Bar,
   Message,
   Bong,
+  Kaching,
   Coin
 }
 
