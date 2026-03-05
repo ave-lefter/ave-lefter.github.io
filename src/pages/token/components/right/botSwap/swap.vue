@@ -28,7 +28,7 @@
       <div class="tabs mt-1px">
         <button v-for="(item, index) in tabs1" :key="index" class="tab-item" type="button"  @click.stop="handleAmount(item, 'buy')">
           <!-- <img class="mr-5px" :src="`${configStore.token_logo_url}${tokenStore.swap.payToken?.logo_url}`" style="border-radius: 50%;" height="14"  alt="" srcset="" > -->
-          <span v-if="!editMode">{{ item.name }}</span>
+          <span v-if="!editMode">{{ item.name||'&nbsp;' }}</span>
           <el-input
 v-else-if="tabs1Ref[index]" v-model="tabs1Ref[index].value"
             style="--el-input-inner-height:24px;--el-input-bg-color:transparent;--el-input-border-color:transparent;--el-input-hover-border-color:transparent;--el-input-focus-border-color:transparent"
@@ -61,7 +61,7 @@ size="small"
           <span class="text-12px color-[--main-text]">%</span>
         </template>
       </el-input>
-      <el-input v-else v-model="amountToken" :clearable="true" class="input-number mt-10px" size="large"  input-style="text-align:right"  placeholder="0.0" @update:model-value="value => {amountToken = value?.replace?.(/\-|[^\d.]/g, '');watchAmount('sell')}">
+      <el-input v-else v-model="amountToken" :clearable="false" class="input-number mt-10px" size="large"  input-style="text-align:right"  placeholder="0.0" @update:model-value="value => {amountToken = value?.replace?.(/\-|[^\d.]/g, '');watchAmount('sell')}">
         <template #prepend>
           <span class="text-12px color-[--secondary-text]">{{ $t('amount') }}</span>
         </template>
@@ -70,8 +70,24 @@ size="small"
         </template>
       </el-input>
       <div class="tabs mt-1px">
-        <button v-for="(item, index) in tabs2" :key="index" class="tab-item" type="button" @click.stop="handleAmount(item, 'sell')">
+        <!-- <button v-for="(item, index) in tabs2" :key="index" class="tab-item" type="button" @click.stop="handleAmount(item, 'sell')">
           <span>{{ item.name }}</span>
+        </button> -->
+          <button v-for="(item, index) in tabs2" :key="index" class="tab-item" type="button"  @click.stop="handleAmount(item, 'sell')">
+          <!-- <img class="mr-5px" :src="`${configStore.token_logo_url}${tokenStore.swap.payToken?.logo_url}`" style="border-radius: 50%;" height="14"  alt="" srcset="" > -->
+          <span v-if="!editMode2">{{ item.name==='0%'?'&nbsp;':item.name }}</span>
+          <el-input
+            v-else-if="tabs2Ref[index]" v-model="tabs2Ref[index].value"
+            style="--el-input-inner-height:24px;--el-input-bg-color:transparent;--el-input-border-color:transparent;--el-input-hover-border-color:transparent;--el-input-focus-border-color:transparent"
+            class="text-center w-full h-full"
+size="small"
+            @blur="tabs2Ref[index].value = Number(tabs2Ref[index].value?.replace?.(/\-|[^\d.]/g, ''))<=1?tabs2Ref[index].value?.replace?.(/\-|[^\d.]/g, ''):'1'"
+            :formatter="formatter"
+            :parser="parser"
+           >  <template #suffix>%</template></el-input>
+        </button>
+        <button class="tab-item h-30px basis-[26px]! grow-0! shrink-0!" type="button" @click="handleEdit2(tabs2Ref, 'sell')">
+          <Icon :name="editMode2 ? 'custom:select' : 'custom:remark'"/>
         </button>
       </div>
       <div class="flex items-center mt-10px text-12px">
@@ -98,7 +114,7 @@ size="small"
       </div>
     </template>
     <template v-if="swapType === 'limit'">
-      <el-input v-model="priceLimit" placeholder="0.0" size="large"  :clearable="true" class="input-number mt-10px" input-style="text-align:right" @update:model-value="value => priceLimit = value?.replace?.(/\-|[^\d.]/g, '')">
+      <el-input v-model="priceLimit" placeholder="0.0" size="large"  :clearable="false" class="input-number mt-10px" input-style="text-align:right" @update:model-value="value => priceLimit = value?.replace?.(/\-|[^\d.]/g, '')">
         <template #prepend>
           <span class="text-12px color-[--secondary-text]">{{ isPriceLimit ? $t('price') : 'MC' }}</span>
           <Icon name="iconamoon:synchronize-fill" class="clickable ml-5px text-12px color-[--main-text]" @click.stop="isPriceLimit = !isPriceLimit"/>
@@ -518,7 +534,9 @@ const handleMax = (balance: string | number, type: 'buy' | 'sell') => {
 }
 
 function handleAmount(item: { name: string; value: string }, type: 'buy' | 'sell') {
+  console.log('handleAmount',item, type)
   if(editMode.value) return
+  if(editMode2.value) return
   if (type === 'buy') {
     amountNative.value = item.value
   } else if (type === 'sell') {
@@ -1531,12 +1549,47 @@ watch(() => tokenStore.placeOrderSuccess, () => {
 })
 
 const editMode = ref(false)
+const editMode2 = ref(false)
 function handleEdit(value: Ref<Array<{value: string}>>,type: string) {
   editMode.value = !editMode.value
   const botSetting = (botSettingStore?.botSettings?.[chain.value]?.buy || {}) as typeof botSettingStore.botSettings.solana
   botSettingStore.botSettings[chain.value][type][botSetting?.selected || 's1'].buyValueList = value.map(el=>el.value)
 }
 
+function handleEdit2(value: Ref<Array<{value: string}>>,type: string) {
+  console.log('handleEdit2',value,type)
+  editMode2.value = !editMode2.value
+  const botSetting = (botSettingStore?.botSettings?.[chain.value]?.sell || {}) as typeof botSettingStore.botSettings.solana
+  botSettingStore.botSettings[chain.value][type][botSetting?.selected || 's1'].sellPerList = value.map(el=>el.value *100)
+}
+
+// Formatter: 0-1 转换为百分比显示（带%）
+const formatter = (value: string | number): string => {
+  console.log('formatter', value)
+  if (!value && value !== 0) {
+    return ''
+  }
+  const numValue = typeof value === 'string' ? parseFloat(value) : value
+  if (isNaN(numValue)) {
+    return ''
+  }
+  return `${Math.round(numValue * 100)}`
+}
+
+const parser = (value: string) => {
+  console.log('parser', value)
+  if (!value) {
+    return ''
+  }
+  const cleanValue = value.trim()
+  const numValue = parseFloat(cleanValue)
+  
+  if (isNaN(numValue)) {
+    return ''
+  }
+
+  return `${numValue/100}`
+}
 // 使用 defineExpose 暴露方法
 defineExpose({
   handleMax,
