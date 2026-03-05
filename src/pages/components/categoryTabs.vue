@@ -291,8 +291,9 @@ watch(
         </div>
         <div class="flex items-center">
           <RankFilter
+          v-if="activeTab!=='pumplive'"
             :storageKey="configMap[activeTab as keyof typeof configMap]?.storageKey"
-            :getDefaultColumns="configMap[activeTab as keyof typeof configMap].getDefaultColumns"
+            :getDefaultColumns="configMap[activeTab as keyof typeof configMap]?.getDefaultColumns || getPumpDefault"
             :ammList="ammList"
           />
           <el-switch

@@ -45,6 +45,16 @@ const filteredAmmList = computed(()=>{
 const filterNumber = computed(() => {
   return 0
 })
+const marketIndicesArr = [
+    'progress',
+    'mCap',
+    'dynamicVolAndTxs'
+  ]
+  let marketIndicesVisible = computed(()=>{
+    return marketIndicesArr.some((item)=>{
+      return !!modelColumns.value?.find((el: any) => el.key === item)?.isVisible
+    })
+  })
 let modelColumns = computed(() => storeColumns.value?.filter((item: any) =>item.children || item.isVisible))
 let dexVisible = computed(() => modelColumns.value?.find((item: any) => item.key === 'dex')?.isVisible)
 
@@ -52,6 +62,14 @@ watch(() => props.storageKey, () => {
   storeColumns = useStorage(props.storageKey, props.getDefaultColumns(t))
   modelColumns = computed(() => storeColumns.value?.filter((item: any) =>item.children || item.isVisible))
   dexVisible = computed(() => modelColumns.value?.find((item: any) => item.key === 'dex')?.isVisible)
+  marketIndicesVisible = computed(()=>{
+    return marketIndicesArr.some((item)=>{
+      return !!modelColumns.value?.find((el: any) => el.key === item)?.isVisible
+    })
+  })
+  if(!marketIndicesVisible.value){
+    activeTab.value = 'chainToken'
+  }
 })
 watch(visible,()=>{
   // 打开弹窗同步所有筛选条件
@@ -175,7 +193,7 @@ function handleBlur(props2: string[], val: string, index: number) {
           </div>
         </div>
         <div class="flex items-center p-4px rounded-4px text-center color-[--third-text] bg-[--border] mb-16px">
-          <span v-for="text in ['chainToken','marketIndices']" :key="text" class="flex-1 lh-28px cursor-pointer" :class="{'color-[--main-text] bg-[--dialog-tab-active-bg]': activeTab === text}" @click.stop="activeTab = text">{{ $t(text) }}</span>
+          <span v-for="text in marketIndicesVisible ? ['chainToken','marketIndices'] : ['chainToken']" :key="text" class="flex-1 lh-28px cursor-pointer" :class="{'color-[--main-text] bg-[--dialog-tab-active-bg]': activeTab === text}" @click.stop="activeTab = text">{{ $t(text) }}</span>
         </div>
         <div v-if="activeTab==='chainToken'" class="flex items-center justify-between text-12px py-6px mb-8px">
           <span class="color-[--secondary-text]">{{ $t('openTime') }}</span>
