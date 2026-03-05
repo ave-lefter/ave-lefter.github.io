@@ -1,7 +1,7 @@
 <template>
   <div class="p-12px text-12px">
     <div class="color-[--main-text] mb-4px ">
-      {{ type == 25 ? 'DEv' : 'KOL' }} {{ $t('insidersOwned') }}
+      {{ type == 25 ? 'DEV' : (type == 31 ? 'KOL': $t('smarter')) }} {{ $t('insidersOwned') }}
       <span class="ml-2px" :style="{ color: Number(ratio) > 5 ? '#F6465D' : '#12B886' }">
         {{
           formatNumber(Number(ratio) >= 0.1 ? ratio || 0 : Number(ratio) == 0 ? '0' : '<0.1', 2)
@@ -35,11 +35,11 @@
             <UserAvatar
               class="mr-8px"
               :wallet_logo="{
-                logo: item.wallet_logo,
-                url: item.wallet_address,
+                logo: item.logo_url,
+                url: item.account_address,
               }"
-              :address="item.wallet_address"
-              :chain="item.chain"
+              :address="item.account_address"
+              :chain="chain"
               iconSize="12px"
             />
             <div class="flex-1.5 min-w-0">
@@ -47,16 +47,16 @@
                 <span class="leading-18px ellipsis text-12px color-[--main-text]">
                   {{
                     item.remark ||
-                    item.wallet_address?.slice(0, 6) + '...' + item.wallet_address?.slice(-4)
+                    item.account_address?.slice(0, 6) + '...' + item.account_address?.slice(-4)
                   }}
                 </span>
               </div>
             </div>
             <div class="flex-1 text-right">
               <div class="text-14px color-[--main-text]"
-                :style="{color:Number(formatNumber(item?.balance_radio || 0, 1))==0? 'var(--third-text)': 'var(--main-text)'}"
+                :style="{color:Number(formatNumber(item?.balance_ratio || 0, 1))==0? 'var(--third-text)': 'var(--main-text)'}"
               >
-                  {{ formatNumber(Number(item.balance_radio) >= 0.1 ? item.balance_radio || 0 : Number(item.balance_radio) == 0 ? '0' : '<0.1', 2) }}%
+                  {{ formatNumber(Number(item.balance_ratio) >= 0.1 ? item.balance_ratio || 0 : Number(item.balance_ratio) == 0 ? '0' : '<0.1', 2) }}%
               </div>
             </div>
           </div>
@@ -78,13 +78,13 @@
 <script setup lang="ts">
 import type { _getDevInfo } from '~/api/pump'
 type DevInfo = Awaited<ReturnType<typeof _getDevInfo>>
-import { type HolderRankItem } from '~/api/pump'
+import { type TagsRatioHoverItem } from '@/api/token'
 const props = defineProps<{
   tokenId: string
   loading: boolean
   ratio: number
   type: number
-  tableList: HolderRankItem[]
+  tableList: TagsRatioHoverItem[]
   onFetch: (tokenId: string, tagType?: number) => void
 }>()
 

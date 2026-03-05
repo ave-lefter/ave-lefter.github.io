@@ -1481,7 +1481,7 @@
   "saved": "Saved",
   "startSwap": "Start Swap",
   "useChainWallet": "Please use the chain wallet to interact with the current token",
-  "pushSettings": "Push Settings",
+  "pushSettings": "Notification Settings",
   "newFeature": "New Feature",
   "CreatePair": "Create Pair",
   "buySetting": "Buy Setup",
@@ -1928,7 +1928,7 @@
   "monitorThTip": "Choose at least one wallet avatar and wallet address",
   "wcWalletTip": "Scan this QR Code with your phone",
   "popTips": "The maximum number of floating windows supported by the draggable is 3",
-  "twitterTracker": "Twitter Tracker",
+  "twitterTracker": "Twitter",
   "hot2": "Hot",
   "searchCA": "Search CA/Address",
   "viewTranslation": "View Translation",
@@ -2057,5 +2057,6 @@
   "following": "Following",
   "sellInits": "Sell Inits.",
   "confirmSellAlTips": "Cashing out now will empty one wallet's holdings and may cause a loss. Proceed with breakeven?",
-  "aiSummaryTip": "Attention: The data is sourced from the internet and Ave.ai cannot guarantee its accuracy. It is for reference only."
+  "aiSummaryTip": "Attention: The data is sourced from the internet and Ave.ai cannot guarantee its accuracy. It is for reference only.",
+  "baseInfo": "Base Info"
 }

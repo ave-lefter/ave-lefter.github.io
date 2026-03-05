@@ -1,20 +1,20 @@
 <template>
   <div class="p-12px text-12px">
     <div class="color-[--main-text] mb-4px">
-      狙击持仓占比
+      {{ getFilter(type) }}&nbsp;{{ $t('insidersOwned') }}
       <span class="ml-2px" :style="{ color: Number(ratio) > 5 ? '#F6465D' : '#12B886' }">
         {{
           formatNumber(Number(ratio) >= 0.1 ? ratio || 0 : Number(ratio) == 0 ? '0' : '<0.1', 2)
         }}%
       </span>
     </div>
-    <div class="w-full text-12px text-white mt-12px">
+    <div class="w-full text-12px text-[--main-text] mt-12px">
       <!-- header -->
       <div class="grid grid-cols-[2fr_1fr_1fr_1fr] text-12px color-[--secondary-text]">
         <div>{{ $t('address') }}</div>
-        <div class="text-right">持仓</div>
-        <div class="text-right">买入/卖出</div>
-        <div class="text-right">总收益</div>
+        <div class="text-right">{{ $t('positions') }}</div>
+        <div class="text-right">{{ $t('buy') }}/{{ $t('sell') }}</div>
+        <div class="text-right">{{ $t('totalProfit') }}</div>
       </div>
       <!-- list -->
       <el-scrollbar :height="300">
@@ -42,18 +42,18 @@
           <div
             v-for="(item, $index) in tableList"
             :key="$index"
-            class="grid grid-cols-[2fr_1fr_1fr_1fr] items-center py-4px mt-8px hover:bg-#141414 rounded-8px"
+            class="grid grid-cols-[2fr_1fr_1fr_1fr] items-center py-4px mt-8px rounded-8px"
           >
             <!-- 地址 -->
             <div class="flex items-center min-w-0">
               <UserAvatar
                 class="mr-8px"
                 :wallet_logo="{
-                  logo: item.wallet_logo,
-                  url: item.wallet_address,
+                  logo: item.logo_url,
+                  url: item.account_address,
                 }"
-                :address="item.wallet_address"
-                :chain="item.chain"
+                :address="item.account_address"
+                :chain="chain"
                 iconSize="32px"
               />
 
@@ -92,7 +92,7 @@
               </div>
 
               <div class="text-10px color-[--secondary-text]">
-                  {{ formatNumber(Math.abs(Number(item.balance_radio || 0)), 2) }}%
+                  {{ formatNumber(Math.abs(Number(item.balance_ratio || 0)), 2) }}%
               </div>
             </div>
 
@@ -111,7 +111,7 @@
             <div class="text-right">
               <div class="text-12px color-[--main-text]">
                 <ave-data-number :value="item.total_profit" :signVisible="true">
-                  {{ formatNumber( Math.abs(item?.total_profit || 0), 2) }}
+                  {{ formatNumber( Math.abs(Number(item?.total_profit || 0)|| 0), 2) }}
                 </ave-data-number>
               </div>
 
@@ -139,13 +139,14 @@
 </template>
 
 <script setup lang="ts">
-import { type HolderRankItem } from '~/api/pump'
+import { type TagsRatioHoverItem } from '@/api/token'
 import { useDevPop } from './utils'
 const props = defineProps<{
   tokenId: string
   loading: boolean
   ratio: number
-  tableList: HolderRankItem[]
+  type: number
+  tableList: TagsRatioHoverItem[]
   onFetch: (tokenId: string, tagType?: number) => void
 }>()
 const botStore = useBotStore()
@@ -165,6 +166,18 @@ const tabs = computed(() => {
     { key: 31, label: 'KOL' },
   ]
 })
+const filterMap = {
+  16: 'insiders',
+  19: 'sniper2',
+  30: 'smarter2',
+  31: 'KOL',
+  36: 'Bundle',
+} as const
+
+function getFilter(type: number) {
+  const key = filterMap[type as keyof typeof filterMap]
+  return key ? t(key) : ''
+}
 
 function onTabChange(tagType: number) {
   if (!props.tokenId) return

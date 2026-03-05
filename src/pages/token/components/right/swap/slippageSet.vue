@@ -51,7 +51,7 @@
                   :step="0.01"
                   :disabled="isAuto"
                   controls-position="right"
-                  clearable
+                  
                   :rules="[
                     { required: true, message: $t('enterSlippage') },
                     { validator, message: $t('slippageMaxTip') }

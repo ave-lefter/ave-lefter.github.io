@@ -136,7 +136,7 @@ function handleBlur(props2: string[], val: string, index: number) {
                     v-model="searchKey"
                     class="[--el-border-color:transparent]"
                     :placeholder="$t('search')"
-                    clearable
+                    
                 >
                     <template #prefix>
                     <Icon name="hugeicons:search-01" />
@@ -179,7 +179,7 @@ function handleBlur(props2: string[], val: string, index: number) {
               v-model.trim.number="tempFilter.created_at_max"
               class="w-106px"
               :placeholder="$t('minor')"
-              clearable
+              
               @blur="(val) => handleBlur(['created_at_max', 'created_at_min'], val, 0)"
             >
               <template #suffix>
@@ -191,7 +191,7 @@ function handleBlur(props2: string[], val: string, index: number) {
               v-model.trim.number="tempFilter.created_at_min"
                class="w-106px"
               :placeholder="$t('max1')"
-              clearable
+              
               @blur="(val) => handleBlur(['created_at_max', 'created_at_min'], val, 1)"
             >
               <template #suffix>
@@ -210,7 +210,7 @@ function handleBlur(props2: string[], val: string, index: number) {
                 v-model.trim.number="tempFilter.dev_balance_ratio_cur_min"
                 class="w-106px"
                 :placeholder="$t('minor')"
-                clearable
+                
                 @blur="(val) => handleBlur(['dev_balance_ratio_cur_min', 'dev_balance_ratio_cur_max'], val, 0)"
               >
                 <template #suffix>
@@ -222,7 +222,7 @@ function handleBlur(props2: string[], val: string, index: number) {
                 v-model.trim.number="tempFilter.dev_balance_ratio_cur_max"
                 class="w-106px"
                 :placeholder="$t('max1')"
-                clearable
+                
                  @blur="(val) => handleBlur(['dev_balance_ratio_cur_min', 'dev_balance_ratio_cur_max'], val, 1)"
               >
                 <template #suffix>
@@ -239,7 +239,7 @@ function handleBlur(props2: string[], val: string, index: number) {
                 v-model.trim.number="tempFilter.holder_min"
                 class="w-106px"
                 :placeholder="$t('minor')"
-                clearable
+                
                 @blur="(val) => handleBlur(['holder_min', 'holder_max'], val, 0)"
               />
               <span class="color-[--third-text]">~</span>
@@ -247,7 +247,7 @@ function handleBlur(props2: string[], val: string, index: number) {
                 v-model.trim.number="tempFilter.holder_max"
                 class="w-106px"
                 :placeholder="$t('max1')"
-                clearable
+                
                 @blur="(val) => handleBlur(['holder_min', 'holder_max'], val, 1)"
               />
             </div>
@@ -267,7 +267,7 @@ function handleBlur(props2: string[], val: string, index: number) {
                 v-model.trim.number="tempFilter[`makers_${tempFilter.activeInterval}_min`]"
                 class="w-106px"
                 :placeholder="$t('minor')"
-                clearable
+                
                 @blur="(val) => handleBlur([`makers_${tempFilter.activeInterval}_min`, `makers_${tempFilter.activeInterval}_max`], val, 0)"
               />
               <span class="color-[--third-text]">~</span>
@@ -275,7 +275,7 @@ function handleBlur(props2: string[], val: string, index: number) {
                 v-model.trim.number="tempFilter[`makers_${tempFilter.activeInterval}_max`]"
                 class="w-106px"
                 :placeholder="$t('max1')"
-                clearable
+                
                 @blur="(val) => handleBlur([`makers_${tempFilter.activeInterval}_min`, `makers_${tempFilter.activeInterval}_max`], val, 1)"
               />
             </div>
@@ -288,7 +288,7 @@ function handleBlur(props2: string[], val: string, index: number) {
                 v-model.trim.number="tempFilter.holders_top10_ratio_min"
                 class="w-106px"
                 :placeholder="$t('minor')"
-                clearable
+                
                 @blur="(val) => handleBlur(['holders_top10_ratio_min', 'holders_top10_ratio_max'], val, 0)"
               />
               <span class="color-[--third-text]">~</span>
@@ -296,7 +296,7 @@ function handleBlur(props2: string[], val: string, index: number) {
                 v-model.trim.number="tempFilter.holders_top10_ratio_max"
                 class="w-106px"
                 :placeholder="$t('max1')"
-                clearable
+                
                 @blur="(val) => handleBlur(['holders_top10_ratio_min', 'holders_top10_ratio_max'], val, 1)"
               />
             </div>
@@ -309,7 +309,7 @@ function handleBlur(props2: string[], val: string, index: number) {
                 v-model.trim.number="tempFilter.sniper_tx_count_min"
                 class="w-106px"
                 :placeholder="$t('minor')"
-                clearable
+                
                 @blur="(val) => handleBlur(['sniper_tx_count_min', 'sniper_tx_count_max'], val, 0)"
               />
               <span class="color-[--third-text]">~</span>
@@ -317,7 +317,7 @@ function handleBlur(props2: string[], val: string, index: number) {
                 v-model.trim.number="tempFilter.sniper_tx_count_max"
                 class="w-106px"
                 :placeholder="$t('max1')"
-                clearable
+                
                 @blur="(val) => handleBlur(['sniper_tx_count_min', 'sniper_tx_count_max'], val, 1)"
               />
             </div>
@@ -330,7 +330,7 @@ function handleBlur(props2: string[], val: string, index: number) {
                 v-model.trim.number="tempFilter.smart_money_buy_count_24h_min"
                 class="w-106px"
                 :placeholder="$t('minor')"
-                clearable
+                
                 @blur="(val) => handleBlur(['smart_money_buy_count_24h_min', 'smart_money_buy_count_24h_max'], val, 0)"
               />
               <span class="color-[--third-text]">~</span>
@@ -338,7 +338,7 @@ function handleBlur(props2: string[], val: string, index: number) {
                 v-model.trim.number="tempFilter.smart_money_buy_count_24h_max"
                 class="w-106px"
                 :placeholder="$t('max1')"
-                clearable
+                
                 @blur="(val) => handleBlur(['smart_money_buy_count_24h_min', 'smart_money_buy_count_24h_max'], val, 1)"
               />
             </div>
@@ -351,7 +351,7 @@ function handleBlur(props2: string[], val: string, index: number) {
                 v-model.trim.number="tempFilter.smart_money_sell_count_24h_min"
                 class="w-106px"
                 :placeholder="$t('minor')"
-                clearable
+                
                 @blur="(val) => handleBlur(['smart_money_sell_count_24h_min', 'smart_money_sell_count_24h_max'], val, 0)"
               />
               <span class="color-[--third-text]">~</span>
@@ -359,7 +359,7 @@ function handleBlur(props2: string[], val: string, index: number) {
                 v-model.trim.number="tempFilter.smart_money_sell_count_24h_max"
                 class="w-106px"
                 :placeholder="$t('max1')"
-                clearable
+                
                 @blur="(val) => handleBlur(['smart_money_sell_count_24h_min', 'smart_money_sell_count_24h_max'], val, 1)"
               />
             </div>
@@ -372,7 +372,7 @@ function handleBlur(props2: string[], val: string, index: number) {
                 v-model.trim.number="tempFilter.insider_balance_ratio_cur_min"
                 class="w-106px"
                 :placeholder="$t('minor')"
-                clearable
+                
                 @blur="(val) => handleBlur(['insider_balance_ratio_cur_min', 'insider_balance_ratio_cur_max'], val, 0)"
               >
                 <template #suffix>
@@ -384,7 +384,7 @@ function handleBlur(props2: string[], val: string, index: number) {
                 v-model.trim.number="tempFilter.insider_balance_ratio_cur_max"
                 class="w-106px"
                 :placeholder="$t('max1')"
-                clearable
+                
                 @blur="(val) => handleBlur(['insider_balance_ratio_cur_min', 'insider_balance_ratio_cur_max'], val, 1)"
               >
                 <template #suffix>
@@ -403,7 +403,7 @@ function handleBlur(props2: string[], val: string, index: number) {
                 v-model.trim.number="tempFilter.progress_min"
                 class="w-106px"
                 :placeholder="$t('minor')"
-                clearable
+                
                 @blur="(val) => handleBlur(['progress_min', 'progress_max'], val, 0)"
               >
                 <template #suffix>
@@ -415,7 +415,7 @@ function handleBlur(props2: string[], val: string, index: number) {
                 v-model.trim.number="tempFilter.progress_max"
                 class="w-106px"
                 :placeholder="$t('max1')"
-                clearable
+                
                 @blur="(val) => handleBlur(['progress_min', 'progress_max'], val, 1)"
               >
                 <template #suffix>
@@ -432,7 +432,7 @@ function handleBlur(props2: string[], val: string, index: number) {
                 v-model.trim.number="tempFilter.marketcap_min"
                 class="w-106px"
                 :placeholder="$t('minor')"
-                clearable
+                
                 @blur="(val) => handleBlur(['marketcap_min', 'marketcap_max'], val, 0)"
               >
                 <template #suffix>
@@ -444,7 +444,7 @@ function handleBlur(props2: string[], val: string, index: number) {
                 v-model.trim.number="tempFilter.marketcap_max"
                 class="w-106px"
                 :placeholder="$t('max1')"
-                clearable
+                
                 @blur="(val) => handleBlur(['marketcap_min', 'marketcap_max'], val, 1)"
               >
                 <template #suffix>
@@ -461,7 +461,7 @@ function handleBlur(props2: string[], val: string, index: number) {
                 v-model.trim.number="tempFilter.tvl_min"
                 class="w-106px"
                 :placeholder="$t('minor')"
-                clearable
+                
                 @blur="(val) => handleBlur(['tvl_min', 'tvl_max'], val, 0)"
               >
                 <template #suffix>
@@ -473,7 +473,7 @@ function handleBlur(props2: string[], val: string, index: number) {
                 v-model.trim.number="tempFilter.tvl_max"
                 class="w-106px"
                 :placeholder="$t('max1')"
-                clearable
+                
                 @blur="(val) => handleBlur(['tvl_min', 'tvl_max'], val, 1)"
               >
                 <template #suffix>
@@ -493,7 +493,7 @@ function handleBlur(props2: string[], val: string, index: number) {
                 v-model.trim.number="tempFilter[`volume_u_${tempFilter.activeInterval}_min`]"
                 class="w-106px"
                 :placeholder="$t('minor')"
-                clearable
+                
                 @blur="(val) => handleBlur([`volume_u_${tempFilter.activeInterval}_min`, `volume_u_${tempFilter.activeInterval}_max`], val, 0)"
               >
                 <template #suffix>
@@ -505,7 +505,7 @@ function handleBlur(props2: string[], val: string, index: number) {
                 v-model.trim.number="tempFilter[`volume_u_${tempFilter.activeInterval}_max`]"
                 class="w-106px"
                 :placeholder="$t('max1')"
-                clearable
+                
                 @blur="(val) => handleBlur([`volume_u_${tempFilter.activeInterval}_min`, `volume_u_${tempFilter.activeInterval}_max`], val, 1)"
               >
                 <template #suffix>
@@ -528,7 +528,7 @@ function handleBlur(props2: string[], val: string, index: number) {
                 v-model.trim.number="tempFilter[`tx_${tempFilter.activeInterval}_count_min`]"
                 class="w-106px"
                 :placeholder="$t('minor')"
-                clearable
+                
                 @blur="(val) => handleBlur([`tx_${tempFilter.activeInterval}_count_min`, `tx_${tempFilter.activeInterval}_count_max`], val, 0)"
               />
               <span class="color-[--third-text]">~</span>
@@ -536,7 +536,7 @@ function handleBlur(props2: string[], val: string, index: number) {
                 v-model.trim.number="tempFilter[`tx_${tempFilter.activeInterval}_count_max`]"
                 class="w-106px"
                 :placeholder="$t('max1')"
-                clearable
+                
                 @blur="(val) => handleBlur([`tx_${tempFilter.activeInterval}_count_min`, `tx_${tempFilter.activeInterval}_count_max`], val, 1)"
               />
             </div>

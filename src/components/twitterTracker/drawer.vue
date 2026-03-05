@@ -11,7 +11,7 @@
       </div>
       <div class="flex items-center gap-12px mb-20px">
         <el-input v-model="query.keyword" class="[&&]:[--el-input-height:36px] [&&]:[--el-input-bg-color:--border]"
-          :placeholder="t('searchAccount')" clearable @input="debouncedConfirmInput">
+          :placeholder="t('searchAccount')"  @input="debouncedConfirmInput">
           <template #prefix>
             <Icon class="text-16px" name="custom:search" />
           </template>

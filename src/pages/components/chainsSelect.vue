@@ -54,7 +54,7 @@ const currentChain = computed(() => {
       <el-input
         v-model="searchKey"
         :placeholder="$t('searchChain')"
-        clearable
+        
       >
         <template #prefix>
           <Icon name="hugeicons:search-01" />

@@ -1,14 +1,14 @@
 <template>
-  <div class="px-15px pb-10px pr-0 bg-[--secondary-bg]" v-if="!isEmpty">
+  <div class="px-15px pr-0 bg-[--secondary-bg]" v-if="!isEmpty">
     <div
-      class="flex-start border-b border-b-solid border-[--d-151A22-l-E8F1FF] pb-12px pt-12px mr-15px mb-12px"
+      class="flex-start border-b border-b-solid border-[--d-151A22-l-E8F1FF] pb-12px pt-12px mr-15px cursor-pointer"
       @click="isExpand = !isExpand"
     >
-      <span class="text-14px">同名代币</span>
-      <Icon class="ml-4px" :name= " isExpand?'material-symbols:keyboard-arrow-down' : 'material-symbols:keyboard-arrow-up'" />
+      <span class="text-14px">{{ t('similarTokens') }}</span>
+      <Icon class="ml-4px" :name= " isExpand? 'material-symbols:keyboard-arrow-up': 'material-symbols:keyboard-arrow-down'" />
       <div class="flex-1"></div>
     </div>
-    <div v-if="isExpand">
+    <div class="mt-12px mb-10px mr-15px" v-if="isExpand">
       <div class="flex justify-between">
         <div class="text-12px lh-12px color-[--third-text] mb-12px">{{ t('similarTokens') }}</div>
         <div class="text-12px lh-12px color-[--third-text] mb-12px">{{ t('mcap') }}</div>

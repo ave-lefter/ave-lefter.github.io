@@ -1,6 +1,6 @@
 import XIndex from './xIndex.vue'
 
-import { getTagsRatioHover, type HolderRankItem } from '@/api/token'
+import { getTagsRatioHover, type TagsRatioHoverItem } from '@/api/token'
 type DevInfo = Awaited<ReturnType<typeof getTagsRatioHover>>
 
 export function useDevPop() {
@@ -14,13 +14,13 @@ export function useDevPop() {
   const contentProps = shallowRef<{
     tokenId: string
     loading: boolean
-    tableList: HolderRankItem[]
+    tableList: TagsRatioHoverItem[]
     total_balance_ratio: number
   }>({
     tokenId: '',
     loading: false,
     tableList: [],
-    total_balance_ratio: 0
+    total_balance_ratio: 0,
   })
   onBeforeRouteLeave(() => {
     $tooltip.hide()
@@ -54,7 +54,7 @@ const contentKey = ref(0)
     target: e.target,
     props: {
       showArrow: false,
-      placement: 'bottom',
+      placement: 'left',
       trigger: 'hover',
       offset: 10,
       'popper-class': 'x--tooltip',
@@ -88,11 +88,11 @@ async function getHolderRank(tokenId: string, tag_type = 0) {
       tableList: Array.isArray(res?.holders)
         ? res.holders.map((i) => ({
             ...i,
-          balance_radio: Number(i.balance_ratio * 100)?.toFixed(2) || '0',
-          total_profit_ratio: Number(i.total_profit_ratio * 100)?.toFixed(2) || '0',
+            balance_ratio: Number(i.balance_ratio * 100)?.toFixed(2) || '0',
+            total_profit_ratio: Number(i.total_profit_ratio * 100)?.toFixed(2) || '0',
           }))
         : [],
-      total_balance_ratio: Number(Number(res.total_balance_ratio * 100)?.toFixed(2)) || 0,
+      total_balance_ratio: Number(Number(Number(res.total_balance_ratio) * 100)?.toFixed(2)) || 0,
     }
   } catch {
     contentProps.value = {

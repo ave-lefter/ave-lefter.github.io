@@ -1,16 +1,16 @@
 <template>
-  <div class="px-15px pb-10px pr-0 bg-[--secondary-bg]">
+  <div class="px-15px pr-0 bg-[--secondary-bg] ">
     <div
-      class="flex-start border-b border-b-solid border-[--d-151A22-l-E8F1FF] pb-12px pt-12px mr-15px mb-12px"
+      class="flex-start border-b border-b-solid border-[--d-151A22-l-E8F1FF] pb-12px mr-15px pt-12px cursor-pointer"
       @click="isExpand = !isExpand"
     >
-      <span class="text-14px">代币信息</span>
-      <Icon class="ml-4px" :name= " isExpand?'material-symbols:keyboard-arrow-down' : 'material-symbols:keyboard-arrow-up'" />
+      <span class="text-14px">{{ $t('baseInfo') }}</span>
+      <Icon class="ml-4px" :name= " isExpand? 'material-symbols:keyboard-arrow-up': 'material-symbols:keyboard-arrow-down'" />
       <div class="flex-1"></div>
       <span v-if="countdown > 0" class="text-12px color-[--third-text1]" >{{ countdown }}s</span>
       <Icon v-else name="material-symbols:sync-outline" class="text-12px color-[--third-text1]" @click.stop.prevent="handleClick"/>
     </div>
-    <div class="grid-container" v-if="isExpand">
+    <div class="grid-container mt-12px mb-10px mr-15px" v-if="isExpand">
       <div class="item" @click="openHoler" :class="isNew ? 'cursor-pointer' : ''">
         <div class="text-12px color-[--secondary-text1] flex items-center justify-center">
           <Icon
@@ -57,10 +57,10 @@
                 ? '#F6465D'
                 : '#12B886',
         }"
-        :tagsRatioId="address + '-' + chain"
+        :tokenId="address + '-' + chain"
       >
         <div class="item cursor-pointer">
-          <div class="text-12px color-[--secondary-text1] flex items-center justify-center">
+          <div class="text-12px flex items-center justify-center">
             <template
               v-if="
                 tagsRatio?.max_dev_ratio !== null &&
@@ -109,7 +109,7 @@
         :type="19"
         :ratio="Number(tagsRatio?.sniper_balance_ratio_cur || 0)"
       >
-        <div class="item">
+        <div class="item cursor-pointer">
           <div
             class="text-12px color-[--secondary-text1] flex items-center justify-center"
             :style="{
@@ -136,55 +136,65 @@
           <span class="block color-[--third-text] mt-6px">{{ $t('sniper2') }}</span>
         </div>
       </HolderRank>
-      <div class="item">
-        <div
-          class="text-12px color-[--secondary-text1] flex items-center justify-center"
-          :style="{
-            color:
-              Number(formatNumber(tagsRatio?.rat_ratio || 0, 1)) == 0
-                ? 'var(--third-text1)'
-                : Number(tagsRatio?.rat_ratio) > 5
-                  ? '#F6465D'
-                  : '#12B886',
-          }"
-        >
-          <Icon class="iconfont icon-rug mr-4px text-12px vertical-middle" name="custom:insider1" />
-          <span
-            >{{
-              formatNumber(Number(tagsRatio?.rat_ratio) > 0.001 ? tagsRatio?.rat_ratio || 0 : 0, 1)
-            }}%</span
+      <HolderRank
+        :tokenId="address + '-' + chain"
+        :type="16"
+        :ratio="Number(tagsRatio?.rat_ratio || 0)"
+      >
+        <div class="item cursor-pointer">
+          <div
+            class="text-12px color-[--secondary-text1] flex items-center justify-center"
+            :style="{
+              color:
+                Number(formatNumber(tagsRatio?.rat_ratio || 0, 1)) == 0
+                  ? 'var(--third-text1)'
+                  : Number(tagsRatio?.rat_ratio) > 5
+                    ? '#F6465D'
+                    : '#12B886',
+            }"
           >
+            <Icon class="iconfont icon-rug mr-4px text-12px vertical-middle" name="custom:insider1" />
+            <span
+              >{{
+                formatNumber(Number(tagsRatio?.rat_ratio) > 0.001 ? tagsRatio?.rat_ratio || 0 : 0, 1)
+              }}%</span
+            >
+          </div>
+          <span class="block color-[--third-text] mt-6px">{{ $t('insiders') }}</span>
         </div>
-        <span class="block color-[--third-text] mt-6px">{{ $t('insiders') }}</span>
-      </div>
-
-      <div class="item">
-        <div
-          class="text-12px color-[--secondary-text1] flex items-center justify-center"
-          :style="{
-            color:
-              Number(formatNumber(tagsRatio?.address_binding_ratio || 0, 1)) == 0
-                ? 'var(--third-text1)'
-                : Number(tagsRatio?.address_binding_ratio) > 5
-                  ? '#F6465D'
-                  : '#12B886',
-          }"
-        >
-          <Icon class="iconfont icon-rug mr-4px text-12px vertical-middle" name="custom:binding" />
-          <span
-            >{{
-              formatNumber(
-                Number(tagsRatio?.address_binding_ratio) > 0.001
-                  ? tagsRatio?.address_binding_ratio || 0
-                  : 0,
-                1
-              )
-            }}%</span
+      </HolderRank>
+      <HolderRank
+        :tokenId="address + '-' + chain"
+        :type="36"
+        :ratio="Number(tagsRatio?.address_binding_ratio || 0)"
+      >
+        <div class="item cursor-pointer">
+          <div
+            class="text-12px color-[--secondary-text1] flex items-center justify-center"
+            :style="{
+              color:
+                Number(formatNumber(tagsRatio?.address_binding_ratio || 0, 1)) == 0
+                  ? 'var(--third-text1)'
+                  : Number(tagsRatio?.address_binding_ratio) > 5
+                    ? '#F6465D'
+                    : '#12B886',
+            }"
           >
+            <Icon class="iconfont icon-rug mr-4px text-12px vertical-middle" name="custom:binding" />
+            <span
+              >{{
+                formatNumber(
+                  Number(tagsRatio?.address_binding_ratio) > 0.001
+                    ? tagsRatio?.address_binding_ratio || 0
+                    : 0,
+                  1
+                )
+              }}%</span
+            >
+          </div>
+          <span class="block color-[--third-text] mt-6px">{{ $t('Bundle') }}</span>
         </div>
-        <span class="block color-[--third-text] mt-6px">{{ $t('Bundle') }}</span>
-      </div>
-
+      </HolderRank>
       <HolderRank
         :tokenId="address + '-' + chain"
         :type="31"
@@ -201,23 +211,31 @@
           <span class="block color-[--third-text] mt-6px">KOL</span>
         </div>
       </HolderRank>
+
+      <HolderRank
+        :tokenId="address + '-' + chain"
+        :type="30"
+        :ratio="Number(tagsRatio?.smart_wallet_ratio || 0)"
+      >
+        <div class="item cursor-pointer">
+          <div
+            class="text-12px color-[--secondary-text1] flex items-center justify-center"
+            :style="{ color: tagsRatio?.smart_wallet_count > 0 ? 'var(--yellow)' : 'var(--third-text1)' }"
+          >
+            <Icon class="iconfont icon-rug mr-4px text-12px vertical-middle" name="custom:smart-plain" />
+            <span>{{ formatNumber(tagsRatio?.smart_wallet_count || 0, 2) }}</span>
+          </div>
+          <span class="block color-[--third-text] mt-6px">{{ $t('smarter') }}</span>
+        </div>
+      </HolderRank>
     </div>
   </div>
 </template>
 <script lang="ts" setup>
-import DevPop from './devPop/index.vue'
+import DevPop from '@/pages/pump/components/devPop/index.vue'
 import HolderRank from './holderRank/index.vue'
 import { SupportFullDataChain } from '@/utils/constants'
 const props = defineProps({
-  //   row: {
-  //     type: Object as PropType<{ chain: string, symbol: string }>,
-  //     default: () => {
-  //       return {
-  //         chain: '',
-  //         symbol: ''
-  //       }
-  //     }
-  //   },
   tagsRatio: {
     type: Object,
   },

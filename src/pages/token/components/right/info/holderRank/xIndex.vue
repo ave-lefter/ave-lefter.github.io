@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-[--main-input-button-bg]" :class="type===19 ? 'w-420px' : 'w-200px'">
+  <div class="bg-[--main-input-button-bg] w-420px">
     <component :is="Com" :tokenId="data.tokenId" :loading="data.loading" :tableList="data.tableList" :onFetch="props.onFetch" :type="type" :ratio="totalRatio"/>
     <!-- <el-skeleton v-if="data.loading && type !=='rank'" :rows="5" animated style="--el-skeleton-circle-size: 32px;padding: 12px" >
       <template #template>
@@ -16,7 +16,7 @@
 </template>
 
 <script setup lang='ts'>
-import Sniper from './sniper.vue'
+import Content from './content.vue'
 import Kol from './kol.vue'
 import type { _getHolderRank, HolderRankItem } from '~/api/pump'
 import type { ShallowRef } from 'vue'
@@ -36,11 +36,11 @@ const totalRatio = computed(() => {
   return props.ratio || Number(data.value.total_balance_ratio)
 } )
 const Com = computed(() => {
-  if(props.type === 25 || props.type === 31) {
-    return Kol
-  } else {
-    return Sniper
-  }
+  // if(props.type === 25 || props.type === 31 || props.type === 30) {
+  //   return Kol
+  // } else {
+    return Content
+  // }
 })
 
 

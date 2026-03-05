@@ -42,7 +42,7 @@
             </div>
           </div>
           <el-form-item :label="$t('walletAddress')" label-position="top" prop="followAddress">
-            <el-input v-model.trim="form.followAddress" clearable :placeholder="$t('enterAddress')" />
+            <el-input v-model.trim="form.followAddress"  :placeholder="$t('enterAddress')" />
           </el-form-item>
           <el-form-item :label="$t('chain')" label-position="top">
             <el-select style="width: 100%" :suffix-icon="SuffixIcon" v-model="form.chain" :persistent="false">
@@ -87,7 +87,7 @@
             <template v-if="form.buyType === 2">
               <el-input
                 v-model.trim.number="form.buyAmount"
-                clearable
+                
                 placeholder="0.00"
                 @input="(val) => onValidateInput(val, 'buyAmount')"
               >
@@ -99,7 +99,7 @@
             <template v-else-if="form.buyType === 3">
               <el-input
                 v-model.trim="form.maxBuyRatio"
-                clearable
+                
                 :placeholder="$t('fixedRatio')"
                 @input="(val) => onValidateInput(val, 'maxBuyRatio')"
               >
@@ -110,7 +110,7 @@
               <el-input
                 class="mt-10px"
                 v-model.trim="form.buyAmount"
-                clearable
+                
                 :placeholder="$t('maxBuyAmount')"
                 @input="(val) => onValidateInput(val, 'buyAmount')"
               >
@@ -149,7 +149,7 @@
               <el-input
                 class="mt-10px"
                 v-model.trim="form.takeProfitRatio"
-                clearable
+                
                 :placeholder="$t('takeProfitRatio')"
                 @input="(val) => onValidateInput(val, 'takeProfitRatio')"
               >
@@ -162,7 +162,7 @@
               <el-input
                 class="mt-10px"
                 v-model.trim="form.stopLossRatio"
-                clearable
+                
                 :placeholder="$t('stopLossRatio')"
                 @input="(val) => onValidateInput(val, 'stopLossRatio')"
               >
@@ -209,7 +209,7 @@
                       v-model.trim.number="advancedForm.minBuyValue"
                       class="flex-1"
                       :placeholder="$t('minor')"
-                      clearable
+                      
                       @blur="
                         (e) =>
                           handleBlur(
@@ -232,7 +232,7 @@
                       v-model.trim.number="advancedForm.maxBuyValue"
                       class="flex-1"
                       :placeholder="$t('max1')"
-                      clearable
+                      
                       @blur="
                         (e) =>
                           handleBlur(
@@ -257,7 +257,7 @@
                       v-model.trim.number="advancedForm.minMarketCap"
                       class="flex-1"
                       :placeholder="$t('minor')"
-                      clearable
+                      
                       @blur="
                         (e) =>
                           handleBlur(
@@ -284,7 +284,7 @@
                       v-model.trim.number="advancedForm.maxMarketCap"
                       class="flex-1"
                       :placeholder="$t('max1')"
-                      clearable
+                      
                       @blur="
                         (e) =>
                           handleBlur(
@@ -327,7 +327,7 @@
                     <div class="flex-start mb-5px" v-for="(token, index) in blacklist" :key="index">
                       <el-input
                         v-model.trim="blacklist[index].value"
-                        clearable
+                        
                         :placeholder="$t('plsEnterAddress')"
                         @blur="validateAddress(index)"
                       ></el-input>

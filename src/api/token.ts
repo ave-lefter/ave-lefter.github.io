@@ -1329,14 +1329,31 @@ export function getTagsRatio(token_id: string) {
   })
 }
 
+export interface TagsRatioHover {
+  fav_count: number
+  holders: TagsRatioHoverItem
+  total: number
+  total_balance_ratio: string
+}
+export interface TagsRatioHoverItem {
+  account_address: string
+  balance_ratio: string
+  balance_usd: string
+  logo_url: string
+  remark: string
+  total_profit: string
+  total_profit_ratio: string
+  total_purchase_usd: string
+  total_sold_usd: string
+}
 // 获取画像详情pop
 export function getTagsRatioHover(data: {
-    token_id: string,
-    self_address?: string,
-    tag_type: number,
-    page_size: number,
-    page_no: number
-}) {
+  token_id: string
+  self_address?: string
+  tag_type: number
+  page_size: number
+  page_no: number
+}): Promise<TagsRatioHover> {
   const { $api } = useNuxtApp()
   return $api('/v2api/token_info/v1/tags/hover', {
     method: 'get',

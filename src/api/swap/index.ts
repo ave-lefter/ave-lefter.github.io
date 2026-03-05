@@ -1,5 +1,5 @@
 import { getSuiMethods, getSuiTokensBalance } from '~/utils/wallet/sui'
-import { ERC20ABI, SwapABI, QuoteABI, SunPump_Launchpad_ABI, SunPump_Router_ABI, Four_TokenManagerHelper_V2_ABI, ERC314ABI, Four_TokenManager_V1_ABI, Four_TokenManager_V2_ABI, WETHABI, getQuoteABI, UniChainsV4, getSwapMethod, PopMeFun_ABI } from '~/utils/wallet/utils/abi'
+import { ERC20ABI, SwapABI, QuoteABI, SunPump_Launchpad_ABI, SunPump_Router_ABI, Four_TokenManagerHelper_V2_ABI, Four_TokenManagerHelper_V3_ABI, ERC314ABI, Four_TokenManager_V1_ABI, Four_TokenManager_V2_ABI, WETHABI, getQuoteABI, UniChainsV4, getSwapMethod, PopMeFun_ABI } from '~/utils/wallet/utils/abi'
 import { QuoteAddress } from '~/utils/wallet/utils/constants'
 import BigNumber from 'bignumber.js'
 import { PublicKey } from '@solana/web3.js'
@@ -1251,29 +1251,29 @@ export async function quoteFourMeme({from_token, to_token, amountIn, amountOut}:
   if ([from_token, to_token].includes(NATIVE_TOKEN) && from_token !== to_token && (amountIn || amountOut)) {
     const { _provider } = getProvider(chain)
     const token = [from_token, to_token].find(i => i !== NATIVE_TOKEN)
-    const TokenManagerHelperV2 = new Contract('0xaa1d6f755fff2816af737630deb6ec9e0707f325', Four_TokenManagerHelper_V2_ABI, _provider)
+    const TokenManagerHelperV3 = new Contract('0xF251F83e40a78868FcfA3FA4599Dad6494E46034', Four_TokenManagerHelper_V3_ABI, _provider)
     const isBuy = from_token === NATIVE_TOKEN
     if (isBuy) {
       if (amountIn && new BigNumber(amountIn).lte('1000000000000000')) {
         return Promise.reject($i18n.t('fourMemeBuyError'))
       }
-      return TokenManagerHelperV2.tryBuy(token, amountOut || '0', amountIn || '0').then(async res => {
+      return TokenManagerHelperV3.tryBuy(token, amountOut || '0', amountIn || '0').then(async res => {
         console.log('bug result', amountOut || '0', amountIn || '0', res)
-        let { tokenManager, quote, estimatedAmount, estimatedCost, estimatedFee, fundRequirement, fundAsParameter } = res
-        let res1 = { tokenManager, quote, estimatedAmount, estimatedCost, estimatedFee, fundRequirement, fundAsParameter }
+        // let { tokenManager, quote, estimatedAmount, estimatedCost, estimatedFee, fundRequirement, fundAsParameter, amountMsgValue } = res
+        // let res1 = { tokenManager, quote, estimatedAmount, estimatedCost, estimatedFee, fundRequirement, fundAsParameter, amountMsgValue }
         if (amountIn) {
           if (Number(res?.estimatedAmount) === 0) {
             return Promise.reject($i18n.t('fourMemeBuyError'))
           }
-          return {...res1, amountOut: res?.estimatedAmount.toString()}
+          return {...res, amountOut: res?.estimatedAmount.toString()}
         } else {
-          return {...res1, amountIn: res?.fundRequirement.toString()}
+          return {...res, amountIn: res?.estimatedCost.toString()}
         }
       })
     } else {
-      console.log('TokenManagerHelperV2', TokenManagerHelperV2)
+      console.log('TokenManagerHelperV3', TokenManagerHelperV3)
       console.log('sell', token, amountIn || '0')
-      return TokenManagerHelperV2.trySell(token, amountIn || '0').then(async res => {
+      return TokenManagerHelperV3.trySell(token, amountIn || '0').then(async res => {
         console.log('sell result', res)
         let {tokenManager, quote, funds, fee} = res
         let res1 = {tokenManager, quote, funds, fee}
@@ -1319,8 +1319,8 @@ export async function fourMemeSwap({fromToken, toToken, fromAmount, isAmountOut,
   if (quoteResult?.tokenManager?.toLowerCase() === v1?.toLowerCase()) {
     if (isBuy) {
       if (!isAmountOut) {
-        const value = quoteResult?.fundRequirement || '0'
-        const amountIn = quoteResult?.fundAsParameter || '0'
+        const value = quoteResult?.amountMsgValue || '0'
+        const amountIn = quoteResult?.amountFunds || '0'
         const gas = await TokenManagerV1.purchaseTokenAMAP.estimateGas(token, amountIn, limitAmount, { value })
         const gasLimit = new BigNumber(gas.toString()).times('100').div('10').toString()
         return {
@@ -1339,7 +1339,7 @@ export async function fourMemeSwap({fromToken, toToken, fromAmount, isAmountOut,
           isFourMeme: true
         }
       } else {
-        const value = quoteResult?.fundRequirement || '0'
+        const value = quoteResult?.amountMsgValue || '0'
         const gas = await TokenManagerV1.purchaseToken.estimateGas(token, amountOut, limitAmount, { value })
         const gasLimit = new BigNumber(gas.toString()).times('100').div('10').toFixed(0)
         return {
@@ -1384,7 +1384,7 @@ export async function fourMemeSwap({fromToken, toToken, fromAmount, isAmountOut,
   } else if (quoteResult?.tokenManager?.toLowerCase() === v2?.toLowerCase()) {
     if (isBuy) {
       if (!isAmountOut) {
-        const value = quoteResult?.fundRequirement || '0'
+        const value = quoteResult?.amountMsgValue || '0'
         const amountIn = quoteResult?.fundAsParameter || '0'
         console.log(token, amountIn.toString(), limitAmount.toString(), { value: value.toString() })
         const gas = await TokenManagerV2['buyTokenAMAP(address,uint256,uint256)'].estimateGas(token, amountIn, limitAmount, { value })
@@ -1405,7 +1405,7 @@ export async function fourMemeSwap({fromToken, toToken, fromAmount, isAmountOut,
           isFourMeme: true
         }
       } else {
-        const value = quoteResult?.fundRequirement || '0'
+        const value = quoteResult?.amountMsgValue || '0'
         const gas = await TokenManagerV2['buyToken(address,uint256,uint256)'].estimateGas(token, amountOut, limitAmount, { value })
         const gasLimit = (gas * 10n).toString()
         return {

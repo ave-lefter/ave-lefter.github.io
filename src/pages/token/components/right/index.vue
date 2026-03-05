@@ -41,7 +41,7 @@
       </div>
       <Info :tagsRatio="tagsRatio" @getTagsRatio="_getTagsRatio"/>
       <SimilarTokens :tokens="similarTokenList" />
-      <Overview class="px-15px pb-10px pr-0 bg-[--secondary-bg] mt-1px" />
+      <Overview class="px-15px pb-10px pr-0 bg-[--secondary-bg]" />
       <div class="bg-[--secondary-bg] flex-1" />
     </div>
 
@@ -124,6 +124,8 @@ const tagsRatio = ref<{
   rat_ratio: number
   sniper_balance_ratio_cur: number
   top10_ratio: number
+  smart_wallet_count: number
+  smart_wallet_ratio: number
 }>({
   address_binding_ratio: 0,
   bundle_ratio: 0,
@@ -135,7 +137,9 @@ const tagsRatio = ref<{
   max_dev_ratio: 0,
   rat_ratio: 0,
   sniper_balance_ratio_cur: 0,
-  top10_ratio: 0
+  top10_ratio: 0,
+  smart_wallet_count: 0,
+  smart_wallet_ratio: 0
 })
 const id = computed(() => route.params.id as string)
 const chain = computed(() => {
@@ -169,10 +173,10 @@ onMounted(() => {
   _getTagsRatio()
   _getSimilarToken()
 })
-async function _getTagsRatio(isTrue:boolean) {
+async function _getTagsRatio(isTrue?:boolean) {
   const res = await getTagsRatio(id.value)
   tagsRatio.value = res || {}
-  if (isTrue) {
+  if (!isTrue) {
     subscribeTokenKlineExtra()
   }
 }
@@ -209,34 +213,39 @@ function mergeStatistics(source: any) {
   if (source?.top10_ratio != null) {
     tagsRatio.value.top10_ratio = source.top10_ratio
   }
-  if (source?.dev_ratio != null && token.value) {
+  if (source?.dev_ratio != null) {
     tagsRatio.value.dev_ratio = source.dev_ratio
   }
-  if (source?.max_dev_ratio != null && token.value) {
+  if (source?.max_dev_ratio != null) {
     tagsRatio.value.max_dev_ratio = source.max_dev_ratio
   }
-  if (source?.first_transfer_in_from_label != null && token.value) {
+  if (source?.first_transfer_in_from_label != null) {
     tagsRatio.value.dev_first_transfer_in_from_label = source.first_transfer_in_from_label
   }
-  if (source?.age_seconds != null && token.value) {
+  if (source?.age_seconds != null) {
     tagsRatio.value.dev_age_seconds = source.age_seconds
   }
-  if (source?.sniper_ratio != null && token.value) {
+  if (source?.sniper_ratio != null) {
     tagsRatio.value.sniper_balance_ratio_cur = source.sniper_ratio
   }
-  if (source?.rat_ratio != null && token.value) {
+  if (source?.rat_ratio != null) {
     tagsRatio.value.rat_ratio = source.rat_ratio
   }
-  if (source?.address_binding_ratio != null && token.value) {
+  if (source?.address_binding_ratio != null) {
     tagsRatio.value.address_binding_ratio = source.address_binding_ratio
   }
-  if (source?.kol_count != null && token.value) {
+  if (source?.kol_count != null) {
     tagsRatio.value.kol_count = source.kol_count
   }
-  if (source?.kol_ratio != null && token.value) {
+  if (source?.kol_ratio != null) {
     tagsRatio.value.kol_ratio = source.kol_ratio
   }
-
+  if (source?.smart_wallet_count != null) {
+    tagsRatio.value.smart_wallet_count = source.smart_wallet_count
+  }
+  if (source?.smart_wallet_ratio != null) {
+    tagsRatio.value.smart_wallet_ratio = source.smart_wallet_ratio
+  }
 }
 const similarTokenList = ref([])
 async function _getSimilarToken() {

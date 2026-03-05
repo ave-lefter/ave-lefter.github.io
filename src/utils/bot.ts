@@ -84,6 +84,8 @@ export function tgLogin() {
     'ave-m-test-7.github.io',
     'ave00.com',
     'pro.ave.ai',
+    'pro.avesp.xyz',
+    'pro0.ave.ai',
   ]
   const domain = window.location.hostname
   const index = domains.indexOf(domain) + 1
