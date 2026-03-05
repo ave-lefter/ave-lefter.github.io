@@ -17,7 +17,7 @@
         <span>{{ $t('profit2') }}</span>
         <Icon name="custom:price" class="text-11px clickable ml-5px" :class="[isShowB ? 'color-[--third-text]' : 'color-[--secondary-text]']" @click.stop="isShowB=!isShowB" @mousedown.stop @mouseup.stop />
       </div>
-      <div class="text-12px mt-5px" :class="getColor()">
+      <div class="text-10px mt-5px" :class="getColor()">
         <template v-if="!isShowB">
            {{ getPlusSign() }}${{ formatNumber(Math.abs(Number(walletTokenInfo?.total_profit) || 0), 2) }}
         </template>
@@ -26,7 +26,7 @@
         </template>
 
       </div>
-      <div class="text-8px" :class="getColor()">({{ formatNumber(Number(walletTokenInfo?.total_profit_ratio || 0) * 100, 2) }}%)</div>
+      <div class="text-10px" :class="getColor()">({{ formatNumber(Number(walletTokenInfo?.total_profit_ratio || 0) * 100, 2) }}%)</div>
     </div>
   </div>
 </template>
