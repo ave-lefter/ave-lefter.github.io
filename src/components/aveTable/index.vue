@@ -31,6 +31,7 @@ const props = withDefaults(defineProps<{
 })
 const emits = defineEmits<{
   (e: 'endReached', value: number): void
+  (e: 'scroll', value: { scrollTop: number; scrollLeft: number }): void
 }>()
 const slots = useSlots()
 const attrs = useAttrs()
@@ -56,6 +57,7 @@ defineExpose({
   getScrollTop: () => _currentScrollTop.value,
   scrollBy: (delta: number) => {
     const next = Math.max(0, _currentScrollTop.value + delta)
+    _currentScrollTop.value = next
     tableRef.value?.scrollToTop?.(next)
   }
 })
@@ -135,7 +137,7 @@ function calculateColumnWidths() {
         :row-height='rowHeight'
         :row-class="rowClass"
         @end-reached="remainDistance=> emits('endReached', remainDistance)"
-        @scroll="onTableScroll"
+        @scroll="(e: any) => { onTableScroll(e); emits('scroll', e) }"
       >
         <template v-for="(slotFn, slotName) in defaultSlots" #[slotName]="slotProps">
           <slot :name="slotName" v-bind="slotProps"/>
