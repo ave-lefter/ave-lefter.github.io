@@ -432,12 +432,6 @@ const indicatorArr = computed(() => {
 //     }
 //     form.value = { ...tableFilter, platforms: platforms }
 // }
-const setCheckedBaseTokens = () => {
-  const baseTokensAll = props.baseTokens.map((i: any) => i.token).join(',')
-  if (!('base_tokens' in tableFilter)) {
-    form.value.base_tokens = baseTokensAll
-  }
-}
 watch(() => props.platformsList, (val, oldValue) => {
   if (isEqual(val, oldValue)) return
   form.value = {...tableFilter}
@@ -447,13 +441,11 @@ watch(() => props.visible, (val) => {
   if (val) {
   tableFilter = pumpStore.pumpV3[props.activeChain][activeTab.value]?.pumpFilter
    form.value = {...tableFilter}
-   setCheckedBaseTokens()
   }
 })
 watch(activeTab,()=>{
  tableFilter = pumpStore.pumpV3[props.activeChain][activeTab.value]?.pumpFilter
   form.value = {...tableFilter}
-  setCheckedBaseTokens()
 })
 // watch(() => storage.value, (val) => {
 //     tableFilter.value = usePumpTableDataFetching(val)

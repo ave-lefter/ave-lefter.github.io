@@ -175,7 +175,6 @@ export const usePumpStore = defineStore('pumpStore', () => {
     'pump_solana_platforms',
     ['pump', 'moonshot', 'raydium', 'jupstudio', 'moon_new', 'cookingcity', 'bonk', 'bags']
   )
-  
   const pumpV3: RemovableRef<Record<ChainKey, pumpData>> = useStorage(
     'pumpV15',
     {

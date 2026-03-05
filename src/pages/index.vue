@@ -996,8 +996,9 @@ onActivated(() => {
   isLeave = false
   wsTableListCache = {}
   wsTableList.value = []
-  getPumpConfig()
-  getPumpList()
+  getPumpConfig().then(() => {
+    getPumpList()
+  })
   wsv2Store.send({
     jsonrpc: '2.0',
     method: 'unsubscribe',
@@ -1176,7 +1177,7 @@ function wsUpdateTableList(wsList: WSPumpObj[]) {
   })
 }
 function getPumpConfig() {
-  _getPumpConfig().then((res) => {
+  return _getPumpConfig().then((res) => {
     pumpConfig.value = Array.isArray(res) ? res : []
     console.log('----pumpConfig--------', pumpConfig.value)
     console.log('-------fourmemeListObj-----', fourmemeListObj)
@@ -1193,6 +1194,7 @@ function getPumpConfig() {
           }
         }) || []
         const platformsString = platforms.filter(Boolean).join(',')
+        
         pumpV3.value[i.chain] = {
           ...(pumpV3.value[i.chain] || {}),
           platforms,
@@ -1212,6 +1214,16 @@ function getPumpConfig() {
             pumpFilter: {...pumpFilterDefault.value,platforms:platformsString},
           },
         }
+      }
+      const baseTokensString = i.base_tokens?.map(y => y.hash).concat('other').join(',')
+      if(!('base_tokens' in pumpV3.value[i.chain].new.pumpFilter)) {
+        pumpV3.value[i.chain].new.pumpFilter.base_tokens = baseTokensString
+      }
+      if(!('base_tokens' in pumpV3.value[i.chain].soon.pumpFilter)) {
+        pumpV3.value[i.chain].soon.pumpFilter.base_tokens = baseTokensString
+      }
+      if(!('base_tokens' in pumpV3.value[i.chain].graduated.pumpFilter)) {
+        pumpV3.value[i.chain].graduated.pumpFilter.base_tokens = baseTokensString
       }
       if (!pump_notice.value?.[i.chain]) {
         pump_notice.value[i.chain] = {
@@ -1447,7 +1459,7 @@ function getFilterData(list: PumpObj[], conditions: any) {
         pass = false
       }
     }
-    if(conditions?.base_tokens){
+    if(conditions?.base_tokens || !('base_tokens' in conditions)){
       const baseHash =
         i.target_token === i.token0_address
           ? i.token1_address
@@ -1552,6 +1564,12 @@ function getFilterData(list: PumpObj[], conditions: any) {
     }
     if(conditions?.rins) {
       pass = pass && i.insider_balance_ratio_cur <= Number(conditions.rins)
+    }
+    if(conditions?.sm_list?.length > 0){
+      pass = pass && i.medias?.length > 0 && conditions.sm_list.some(y=> i.medias?.findIndex(i => y.includes(i.icon)) !== -1)
+    }
+    if(conditions?.has_sm){
+      pass = pass && i.medias?.length > 0
     }
     return pass
   })
