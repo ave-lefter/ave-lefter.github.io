@@ -902,7 +902,10 @@ const onKeyDown = useThrottleFn((e: KeyboardEvent) => {
   }, 300)
 
   const delta = e.key === 'ArrowDown' ? SCROLL_STEP : -SCROLL_STEP
-  _localScrollTop = Math.max(0, _localScrollTop + delta)
+  const rowHeight = 50 // AveTable 默认行高
+  const totalHeight = filterTableList.value.length * rowHeight
+  const maxScrollTop = Math.max(0, totalHeight - finalHeight.value)
+  _localScrollTop = Math.min(Math.max(0, _localScrollTop + delta), maxScrollTop)
   aveTableRef.value?.scrollToTop?.(_localScrollTop)
 }, 60, true, false)
 
