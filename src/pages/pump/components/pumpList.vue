@@ -304,16 +304,17 @@
                       v-if="
                         row?.medias?.length > 0 && pumpSetting?.define?.some((i) => i === 'media')
                       "
-                      class="flex text-12px"
+                      class="flex text-12px items-center"
                     >
-                      <div v-for="(item, index) in row?.medias" :key="index">
+                      <div v-for="(item, index) in row?.medias" :key="index" class="flex ">
                         <template v-if="item.url">
-                          <span v-if="item.name === 'QQ'" v-tooltip="item.url" class="mr-8px">
-                            <Icon
-                              :name="`custom-media:${item.icon}`"
-                              class="text-[--third-text1] h-12px"
-                            />
-                          </span>
+                          <Icon
+                            v-if="item.name === 'QQ'" v-tooltip="item.url"
+                            :name="`custom-media:${item.icon}`"
+                            class="text-[--third-text1] h-12px leading-12px mr-8px"
+                          />
+                          <!-- <span v-if="item.name === 'QQ'" v-tooltip="item.url" class="mr-8px h-12px leading-12px">
+                          </span> -->
                           <XPopup
                             v-else-if="item.icon === 'twitter'"
                             :tokenId="(row.token + '-' + row.chain)"
