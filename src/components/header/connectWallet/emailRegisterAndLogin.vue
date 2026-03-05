@@ -205,7 +205,7 @@
     </el-divider>
     <ul v-show="cType === 'login'" :key="useThemeStore().theme" class="w-loginByThird">
       <li class="relative">
-        <el-button class="w-[100%]" color="var(--border)" :loading="loading4" :disabled="disabled4">
+        <el-button class="w-[100%]" color="var(--border)" :disabled="disabled4">
           <div id="g_id_onload" :class="[loading4 ? 'loading' : '']" />
         </el-button>
       </li>
