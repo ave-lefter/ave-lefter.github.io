@@ -569,10 +569,12 @@ function initGoogleLogin() {
       z-index: 1;
     `
     loading4.value = false
+    disabled4.value = false
   }
 }
 
 onMounted(() => {
+  console.log('login mounted')
   formRef.value?.resetFields()
   loading4.value = true
   const gsiClientEl = document.querySelector('#gsiClient')
@@ -589,7 +591,7 @@ onMounted(() => {
     setTimeout(() => {
       if(disabled4.value ){
         loading4.value = false
-        disabled4.value = true
+        disabled4.value = false
       }
     }, 5000)
   } else {
