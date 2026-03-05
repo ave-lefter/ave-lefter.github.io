@@ -7,7 +7,7 @@
   </div>
   <el-form ref="formAppCode"  class="mt-40px form-container" style="--el-border-radius-base:6px" :model="formData" :rules="rules" label-width="auto" size="large" label-position="top" @submit.prevent="importCode">
     <el-form-item prop="code" label="Code">
-      <el-input v-model="formData.code" :rows="5" type="textarea" :placeholder="$t('plsImport')"  clearable/>
+      <el-input v-model="formData.code" :rows="5" type="textarea" :placeholder="$t('plsImport')"  />
     </el-form-item>
     <el-form-item prop="" class="text-center mb-5px!">
       <div class="" style="width: 100%; text-align: center; margin-top: 30px;">

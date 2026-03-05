@@ -277,12 +277,12 @@
             <el-form-item :label="t('plsEnterAddress')" label-position="top" prop="address">
               <el-input v-model="withdrawForm.address"
                 style="border-radius: 4px;--el-input-height:48px;"
-                clearable placeholder="" />
+                 placeholder="" />
             </el-form-item>
             <el-form-item :label="t('plsEnterAmount')" label-position="top" prop="amount">
               <el-input v-model="withdrawForm.amount"
                 style="border-radius: 4px;--el-input-height:48px;"
-                inputmode="decimal" clearable placeholder="0.00"
+                inputmode="decimal"  placeholder="0.00"
                 @input="value => withdrawForm.amount = value.replace(/\-|[^\d.]/g, '')">
                 <template #suffix>
                   <span class="color-[--main-text]">{{  withdrawChainInfo2?.symbol || getChainInfo(withdrawForm.chain)?.main_name}}</span>
@@ -307,7 +307,7 @@
             <el-form-item v-if="withdrawForm.chain === 'ton'" :label="`memo(${$t('optional')})`" label-position="top" prop="memo">
               <el-input v-model="withdrawForm.memo"
                 style="border-radius: 4px;--el-input-height:48px;"
-                clearable placeholder="" />
+                 placeholder="" />
             </el-form-item>
             <!-- <div class="font-400 text-12px lh-[100%] color-#FFBE3C text-center mt-45px">{{ t('withdrawTip') }}</div> -->
             <el-button native-type="submit" style="width: 100%; margin-top: 25px" size="large" type="primary"

@@ -113,7 +113,7 @@ function reset() {
         <div class="flex items-center mt-8px mb-20px [--el-font-size-base:12px]">
           <el-input
             v-model.trim.number="buyRange[0]"
-            clearable
+            
             type="text"
             :placeholder="$t('min3')"
              style="--el-input-border-color:var(--border)"
@@ -122,7 +122,7 @@ function reset() {
           <span class="ml-10px mr-10px">~</span>
           <el-input
             v-model.trim.number="buyRange[1]"
-            clearable
+            
             type="text"
             :placeholder="$t('max')"
              style="--el-input-border-color:var(--border)"
@@ -135,7 +135,7 @@ function reset() {
         <div class="flex items-center mt-8px [--el-font-size-base:12px]">
           <el-input
             v-model.trim.number="sellRange[0]"
-            clearable
+            
             type="text"
             :placeholder="$t('min3')"
              style="--el-input-border-color:var(--border)"
@@ -144,7 +144,7 @@ function reset() {
           <span class="ml-10px mr-10px">~</span>
           <el-input
             v-model.trim.number="sellRange[1]"
-            clearable
+            
             type="text"
             :placeholder="$t('max')"
              style="--el-input-border-color:var(--border)"

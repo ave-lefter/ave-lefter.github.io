@@ -8,8 +8,8 @@
         <button v-if="swapStore.activeTab === 1" class="max-btn" type="button" @click.stop="handlePercentChange(100)">{{ $t('max') }}</button>
       </div>
       <div class="flex justify-between items-center mt-10px">
-        <el-input v-if="(swapStore.activeTab === 0)" v-model="toAmount" placeholder="0.0" size="large" clearable class="input-number" input-style="text-align:right"  :readonly="isOnlyGetAmountsOut" @update:model-value="value => {toAmount = value?.replace?.(/\-|[^\d.]/g, '');watchToAmount()}" @focus="percentStepRef?.handleClick(0, true)" />
-        <el-input v-if="(swapStore.activeTab === 1)" v-model="fromAmount" placeholder="0.0" size="large" clearable class="input-number" input-style="text-align:right"  @update:model-value="value => {fromAmount = value?.replace?.(/\-|[^\d.]/g, '');watchFromAmount()}" @focus="percentStepRef?.handleClick(0, true)" />
+        <el-input v-if="(swapStore.activeTab === 0)" v-model="toAmount" placeholder="0.0" size="large"  class="input-number" input-style="text-align:right"  :readonly="isOnlyGetAmountsOut" @update:model-value="value => {toAmount = value?.replace?.(/\-|[^\d.]/g, '');watchToAmount()}" @focus="percentStepRef?.handleClick(0, true)" />
+        <el-input v-if="(swapStore.activeTab === 1)" v-model="fromAmount" placeholder="0.0" size="large"  class="input-number" input-style="text-align:right"  @update:model-value="value => {fromAmount = value?.replace?.(/\-|[^\d.]/g, '');watchFromAmount()}" @focus="percentStepRef?.handleClick(0, true)" />
       </div>
     </div>
     <div class="card-container bottom mt-10px">
@@ -20,8 +20,8 @@
         <button v-if="swapStore.activeTab === 0" class="max-btn" type="button" @click.stop="handlePercentChange(100)">{{ $t('max') }}</button>
       </div>
       <div class="flex justify-between items-center mt-10px">
-        <el-input v-if="(swapStore.activeTab === 1)" v-model="toAmount" placeholder="0.0" size="large" clearable class="input-number" input-style="text-align:right" :readonly="isOnlyGetAmountsOut" @update:model-value="value => {toAmount = value?.replace?.(/\-|[^\d.]/g, '');watchToAmount()}" @focus="percentStepRef?.handleClick(0, true)" />
-        <el-input v-if="(swapStore.activeTab === 0)" v-model="fromAmount" placeholder="0.0" size="large" clearable class="input-number" input-style="text-align:right" @update:model-value="value => {fromAmount = value?.replace?.(/\-|[^\d.]/g, '');watchFromAmount()}" @focus="percentStepRef?.handleClick(0, true)" />
+        <el-input v-if="(swapStore.activeTab === 1)" v-model="toAmount" placeholder="0.0" size="large"  class="input-number" input-style="text-align:right" :readonly="isOnlyGetAmountsOut" @update:model-value="value => {toAmount = value?.replace?.(/\-|[^\d.]/g, '');watchToAmount()}" @focus="percentStepRef?.handleClick(0, true)" />
+        <el-input v-if="(swapStore.activeTab === 0)" v-model="fromAmount" placeholder="0.0" size="large"  class="input-number" input-style="text-align:right" @update:model-value="value => {fromAmount = value?.replace?.(/\-|[^\d.]/g, '');watchFromAmount()}" @focus="percentStepRef?.handleClick(0, true)" />
       </div>
     </div>
     <PercentStep ref="percentStepInf" :activeColor="swapStore.activeTab === 0 ? upColor[0]: downColor[0]" @change="handlePercentChange"/>

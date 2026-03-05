@@ -237,7 +237,7 @@
           {{ $t('markerAddress') }}
         </label>
       </div>
-      <el-input id="markerAddress" v-model="dialogFilter.markerAddress" clearable class="text-12px" :placeholder="$t('markerAddress')"/>
+      <el-input id="markerAddress" v-model="dialogFilter.markerAddress"  class="text-12px" :placeholder="$t('markerAddress')"/>
       <div class="mb-10px mt-20px">
         <label>
           {{ $t('filter') }}
@@ -246,7 +246,7 @@
       <div class="flex items-center gap-20px">
         <el-input
           v-model.trim.number="dialogFilter.minVol"
-          clearable
+          
           type="text"
           class="text-12px"
           :placeholder="$t('filterSmallAmount')"
@@ -257,7 +257,7 @@
         </el-input>
         <el-input
           v-model.trim.number="dialogFilter.maxVol"
-          clearable
+          
           type="text"
            class="text-12px"
            :placeholder="$t('filterLargeAmount')"

@@ -90,7 +90,7 @@
                       v-model.trim="searchKeyword"
                       size="large"
                       :placeholder="$t('attentionSearch')"
-                      clearable
+                      
                       @clear="handleFilterQuery()"
                     />
                   </div>

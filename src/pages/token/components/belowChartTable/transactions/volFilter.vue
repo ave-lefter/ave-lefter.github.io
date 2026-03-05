@@ -67,7 +67,7 @@ function onBlur(index: number) {
         <el-input-number
           v-model="filterArray[0]"
           :min="0" :controls="false"
-          :placeholder="$t('minor')" clearable
+          :placeholder="$t('minor')" 
           required
           @blur="onBlur(0)"
         />
@@ -75,7 +75,7 @@ function onBlur(index: number) {
         <el-input-number
           v-model="filterArray[1]"
           :min="0" :controls="false"
-          :placeholder="$t('max1')" clearable
+          :placeholder="$t('max1')" 
           required
           @blur="onBlur(1)"
         />

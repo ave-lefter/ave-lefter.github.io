@@ -47,7 +47,7 @@ function handleBlurBuyValue() {
   <el-input
     v-model.trim="quickBuyValue"
     :size="size"
-    clearable
+    
     placeholder="0"
     class="[--el-component-size-small:22px] [&&]:[--el-input-width:88px]"
     @input="handleInput"

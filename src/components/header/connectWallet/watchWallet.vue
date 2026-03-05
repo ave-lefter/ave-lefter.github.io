@@ -35,7 +35,7 @@
       </el-select>
     </el-form-item>
     <el-form-item prop="address" :label="$t('address')">
-      <el-input v-model="watchWalletForm.address" :placeholder="$t('enterAddress')" clearable style="--el-input-inner-height:48px"/>
+      <el-input v-model="watchWalletForm.address" :placeholder="$t('enterAddress')"  style="--el-input-inner-height:48px"/>
     </el-form-item>
     <el-form-item prop="" class="text-center mb-5px!">
       <div class="" style="width: 100%; text-align: center; margin-top: 30px;">

@@ -78,7 +78,7 @@
         </div>
         </div>
         <el-input v-model="query.token_keyword" style="--el-input-bg-color:var(--main-list-hover);--el-input-height:26px;"
-          class="w-160px" size="small" clearable :placeholder="t('searchCA')" @input="debouncedConfirmInput">
+          class="w-160px" size="small"  :placeholder="t('searchCA')" @input="debouncedConfirmInput">
           <template #prefix>
             <Icon name="custom:search" />
           </template>

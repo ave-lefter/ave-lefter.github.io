@@ -31,7 +31,7 @@
           v-model.trim="query"
           class="search-input px-20px"
           :placeholder="$t('blackListPlaceHolder')"
-          clearable
+          
           autofocus
           size="large"
         >

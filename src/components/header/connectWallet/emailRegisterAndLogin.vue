@@ -205,7 +205,7 @@
     </el-divider>
     <ul v-show="cType === 'login'" :key="useThemeStore().theme" class="w-loginByThird">
       <li class="relative">
-        <el-button class="w-[100%]" color="var(--border)" :loading="loading4" :disabled="disabled4">
+        <el-button class="w-[100%]" color="var(--border)" :disabled="disabled4">
           <div id="g_id_onload" :class="[loading4 ? 'loading' : '']" />
         </el-button>
       </li>
@@ -569,10 +569,12 @@ function initGoogleLogin() {
       z-index: 1;
     `
     loading4.value = false
+    disabled4.value = false
   }
 }
 
 onMounted(() => {
+  console.log('login mounted')
   formRef.value?.resetFields()
   loading4.value = true
   const gsiClientEl = document.querySelector('#gsiClient')
@@ -589,7 +591,7 @@ onMounted(() => {
     setTimeout(() => {
       if(disabled4.value ){
         loading4.value = false
-        disabled4.value = true
+        disabled4.value = false
       }
     }, 5000)
   } else {
