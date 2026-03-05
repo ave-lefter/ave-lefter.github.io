@@ -871,5 +871,7 @@
   "twitterTracker2": "Tin tức",
   "onlyTitle": "Chỉ tiêu đề",
   "socialMediaTracker": "Trình theo dõi phương tiện",
-  "ViewFullText": "Xem toàn văn"
+  "ViewFullText": "Xem toàn văn",
+  "migratedToMarket": "Đã chuyển sang thị trường",
+  "createdAt": "Tạo lúc"
 }

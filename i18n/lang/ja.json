@@ -1480,5 +1480,7 @@
   "twitterTracker2": "ニュース",
   "onlyTitle": "タイトルのみ",
   "socialMediaTracker": "メディアトラッカー",
-  "ViewFullText": "全文を表示"
+  "ViewFullText": "全文を表示",
+  "migratedToMarket": "市場に移行",
+  "createdAt": "作成日"
 }

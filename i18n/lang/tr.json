@@ -627,5 +627,7 @@
   "twitterTracker2": "Haberler",
   "onlyTitle": "Yalnızca Başlık",
   "socialMediaTracker": "Medya Takipçisi",
-  "ViewFullText": "Tam metni görüntüle"
+  "ViewFullText": "Tam metni görüntüle",
+  "migratedToMarket": "Pazara taşındı",
+  "createdAt": "Oluşturuldu"
 }

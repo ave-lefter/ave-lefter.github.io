@@ -653,5 +653,7 @@
   "twitterTracker2": "Noticias",
   "onlyTitle": "Sólo título",
   "socialMediaTracker": "Rastreador de medios",
-  "ViewFullText": "Ver texto completo"
+  "ViewFullText": "Ver texto completo",
+  "migratedToMarket": "Migrado al mercado",
+  "createdAt": "Creado el"
 }

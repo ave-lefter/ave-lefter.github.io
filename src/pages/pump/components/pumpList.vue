@@ -56,7 +56,6 @@
                       />
                       <Icon
                         v-else
-
                         name="custom:dev-invisible"
                         class="text-12px"
                         @click.stop="addOrRemoveBlaclList(row, 'dev')"
