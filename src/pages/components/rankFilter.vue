@@ -67,11 +67,9 @@ watch(() => props.storageKey, () => {
       return !!modelColumns.value?.find((el: any) => el.key === item)?.isVisible
     })
   })
-  if(!marketIndicesVisible.value){
-    activeTab.value = 'chainToken'
-  }
 })
 watch(visible,()=>{
+  activeTab.value = 'chainToken'
   // 打开弹窗同步所有筛选条件
   if(visible.value){
     tempFilter.value = cloneDeep(globalStore.rankConditions[globalStore.rankActiveTab]?.filter)
