@@ -36,7 +36,7 @@
           >
             <Icon name="material-symbols:arrow-back-ios-new-rounded" class="text-12px" />
           </div>
-          <el-scrollbar :height="scrollbarHeight" @scroll="centerScroll">
+          <el-scrollbar :height="scrollbarHeight" @scroll="centerScroll" wrap-class="bg-[--secondary-bg]">
             <div
               :class="orderBookVisible ? 'grid gap-1px' : 'grid grid-cols-1 gap-1px'"
               :style="

@@ -1,47 +1,49 @@
 <template>
   <div v-show="globalStore.showRight">
-      <div class="flex flex-col h-[calc(100vh-94px)] v-scroller-container">
-        <!-- <div class="p-15px bg-[--secondary-bg]">
-          <PriceTabs v-model="tabActive" :tabs="tabs" />
-          <template v-for="item in tabs" :key="item.id">
-            <VolumeStats
-              v-if="tabActive === item.id"
-              :tabActive="item.id"
-              :tabActiveName="item.name"
-            />
-          </template>
-        </div> -->
-        <PriceTabs v-model="tabActive" :tabs="tabs" />
-        <!-- <div class="flex items-center justify-around color-[--main-text] p-15px bg-[--secondary-bg] mt-4px">
-        <div class="text-center">
-          <div class="text-14px mb-5px">${{ formatNumber(token?.open_price || 0, 3) }}</div>
-          <div class="text-12px color-[--third-text]">{{ $t('openPrice') }}</div>
-        </div>
-        <div class="text-center">
-          <div class="text-14px mb-5px">{{ tokenStore.circulation?.gt?.(0) ? (formatNumber(((tokenStore?.tokenInfoExtra?.amount_24 || 0) / Number(tokenStore?.circulation.toFixed())) * 100 || 0, 2) + '%') : '-' }}</div>
-          <div class="text-12px color-[--third-text]">{{ $t('24Exchange') }}</div>
-        </div>
-        <div class="text-center">
-          <div class="text-14px mb-5px">-</div>
-          <div class="text-12px color-[--third-text]">DEV</div>
-        </div>
-      </div> -->
-        <div class="p-15px bg-[--secondary-bg] mt-.5px">
-          <!-- <BotSwap /> -->
-          <component :is="SwapCom" :key="walletStore.address ? 'Swap' : 'BotSwap'" />
-        </div>
-        <div class="p-15px pb-5px bg-[--secondary-bg] mt-1px">
-          <!-- <div
-            class="flex justify-between border-b-1px border-b-solid border-b-[--main-divider] pb-8px mb-8px text-12px"
-          >
-            <span class="text-12px color-[--main-text]">{{ $t('totalPair') }}</span>
-            {{ formatNumber(tokenStore.token?.main_pair_tvl || 0, 1) }}
+      <el-scrollbar style="height: calc(100vh - 94px);margin-right: -3px;padding-right: 3px;" wrap-class="bg-[--secondary-bg]">
+        <div class="flex flex-col h-full bg-[--main-divider]">
+          <!-- <div class="p-15px bg-[--secondary-bg]">
+            <PriceTabs v-model="tabActive" :tabs="tabs" />
+            <template v-for="item in tabs" :key="item.id">
+              <VolumeStats
+                v-if="tabActive === item.id"
+                :tabActive="item.id"
+                :tabActiveName="item.name"
+              />
+            </template>
           </div> -->
-          <Pairs @openFilterModal="openFilterModal" />
+          <PriceTabs v-model="tabActive" :tabs="tabs" />
+          <!-- <div class="flex items-center justify-around color-[--main-text] p-15px bg-[--secondary-bg] mt-4px">
+          <div class="text-center">
+            <div class="text-14px mb-5px">${{ formatNumber(token?.open_price || 0, 3) }}</div>
+            <div class="text-12px color-[--third-text]">{{ $t('openPrice') }}</div>
+          </div>
+          <div class="text-center">
+            <div class="text-14px mb-5px">{{ tokenStore.circulation?.gt?.(0) ? (formatNumber(((tokenStore?.tokenInfoExtra?.amount_24 || 0) / Number(tokenStore?.circulation.toFixed())) * 100 || 0, 2) + '%') : '-' }}</div>
+            <div class="text-12px color-[--third-text]">{{ $t('24Exchange') }}</div>
+          </div>
+          <div class="text-center">
+            <div class="text-14px mb-5px">-</div>
+            <div class="text-12px color-[--third-text]">DEV</div>
+          </div>
+        </div> -->
+          <div class="p-15px bg-[--secondary-bg] mt-.5px">
+            <!-- <BotSwap /> -->
+            <component :is="SwapCom" :key="walletStore.address ? 'Swap' : 'BotSwap'" />
+          </div>
+          <div class="p-15px pb-5px bg-[--secondary-bg] mt-1px">
+            <!-- <div
+              class="flex justify-between border-b-1px border-b-solid border-b-[--main-divider] pb-8px mb-8px text-12px"
+            >
+              <span class="text-12px color-[--main-text]">{{ $t('totalPair') }}</span>
+              {{ formatNumber(tokenStore.token?.main_pair_tvl || 0, 1) }}
+            </div> -->
+            <Pairs @openFilterModal="openFilterModal" />
+          </div>
+          <Overview class="px-15px pb-10px pr-0 bg-[--secondary-bg] mt-1px" />
+          <div class="bg-[--secondary-bg] flex-1" />
         </div>
-        <Overview class="px-15px pb-10px pr-0 bg-[--secondary-bg] mt-1px" />
-        <div class="bg-[--secondary-bg] flex-1" />
-      </div>
+      </el-scrollbar>
 
     <el-dialog v-if="dialogVisible" v-model="dialogVisible" :title="searchAmm" width="480" destroy-on-close>
       <Pairs :search="searchAmm" :isInModal="true" />
