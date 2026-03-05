@@ -267,5 +267,6 @@ export const WSEventV2Type = {
   TOKEN_UPDATED: 'token_updated',
   PORTRAIT_STATISTICS:'portrait_statistics',
   TWITTER_MONITOR:'twitter_monitor',
-  PUBLIC_TWITTER:'public_twitter'
+  PUBLIC_TWITTER: 'public_twitter',
+  SUB_TOKEN_KLINE_EXTRA: 'sub_token_kline_extra'
 }

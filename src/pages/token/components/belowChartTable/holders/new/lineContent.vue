@@ -67,8 +67,7 @@ const {token} = storeToRefs(useTokenStore())
 
 
 let timer:number
-
-const popVisible=shallowRef<boolean>(false)
+const { clickHolderCount, popVisible } = storeToRefs(useGlobalStore())
 const holdersNum= shallowRef<number|string>(0)
 const HoldersAbove10Usd= shallowRef<number|string>(0)
 const holdersAvg= shallowRef<number|string|undefined>(0)
@@ -214,6 +213,17 @@ onUnmounted(() => {
   }
   isInitialized.value = false
 })
+watch(() => clickHolderCount.value, (val) => {
+  if (val) {
+    nextTick(() => {
+      setTimeout(() => {
+        popVisible.value = true
+      }, 200)
+    })
+  }
+},
+{ flush: 'post' }
+)
 watch(()=>addressAndChain.value.address, (val) => {
   console.log('token changed', val)
   isInitialized.value = false

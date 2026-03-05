@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Transactions from './transactions/transactions.vue'
+import Holders from './holders/index.vue'
 import OrdersTab from './orders/index.vue'
 import OneClick from '../right/botSwap/oneClick.vue'
 import OrderBookButton from '../right/botSwap/orderBookButton.vue'
@@ -20,7 +21,7 @@ const {token, tokenInfoExtra ,pairAddress,commonHeight} = storeToRefs(useTokenSt
 const activeTab = shallowRef<keyof typeof components | 'Orders'>('Transactions')
 const components = {
   Transactions,
-  Holders: defineAsyncComponent(() => import('./holders/index.vue')),
+  Holders: Holders,
   LP: defineAsyncComponent(() => import('./lp/index.vue')),
   Attention: defineAsyncComponent(() => import('./attention/index.vue')),
   Orders: OrdersTab,
@@ -73,7 +74,11 @@ watch(
     }
   }
 )
-
+watch(() => globalStore.clickHolderCount, (val) => {
+  if (val) {
+    activeTab.value = 'Holders'
+  }
+})
 // 保存订单薄打开前的标签状态
 const previousTab = ref<keyof typeof components>('Transactions')
 
@@ -154,7 +159,7 @@ const comProps = computed(() => {
     MySwap: {},
   }[activeTab.value] || {}
 })
-onMounted(() => {
+onMounted  (() => {
   globalStore.getFollowsNum()
 })
 

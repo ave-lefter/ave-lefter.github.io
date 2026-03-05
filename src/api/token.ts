@@ -1318,3 +1318,28 @@ export function getSimilarTokens(token_id:string) {
     }
   })
 }
+// 画像百分比
+export function getTagsRatio(token_id: string) {
+  const { $api } = useNuxtApp()
+  return $api('/v2api/token_info/v1/tags/ratio', {
+    method: 'get',
+    query: {
+      token_id,
+    },
+  })
+}
+
+// 获取画像详情pop
+export function getTagsRatioHover(data: {
+    token_id: string,
+    self_address?: string,
+    tag_type: number,
+    page_size: number,
+    page_no: number
+}) {
+  const { $api } = useNuxtApp()
+  return $api('/v2api/token_info/v1/tags/hover', {
+    method: 'get',
+    query: data,
+  })
+}

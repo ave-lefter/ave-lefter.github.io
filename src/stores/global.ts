@@ -164,6 +164,8 @@ export const useGlobalStore = defineStore('global', () => {
     jump: 'close',
     border: '',
   })
+  const clickHolderCount = shallowRef(0)
+  const popVisible = shallowRef<boolean>(false)
   // 涨跌幅时区
   const zone=useStorage('zone','24h')
 
@@ -417,6 +419,8 @@ export const useGlobalStore = defineStore('global', () => {
     klineSettingPop,
     zone,
     zoneList,
-    showMarket
+    showMarket,
+    clickHolderCount,
+    popVisible
   }
 })
