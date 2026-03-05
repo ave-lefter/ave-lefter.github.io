@@ -33,7 +33,7 @@
           font-size: 12px;
         "
       placeholder="0"
-      clearable
+      
       type="text"
       @input="(value) => {
             quickBuyValue1 = value.replace(/\-|[^\d.]/g, '')

@@ -19,7 +19,7 @@
         class="search-input"
         v-model.trim="keyword"
         :placeholder="t('enterAddress/token')"
-        clearable
+        
         @keydown.enter="tokenSearch"
       >
         <template #prefix>

@@ -103,7 +103,7 @@ function onSelect(item: { text: string; value: string }) {
       <div class="flex items-center mt-10px [--el-font-size-base:12px]">
         <el-input
           v-model.trim.number="rangeArr[0]"
-          clearable
+          
           type="text"
           :placeholder="$t('min3')"
           style="--el-input-border-color:var(--border);"
@@ -114,7 +114,7 @@ function onSelect(item: { text: string; value: string }) {
         <span class="ml-10px mr-10px text-12px color-[--main-text]">~</span>
         <el-input
           v-model.trim.number="rangeArr[1]"
-          clearable
+          
           type="text"
            :placeholder="$t('max')"
            style="--el-input-border-color:var(--border)"

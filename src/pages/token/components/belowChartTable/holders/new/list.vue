@@ -61,7 +61,7 @@
                     <el-input
                       v-model.trim="keyword"
                       :placeholder="$t('searchWallet')"
-                      clearable
+                      
                     />
                   </div>
                   <div class="mt-20px">

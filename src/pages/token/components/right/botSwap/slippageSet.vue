@@ -56,7 +56,7 @@
                 v-model="clipboardQuickInput[chain]"
                 class="input-swap input-number flex-auto! max-w-150px clipped-input rd-8px! ml-auto"
                 inputmode="decimal"
-                clearable
+                
                 placeholder="0.0"
                 @update:model-value="
                   (value) => {
@@ -186,7 +186,7 @@
                       :disabled="isAutoB"
                       controls-position="right"
                       :controls="false"
-                      clearable
+                      
                       :rules="[
                         { required: true, message: $t('enterSlippage') },
                         {
@@ -269,7 +269,7 @@
                 "
                 class="input-number"
                 inputmode="decimal"
-                clearable
+                
                 :placeholder="chain === 'solana' ? $t('customFee1') : $t('customEvmFee1')"
                 @update:model-value="watchCusTomPriorityFee($event, 'buy')"
                 @blur="handleBlurFee('buy')"
@@ -415,7 +415,7 @@
                       :disabled="isAutoS"
                       controls-position="right"
                       :controls="false"
-                      clearable
+                      
                       :rules="[
                         { required: true, message: $t('enterSlippage') },
                         {
@@ -498,7 +498,7 @@
                 "
                 class="input-number"
                 inputmode="decimal"
-                clearable
+                
                 :placeholder="chain === 'solana' ? $t('customFee1') : $t('customEvmFee1')"
                 @update:model-value="watchCusTomPriorityFee($event, 'sell')"
                 @blur="handleBlurFee('sell')"

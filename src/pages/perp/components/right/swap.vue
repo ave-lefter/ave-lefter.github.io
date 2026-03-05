@@ -12,7 +12,7 @@
         :step="(pricePrecision < 0 ? 10 ** -pricePrecision : 1)"
         :step-strictly="pricePrecision < 0"
         size="large"
-        clearable
+        
         class="[&&]:w-full"
         :controls="false"
         align="left"
@@ -38,7 +38,7 @@
         class="[&&]:w-full"
         :controls="false"
         size="large"
-        clearable
+        
         align="left"
         :max="maxAmount"
         @input="percent = 0"
@@ -108,7 +108,7 @@
             class="flex-1 input-number"
             :placeholder="t('TP1')"
             size="large"
-            clearable
+            
             @update:model-value="value => tpPriceChange(value)"
           >
             <!-- <template #suffix>

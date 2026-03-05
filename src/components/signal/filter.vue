@@ -95,7 +95,7 @@ function updateCurrentNum() {
           <el-input
             v-model="tempFilterParams.token"
             size="large"
-            clearable
+            
             :placeholder="$t('searchPlaceholder')"
             class="[&&]:[--el-input-bg-color:--border] [&&]:[--el-input-border-color:--border] [&&]:[--el-input-hover-border-color:--primary-color] [&&]:text-12px"
           />

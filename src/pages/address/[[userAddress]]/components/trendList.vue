@@ -48,7 +48,7 @@
               <div class="text-14px font-400 mb-8px">
                 {{ $t('tokenAddress') }}
               </div>
-              <el-input v-model="filterForm.token.value" clearable />
+              <el-input v-model="filterForm.token.value"  />
               <div class="mt-10px flex">
                 <el-button
                   class="h-30px m-l-auto min-w-70px flex-1"
@@ -256,13 +256,13 @@
                 <el-input
                   v-model.trim.number="filterForm.amount.amount_min"
                   :placeholder="$t('minor')"
-                  clearable
+                  
                 />
                 <span class="ml-10px mr-10px">~</span>
                 <el-input
                   v-model.trim.number="filterForm.amount.amount_max"
                   :placeholder="$t('max1')"
-                  clearable
+                  
                 />
               </div>
               <div class="mt-10px flex">
@@ -330,13 +330,13 @@
                 <el-input
                   v-model.trim.number="filterForm.price.volume_min"
                   :placeholder="$t('minor')"
-                  clearable
+                  
                 />
                 <span class="ml-10px mr-10px">~</span>
                 <el-input
                   v-model.trim.number="filterForm.price.volume_max"
                   :placeholder="$t('max1')"
-                  clearable
+                  
                 />
               </div>
               <div class="mt-10px flex">

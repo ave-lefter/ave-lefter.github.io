@@ -19,7 +19,7 @@
       <el-input
         v-model="form.remark"
         type="text"
-        clearable
+        
         maxlength="20"
         show-word-limit
         :placeholder="placeholder"
