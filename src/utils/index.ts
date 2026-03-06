@@ -26,6 +26,7 @@ import FingerprintJs from '@fingerprintjs/fingerprintjs'
 import { UniChainsV4 } from './wallet/utils/abi'
 import type { MessageHandler } from 'element-plus'
 import CryptoJS from 'crypto-js'
+import localforage from 'localforage'
 export * from './wallet/utils/index'
 
 export function isJSON(str: string) {
@@ -1476,4 +1477,22 @@ export function formatXUser(url?: string) {
   } catch {
     return ''
   }
+}
+
+export async function withCache<T>(
+  cacheKey: string,
+  fetcher: () => Promise<T>,
+  ttl: number = 24 * 60 * 60 * 1000
+): Promise<T> {
+  const cached = await localforage.getItem<{ data: T; timestamp: number }>(cacheKey)
+
+  if (cached && (Date.now() - cached.timestamp < ttl)) {
+    return cached.data
+  }
+
+  const res = await fetcher()
+  // 顺手存一下，不阻塞返回
+  localforage.setItem(cacheKey, { data: res, timestamp: Date.now() })
+
+  return res
 }

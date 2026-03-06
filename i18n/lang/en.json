@@ -2058,5 +2058,10 @@
   "sellInits": "Sell Inits.",
   "confirmSellAlTips": "Cashing out now will empty one wallet's holdings and may cause a loss. Proceed with breakeven?",
   "aiSummaryTip": "Attention: The data is sourced from the internet and Ave.ai cannot guarantee its accuracy. It is for reference only.",
-  "baseInfo": "Base Info"
+  "baseInfo": "Base Info",
+  "tieredCommission": "Levels Referral",
+  "tieredCommissionTips": "Rebate income consists of three parts: L1 rebate, L2 rebate and other rebates. \nOther rebates include multi-level promotion income and related incentives within the statistical scope of the platform, which are unified into accounting and display.",
+  "commissionStatistics": "Commission Statistics",
+  "commissionValue": "Commission Value",
+  "totalSwapValue": "Total Volume"
 }

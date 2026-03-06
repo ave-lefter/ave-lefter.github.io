@@ -1265,12 +1265,32 @@ export interface IGetAllTagsResponse {
   nick_name: string;
 }
 
-export function getAllTags(): Promise<IGetAllTagsResponse[]> {
-  const {$api} = useNuxtApp()
-  return $api('/v2api/token_info/v1/tags', {
-    method: 'get',
-  })
+// export async function getAllTags(): Promise<IGetAllTagsResponse[]> {
+//   const cacheKey = '/v2api/token_info/v1/tags'
+//   // 加上缓存时间，缓存时间为 24 小时
+//   const cacheTime = 24 * 60 * 60 * 1000
+//   const cachedData = await localforage.getItem(cacheKey)
+//   if (cachedData) {
+//     const { data, timestamp } = cachedData as { data: IGetAllTagsResponse[]; timestamp: number }
+//     if (Date.now() - timestamp < cacheTime) {
+//       return data
+//     }
+//   }
+//   const {$api} = useNuxtApp()
+//   return $api('/v2api/token_info/v1/tags', {
+//     method: 'get',
+//   }).then(async res => {
+//     await localforage.setItem(cacheKey, { data: res, timestamp: Date.now() })
+//     return res
+//   })
+// }
+
+export async function getAllTags(): Promise<IGetAllTagsResponse[]> {
+  const { $api } = useNuxtApp()
+  const url = '/v2api/token_info/v1/tags'
+  return withCache(url, () => $api(url, { method: 'get' }), 24 * 60 * 60 * 1000)
 }
+
 
 export interface AiSummaryResponse{
   summary:string;

@@ -238,10 +238,15 @@ const tableFilterVisible = ref({
 const makerTooltip = ref()
 const markerTooltipVisible = shallowRef(false)
 const currentRow = shallowRef<IGetSimpleTxsResponse & { senderProfile: Profile, maker_bal?: number }>({} as any)
+const isKeyScrolling = shallowRef(false)
+let keyScrollTimer: ReturnType<typeof setTimeout> | null = null
+
 const isPausedTxs = computed(() => {
   return isHoverTable.value
     || tokenDetailSStore.drawerVisible
-    || markerTooltipVisible.value || (sortConditions.value.sort_dir ==='asc')
+    || markerTooltipVisible.value
+    || (sortConditions.value.sort_dir === 'asc')
+    || isKeyScrolling.value
 })
 
 const addressAndChain = computed(() => {
@@ -879,6 +884,35 @@ function goBrowser(row: IGetSimpleTxsResponse) {
 }
 
 const tabsContainer = ref<HTMLElement | null>(null)
+
+const SCROLL_STEP = 80
+let _localScrollTop = 0
+
+const onKeyDown = useThrottleFn((e: KeyboardEvent) => {
+  if (e.key !== 'ArrowUp' && e.key !== 'ArrowDown') return
+  if (!isHoverTable.value) return
+  e.preventDefault()
+
+  isKeyScrolling.value = true
+  if (keyScrollTimer) clearTimeout(keyScrollTimer)
+  keyScrollTimer = setTimeout(() => {
+    isKeyScrolling.value = false
+    if (wsPairCache.value.length) updatePairTxs()
+    if (wsLiqCache.value.length) updateLiqList()
+  }, 300)
+
+  const delta = e.key === 'ArrowDown' ? SCROLL_STEP : -SCROLL_STEP
+  _localScrollTop = Math.max(0, _localScrollTop + delta)
+  aveTableRef.value?.scrollToTop?.(_localScrollTop)
+}, 60, true, false)
+
+onMounted(() => {
+  window.addEventListener('keydown', onKeyDown)
+})
+onUnmounted(() => {
+  window.removeEventListener('keydown', onKeyDown)
+  if (keyScrollTimer) clearTimeout(keyScrollTimer)
+})
 function setActiveTab(val: string,index:number) {
   if(val===activeTab.value) return
   activeTab.value = val
@@ -1092,6 +1126,7 @@ onUnmounted(() => {
         onMouseleave:()=>isHoverTable=false,
         onClick: onRowClick
       }"
+        @scroll="({ scrollTop }: { scrollTop: number }) => { _localScrollTop = scrollTop }"
         @endReached="loadMore">
         <template  #empty>
           <div v-if="!tableLoading" class="h-full flex flex-col items-center justify-center pt-100px">

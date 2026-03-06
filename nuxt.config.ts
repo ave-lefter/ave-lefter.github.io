@@ -245,6 +245,22 @@ export default defineNuxtConfig({
       clientsClaim: true,
       runtimeCaching: [
         {
+          // 匹配 Iconify 的域名
+          urlPattern: ({ url }) => url.host === 'api.iconify.design',
+          handler: 'CacheFirst',
+          options: {
+            cacheName: 'iconify-json-cache',
+            expiration: {
+              maxEntries: 100,
+              maxAgeSeconds: 60 * 60 * 24 * 30 // 本地存 30 天
+            },
+            cacheableResponse: {
+              // 明确允许缓存成功（200）的响应
+              statuses: [0, 200]
+            }
+          }
+        },
+        {
           urlPattern: ({ request }) => request.destination === 'document',
           handler: 'NetworkFirst',
           options: {
