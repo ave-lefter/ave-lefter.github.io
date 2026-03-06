@@ -658,7 +658,8 @@ function reset() {
   if (formRef.value) {
     formRef.value.resetFields()  // 重置表单字段
   }
-  const form = { ...initForm,platforms:props.platformsList.map(platform => platform.platform).join(','),base_tokens:baseTokensAllStr.value,has_sm:0 }
+  const form = { ...initForm,platforms:props.platformsList.map(platform => platform.platform).join(',')
+  ,base_tokens:baseTokensAllStr.value,no_repeat_social_media:false }
   tableFilter = { ...form }
   pumpStore.pumpV3[props.activeChain][activeTab.value].pumpFilter = { ...form }  // 更新过滤器数据
   // 触发更新事件
