@@ -1380,3 +1380,14 @@ export function getTagsRatioHover(data: {
     query: data,
   })
 }
+
+// 同图片
+export function getTokenSimilarpic(token_id:string) {
+  const { $api } = useNuxtApp()
+  return $api('/v2api/token/v1/token/similarpic', {
+    method: 'get',
+    query: {
+      token_id
+    }
+  })
+}
