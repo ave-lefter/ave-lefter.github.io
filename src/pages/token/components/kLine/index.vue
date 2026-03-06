@@ -231,7 +231,7 @@ const route = useRoute()
 const walletStore = useWalletStore()
 const scrollTop = ref(0)
 const wsStore = useWSStore()
-const { showMarket } = storeToRefs(useGlobalStore())
+const { showMarket, migrated } = storeToRefs(useGlobalStore())
 const totalHolders = computed(() => [
   { id: 'trade', name: t('mine') },
   {
@@ -300,12 +300,12 @@ const dialogVisible_remind = ref(false)
 //   year: 50
 // })
 
-const migrated = ref( null as null | {
-  migrate_time: number
-  migrate_uprice: string
-  showMarket: boolean
-  mcap: number
-})
+// const migrated = ref( null as null | {
+//   migrate_time: number
+//   migrate_uprice: string
+//   showMarket: boolean
+//   mcap: number
+// })
 const chain = computed(() => {
   return getAddressAndChainFromId(token.value)?.chain || tokenStore?.token?.chain || ''
 })

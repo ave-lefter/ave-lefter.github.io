@@ -300,6 +300,13 @@ export const useGlobalStore = defineStore('global', () => {
   const showImport = shallowRef(false)
   const showBotRecord = shallowRef(false)
 
+  const migrated = ref( null as null | {
+    migrate_time: number
+    migrate_uprice: string
+    showMarket: boolean
+    mcap: number
+  })
+
 
   //  点击图表显示交易历史
    const isClickKlineFilter = useStorage('isClickKlineFilter', true)
@@ -417,6 +424,7 @@ export const useGlobalStore = defineStore('global', () => {
     klineSettingPop,
     zone,
     zoneList,
-    showMarket
+    showMarket,
+    migrated
   }
 })
