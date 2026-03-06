@@ -2034,5 +2034,10 @@
   "following": "關注數",
   "sellInits": "回本",
   "confirmSellAlTips": "當前回本將會導致1個錢包清倉持有的代幣,可能會產生虧損,確認繼續要回本嗎?",
-  "aiSummaryTip": "注意：數據來源於網絡，Ave.ai無法保證其準確性，僅供參考。"
+  "aiSummaryTip": "注意：數據來源於網絡，Ave.ai無法保證其準確性，僅供參考。",
+  "tieredCommission": "分級返傭",
+  "tieredCommissionTips": "返傭收益由 L1 返傭、L2 返傭及其他返傭 三部分構成。\n其他返傭包含平台統計範圍內的多層推廣收益及相關激勵，統一納入核算與展示。",
+  "commissionStatistics": "返傭統計",
+  "commissionValue": "返佣金額",
+  "totalSwapValue": "總交易額"
 }
