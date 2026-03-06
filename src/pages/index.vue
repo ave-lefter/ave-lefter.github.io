@@ -99,7 +99,7 @@
     <el-row type="flex" :gutter="pumpSetting.isGutter ? 10 : 2" class="w-full pl-16px" :class="pumpSetting.isGutter? 'pr-6px': 'pr-14px'">
       <el-col v-show="single('new') && pumpSetting.grid['new']?.show" :span="getSpan()" :style="{order: orderNew}">
         <div class="pump-item  rounded-4px" style="padding-top: 15px;">
-          <div class="pump-item_header flex-start px-12px">
+          <div class="pump-item_header flex-start px-12px rounded-4px">
             <template v-if="width > 1024">
               <!-- <img
                 class="mr-5px"
@@ -145,7 +145,40 @@
             <span  v-show="isPausedObj?.new" class=" mr-auto bg-#FFA6221A px-4px py-4px rounded-4px ml-8px flex items-center justify-center w-26px h-26px">
               <Icon name="custom:stop" class="color-#FFA622 text-16px"/>
             </span>
-           <span class="flex-1" />
+            <span class="flex-1" />
+            <el-input
+              v-if="pumpSetting?.show_search"
+              ref="inputSearch"
+              v-model.trim="pumpStore.pumpV3[activeChain].new.pumpFilter.q"
+              class="search-input1 px-20px mr-4px"
+              size="small"
+              :placeholder="$t('keywordsPlaceholder')"
+              @input="(val) => {
+                pumpStore.pumpV3[activeChain].new.pumpFilter.q = val.replace(/\s/g, '')
+                debouncedFetch('new')
+              }"
+            >
+              <template #prefix>
+                <Icon
+                  class="text-12px text-[var(--third-text)]"
+                  name="custom:search"
+                />
+              </template>
+              <template #suffix>
+                <Icon
+                  v-if="pumpStore.pumpV3[activeChain].new.pumpFilter.q"
+                  name="pajamas:clear"
+                  class="color-[--third-text9] text-12px hover:opacity-70% cursor-pointer mr-10px"
+                  @click="pumpStore.pumpV3[activeChain].new.pumpFilter.q = ''; debouncedFetch('new')"
+                />
+              </template>
+            </el-input>
+            <QuickSwapSetCustom
+              v-model:quickBuyValue="quickBuyValue1"
+              v-model:customSelected="swapSetSelected1"
+              :chain="activeChain"
+              class="mr-8px"
+            />
             <AudioSelect activeTab="new" :chain="activeChain"/>
             <PumpFilterButton
               :key="`pumpFilterButton_${activeChain}_new`"
@@ -645,7 +678,7 @@ const tabsList = computed(() => {
 const list1 = computed(() => {
   let list = fourmemeListObj?.[activeChain.value]?.new || []
   const list1 = (wsTableList.value || [])?.filter(i => i.state === 'new' && i.chain === activeChain.value)
-  
+
   const wsList1 = list1?.filter((i: { pair: string }) => !list?.some(j => j.pair === i.pair))
   let filterList = [...wsList1, ...list].map(i => {
   const baseHash =
@@ -1323,7 +1356,7 @@ function getPumpConfig() {
           }
         }) || []
         const platformsString = platforms.filter(Boolean).join(',')
-        
+
         pumpV3.value[i.chain] = {
           ...(pumpV3.value[i.chain] || {}),
           platforms,
@@ -1581,7 +1614,7 @@ async function getPump(rawParams: {
         isInitObj[finalParams.category as keyof typeof isInitObj] = false
       }
     }
-   
+
   } catch (err) {
     console.error('Fetch pump list failed:', err)
   } finally {
@@ -1615,7 +1648,7 @@ function getFilterData(list: PumpObj[], conditions: any) {
   const duplicateUrls = new Set<string>([...urlCount.entries()].filter(([, n]) => n > 1).map(([url]) => url))
   return list?.filter((i) => {
     let pass = true
-    
+
     if (conditions?.q) {
       const arr = conditions?.q.split(',')
       pass = pass && arr?.findIndex(y=> i.target_token == y || i.name?.includes?.(y) || i.symbol?.includes?.(y)) !== -1
