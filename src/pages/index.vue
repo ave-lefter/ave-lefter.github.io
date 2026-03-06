@@ -227,7 +227,10 @@
               class="search-input1 px-20px mr-4px"
               size="small"
               :placeholder="$t('keywordsPlaceholder')"
-              @input="(val) => pumpStore.pumpV3[activeChain].soon.pumpFilter.q = val.replace(/\s/g, '')"
+              @input="(val) => {
+                pumpStore.pumpV3[activeChain].soon.pumpFilter.q = val.replace(/\s/g, '')
+                debouncedFetch('soon')
+              }"
             >
               <template #prefix>
                 <Icon
@@ -240,7 +243,7 @@
                   v-if="pumpStore.pumpV3[activeChain].soon.pumpFilter.q"
                   name="pajamas:clear"
                   class="color-[--third-text9] text-12px hover:opacity-70% cursor-pointer mr-10px"
-                  @click="pumpStore.pumpV3[activeChain].soon.pumpFilter.q = ''"
+                  @click="pumpStore.pumpV3[activeChain].soon.pumpFilter.q = ''; debouncedFetch('soon')"
                 />
               </template>
             </el-input>
@@ -332,7 +335,10 @@
               class="search-input1 px-20px mr-4px"
               size="small"
               :placeholder="$t('keywordsPlaceholder')"
-              @input="(val) => pumpStore.pumpV3[activeChain].graduated.pumpFilter.q = val.replace(/\s/g, '')"
+              @input="(val) => {
+                pumpStore.pumpV3[activeChain].graduated.pumpFilter.q = val.replace(/\s/g, '')
+                debouncedFetch('graduated')
+              }"
             >
               <template #prefix>
                 <Icon
@@ -345,7 +351,7 @@
                   v-if="pumpStore.pumpV3[activeChain].graduated.pumpFilter.q"
                   name="pajamas:clear"
                   class="color-[--third-text] text-12px hover:opacity-70% cursor-pointer mr-10px"
-                  @click="pumpStore.pumpV3[activeChain].graduated.pumpFilter.q = ''"
+                  @click="pumpStore.pumpV3[activeChain].graduated.pumpFilter.q = ''; debouncedFetch('graduated')"
                 />
               </template>
             </el-input>
@@ -1384,33 +1390,30 @@ function handleFilterVisibleChange(visible: boolean, type: 'new' | 'soon' | 'gra
 //   debouncedFetch('graduated')
 // }, { deep: true })
 
-// const debouncedFetch = useDebounceFn((type) => search(type), 500)
-// function search(type: string) {
-//   if (type == 'new') {
-//     const pumpFilter_new = localStorage.getItem(`pumpFilter_${activeChain.value}_new`)
-//     const params1 = {
-//       category: 'new',
-//       ...(pumpFilter_new ? JSON.parse(pumpFilter_new) : ''),
-//     }
-//     getPump(params1, true)
-//   }
-//   if (type == 'soon') {
-//     const pumpFilter_soon = localStorage.getItem(`pumpFilter_${activeChain.value}_new`)
-//     const params2 = {
-//       category: 'soon',
-//       ...(pumpFilter_soon ? JSON.parse(pumpFilter_soon) : ''),
-//     }
-//     getPump(params2, true)
-//   }
-//   if (type == 'graduated') {
-//     const pumpFilter_graduated = localStorage.getItem(`pumpFilter_${activeChain.value}_graduated`)
-//     const params3 = {
-//       category: 'graduated',
-//       ...(pumpFilter_graduated ? JSON.parse(pumpFilter_graduated) : ''),
-//     }
-//     getPump(params3, true)
-//   }
-// }
+const debouncedFetch = useDebounceFn((type) => search(type), 500)
+function search(type: string) {
+  if (type == 'new') {
+    const params1 = {
+      category: 'new',
+      ...(pumpStore.pumpV3[activeChain.value].new.pumpFilter),
+    }
+    getPump(params1, true)
+  }
+  if (type == 'soon') {
+    const params2 = {
+      category: 'soon',
+      ...(pumpStore.pumpV3[activeChain.value].soon.pumpFilter),
+    }
+    getPump(params2, true)
+  }
+  if (type == 'graduated') {
+    const params3 = {
+      category: 'graduated',
+      ...(pumpStore.pumpV3[activeChain.value].graduated.pumpFilter),
+    }
+    getPump(params3, true)
+  }
+}
 
 
 function handlerFilterConfirm(
@@ -1612,6 +1615,7 @@ function getFilterData(list: PumpObj[], conditions: any) {
   const duplicateUrls = new Set<string>([...urlCount.entries()].filter(([, n]) => n > 1).map(([url]) => url))
   return list?.filter((i) => {
     let pass = true
+    
     if (conditions?.q) {
       const arr = conditions?.q.split(',')
       pass = pass && arr?.findIndex(y=> i.target_token == y || i.name == y || i.symbol == y) !== -1
