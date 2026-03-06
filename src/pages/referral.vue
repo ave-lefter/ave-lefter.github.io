@@ -200,7 +200,7 @@
               </div>
             </div>
           </li>
-          <li class="bg-#FFFFFF0D p-24px rd-4px mt-8px flex-1">
+          <!-- <li class="bg-#FFFFFF0D p-24px rd-4px mt-8px flex-1">
             <div class="text-16px font-500 color-#fff mb-16px">{{ $t('other') }} {{ $t('commissionStatistics') }}</div>
             <div class="flex items-center justify-between">
               <div>
@@ -216,7 +216,7 @@
                 <div class="text-14px color-#fff">${{ formatNumber2(levelsReferralInfo?.other?.swapValue || 0, 2) }}</div>
               </div>
             </div>
-          </li>
+          </li> -->
         </ul>
         <div class="section-title mt-80px">
           <!-- <img width="28" height="28" src="@/assets/images/referral/data.svg" alt="" srcset="" > -->
