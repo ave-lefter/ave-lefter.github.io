@@ -901,12 +901,22 @@ const onKeyDown = useThrottleFn((e: KeyboardEvent) => {
     if (wsLiqCache.value.length) updateLiqList()
   }, 300)
 
-  const delta = e.key === 'ArrowDown' ? SCROLL_STEP : -SCROLL_STEP
+  const isScrollDown = e.key === 'ArrowDown'
+  const delta = isScrollDown ? SCROLL_STEP : -SCROLL_STEP
   const rowHeight = 50 // AveTable 默认行高
   const totalHeight = filterTableList.value.length * rowHeight
   const maxScrollTop = Math.max(0, totalHeight - finalHeight.value)
-  _localScrollTop = Math.min(Math.max(0, _localScrollTop + delta), maxScrollTop)
-  aveTableRef.value?.scrollToTop?.(_localScrollTop)
+  const nextScrollTop = Math.min(Math.max(0, _localScrollTop + delta), maxScrollTop)
+  aveTableRef.value?.scrollToTop?.(nextScrollTop)
+  _localScrollTop = nextScrollTop
+
+  // 只有向下滚动且接近底部时才触发加载更多
+  if (isScrollDown && maxScrollTop > 0) {
+    const remainDistance = maxScrollTop - nextScrollTop
+    if (remainDistance <= 20 && !(listStatus.value.loadingTxs || listStatus.value.finished)) {
+      _getTokenTxs()
+    }
+  }
 }, 60, true, false)
 
 onMounted(() => {

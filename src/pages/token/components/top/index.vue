@@ -444,7 +444,6 @@
                     <el-input
                       v-model.trim="remark2"
                       :placeholder="remark"
-                      
                     />
                   </div>
                   <div class="mt-20px flex-center">
@@ -503,7 +502,7 @@
             </span>
             <span
               v-if="pair"
-              v-tooltip.raw="`${t('migratedToMarket')}: ${formatDate(pair?.first_trade_at)} <br/>${t('createdAt')}: ${formatDate(pair?.created_at)}`"
+              v-tooltip.raw="pairTooltipContent"
               class="ml-5px hover:color-[--main-text] leading-12px font-400 mr-8px"
             >
               {{ formatTimeFromNow(pair?.created_at, false, true) }}
@@ -1192,6 +1191,14 @@ const token = computed(() => {
 })
 const pair = computed(() => {
   return tokenStore.pair
+})
+
+const pairTooltipContent = computed(() => {
+  const migrate_time = globalStore?.migrated?.migrate_time
+  if(migrate_time){
+    return `${t('migratedToMarket')}: ${formatDate(migrate_time)} <br/>${t('createdAt')}: ${formatDate(token.value?.opening_at)}`
+  }
+  return `${t('createdAt')}: ${formatDate(token?.value?.opening_at)}`
 })
 
 const price = computed(() => {
