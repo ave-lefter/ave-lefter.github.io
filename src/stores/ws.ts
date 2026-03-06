@@ -91,9 +91,12 @@ export const useWSStore = defineStore('ws', () => {
         wsResult[event] = data
       } else if (event === WSEventType.SWITCH_MAIN_PAIR_V2) {
         // 内盘转外盘更新 pair
+        wsResult[event] = data
+        console.log('------------SWITCH_MAIN_PAIR_V2---------',data)
         useTokenStore().onSwitchMainPairV2(data)
       } else if (event === WSEventType.PUBLIC_PORTRAIT) {
         usePublicPortraitStore().updatePublicPortrait(data?.msg || [])
+        wsResult[event] = data?.msg || []
       }  else {
         wsResult[event] = data
       }

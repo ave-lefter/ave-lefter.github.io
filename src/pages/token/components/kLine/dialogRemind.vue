@@ -180,7 +180,7 @@
             :step="0.01"
             controls-position="right"
             :controls="false"
-            clearable
+            
             @focus="onFocus1"
             @change="changeCustomRatio"
           />

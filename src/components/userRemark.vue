@@ -15,6 +15,8 @@
         :class="addressClass"
         :style="addressStyle"
         :title="showAddressTitle ? remark2 : undefined"
+        @contextmenu.stop ="handleContextMenu"
+        @click.stop="handleClick"
         @mouseover.stop="mouseoverAddress"
       >
         {{ remark1 }}
@@ -25,8 +27,9 @@
         :class="addressClass"
         :style="addressStyle"
         :title="showAddressTitle ? remark2 : undefined"
+        @click.stop="handleClick"
       >
-        {{ remark1 }}
+       {{ remark1 }}
       </span>
     </template>
 
@@ -98,6 +101,7 @@ const {updateNum3}=storeToRefs(useFollowStore())
 const { t } = useI18n()
 
 const botStore = useBotStore()
+const globalStore = useGlobalStore()
 
 const remarksStore = useRemarksStore()
 const walletStore = useWalletStore()
@@ -183,6 +187,29 @@ function sendRemarkToServer(remark: string) {
     .finally(() => {
       loadingEdit.value = false
     })
+}
+// 右键点击事件处理
+function handleContextMenu(e: MouseEvent) {
+  e.preventDefault()
+  const rightClickAction = globalStore.audioSettings?.wallet?.rightClickAction
+  // rightClickAction: 0 不打开, 1 新tab打开
+  const url = `/address/${props.address}/${props.chain}`
+  if (rightClickAction === 1) {
+    window.open(url, '_blank')
+  }
+}
+
+// 右键点击事件处理
+function handleClick(e: MouseEvent) {
+  e.preventDefault()
+  const clickAction = globalStore.audioSettings?.wallet?.clickAction
+  // rightClickAction: 0 不打开, 1 新tab打开
+  const url = `/address/${props.address}/${props.chain}`
+  if (clickAction === 1) {
+    window.open(url, '_blank')
+  } else {
+    window.open(url, '_self')
+  }
 }
 </script>
 

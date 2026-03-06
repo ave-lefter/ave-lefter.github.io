@@ -31,7 +31,7 @@
           v-model.trim="query"
           class="search-input px-20px"
           :placeholder="$t('blackListPlaceHolder')"
-          clearable
+          
           autofocus
           size="large"
         >
@@ -76,6 +76,12 @@
                     class="px-12px py-12px w-100% cursor-pointer hover:bg-[--border]"
                     @click="add(item)"
                   >
+                    <Icon
+                      v-if="item.icon"
+                      :name="`custom:${item.icon}`"
+                      class="text-12px hover:opacity-70% cursor-pointer mr-5px"
+                      :style="{ color: item.color }"
+                    />
                     {{ item.name }}
                   </li>
                 </ul>
@@ -94,16 +100,17 @@
               class="btn"
               :class="active == item.value ? 'active' : ''"
               @click="switchItem(item)"
+
               >{{ item.name }}
-              <template
+              <span
+                class="px-4px py-2px rounded-4px ml-5px text-12px"
                 v-if="pumpBlackList?.filter((i) => i.type == item.value)?.length > 0"
+                :style="{background : filterTypeList(item.value).bg, color: filterTypeList(item.value).color}"
               >
-                {{ pumpBlackList?.filter((i) => i.type == item.value)?.length }}
-              </template>
+              {{ pumpBlackList?.filter((i) => i.type == item.value)?.length }}
+              </span>
             </el-button>
           </div>
-
-          <span>{{ $t('type') }}</span>
           <span>{{ $t('operate') }}</span>
         </div>
 
@@ -111,13 +118,15 @@
           <ul class="content1 mb-20px">
             <li v-for="(row, $index) in list" :key="$index">
               <a href="" class="flex no-underline h-50px" @click.stop.prevent>
-                <div class="flex-start" v-if="row.type == 'dev' || row.type == 'ca'">{{ row.address?.slice(0,4) + '...'+ row.address?.slice(-4)}}<Icon v-copy="row.address" name="bxs:copy" class="ml-5px clickable color-[--third-text]" @click.stop.prevent /></div>
-                <div v-else>{{ row.address }}</div>
                 <div>
-                  <template v-if="row.type == 'dev'">{{ $t('dev') }}</template>
-                  <template v-else-if="row.type == 'ca'">{{ $t('ca') }}</template>
-                  <template v-else-if="row.type == 'keyword'">{{ $t('keywords') }}</template>
-                  <template v-else>{{ row.type }}</template>
+                  <div class="flex-start mb-5px text-14px" v-if="row.type == 'dev' || row.type == 'ca'">{{ row.address?.slice(0,4) + '...'+ row.address?.slice(-4)}}<Icon v-copy="row.address" name="bxs:copy" class="ml-5px clickable color-[--third-text] text-12px" @click.stop.prevent /></div>
+                  <div class="flex-start mb-5px text-14px" v-else>{{ row.address }}<Icon v-copy="row.address" name="bxs:copy" class="ml-5px clickable color-[--third-text] text-12px" @click.stop.prevent /></div>
+
+                  <span v-if="row.type == 'dev'" :style="{background : filterTypeList(row.type).bg, color: filterTypeList(row.type).color}" class="px-4px py-2px rounded-4px text-10px">{{ $t('dev') }}</span>
+                  <span v-else-if="row.type == 'ca'" :style="{background : filterTypeList(row.type).bg, color: filterTypeList(row.type).color}" class="px-4px py-2px rounded-4px text-10px" >{{ $t('ca') }}</span>
+                  <span v-else-if="row.type == 'keyword'" :style="{background : filterTypeList(row.type).bg, color: filterTypeList(row.type).color}" class="px-4px py-2px rounded-4px text-10px">{{ $t('keywords') }}</span>
+                  <span v-else-if="row.type == 'twitter'" :style="{background : filterTypeList(row.type).bg, color: filterTypeList(row.type).color}" class="px-4px py-2px rounded-4px text-10px">{{ $t('twitter') }}</span>
+                  <span v-else :style="{background : filterTypeList(row.type).bg, color: filterTypeList(row.type).color}" class="px-4px py-2px rounded-4px text-12px">{{ row.type }}</span>
                 </div>
                 <div class="flex-end">
                   <el-button class="btn restore" @click.stop.prevent="restore(row)"
@@ -166,32 +175,78 @@ const query = shallowRef('')
 
 const isRotate = shallowRef(false)
 const active = shallowRef('all')
-type TypeValue = 'all' | 'dev' | 'ca' | 'keyword'
+type TypeValue = 'all' | 'dev' | 'ca' | 'keyword' | 'twitter'
 type TypeItem = {
   name: string
   value: TypeValue
+  color: string
+  icon: string
 }
 const typeList = computed<TypeItem[]>(() => {
   return [
     {
       name: t('all'),
       value: 'all',
+      color: '#3F80F7',
+      icon:''
     },
     {
       name: t('dev'),
       value: 'dev',
+      color: '#FFA622',
+      icon:'dev-invisible'
     },
     {
       name: t('ca'),
       value: 'ca',
+      color: '#FFA622',
+      icon:'token'
     },
     {
       name: t('keywords'),
       value: 'keyword',
+      color: '#12B886',
+      icon: 'search'
+    },
+    {
+      name: t('twitter'),
+      value: 'twitter',
+      color: '#009EF7',
+      icon: 'twitter-visible'
     },
   ]
 })
+function filterTypeList(type: TypeValue){
+  const obj = {
+    all: {
+      color: '#3F80F7',
+      bg: '#4080f71a',
+      icon: '',
 
+    },
+    dev: {
+      color: '#FFA622',
+      bg: '#ffa6221a',
+      icon:'dev-invisible'
+    },
+    ca: {
+      color: '#FFA622',
+      bg: '#ffa6221a',
+      icon:'token'
+    },
+    keyword: {
+      color: '#12B886',
+      bg: '#12b8861a',
+      icon: 'search'
+    },
+    twitter: {
+      color: '#009EF7',
+      bg: '#009ef71a',
+      icon: 'twitter-visible'
+    }
+  }
+  return obj [type] || { color: '#3F80F7', icon:'' }
+}
 const list = computed(() => {
   const list = pumpBlackList.value?.slice() || []
   if (active.value == 'dev') {
@@ -200,17 +255,19 @@ const list = computed(() => {
     return list?.filter(i => i.type == 'ca') || []
   } else if (active.value == 'keyword') {
     return list?.filter(i => i.type == 'keyword') || []
-  } else {
+  } else if (active.value == 'twitter') {
+    return list?.filter(i => i.type == 'twitter') || []
+  }else {
     return list || []
   }
 })
 
 
 function openDialog() {}
-function switchItem(item: { value: 'all' | 'dev' | 'ca' | 'keyword' }) {
+function switchItem(item: { value: 'all' | 'dev' | 'ca' | 'keyword' | 'twitter' }) {
   active.value = item.value
 }
-function add(item: { value:  'dev' | 'ca' | 'keyword' }) {
+function add(item: { value:  'dev' | 'ca' | 'keyword' | 'twitter' }) {
   if (pumpBlackList.value?.length > 499) {
     ElMessage.error(t('blacklistLimit'))
     return
@@ -344,11 +401,11 @@ function restore(item: { address: string, type: string }) {
       flex: 3;
       text-align: left;
     }
+    // > :nth-child(2) {
+    //   flex: 1;
+    //   text-align: right;
+    // }
     > :nth-child(2) {
-      flex: 1;
-      text-align: right;
-    }
-    > :nth-child(3) {
       flex: 1;
       text-align: right;
     }
@@ -388,11 +445,11 @@ function restore(item: { address: string, type: string }) {
         font-size: 12px;
         text-align: left;
       }
+      // > :nth-child(2) {
+      //   flex: 1;
+      //   text-align: right;
+      // }
       > :nth-child(2) {
-        flex: 1;
-        text-align: right;
-      }
-      > :nth-child(3) {
         flex: 1;
         text-align: right;
       }

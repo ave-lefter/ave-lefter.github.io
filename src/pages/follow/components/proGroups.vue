@@ -98,7 +98,7 @@
     popper-style="--el-popover-title-font-size:14px;--el-popover-title-text-color:var(--main-text)" width="248" :teleported="false">
       <el-form ref="formRef" v-click-outside="clickOutside" :model="form" :rules="rules" @submit.prevent.stop="handleConfirmEdit(formRef)">
         <el-form-item prop="groupName" label-position="top" size="large" class="mb-20px!">
-          <el-input v-model="form.groupName" class="[&&]:[--el-fill-color-blank:var(--d-666-l-F2F2F2)] [%%]:[el-input__count-inner:transparent]" :placeholder="t('enterGroupName')" :maxlength="50" show-word-limit clearable />
+          <el-input v-model="form.groupName" class="[&&]:[--el-fill-color-blank:var(--d-666-l-F2F2F2)] [%%]:[el-input__count-inner:transparent]" :placeholder="t('enterGroupName')" :maxlength="50" show-word-limit  />
         </el-form-item>
         <el-form-item class="mb-0px!">
           <div class="flex-between w-100%">

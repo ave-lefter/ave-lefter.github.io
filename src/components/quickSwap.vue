@@ -3,7 +3,7 @@ import BigNumber from 'bignumber.js'
 import {ElNotification} from 'element-plus'
 import {useStorage} from '@vueuse/core'
 import {bot_createSolTx, bot_createSwapEvmTx, bot_createSwapTonTx, bot_getTokenBalance} from '~/api/bot'
-import { formatBotGasTips } from '~/utils/bot'
+import { formatBotGasTips, hasCreateTxError, getCreateTxErrorMsg, handleBotError } from '~/utils/bot'
 import type { BotChain, BotSettingKey } from '~/utils/types'
 import useWalletSwap from './quickSwap/wallet'
 import { recordTxV2, updateTxV2 } from '~/api/tracking'
@@ -12,6 +12,7 @@ const { walletSwap, loadingWalletSwap } = useWalletSwap()
 const {t} = useI18n()
 const props = withDefaults(defineProps<{
   quickBuyValue: string
+  swapSetSelected?: 's1' | 's2' | 's3'
   row: {
     chain: BotChain
     symbol?: string
@@ -31,7 +32,8 @@ const props = withDefaults(defineProps<{
   buttonBg: 'rgba(18, 184, 134, 0.15)',
   classNames: '',
   size: '14px',
-  buttonType: 0
+  buttonType: 0,
+  swapSetSelected: undefined
 })
 const botStore = useBotStore()
 const loadingSwap = shallowRef(false)
@@ -108,7 +110,7 @@ async function submitSwap(amount: string) {
   const {chain} = props.row
   const isSolana = chain === 'solana'
   const {botSettings} = botSettingStore
-  const selected = botSettings?.[chain]?.buy?.selected as BotSettingKey
+  const selected = props.swapSetSelected || botSettings?.[chain]?.buy?.selected as BotSettingKey
   const currentBotSetting = botSettings?.[chain]?.buy?.[selected]
   // if (isSolana && currentBotSetting?.mev) {
   //   if (!await botStore.getBundleAvailable()) {
@@ -127,7 +129,7 @@ async function submitSwap(amount: string) {
     }
     data.priorityFee = new BigNumber(priorityFee).times(10 ** 9).toFixed(0)
   } else if (chain !== 'ton') {
-    const gasPrice = Number(settings?.customFee) === 0 ? '0' : (settings?.customFee || gasTips?.[settings?.level as number] || '3')
+    const gasPrice = settings?.customFee == '0' ? '0' : (settings?.customFee || gasTips?.[settings?.level as number] || '3')
     data.gasTip = Number(new BigNumber(gasPrice).times(10 ** 9).toFixed(0))
     data.contractType = 0
     data.chain = chain
@@ -177,13 +179,18 @@ const tokenStore = useTokenStore()
 const wsStore = useWSStore()
 function handleTxSuccess(res: any, _batchId: string) {
   if (res) {
+    const chain = props.row.chain
+    const txInfo: any = res?.[0] || {}
+    if (hasCreateTxError(txInfo)) {
+      handleBotError(getCreateTxErrorMsg(txInfo))
+      loadingSwap.value = false
+      return
+    }
     let Timer: null | ReturnType<typeof setTimeout> = setTimeout(() => {
       // ElNotification({type: 'success', message: t('transactionsSubmitted')})
       tokenStore.placeOrderUpdate++
       loadingSwap.value = false
     }, 500)
-    const chain = props.row.chain
-    const txInfo: any = res?.[0] || {}
     const recordTxUrlObj = {
       solana: '/botapi/swap/createSolTx',
       ton: '/botapi/swap/createSwapTonTx',
@@ -276,8 +283,10 @@ async function getTokenBalance(chain: string) {
       class="mr-4px"
       name="mynaui:lightning-solid"
     />
-    {{ quickBuyValue || 0 }}
-    <span v-if="mainNameVisible" class="ml-5px" >{{ getChainInfo(row.chain)?.main_name || '' }}</span>
+    <div class="m-text">
+      <span>{{ quickBuyValue || 0 }}</span>
+      <span v-if="mainNameVisible" class="ml-5px" >{{ getChainInfo(row.chain)?.main_name || '' }}</span>
+    </div>
   </el-button>
   <el-dialog
     v-if="visible" v-model="visible" :title="$t('buy')"
@@ -325,8 +334,10 @@ async function getTokenBalance(chain: string) {
       class="mr-4px text-12px"
       name="mynaui:lightning-solid"
     />
-    {{ Number(quickBuyValue) ? (quickBuyValue || 0) : $t('buy') }}
-    <span v-if="mainNameVisible && Number(quickBuyValue)" class="ml-5px" >{{ getChainInfo(row.chain)?.main_name || '' }}</span>
+    <div class="m-text">
+      {{ Number(quickBuyValue) ? (quickBuyValue || 0) : $t('buy') }}
+      <span v-if="mainNameVisible && Number(quickBuyValue)" class="ml-5px" >{{ getChainInfo(row.chain)?.main_name || '' }}</span>
+    </div>
   </el-button>
 
 </template>

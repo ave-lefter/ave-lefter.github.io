@@ -23,6 +23,9 @@ export const useTwitterTrackerStore = defineStore('tracker', () => {
     const list = ref([])
     const cursor = ref(null)
 
+    const showFooter = ref(false)
+    const loading2 = ref(false)
+    const finished2 = ref(false)
     const onDrag = useThrottleFn((x: number) => {
         if (x <= 0) {
           translateStyle.value = 12
@@ -104,6 +107,9 @@ export const useTwitterTrackerStore = defineStore('tracker', () => {
         loading,
         list,
         cursor,
-        finished
+        finished,
+        showFooter,
+        loading2,
+        finished2,
     }
 })

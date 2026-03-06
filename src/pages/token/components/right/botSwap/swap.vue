@@ -1,7 +1,7 @@
 <template>
   <div>
     <template v-if="activeTab === 'buy'">
-      <el-input v-model="amountNative" placeholder="0.0" size="large"  clearable class="input-number mt-10px" input-style="text-align:right"  @update:model-value="value => {amountNative = value?.replace?.(/\-|[^\d.]/g, '');watchAmount('buy')}">
+      <el-input v-model="amountNative" placeholder="0.0" size="large"  :clearable="false" class="input-number mt-10px" input-style="text-align:left"  @update:model-value="value => {amountNative = value?.replace?.(/\-|[^\d.]/g, '');watchAmount('buy')}">
         <template #prepend>
           <span class="text-12px color-[--secondary-text]">{{ $t('amount') }}</span>
         </template>
@@ -24,18 +24,11 @@
           </el-dropdown>
         </template>
       </el-input>
-      <div class="flex items-center mt-10px text-12px">
-        <span class="color-[--main-text]">≈{{  formatNumber(amountNativeOut || 0) }} {{ tokenInfo?.symbol }}</span>
-        <Icon name="ri:wallet-fill" class="color-[--third-text] text-14px ml-auto" />
-        <span class="text-12px color-[--third-text] mx-3px">{{ botSwapStore.botSwapSelectedWallets?.length }}</span>
-        <div class="color-[--third-text]" :class="{ 'clickable': botSwapStore.botSwapSelectedWallets?.length <= 1 }" @click.stop="handleMax(tokenStore.swap.payToken?.balance || 0, 'buy')">{{ $t('balance1') }}: <span>{{ formatNumber(totalSelectWalletBalance || 0) }}</span> {{ tokenStore.swap.payToken?.symbol || '' }}
-        </div>
-        <RefreshBalance class="color-[--third-text]" :type="0" isPayToken isBatch />
-      </div>
-      <div class="tabs mt-10px">
+
+      <div class="tabs mt-1px">
         <button v-for="(item, index) in tabs1" :key="index" class="tab-item" type="button"  @click.stop="handleAmount(item, 'buy')">
           <!-- <img class="mr-5px" :src="`${configStore.token_logo_url}${tokenStore.swap.payToken?.logo_url}`" style="border-radius: 50%;" height="14"  alt="" srcset="" > -->
-          <span v-if="!editMode">{{ item.name }}</span>
+          <span v-if="!editMode">{{ item.name||'&nbsp;' }}</span>
           <el-input
 v-else-if="tabs1Ref[index]" v-model="tabs1Ref[index].value"
             style="--el-input-inner-height:24px;--el-input-bg-color:transparent;--el-input-border-color:transparent;--el-input-hover-border-color:transparent;--el-input-focus-border-color:transparent"
@@ -48,17 +41,27 @@ size="small"
           <Icon :name="editMode ? 'custom:select' : 'custom:remark'"/>
         </button>
       </div>
+      <div class="flex items-center mt-10px text-12px">
+        <!-- <Icon name="ri:wallet-fill" class="color-[--third-text] text-14px ml-auto" />
+        <span class="text-12px color-[--third-text] mx-3px">{{ botSwapStore.botSwapSelectedWallets?.length }}</span>
+        <div class="color-[--third-text]" :class="{ 'clickable': botSwapStore.botSwapSelectedWallets?.length <= 1 }" @click.stop="handleMax(tokenStore.swap.payToken?.balance || 0, 'buy')">{{ $t('balance1') }}: <span>{{ formatNumber(totalSelectWalletBalance || 0) }}</span> {{ tokenStore.swap.payToken?.symbol || '' }}
+        </div>
+        <RefreshBalance class="color-[--third-text]" :type="0" isPayToken isBatch /> -->
+        <AutoSellSet v-if="activeTab === 'buy' && swapType==='market' && chain !=='ton'" class="w-full">
+          <span class="color-[--third-text]">≈{{  formatNumber(amountNativeOut || 0) }} {{ tokenInfo?.symbol }}</span>
+        </AutoSellSet>
+      </div>
     </template>
     <template v-else-if="activeTab === 'sell'">
-      <el-input v-if="botSwapStore.botSwapSelectedWallets?.length > 1"  v-model="amountSellTokenPercent" clearable class="input-number mt-10px" size="large"  input-style="text-align:right"  placeholder="0" @update:model-value="value => {amountSellTokenPercent = value?.replace?.(/\-|[^\d.]/g, '');watchAmount('sell')}">
+      <el-input v-if="botSwapStore.botSwapSelectedWallets?.length > 1"  v-model="amountSellTokenPercent" :clearable="false" class="input-number mt-10px" size="large"  input-style="text-align:left"  placeholder="0" @update:model-value="value => {amountSellTokenPercent = value?.replace?.(/\-|[^\d.]/g, '');watchAmount('sell')}">
         <template #prepend>
           <span class="text-12px color-[--secondary-text]">{{ tokenInfo?.symbol }}</span>
         </template>
         <template #append>
-           <span class="text-12px color-[--main-text]">%</span>
+          <span class="text-12px color-[--main-text]">%</span>
         </template>
       </el-input>
-      <el-input v-else v-model="amountToken" clearable class="input-number mt-10px" size="large"  input-style="text-align:right"  placeholder="0.0" @update:model-value="value => {amountToken = value?.replace?.(/\-|[^\d.]/g, '');watchAmount('sell')}">
+      <el-input v-else v-model="amountToken" :clearable="false" class="input-number mt-10px" size="large"  input-style="text-align:left"  placeholder="0.0" @update:model-value="value => {amountToken = value?.replace?.(/\-|[^\d.]/g, '');watchAmount('sell')}">
         <template #prepend>
           <span class="text-12px color-[--secondary-text]">{{ $t('amount') }}</span>
         </template>
@@ -66,6 +69,27 @@ size="small"
            <span class="text-12px color-[--main-text]">{{ tokenInfo?.symbol  }}</span>
         </template>
       </el-input>
+      <div class="tabs mt-1px">
+        <!-- <button v-for="(item, index) in tabs2" :key="index" class="tab-item" type="button" @click.stop="handleAmount(item, 'sell')">
+          <span>{{ item.name }}</span>
+        </button> -->
+          <button v-for="(item, index) in tabs2" :key="index" class="tab-item" type="button"  @click.stop="handleAmount(item, 'sell')">
+          <!-- <img class="mr-5px" :src="`${configStore.token_logo_url}${tokenStore.swap.payToken?.logo_url}`" style="border-radius: 50%;" height="14"  alt="" srcset="" > -->
+          <span v-if="!editMode2">{{ item.name==='0%'?'&nbsp;':item.name }}</span>
+          <el-input
+            v-else-if="tabs2Ref[index]" v-model="tabs2Ref[index].value"
+            style="--el-input-inner-height:24px;--el-input-bg-color:transparent;--el-input-border-color:transparent;--el-input-hover-border-color:transparent;--el-input-focus-border-color:transparent"
+            class="text-center w-full h-full"
+size="small"
+            @blur="tabs2Ref[index].value = Number(tabs2Ref[index].value?.replace?.(/\-|[^\d.]/g, ''))<=1?tabs2Ref[index].value?.replace?.(/\-|[^\d.]/g, ''):'1'"
+            :formatter="formatter"
+            :parser="parser"
+           >  <template #suffix>%</template></el-input>
+        </button>
+        <button class="tab-item h-30px basis-[26px]! grow-0! shrink-0!" type="button" @click="handleEdit2(tabs2Ref, 'sell')">
+          <Icon :name="editMode2 ? 'custom:select' : 'custom:remark'"/>
+        </button>
+      </div>
       <div class="flex items-center mt-10px text-12px">
         <div class="color-[--main-text] flex items-center"><span>≈{{ formatNumber(amountTokenOut || 0) }}</span>
           <el-dropdown placement="bottom" trigger="click" @visible-change="visible => show = visible">
@@ -83,19 +107,14 @@ size="small"
             </template>
           </el-dropdown>
         </div>
-        <Icon name="ri:wallet-fill" class="color-[--third-text] text-14px ml-auto" />
+        <!-- <Icon name="ri:wallet-fill" class="color-[--third-text] text-14px ml-auto" />
         <span class="text-12px color-[--third-text] mx-3px">{{ botSwapStore.botSwapSelectedWallets?.length }}</span>
         <span class="color-[--third-text]" :class="{ 'clickable': botSwapStore.botSwapSelectedWallets?.length <= 1 }" @click.stop="handleMax(tokenStore.swap.token?.balance || 0, 'sell')">{{ $t('balance1') }}: <span >{{ formatNumber(totalSelectWalletBalance1 || 0) }}</span> {{ tokenInfo?.symbol }}</span>
-        <RefreshBalance class="color-[--third-text]" :type="1" isPayToken isBatch />
-      </div>
-      <div class="tabs mt-10px">
-        <button v-for="(item, index) in tabs2" :key="index" class="tab-item" type="button" @click.stop="handleAmount(item, 'sell')">
-          <span>{{ item.name }}</span>
-        </button>
+        <RefreshBalance class="color-[--third-text]" :type="1" isPayToken isBatch /> -->
       </div>
     </template>
     <template v-if="swapType === 'limit'">
-      <el-input v-model="priceLimit" placeholder="0.0" size="large"  clearable class="input-number mt-10px" input-style="text-align:right" @update:model-value="value => priceLimit = value?.replace?.(/\-|[^\d.]/g, '')">
+      <el-input v-model="priceLimit" placeholder="0.0" size="large"  :clearable="false" class="input-number mt-10px" input-style="text-align:left" @update:model-value="value => priceLimit = value?.replace?.(/\-|[^\d.]/g, '')">
         <template #prepend>
           <span class="text-12px color-[--secondary-text]">{{ isPriceLimit ? $t('price') : 'MC' }}</span>
           <Icon name="iconamoon:synchronize-fill" class="clickable ml-5px text-12px color-[--main-text]" @click.stop="isPriceLimit = !isPriceLimit"/>
@@ -121,7 +140,6 @@ size="small"
         </el-input>
       </div>
     </template>
-    <AutoSellSet v-if="activeTab === 'buy' && swapType==='market' && chain !=='ton'" class="mt-15px" />
     <template v-if="isSupportSwap">
       <el-button v-if="!isApprove" :color="swapButtonColor" class="submit-btn" native-type="button" :loading="loadingApprove || loadingSwap || loadingAllowance" :disabled="Number(fromToken.balance) < Number(fromAmount)" @click.stop="approve">{{ Number(fromToken.balance) === 0 || Number(fromToken.balance) < Number(fromAmount) ? (checkAmountMessage() || $t('approve')) : $t('approve') }}</el-button>
 
@@ -199,9 +217,10 @@ import { useI18n } from 'vue-i18n'
 import { NATIVE_TOKEN, MIN_BALANCE } from '@/utils/constants'
 import BigNumber from 'bignumber.js'
 import { debounce } from 'lodash-es'
-import { getAddressAndChainFromId, isEvmChain, getRpcProvider } from '@/utils'
+import { getAddressAndChainFromId, isEvmChain, getRpcProvider, formatUnits } from '@/utils'
 import { ElMessageBox } from 'element-plus'
 import { useBotSwap } from '~/composables/botSwap'
+import { useTransactionPrompt } from '@/composables/useTransactionPrompt'
 import { bot_createSolTx, bot_createSwapEvmTx, bot_createSolLimitTx, bot_createEvmLimitTx, bot_createSwapTonTx, bot_createTonLimitSwap, getAutoSlippage } from '@/api/bot'
 import RefreshBalance from './refreshBalance.vue'
 import { formatDec, formatNumber } from '@/utils/formatNumber'
@@ -211,7 +230,7 @@ import type { BotChain } from '~/utils/types'
 import { recordTxV2, updateTxV2 } from '~/api/tracking'
 import BottomSetting from './bottomSetting.vue'
 import delayedNotify from '~/utils/notify'
-import { formatBotError } from '~/utils/bot'
+import { formatBotError, hasCreateTxError, getCreateTxErrorMsg } from '~/utils/bot'
 
 
 
@@ -241,6 +260,7 @@ const tabs2Ref = ref(props.tabs2)
 const emit = defineEmits(['getTokenBalance', 'update:botSettings'])
 
 const { t } = useI18n()
+const { executing } = useTransactionPrompt()
 
 const show = ref(false)
 
@@ -514,7 +534,9 @@ const handleMax = (balance: string | number, type: 'buy' | 'sell') => {
 }
 
 function handleAmount(item: { name: string; value: string }, type: 'buy' | 'sell') {
+  console.log('handleAmount',item, type)
   if(editMode.value) return
+  if(editMode2.value) return
   if (type === 'buy') {
     amountNative.value = item.value
   } else if (type === 'sell') {
@@ -657,6 +679,25 @@ function getChain() {
   return chain as BotChain
 }
 
+function getPromptMainEvmAddress() {
+  return botStore.evmAddress || botSwapStore.botSwapSelectedWallets?.[0] || ''
+}
+
+function getPromptChainAddress(chain: BotChain) {
+  const evmAddress = getPromptMainEvmAddress()
+  const wallet = botStore.walletList?.find?.(item => item.evmAddress === evmAddress)
+  const chainAddress = wallet?.addresses?.find?.(item => item?.chain === chain)?.address
+  return chainAddress || botStore.userInfo?.addresses?.find?.(item => item?.chain === chain)?.address || ''
+}
+
+function isSameAddress(a?: string, b?: string, chain?: BotChain) {
+  if (!a || !b) return false
+  if (chain && isEvmChain(chain)) {
+    return a.toLowerCase() === b.toLowerCase()
+  }
+  return a === b
+}
+
 const isSupportSwap = computed(() => {
   const chain = getChain()
   return botStore.accessToken && botStore?.isSupportChains?.includes?.(chain)
@@ -749,6 +790,68 @@ async function submitBotSwap() {
   loadingSwap.value = true
   const isBuy = props.activeTab === 'buy'
   const chain = getChain()
+  const promptCreatorAddress = getPromptChainAddress(chain)
+  const promptAvatarAddress = promptCreatorAddress || getPromptMainEvmAddress()
+  const promptFromToken = isBuy ? tokenStore.swap.payToken : tokenStore.swap.token
+  const promptToToken = isBuy ? tokenStore.swap.token : tokenStore.swap.payToken
+  let promptStartTime = 0
+  let promptTimer: ReturnType<typeof setInterval> | null = null
+  let promptAutoCloseTimer: ReturnType<typeof setTimeout> | null = null
+  let promptDone = false
+  const clearPromptTimer = () => {
+    if (promptTimer) {
+      clearInterval(promptTimer)
+      promptTimer = null
+    }
+  }
+  const clearPromptAutoCloseTimer = () => {
+    if (promptAutoCloseTimer) {
+      clearTimeout(promptAutoCloseTimer)
+      promptAutoCloseTimer = null
+    }
+  }
+  promptStartTime = Date.now()
+  const promptHandle = executing({
+    avatarAddress: promptAvatarAddress,
+    avatarChain: chain,
+  })
+  const finishPromptFail = () => {
+    if (promptDone) return
+    promptDone = true
+    clearPromptTimer()
+    clearPromptAutoCloseTimer()
+    promptHandle.close()
+  }
+  const finishPromptSuccess = (txInfo1: any) => {
+    if (promptDone) return
+    promptDone = true
+    clearPromptTimer()
+    clearPromptAutoCloseTimer()
+    const elapsedSec = (Date.now() - promptStartTime) / 1000
+    const fromAmountDisplay = txInfo1?.fromAmount ? formatUnits(txInfo1.fromAmount, promptFromToken?.decimals || 0) : fromAmount.value
+    const toAmountDisplay = txInfo1?.outputAmount ? formatUnits(txInfo1.outputAmount, promptToToken?.decimals || 0) : toAmount.value
+    promptHandle.success({
+      chain: chain,
+      txHash: txInfo1?.txHash || txInfo1?.hash || '',
+      elapsedSec,
+      isBuy,
+      fromSymbol: promptFromToken?.symbol || '',
+      fromAmount: fromAmountDisplay,
+      toSymbol: promptToToken?.symbol || '',
+      toAmount: toAmountDisplay,
+      avatarAddress: promptAvatarAddress,
+      avatarChain: chain,
+    })
+  }
+  promptTimer = setInterval(() => {
+    promptHandle.update(Date.now() - promptStartTime)
+  }, 100)
+  promptAutoCloseTimer = setTimeout(() => {
+    if (promptDone) return
+    clearPromptTimer()
+    promptHandle.close()
+    promptAutoCloseTimer = null
+  }, 120000)
   const chainMainToken: Record<string, string> = {
     solana: 'sol',
     ton: 'TON',
@@ -814,6 +917,7 @@ async function submitBotSwap() {
         // const chain = 'solana'
         const isError = res?.every?.((i: { errorLog: string }) => i?.errorLog)
         res?.forEach?.((txInfo: any) => {
+          const isPromptTx = !promptCreatorAddress || isSameAddress(txInfo?.creatorAddress, promptCreatorAddress, chain)
           const walletName = botStore.walletList?.find?.(j => j?.addresses?.find?.(k => k?.chain === chain)?.address === txInfo?.creatorAddress?.toLowerCase?.())?.name || ''
           let Timer: null | ReturnType<typeof setTimeout> = setTimeout(() => {
             // this.$store.state.bot.historyUpdate++
@@ -836,6 +940,9 @@ async function submitBotSwap() {
               Timer = null
             }
             handleBotError(walletName + ' ' + txInfo?.errorLog, ElNotification)
+            if (isPromptTx) {
+              finishPromptFail()
+            }
             if (isError) {
               loadingSwap.value = false
               return
@@ -856,27 +963,36 @@ async function submitBotSwap() {
           const unwatch = watch(() => wsStore?.wsResult.tgbot, (subscribeResult) => {
             const _batchId = subscribeResult.batchId
             const txInfo1 = subscribeResult?.txList?.[0]
-            if (_batchId?.includes(batchId) && txInfo.creatorAddress === txInfo1?.walletAddress) {
+            if (_batchId?.includes(batchId) && isSameAddress(txInfo.creatorAddress, txInfo1?.walletAddress, chain)) {
               if (Timer) {
                 clearTimeout(Timer)
                 Timer = null
               }
               tokenStore.placeOrderSuccess++
                if (txInfo1?.success) {
-                ElNotification({ type: 'success', message: txInfo1?.walletName + ' ' + t('tradeSuccess') })
                 updateTxV2({...txInfo1, chain: subscribeResult?.chain}, txInfo?.id || '')
+                if (isPromptTx) {
+                  finishPromptSuccess(txInfo1)
+                }
               } else {
                 const msg = formatBotError(txInfo1?.failMessage) || 'swap error'
                 handleBotError(txInfo1?.walletName + ' ' + msg, ElNotification)
+                if (isPromptTx) {
+                  finishPromptFail()
+                }
               }
               unwatch()
               loadingSwap.value = false
             }
           })
         })
+      } else {
+        finishPromptFail()
+        loadingSwap.value = false
       }
     }).catch(err => {
       handleBotError(err || 'swap error', ElNotification)
+      finishPromptFail()
       loadingSwap.value = false
     })
   } else if (isEvmChain(chain)) {
@@ -887,7 +1003,7 @@ async function submitBotSwap() {
     const { gasTip1List, gasTip2List } = formatBotGasTips(botSwapStore.gasTip, chain)
     const gasTips = mev ? gasTip1List : gasTip2List
     const settings = mev ? botSettings?.gas[0] : botSettings?.gas[1]
-    const gasPrice = !settings?.customFee ? '0' : (settings?.customFee || gasTips?.[settings?.level] || '3')
+    const gasPrice = settings?.customFee == '0' ? '0' : (settings?.customFee || gasTips?.[settings?.level || 0] || '3')
     const gasTip = Number(new BigNumber(gasPrice).times(10 ** 9).toFixed(0))
     const ft = isBuy ? tokenStore.swap.payToken : tokenStore.swap.token
     const tt = isBuy ? tokenStore.swap.token : tokenStore.swap.payToken
@@ -943,8 +1059,9 @@ async function submitBotSwap() {
     // })
     bot_createSwapEvmTx(data).then(res => {
       if (res) {
-        const isError = res?.every?.((i: { errorLog: string }) => i?.errorLog)
+        const isError = res?.every?.((i: any) => hasCreateTxError(i))
         res?.forEach?.((txInfo: any) => {
+          const isPromptTx = !promptCreatorAddress || isSameAddress(txInfo?.creatorAddress, promptCreatorAddress, chain)
           const walletName = botStore.walletList?.find?.(j => j?.evmAddress?.toLowerCase?.() === txInfo?.creatorAddress?.toLowerCase?.())?.name || ''
           let Timer: null | ReturnType<typeof setTimeout> = setTimeout(() => {
             // tokenStore.placeOrderUpdate++
@@ -957,12 +1074,15 @@ async function submitBotSwap() {
             amountTokenOut.value = ''
             // this.dialogVisibleSwap = false
           }, 500)
-          if (txInfo?.errorLog) {
+          if (hasCreateTxError(txInfo)) {
             if (Timer) {
               clearTimeout(Timer)
               Timer = null
             }
-            handleBotError(walletName + ' ' + txInfo?.errorLog, ElNotification)
+            handleBotError(walletName + ' ' + getCreateTxErrorMsg(txInfo), ElNotification)
+            if (isPromptTx) {
+              finishPromptFail()
+            }
             if (isError) {
               loadingSwap.value = false
               return
@@ -979,14 +1099,13 @@ async function submitBotSwap() {
             const txInfo1 = subscribeResult?.txList?.[0]
             console.log('txInfo1', txInfo1)
             console.log('txInfo', txInfo, _batchId?.includes?.(batchId) && txInfo.creatorAddress === txInfo1?.walletAddress)
-            if (_batchId?.includes?.(batchId) && txInfo.creatorAddress === txInfo1?.walletAddress) {
+            if (_batchId?.includes?.(batchId) && isSameAddress(txInfo.creatorAddress, txInfo1?.walletAddress, chain)) {
               if (Timer) {
                 clearTimeout(Timer)
                 Timer = null
               }
               tokenStore.placeOrderSuccess++
               if (txInfo1?.success) {
-                ElNotification({ type: 'success', message: txInfo1?.walletName + ' ' + t('tradeSuccess') })
                 updateTxV2({...txInfo1, chain: subscribeResult?.chain}, txInfo?.id || '')
                 updateBalanceFromWs({
                   chain: data.chain,
@@ -994,9 +1113,15 @@ async function submitBotSwap() {
                   outTokenAddress: data.outTokenAddress,
                   ...txInfo1
                 })
+                if (isPromptTx) {
+                  finishPromptSuccess(txInfo1)
+                }
               } else {
                 const msg = formatBotError(txInfo1?.failMessage) || 'swap error'
                 handleBotError(txInfo1?.walletName + ' ' + msg, ElNotification)
+                if (isPromptTx) {
+                  finishPromptFail()
+                }
               }
               unwatch()
               loadingSwap.value = false
@@ -1006,6 +1131,7 @@ async function submitBotSwap() {
       }
     }).catch(err => {
       handleBotError(err || 'swap error', ElNotification)
+      finishPromptFail()
       loadingSwap.value = false
     })
   }
@@ -1199,7 +1325,7 @@ function submitBotLimit() {
     }
     bot_createEvmLimitTx(data).then(res => {
       if (res) {
-        const isError = res?.every?.((i: { errorLog: string }) => i?.errorLog)
+        const isError = res?.every?.((i: any) => hasCreateTxError(i))
         res?.forEach?.((txInfo: any) => {
           const walletName = botStore.walletList?.find?.(j => j?.addresses?.find?.(k => k?.chain === chain)?.address === txInfo?.creatorAddress?.toLowerCase?.())?.name || ''
           let Timer: null | ReturnType<typeof setTimeout> = setTimeout(() => {
@@ -1215,12 +1341,12 @@ function submitBotLimit() {
           amountTokenOut.value = ''
           amountNativeOut.value = ''
         }, 500)
-        if (txInfo?.errorLog) {
+        if (hasCreateTxError(txInfo)) {
           if (Timer) {
             clearTimeout(Timer)
             Timer = null
           }
-          handleBotError(walletName + ' ' + txInfo?.errorLog, ElNotification)
+          handleBotError(walletName + ' ' + getCreateTxErrorMsg(txInfo), ElNotification)
           if (isError) {
             loadingSwap.value = false
             return
@@ -1423,12 +1549,53 @@ watch(() => tokenStore.placeOrderSuccess, () => {
 })
 
 const editMode = ref(false)
+const editMode2 = ref(false)
 function handleEdit(value: Ref<Array<{value: string}>>,type: string) {
   editMode.value = !editMode.value
   const botSetting = (botSettingStore?.botSettings?.[chain.value]?.buy || {}) as typeof botSettingStore.botSettings.solana
   botSettingStore.botSettings[chain.value][type][botSetting?.selected || 's1'].buyValueList = value.map(el=>el.value)
 }
 
+function handleEdit2(value: Ref<Array<{value: string}>>,type: string) {
+  console.log('handleEdit2',value,type)
+  editMode2.value = !editMode2.value
+  const botSetting = (botSettingStore?.botSettings?.[chain.value]?.sell || {}) as typeof botSettingStore.botSettings.solana
+  botSettingStore.botSettings[chain.value][type][botSetting?.selected || 's1'].sellPerList = value.map(el=>el.value *100)
+}
+
+// Formatter: 0-1 转换为百分比显示（带%）
+const formatter = (value: string | number): string => {
+  console.log('formatter', value)
+  if (!value && value !== 0) {
+    return ''
+  }
+  const numValue = typeof value === 'string' ? parseFloat(value) : value
+  if (isNaN(numValue)) {
+    return ''
+  }
+  return `${Math.round(numValue * 100)}`
+}
+
+const parser = (value: string) => {
+  console.log('parser', value)
+  if (!value) {
+    return ''
+  }
+  const cleanValue = value.trim()
+  const numValue = parseFloat(cleanValue)
+  
+  if (isNaN(numValue)) {
+    return ''
+  }
+
+  return `${numValue/100}`
+}
+// 使用 defineExpose 暴露方法
+defineExpose({
+  handleMax,
+  totalSelectWalletBalance,
+  totalSelectWalletBalance1
+});
 // 生命周期钩子
 onMounted(() => {
   initPriceLimit()
@@ -1505,7 +1672,7 @@ onMounted(() => {
       padding: 0 10px;
     }
     :deep() .el-input-group__prepend {
-      --el-fill-color-light: var(--border);
+      // --el-fill-color-light: var(--border);
       min-width: 70px;
       padding: 0 12px;
     }

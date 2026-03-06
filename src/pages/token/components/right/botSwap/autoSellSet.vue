@@ -1,8 +1,9 @@
 <template>
   <div v-show="botStore.userInfo?.evmAddress">
     <div class="flex-between h-24px my--2px ">
+      <slot></slot>
       <div class="flex items-center">
-        <el-checkbox v-model="isAutoSellConfig" class="auto-sell-checkbox"><span class="font-400 color-#3F80F7 text-14px">{{ $t('advancedTrading') }}</span></el-checkbox>
+        <el-checkbox v-model="isAutoSellConfig" class="auto-sell-checkbox"><span class="font-400 text-12px">{{ $t('advancedTrading') }}</span></el-checkbox>
         <Icon
           v-tooltip.raw="{
           content: $t('advancedTradingTips'),
@@ -12,8 +13,9 @@
         }" name="material-symbols:help-rounded" class="text-14px color-[--icon-color] cursor-pointer ml-3px" />
       </div>
       <!-- <div class="flex items-center gap-5px" v-show="isAutoSellConfig" > -->
-      <div class="flex items-center gap-5px">
-        <el-select popper-class="w-selectAutoSell" v-model="autoSellConfigName" :placeholder="t('defaultPolicy')" style="width: 110px" @change="changeAutoSellConfig" placement="bottom-end" :persistent="false" size="small" :disabled="!isAutoSellConfig" v-tooltip="autoSellConfigNameStr">
+    </div>
+    <div v-if="isAutoSellConfig" class="flex items-center gap-10px mt-8px">
+        <el-select popper-class="w-selectAutoSell" v-model="autoSellConfigName" :placeholder="t('defaultPolicy')"  @change="changeAutoSellConfig" placement="bottom-end" :persistent="false" size="small" :disabled="!isAutoSellConfig" v-tooltip="autoSellConfigNameStr">
           <li class="el-select-dropdown__item text-[--third-text]!">{{ t('defaultPolicy') }}</li>
           <el-option
             v-for="item in autoSellConfigOption"
@@ -23,8 +25,7 @@
           >
           </el-option>
         </el-select>
-        <SlippageSet :canSetAuto="true" :isAutoSell="true" :showAutoSell="true" :chain="(tokenStore.tokenInfo?.token?.chain as BotChain)" :setting="botSettingStore?.botSettings[chain]"  />
-      </div>
+        <SlippageSet :canSetAuto="true" :isAutoSell="true" :showAutoSell="true" :chain="(tokenStore.tokenInfo?.token?.chain as BotChain)" :setting="botSettingStore?.botSettings[chain]"/>
     </div>
     <ul v-show="botSettingStore.autoSellConfigs.isAutoSellConfig">
       <li v-for="(item, index) in autoSellConfig" :key="index" class="mt-8px flex items-center gap-4px">
@@ -256,6 +257,10 @@ function triggerAutoSellConfig() {
 <style scoped lang='scss'>
 .auto-sell-checkbox :deep() {
   --el-checkbox-height: 20px;
+  .el-checkbox__label{
+    --el-checkbox-text-color:var(--third-text);
+    --el-checkbox-checked-text-color:var(--secondary-text)
+  }
   .el-checkbox__input {
     align-items: center;
   }

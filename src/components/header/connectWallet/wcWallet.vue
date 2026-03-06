@@ -38,7 +38,7 @@
         </div>
         <div class="color-[--d-999-l-666]">Google Play</div>
       </a>
-       <a class="text-center clickable" target="_blank" href="https://www.avedownload.com/app/ave.ai.2.3.07.c.apk">
+       <a class="text-center clickable" target="_blank" href="https://www.avedownload.com/app/ave.ai.2.3.17.apk">
         <div class="mb-5px">
           <Icon name="material-symbols:android" class="text-20px color-#8ad04d" />
         </div>

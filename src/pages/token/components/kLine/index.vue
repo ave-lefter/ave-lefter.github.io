@@ -198,6 +198,8 @@ import {
   useTop100AvgPriceLine,
   useBotAvgPriceLine,
   useKOLAvgPriceLine,
+  DEFAULT_LIST,
+  SUPPORT_LIST
 } from './utils'
 import {
   useLocalStorage,
@@ -209,7 +211,7 @@ import {
 import type { WSTx, KLineBar, SimpleWSTx } from './types'
 import BigNumber from 'bignumber.js'
 import { useKlineMarks } from './mark'
-import { DefaultHeight, WSSimpleTxChain } from '~/utils/constants'
+import { DefaultHeight, WSSimpleTxChain, SupportTokenKlineLaunchpad, SupportTokenKlineChains } from '~/utils/constants'
 import { TW_STUDY } from './constant'
 import UnknownRisk from './unknownRisk.vue'
 import DialogRemind from './dialogRemind.vue'
@@ -224,9 +226,12 @@ const tokenStore = props.isRank ? useRankKlineStore() : useTokenStore()
 const botStore = useBotStore()
 const tokenDetailsStore = useTokenDetailsStore()
 const globalStore = useGlobalStore()
+const localeStore = useLocaleStore()
 const route = useRoute()
 const walletStore = useWalletStore()
 const scrollTop = ref(0)
+const wsStore = useWSStore()
+const { showMarket } = storeToRefs(useGlobalStore())
 const totalHolders = computed(() => [
   { id: 'trade', name: t('mine') },
   {
@@ -250,7 +255,7 @@ const totalHolders = computed(() => [
     name: 'KOL',
   },
 ])
-const linesChecked = useLocalStorage('tv_markLines', {
+const linesChecked = useLocalStorage('tv_markLines1', {
   buy: {
     checked: true,
     color: '#12B886',
@@ -269,7 +274,7 @@ const linesChecked = useLocalStorage('tv_markLines', {
   },
   kol: {
     checked: false,
-    color: '#424ADF',
+    color: '#9CA1A8',
   },
 })
 const colorPickerVisible = ref({} as Record<string, boolean>)
@@ -295,6 +300,12 @@ const dialogVisible_remind = ref(false)
 //   year: 50
 // })
 
+const migrated = ref( null as null | {
+  migrate_time: number
+  migrate_uprice: string
+  showMarket: boolean
+  mcap: number
+})
 const chain = computed(() => {
   return getAddressAndChainFromId(token.value)?.chain || tokenStore?.token?.chain || ''
 })
@@ -329,6 +340,13 @@ watch(
   () => token.value,
   (val) => {
     if (!val) return
+
+    migrated.value = {
+      migrate_time: 0,
+      migrate_uprice: '0',
+      showMarket: false,
+      mcap: 0,
+    }
     if (_widget?.activeChart?.()) {
       _widget?.activeChart?.()?.removeAllShapes?.()
       // const chart = _widget?.activeChart?.()
@@ -343,34 +361,57 @@ watch(
   }
 )
 
-watch(pair, (val) => {
-  if (val === klinePair.value) return
+watch([pair, () => tokenStore.selectedToken], () => {
   switchTokenKline()
 })
-
 watch(
-  () => tokenStore.selectedToken,
-  () => {
-    switchTokenKline()
+  () => wsStore.wsResult[WSEventType.SWITCH_MAIN_PAIR_V2],
+  (val) => {
+
+    if (isReady.value && route.name === 'token-id' && val) {
+      const new_main_pair_data = val.new_main_pair_data
+        if(new_main_pair_data.target_token == tokenAddress.value){
+          const migrate_uprice = new_main_pair_data.target_token == new_main_pair_data.token0_address ? new_main_pair_data?.token0_price_usd : new_main_pair_data?.token1_price_usd
+          console.log('----------migrate_uprice------------',migrate_uprice)
+          if (new_main_pair_data?.blocktime) {
+            migrated.value = {
+              migrate_time: new_main_pair_data?.blocktime,
+              migrate_uprice: migrate_uprice,
+              showMarket: showMarket.value,
+              mcap: new BigNumber(migrate_uprice || 0).times(tokenStore?.token?.total || 0).toNumber(),
+            }
+            console.log('----------migrate_uprice-1-----------',migrated.value)
+            setTimeout(() => {
+              onMarkChanged(true)
+            }, 500)
+          }
+        }
+    }
   }
 )
+// watch(
+//   () => tokenStore.selectedToken,
+//   () => {
+//     switchTokenKline()
+//   }
+// )
 
 function switchTokenKline() {
   isReadyLine = false
-  resetLimitPriceLineId()
-  // resetAvgPriceLineId()
-  resetTop100AvgPriceLineId()
-  resetBotAvgLineId()
-  resetKOLLine()
   const val = pair.value
   if (isReady.value && route.name === 'token-id') {
+    resetLimitPriceLineId()
+    // resetAvgPriceLineId()
+    resetTop100AvgPriceLineId()
+    resetBotAvgLineId()
+    resetKOLLine()
     const isSupportSecChains = (chain.value && supportSecChains.includes(chain.value)) || false
     const QUICK_KEY = 'tradingview.IntervalWidget.quicks'
     const preResolutions = localStorage.getItem(QUICK_KEY)
     resolution.value = initTradingViewIntervals(resolution.value, chain.value, isSupportSecChains)
     const nextResolutions = localStorage.getItem(QUICK_KEY)
     if (preResolutions !== nextResolutions) {
-        resetChart()
+      // resetChart()
     }
     if (_widget && _widget?.activeChart?.()) {
       _widget?.resetCache?.()
@@ -399,9 +440,15 @@ watch(user, () => {
   }
 })
 
+watch(()=>localeStore.locale,()=>{
+  if (isReady.value && route.name === 'token-id') {
+    console.log('localeStore.locale', localeStore.locale)
+    _widget?.activeChart?.()?.clearMarks?.()
+    _widget?.activeChart?.()?.refreshMarks?.()
+  }
+})
+
 const price = 0
-const wsStore = useWSStore()
-const localeStore = useLocaleStore()
 
 // const marks = shallowRef([{ id: 'trade', name: '我的' }])
 
@@ -422,8 +469,6 @@ const listenerGuidMap = new Map()
 const resolution = shallowRef(localStorage.getItem('tv_resolution') || '15')
 const themeStore = useThemeStore()
 let _widget: null | IChartingLibraryWidget = null
-
-const showMarket = useLocalStorage('tv_showMarket', false)
 
 // 切换主题
 watch(
@@ -556,7 +601,7 @@ function createTogglePriceWarningButton() {
 
   const updateButtonContent = () => {
     btn.innerHTML =
-      '<div style="display: flex;align-items: center;cursor:pointer;padding: 7px 5px 7px 0;border-radius: 6px;" onMouseOver="this.style.background=\'none\'"  onMouseLeave="this.style.background=\'none\'"><img width="18" height="18" src="https://ave.s3.ap-east-1.amazonaws.com/im/alert.png" /></div>'
+      '<div style="display: flex;align-items: center;cursor:pointer;padding: 7px 0px 7px 0;border-radius: 6px;" onMouseOver="this.style.background=\'none\'"  onMouseLeave="this.style.background=\'none\'"><svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14.4 12.1429H16V13.7619H0V12.1429H1.6V6.47619C1.6 4.7586 2.27428 3.11135 3.47452 1.89683C4.67475 0.682311 6.30261 0 8 0C9.69739 0 11.3253 0.682311 12.5255 1.89683C13.7257 3.11135 14.4 4.7586 14.4 6.47619V12.1429ZM12.8 12.1429V6.47619C12.8 5.188 12.2943 3.95256 11.3941 3.04167C10.4939 2.13078 9.27304 1.61905 8 1.61905C6.72696 1.61905 5.50606 2.13078 4.60589 3.04167C3.70571 3.95256 3.2 5.188 3.2 6.47619V12.1429H12.8ZM5.6 15.381H10.4V17H5.6V15.381Z" fill="#9CA1A8"/></svg></div>'
   }
 
   btn.onclick = () => {
@@ -572,9 +617,10 @@ function createTogglePriceWarningButton() {
 function createResetBtn() {
   const btn = _widget?.createButton({ align: 'right', useTradingViewStyle: false })
   if (!btn) return
-  btn.innerHTML = `<div style="cursor:pointer"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
-<path d="M15.2182 3.04349C13.7649 1.95145 11.9578 1.30436 10 1.30436C5.19744 1.30436 1.30437 5.197 1.30437 9.99998C1.30437 11.3595 1.61643 12.646 2.17263 13.7925L1.09227 14.549C0.394018 13.1844 0 11.6381 0 9.99998C0 4.47692 4.47711 0 9.99999 0C12.2907 0 14.4009 0.770215 16.0869 2.0652V0.650475C16.0869 0.29128 16.3765 0 16.7391 0C17.0996 0 17.3913 0.292122 17.3913 0.650475V3.69649C17.3913 3.87652 17.3191 4.03871 17.2015 4.15676C17.0822 4.27482 16.9195 4.34783 16.7404 4.34783H13.6944C13.3352 4.34783 13.0435 4.05826 13.0435 3.69567C13.0435 3.33563 13.3356 3.04351 13.6944 3.04351H15.2182V3.04349ZM4.78177 16.9565C6.23513 18.0486 8.04198 18.6957 9.99999 18.6957C14.8026 18.6957 18.6956 14.8021 18.6956 10C18.6956 8.89779 18.4906 7.84394 18.1169 6.87417L19.2136 6.1065C19.7202 7.30301 20 8.61839 20 10C20 15.5222 15.5227 20 10 20C7.70955 20 5.59912 19.2298 3.91308 17.9348V19.3487C3.91308 19.7087 3.62348 20 3.26089 20C2.90065 20 2.60873 19.7079 2.60873 19.3487V16.3026C2.60873 16.1235 2.68093 15.9605 2.79832 15.8432C2.91783 15.7252 3.08045 15.6521 3.25964 15.6521H6.30566C6.66508 15.6521 6.95657 15.9417 6.95657 16.3043C6.95657 16.6644 6.66444 16.9565 6.30566 16.9565H4.78177V16.9565Z" fill="#9CA1A8"/>
-</svg></div>`
+  btn.innerHTML = `<div style="cursor:pointer"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M2.7704 1.94641C4.22205 0.688536 6.07919 -0.00267189 8 7.76212e-06C12.4184 7.76212e-06 16 3.5816 16 8C16 9.7088 15.464 11.2928 14.552 12.592L12 8H14.4C14.4001 6.7453 14.0314 5.51825 13.3397 4.47141C12.6481 3.42457 11.6639 2.60413 10.5097 2.1121C9.35554 1.62008 8.08217 1.47817 6.84797 1.70402C5.61376 1.92987 4.47316 2.51352 3.568 3.3824L2.7704 1.94641ZM13.2296 14.0536C11.778 15.3115 9.92081 16.0027 8 16C3.5816 16 0 12.4184 0 8C0 6.2912 0.536 4.7072 1.448 3.408L4 8H1.6C1.5999 9.2547 1.9686 10.4818 2.66027 11.5286C3.35194 12.5754 4.33605 13.3959 5.49026 13.8879C6.64446 14.3799 7.91783 14.5218 9.15203 14.296C10.3862 14.0701 11.5268 13.4865 12.432 12.6176L13.2296 14.0536Z" fill="#9CA1A8"/>
+</svg>
+</div>`
   btn.onclick = () => {
     kHeight.value = DefaultHeight.KLINE
     _widget?.resetCache?.()
@@ -591,6 +637,7 @@ const {
   profilingMarksCache,
   createDisplayButton,
   markTabsVisible,
+  wsPublicPortraitUpdateMarks
 } = useKlineMarks()
 
 watch(marksTabs, () => {
@@ -653,6 +700,8 @@ async function initChart() {
       'header_settings',
       'header_saveload',
       'timeframes_toolbar',
+      'symbol_search_hot_key',
+      'show_interval_dialog_on_key_press'
     ],
     enabled_features: [
       'request_only_visible_range_on_reset',
@@ -756,14 +805,16 @@ async function initChart() {
     datafeed: {
       onReady: (callback) => {
         // const chain = props.chain
-        const isSupportSecChains = chain.value && supportSecChains.includes(chain.value)
+        // const isSupportSecChains = chain.value && supportSecChains.includes(chain.value)
         const configurationData = {
-          supported_resolutions: isSupportSecChains ?  ['1S','5S', '15S', '30S', '1', '5', '15', '30', '60', '120', '240', '1D', '1W'] as ResolutionString[]:['1S','5S','1', '5', '15', '30', '60', '120', '240', '1D', '1W']as ResolutionString[],
+          // supported_resolutions: isSupportSecChains ? SUPPORT_LIST as ResolutionString[]: DEFAULT_LIST as ResolutionString[],
+          supported_resolutions: SUPPORT_LIST as ResolutionString[],
           supports_marks: true,
           supports_timescale_marks: true,
           supports_time: true,
         }
         setIframeCssVar()
+
 
         setTimeout(() => callback(configurationData), 50)
       },
@@ -794,13 +845,13 @@ async function initChart() {
             has_daily: true,
             // has_no_volume: false, // 布尔表示商品是否拥有成交量数据
             has_weekly_and_monthly: true,
-            supported_resolutions: isSupportSecChains ?  ['1S','5S', '15S', '30S', '1', '5', '15', '30', '60', '120', '240', '1D', '1W'] as ResolutionString[]:['1S','5S','1', '5', '15', '30', '60', '120', '240', '1D', '1W']as ResolutionString[], // 在这个商品的周期选择器中启用一个周期数组。 数组的每个项目都是字符串。
+            supported_resolutions: isSupportSecChains ? SUPPORT_LIST as ResolutionString[]: DEFAULT_LIST as ResolutionString[], // 在这个商品的周期选择器中启用一个周期数组。 数组的每个项目都是字符串。
             data_status: 'streaming' as 'streaming' | 'endofday' | 'delayed_streaming',
             visible_plots_set: 'ohlcv' as VisiblePlotsSet,
             type: 'crypto',
             listed_exchange: getSwapInfo?.(chain.value || '', amm.value)?.show_name || '',
           }
-          console.log('[resolveSymbol]: Symbol resolved', symbolName)
+          console.log('[resolveSymbol]: Symbol resolved', symbolInfo)
           setTimeout(() => onResolve(symbolInfo), 0)
         } catch (err) {
           onError(err?.toString?.() || 'resolveSymbol err')
@@ -828,14 +879,13 @@ async function initChart() {
             from,
             to: firstDataRequest ? 0 : Math.max(to, firstBarTime || 0),
           }
+
           const isTokenKline =
-            SupportTokenKlineChains?.includes?.(chain.value) &&
             !props.isRank &&
             'tokenAllPair' in tokenStore &&
             tokenStore?.tokenAllPair &&
-            tokenStore?.selectedToken
-
-          console.log('[getBars] isTokenKline', isTokenKline)
+            tokenStore?.selectedToken ||
+            (firstDataRequest && tokenStore?.selectedToken)
           if (!isTokenKline) {
             params.pair_id = pair.value + '-' + chain.value
             delete params.token_id
@@ -844,6 +894,14 @@ async function initChart() {
           const getKlineFunc = isTokenKline ? getTokenKlineHistory : getKlineHistoryData
           getKlineFunc(params)
             .then((res) => {
+              if (res?.extra_data?.migrate_time && res?.extra_data?.migrate_uprice) {
+                migrated.value = {
+                  migrate_time: new Date(res.extra_data.migrate_time).getTime() / 1000,
+                  migrate_uprice: res.extra_data.migrate_uprice,
+                  showMarket: showMarket.value,
+                  mcap: new BigNumber(res.extra_data.migrate_uprice || 0).times(tokenStore?.token?.total || 0).toNumber(),
+                }
+              }
               const bars1 = res?.kline_data || []
               const bars =
                 bars1?.map?.((i) => ({
@@ -979,6 +1037,7 @@ async function initChart() {
           chain: chain.value || '',
           user: user.value,
           onDataCallback,
+          migrated: migrated.value,
         })
         // getUserKlineTxTags({
         //   from,
@@ -1044,12 +1103,23 @@ async function initChart() {
 
     let user_address = user.value
     for (const [, markArr] of profilingMarksCache) {
-      const addr = markArr.find((el) => el.id === markId)?.user_address
-      if (addr) {
-        user_address = addr
-        break
+      const flag = markArr.some(({type,holders})=>{
+        return holders.some(hol=>{
+          if(hol.buy && markId === `${hol.buy.tx_time}-buy-${type}`){
+            user_address = hol.wallet_address
+            return true
+          }
+          if(hol.sell && markId === `${hol.sell.tx_time}-sell-${type}`){
+            user_address = hol.wallet_address
+            return true
+          }
+        })
+      })
+      if(flag){
+        break;
       }
     }
+
     const $patchParams = {
       drawerVisible: true,
       tokenInfo: {
@@ -1137,6 +1207,7 @@ function onWsKline(
       }
       if (target === t && !loading) {
         const _pair = 'pair' in tx ? tx.pair : tx.pair_address
+        const pair1 = tokenStore.selectedToken ? tokenStore.tokenInfo?.pairs?.[0]?.pair : tokenStore?.pairAddress
         const _price =
           'price_u' in tx
             ? Number(tx.price_u || 0)
@@ -1145,12 +1216,21 @@ function onWsKline(
                   ? tx.from_price_usd
                   : tx.to_price_usd
               ) || 0
-        if (_pair === pair.value) {
+        if (_pair === pair1) {
           lastPairPrice = _price
         }
-        if (_pair !== pair.value) {
+        if (tx?.tag === 'PairNoiseTx' || tx?.tag === 'TokenNoiseTx') {
+          return
+        }
+        if (_pair !== pair1) {
           const price = _price
-          if (!lastPairPrice && Math.abs(price - lastPairPrice) > lastPairPrice * 0.35) {
+          if (!props.isRank && 'pairs' in tokenStore) {
+            const currentPairInfo = tokenStore?.pairs?.find((i) => i.pair === pair.value)
+            if (currentPairInfo && !Number(currentPairInfo?.reserve0) && !Number(currentPairInfo?.reserve1)) {
+              return
+            }
+          }
+          if (lastPairPrice && Math.abs(price - lastPairPrice) > lastPairPrice * 0.35) {
             return
           }
         }
@@ -1184,6 +1264,19 @@ function onWsKline(
         },
         _widget
       )
+    } else if (event === WSEventType.PUBLIC_PORTRAIT) {
+      const marksTabsIds = marksTabs.value.map((v) => v.id)
+      const msgArr = (data?.msg || [])?.filter?.(el=>{
+        return marksTabsIds.some(id=> el.maker_type.includes(id))
+      })
+      if(msgArr.length === 0){
+        return
+      }
+       const interval = switchResolution(resolution)
+      wsPublicPortraitUpdateMarks(msgArr,_widget,{
+        interval: Number(interval),
+        user: user.value
+      })
     }
   }, 'kline')
 }

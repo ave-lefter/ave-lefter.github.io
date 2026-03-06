@@ -8,7 +8,7 @@
       </tr>
     </thead>
     <tbody >
-      <tr
+      <!-- <tr
         v-if="tokenAllPair"
         :class="{ active: tokenStore.selectedToken }"
         @click.stop="tokenStore.switchPair(true)"
@@ -16,7 +16,7 @@
         <td>
           <div class="main flex justify-start items-center">
             <span>{{ tokenAllPair?.symbol || '' }}</span>
-            <Icon v-tooltip="{ content: $t('allPairsTips'), props: { placement: 'top-start',  'popper-class':'max-w-250px', 'arrow-offset': '12' }}" name="solar:dollar-bold" class="color-#FFA622 text-14px ml-4px" />
+            <Icon v-tooltip="{ content: $t('allPairsTips'), props: { placement: 'top-start',  'popper-class':'max-w-250px', 'arrow-offset': 12 }}" name="solar:dollar-bold" class="color-#FFA622 text-14px ml-4px" />
           </div>
           <div class="minor">[All Pools]</div>
         </td>
@@ -31,12 +31,12 @@
             <div class="main" v-html="'$' + formatNumber(tokenAllPair.reserveU || 0, 2)" />
           </div>
         </td>
-      </tr>
+      </tr> -->
       <tr
         v-for="(item, index) in ((show ? pairs : pairs?.slice?.(0, isInModal? undefined: 1)) || [])"
         :key="item.pair"
         :class="{ active: tokenStore.pairAddress === item.pair && (!tokenStore.selectedToken || !tokenAllPair) }"
-        @click.stop="tokenStore.switchPair(item.pair)"
+        @click.stop="switchPair(item)"
       >
         <td>
           <div class="main flex justify-start items-center">
@@ -187,6 +187,17 @@ const tokenAllPair = computed(() => {
   return tokenStore.tokenAllPair
 })
 
+function switchPair(item: any) {
+  if (tokenStore.pairAddress === item.pair && (!tokenStore.selectedToken && tokenAllPair.value)){
+    tokenStore.switchPair(true)
+  } else {
+    if (tokenStore.pairAddress === item.pair && !tokenAllPair.value){
+      return
+    }
+    tokenStore.switchPair(item.pair)
+  }
+}
+
 </script>
 
 <style scoped lang="scss">
@@ -240,7 +251,7 @@ const tokenAllPair = computed(() => {
         // background: var(--tab-active-bg);
       }
       .main {
-        color: var(--main-text);
+        color: var(--main-text1);
         &.red{
           color:#F6465D
         }

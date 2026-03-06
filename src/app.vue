@@ -2,12 +2,11 @@
   <NuxtPwaAssets />
   <el-config-provider :locale="elementLocale">
     <NuxtLayout>
-      <NuxtPage :keepalive="{include: 'pump'}" :page-key="routeName" />
+      <NuxtPage />
     </NuxtLayout>
   </el-config-provider>
   <TokenDetails/>
-  <!-- 交易提示暂隐藏，仅展示底部币价 -->
-  <!-- <TransactionPromptSlot /> -->
+  <TransactionPromptSlot />
   <!-- 手动引入 custom:checked -->
   <Icon style="display: none;" name="custom:checked" />
 
@@ -15,7 +14,7 @@
 
 <script setup lang='ts'>
   import TokenDetails from '~/pages/token/components/tokenDetails/index.vue'
-  // import TransactionPromptSlot from '~/components/TransactionPrompt/TransactionPromptSlot.vue'
+  import TransactionPromptSlot from '~/components/TransactionPrompt/TransactionPromptSlot.vue'
   import { useRemarksStore } from '@/stores/remarks'
   import en from 'element-plus/es/locale/lang/en'
   import type {GetHotTokensResponse} from '~/api/token'
@@ -32,11 +31,11 @@
     setVal: (val: GetHotTokensResponse[]) => hotTokens.value = val
   })
 
-  const route = useRoute()
+  // const route = useRoute()
 
-  const routeName = computed(() => {
-    return (route.name || '') as string
-  })
+  // const routeName = computed(() => {
+  //   return (route.name || '') as string
+  // })
 
   watch(() => useLocaleStore().locale, async (val) => {
     if (!val) return
@@ -91,4 +90,3 @@
   })
 
 </script>
-

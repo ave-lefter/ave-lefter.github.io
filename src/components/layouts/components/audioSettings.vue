@@ -163,6 +163,9 @@ const dialogVisible = computed({
 const isNotice = computed(() => {
   return audioSettings.value.active === 'notice'
 })
+const isWallet = computed(() => {
+  return audioSettings.value.active === 'wallet'
+})
 const audioRef = ref<HTMLAudioElement | null>(null)
 function playAudio(settingKey: keyof typeof audioSettings.value.audio) {
   if (audioRef.value) {
@@ -206,6 +209,13 @@ watch(dialogVisible, () => {
     }
     if (!settings.notice.pumpPlatforms) {
       settings.notice.pumpPlatforms = []
+    }
+    // 初始化钱包设置
+    if (!settings.wallet) {
+      settings.wallet = {
+        clickAction: 0,
+        rightClickAction: 0
+      }
     }
     console.log('initPumpPlatforms2', settings)
     audioSettings.value = settings
@@ -431,22 +441,58 @@ function getEstimatedGas() {
 </script>
 
 <template>
-  <el-dialog v-model="dialogVisible" :width="360" destroy-on-close>
+  <el-dialog v-model="dialogVisible" align-center :width="360" destroy-on-close>
     <template #header>
-      <span
-        :class="`text-20px font-500 mr-24px cursor-pointer ${isNotice ? 'color-[--main-text]' : 'color-[--third-text]'}`"
-        @click="audioSettings.active = 'notice'"
-        >{{ $t('noticeSettings') }}</span
-      >
-      <span
-        :class="`text-20px font-500 cursor-pointer ${!isNotice ? 'color-[--main-text]' : 'color-[--third-text]'}`"
-        @click="audioSettings.active = 'audio'"
-        >{{ $t('audioSettings') }}</span
-      >
+      <template v-if="isWallet">
+        <span class="text-20px font-500 color-[--main-text]">{{ $t('walletPageSettings') }}</span>
+      </template>
+      <template v-else>
+        <span
+          :class="`text-20px font-500 mr-24px cursor-pointer ${isNotice ? 'color-[--main-text]' : 'color-[--third-text]'}`"
+          @click="audioSettings.active = 'notice'"
+          >{{ $t('noticeSettings') }}</span
+        >
+        <span
+          :class="`text-20px font-500 cursor-pointer ${!isNotice ? 'color-[--main-text]' : 'color-[--third-text]'}`"
+          @click="audioSettings.active = 'audio'"
+          >{{ $t('audioSettings') }}</span
+        >
+      </template>
     </template>
     <template #default>
       <div class="mx--20px border-t-solid border-t-1px border-t-[--dialog-divider] mb-20px" />
-      <div v-if="isNotice" class="text-12px">
+      <!-- 钱包设置 -->
+      <div v-if="isWallet" class="text-14px">
+        <div class="flex justify-between items-center mb-24px">
+          <span>{{ $t('clickWalletAddress') }}</span>
+          <el-radio-group
+            v-model="audioSettings.wallet.clickAction"
+            class="[&&]:[--el-border:none]"
+            :fill="isDark ? '#282D35' : '#fff'"
+            :text-color="isDark ? '#F5F5F5' : '#111'"
+          >
+            <el-radio-button :label="$t('jump2')" :value="0" />
+            <el-radio-button :label="$t('openInNewTab')" :value="1" />
+          </el-radio-group>
+        </div>
+        <div class="flex justify-between items-center mb-24px">
+          <span>{{ $t('rightClickWalletAddress') }}</span>
+          <el-radio-group
+            v-model="audioSettings.wallet.rightClickAction"
+            class="[&&]:[--el-border:none]"
+            :fill="isDark ? '#282D35' : '#fff'"
+            :text-color="isDark ? '#F5F5F5' : '#111'"
+          >
+            <el-radio-button :label="$t('noOpen')" :value="0" />
+            <el-radio-button :label="$t('openInNewTab')" :value="1" />
+          </el-radio-group>
+        </div>
+        <el-button type="primary" class="w-full" @click="onSave">
+          {{ $t('complete') }}
+        </el-button>
+      </div>
+      <!-- 通知设置 -->
+      <div v-else-if="isNotice" class="text-12px">
         <el-scrollbar max-height="537px" class="pr-10px" :always="false">
           <div class="h-full overflow-hidden">
             <div class="flex justify-between items-center mb-24px">
@@ -514,11 +560,11 @@ function getEstimatedGas() {
                   <div class="flex items-center">
                     <span><span>Zoe&nbsp;</span>{{ $t('createPosition') }}</span>
                     <span class="flex items-center">
-                      <span class="color-[--up-color]">&nbsp;1BNB</span
-                      ><img
+                      <span class="color-[--up-color]">&nbsp;1BNB</span>
+                      <img
                         class="w-16px h-16px rounded-[50%] mx-4px"
                         src="@/assets/images/pump/m-symbol.svg"
->{{ $t('of') }}&nbsp;SENTIS
+                      >{{ $t('of') }}&nbsp;SENTIS
                     </span>
                   </div>
                   <Icon
@@ -793,6 +839,11 @@ function getEstimatedGas() {
           :title="$t('twitterTracker')"
           @playAudio="playAudio('twitter')"
         />
+        <AudioSettingsItem
+          v-model="audioSettings.audio.news"
+          :title="$t('twitterTracker2')"
+          @playAudio="playAudio('news')"
+        />
         <div class="mb-21px text-12px">{{ $t('tradeSound') }}</div>
         <AudioSettingsItem
           v-model="audioSettings.audio.marketBuy"
@@ -929,11 +980,17 @@ v-model:visible="visible"
   padding: 2px;
   background: var(--border);
   border-radius: 4px;
+  .el-radio-button {
+    flex: 1;
+  }
   .el-radio-button__inner {
     background: var(--border);
     border: none;
     color: var(--secondary-text);
     font-weight: 500;
+    width: 100%;
+    text-align: center;
+    justify-content: center;
   }
 }
 </style>

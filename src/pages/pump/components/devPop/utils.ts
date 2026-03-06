@@ -18,13 +18,9 @@ export function useDevPop() {
     tokenId: '',
     loading: false
   })
-  watch(
-    () => router.currentRoute.value.fullPath,
-    () => {
-      $tooltip.hide()
-    }
-  )
-
+  onBeforeRouteLeave(() => {
+    $tooltip.hide()
+  })
   function onEnter(tokenId: string, e: { target: any }, isGetData = true) {
     if (isGetData) {
       getDevInfo(tokenId)

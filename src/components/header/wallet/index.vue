@@ -2,7 +2,7 @@
   <el-popover v-model:visible="tgWalletVisible" placement="bottom-end" :width="360" trigger="click" popper-style="--el-popover-padding: 0;">
     <template #reference>
       <div
-        class="flex text-12px clickable-btn color-[--main-text] bg-[--main-input-button-bg] h-32px cursor-pointer flex items-center border-rd-4px px-10px py-0 min-w-80px  ml-8px">
+        class="flex text-12px clickable-btn color-[--main-text] bg-[--main-input-button-bg] h-32px cursor-pointer flex items-center border-rd-4px pl-10px pr-3px py-0 min-w-80px  ml-8px">
         <img
           class="border-rd-[50%] mr-5px" height="16" :src="generateAvatarIcon(botStore?.userInfo?.name || '')"
           alt="">
@@ -89,6 +89,17 @@
               <Icon name="material-symbols:chevron-right-rounded" class="text-16px mr--5px" />
             </div>
           </li>
+          <!-- <li class="flex justify-between h-40px px-20px clickable" @click.stop="toReferrer">
+            <div class="color-[--main-text] flex items-center gap-8px">
+              <Icon name="custom:gift" class="text-16px" />
+              <span class="font-500 text-14px">{{ t('refer') }}</span>
+            </div>
+            <div class="color-[--secondary-text] flex items-center gap-4px">
+              <span class="font-500 text-12px">
+              </span>
+              <Icon name="material-symbols:chevron-right-rounded" class="text-16px mr--5px" />
+            </div>
+          </li> -->
           <li class="flex justify-between h-40px px-20px clickable"
             @click="router.push('/safe');tgWalletVisible = false">
             <div class="color-[--main-text] flex items-center gap-8px">
@@ -266,12 +277,12 @@
             <el-form-item :label="t('plsEnterAddress')" label-position="top" prop="address">
               <el-input v-model="withdrawForm.address"
                 style="border-radius: 4px;--el-input-height:48px;"
-                clearable placeholder="" />
+                 placeholder="" />
             </el-form-item>
             <el-form-item :label="t('plsEnterAmount')" label-position="top" prop="amount">
               <el-input v-model="withdrawForm.amount"
                 style="border-radius: 4px;--el-input-height:48px;"
-                inputmode="decimal" clearable placeholder="0.00"
+                inputmode="decimal"  placeholder="0.00"
                 @input="value => withdrawForm.amount = value.replace(/\-|[^\d.]/g, '')">
                 <template #suffix>
                   <span class="color-[--main-text]">{{  withdrawChainInfo2?.symbol || getChainInfo(withdrawForm.chain)?.main_name}}</span>
@@ -296,7 +307,7 @@
             <el-form-item v-if="withdrawForm.chain === 'ton'" :label="`memo(${$t('optional')})`" label-position="top" prop="memo">
               <el-input v-model="withdrawForm.memo"
                 style="border-radius: 4px;--el-input-height:48px;"
-                clearable placeholder="" />
+                 placeholder="" />
             </el-form-item>
             <!-- <div class="font-400 text-12px lh-[100%] color-#FFBE3C text-center mt-45px">{{ t('withdrawTip') }}</div> -->
             <el-button native-type="submit" style="width: 100%; margin-top: 25px" size="large" type="primary"
@@ -925,6 +936,9 @@ const getTransferGasFee = throttle(function () {
   const amount = matchResult ? matchResult[0] : ''
   withdrawForm.amount = amount
   withdrawFormRef.value?.validateField?.('amount')
+}
+function toReferrer() {
+  window.open('/referral')
 }
 </script>
 

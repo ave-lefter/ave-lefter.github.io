@@ -1,5 +1,5 @@
 <template>
-  <SlippageSet :key="chain" :canSetAuto="true" :chain="chain" :showClipboardSet="showClipboardSet" :setting="botSettings[chain]">
+  <SlippageSet :key="chain" v-model:chain="activeChain" :canSetAuto="true" :showClipboardSet="showClipboardSet" :setting="botSettingStore.botSettings[activeChain]" @open="activeChain = chain">
     <template #icon>
       <slot name="icon"/>
     </template>
@@ -9,7 +9,7 @@
 import SlippageSet from './slippageSet.vue'
 import type { BotChain } from '~/utils/types'
 
-defineProps({
+const props = defineProps({
   chain: {
     type: String as PropType<BotChain>,
     default: ''
@@ -20,7 +20,8 @@ defineProps({
   }
 })
 const botSettingStore = useBotSettingStore()
-const { botSettings } = storeToRefs(botSettingStore)
+
+const activeChain = ref<BotChain>(props.chain || 'bsc')
 
 </script>
 

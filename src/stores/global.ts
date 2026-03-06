@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { useStorage } from '@vueuse/core'
+import { useStorage, useLocalStorage } from '@vueuse/core'
 import type { pumpBlack, pumpObjColor } from '@/api/types/pump'
 import { _getFollowsNum } from '@/api/follow'
 import type { MonitorChainType } from '~/utils/types'
@@ -7,6 +7,7 @@ import type{ GetHotTokensResponse } from '@/api/token'
 import type { ILatestNotice } from '~/api/user'
 import { getUserFavoriteGroups, type GetUserFavoriteGroupsResponse } from '~/api/fav'
 export const useGlobalStore = defineStore('global', () => {
+  const t = getGlobalT()
   const wsStore = useWSStore()
   const localeStore = useLocaleStore()
   const themeStore = useThemeStore()
@@ -80,7 +81,7 @@ export const useGlobalStore = defineStore('global', () => {
     >
     jump: 'close' | 'open' | 'open_jump'
     border: string
-  }>('pumpSetting8', {
+  }>('pumpSetting9', {
     fontSize_mc: '12px',
     size_swap: '12px',
     Progress_isCircle: 'circle',
@@ -109,21 +110,21 @@ export const useGlobalStore = defineStore('global', () => {
     data: {
       mc: {
         minSize: 30000,
-        minColor: getCssVariable('--main-text'),
+        minColor: getCssVariable('--main-text1'),
         middleSize: 100000,
         middleColor: '#FFA622',
         maxColor: '#12B886',
       },
       vol: {
         minSize: 1000,
-        minColor: getCssVariable('--main-text'),
+        minColor: getCssVariable('--main-text1'),
         middleSize: 50000,
         middleColor: '#FFA622',
         maxColor: '#12B886',
       },
       holders: {
         minSize: 100,
-        minColor: getCssVariable('--main-text'),
+        minColor: getCssVariable('--main-text1'),
         middleSize: 500,
         middleColor: '#FFA622',
         maxColor: '#12B886',
@@ -163,13 +164,22 @@ export const useGlobalStore = defineStore('global', () => {
     jump: 'close',
     border: '',
   })
+  // 涨跌幅时区
+  const zone=useStorage('zone','24h')
 
+  const zoneList=computed(()=>{
+    return [
+    {key:'24h',value:t('past24h')},
+    {key:'+8h',value:'UTC+8, 00:00'},
+  ]
+  })
+  const showMarket = useLocalStorage('tv_showMarket', false)
   watch(
     () => themeStore.isDark,
     () => {
-      pumpSetting.value.data.mc.minColor = getCssVariable('--main-text')
-      pumpSetting.value.data.vol.minColor = getCssVariable('--main-text')
-      pumpSetting.value.data.holders.minColor = getCssVariable('--main-text')
+      pumpSetting.value.data.mc.minColor = getCssVariable('--main-text1')
+      pumpSetting.value.data.vol.minColor = getCssVariable('--main-text1')
+      pumpSetting.value.data.holders.minColor = getCssVariable('--main-text1')
     },
     {immediate: true}
   )
@@ -193,7 +203,7 @@ export const useGlobalStore = defineStore('global', () => {
     sort: 'created_timestamp',
     sort_dir: 'DESC',
   })
-  const audioSettings = useStorage('audioSettings-v2',{
+  const audioSettings = useStorage('audioSettings-v5',{
     active:'',
     notice:{
       monitor:true,
@@ -221,12 +231,17 @@ export const useGlobalStore = defineStore('global', () => {
       marketSell:'',
       limit:'',
       volume:50,
-      twitter:''
+      twitter:'',
+      news:''
+    },
+    wallet:{
+      clickAction:0, // 0: 跳转, 1: 新tab打开
+      rightClickAction:0 // 0: 不打开, 1: 新tab打开
     }
   })
 
   // 预留一个全局变量，用于控制 token 历史的显示
-  const tokenHistoryVisible = true
+  const tokenHistoryVisible = useStorage('tokenHistoryVis',false)
   const klineSettingPop = ref({
     visible:false,
     position:[] as number[]
@@ -399,6 +414,9 @@ export const useGlobalStore = defineStore('global', () => {
     showImport,
     showBotRecord,
     batchRemarkFormData,
-    klineSettingPop
+    klineSettingPop,
+    zone,
+    zoneList,
+    showMarket
   }
 })

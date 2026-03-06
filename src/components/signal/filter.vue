@@ -9,6 +9,7 @@ const props = defineProps<{
 }>()
 const globalStore = useGlobalStore()
 const emit = defineEmits(['update:filterParams', 'onConfirm', 'onReset'])
+const audioButtonRef = ref()
 // const shouldAlert = computed({
 //   get() {
 //     return props.modelValue
@@ -94,7 +95,7 @@ function updateCurrentNum() {
           <el-input
             v-model="tempFilterParams.token"
             size="large"
-            clearable
+            
             :placeholder="$t('searchPlaceholder')"
             class="[&&]:[--el-input-bg-color:--border] [&&]:[--el-input-border-color:--border] [&&]:[--el-input-hover-border-color:--primary-color] [&&]:text-12px"
           />
@@ -161,15 +162,16 @@ function updateCurrentNum() {
       </template>
     </el-popover>
     <Icon
+      ref="audioButtonRef"
       :name="globalStore.audioSettings.audio.signal ? 'custom:ad':'custom:admute'"
       class="mr-4px cursor-pointer"
-      @click="globalStore.audioSettings.active = 'audio'"
     />
     <!-- <el-switch
       v-model="shouldAlert"
       size="small"
       active-value="1"
       inactive-value="0"/> -->
+    <AudioPopover v-if="audioButtonRef" :buttonRef="audioButtonRef" type="signal"/>
   </div>
 </template>
 

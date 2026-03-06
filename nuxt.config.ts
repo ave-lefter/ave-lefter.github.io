@@ -27,6 +27,7 @@ export default defineNuxtConfig({
     '@pinia/nuxt',
     '@vite-pwa/nuxt',
     '@nuxtjs/i18n',
+    '@nuxtjs/sitemap',
   ],
   runtimeConfig: {
     public: {
@@ -96,6 +97,15 @@ export default defineNuxtConfig({
   },
   router: {
 
+  },
+  routeRules: {
+    '/pump/**': { sitemap: false },
+    '/*/components/**': { sitemap: false },
+    '/follow/': { sitemap: false },
+  },
+  site: {
+    url: 'https://pro.ave.ai', // 替换为你的域名
+    name: 'Ave.ai',
   },
   css: [
     // 可以在这里添加 UnoCSS 的基础样式（如果需要的话）

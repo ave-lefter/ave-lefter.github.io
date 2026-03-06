@@ -31,7 +31,7 @@
           <span v-else />
         </template>
         <el-table-column
-          label="地址"
+          :label="$t('address')"
           align="left"
           width="225"
           fixed="left"

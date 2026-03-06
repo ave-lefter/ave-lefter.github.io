@@ -8,6 +8,7 @@ import StopTable from './stopTable.vue'
 import ClosePosition from './closePosition.vue'
 import { WSPerpEventType } from '~/utils/constants'
 import { getLeverageFromContractId } from '~/utils/perp'
+import Share from './share.vue'
 
 const props = defineProps({
   searchParams: {
@@ -37,8 +38,18 @@ const typeDict = computed(() => {
 
 const filterListData = computed(() => {
   const result = perpStore.position?.filter((i) => {
-    return (props?.searchParams?.filterContractIdList && i.contractId === props?.searchParams?.filterContractIdList) || !props.searchParams?.filterContractIdList
+    return (
+      (props?.searchParams?.filterContractIdList &&
+        i.contractId === props?.searchParams?.filterContractIdList) ||
+      !props.searchParams?.filterContractIdList
+    )
   })
+  const current = result?.find((i) => i.contractId === perpStore.perp.contractId)
+  if (current) {
+    return [current].concat(
+      (result || []).filter((i) => i.contractId !== perpStore.perp.contractId)
+    )
+  }
   return result || []
 })
 
@@ -54,9 +65,14 @@ watch(
         //   .plus(BigNumber(el.openSize).multipliedBy(el.oraclePrice))
         // el.unrealizedPnl = profitWithFee.toString()
         const price = updateData?.lastPrice || updateData?.oraclePrice || '0'
-        const profit = Number(el?.openSize) >= 0
-          ? new BigNumber(price).times(new BigNumber(el?.openSize || 0).abs()).minus(new BigNumber(el.openValue).abs())
-          : new BigNumber(el.openValue || 0).abs().minus(new BigNumber(price).times(new BigNumber(el.openSize).abs()))
+        const profit =
+          Number(el?.openSize) >= 0
+            ? new BigNumber(price)
+                .times(new BigNumber(el?.openSize || 0).abs())
+                .minus(new BigNumber(el.openValue).abs())
+            : new BigNumber(el.openValue || 0)
+                .abs()
+                .minus(new BigNumber(price).times(new BigNumber(el.openSize).abs()))
         el.unrealizedPnl = profit.dp(2, BigNumber.ROUND_FLOOR).toString()
         // el.unrealizedPnlRate = new BigNumber(el.unrealizedPnl)
         //   .div(new BigNumber(el.openValue).abs())
@@ -127,7 +143,13 @@ const orderList = computed(() => {
   if (!stopProfitLossRow.value?.contractId) {
     return []
   }
-  return (perpStore.order?.filter?.((i) => i.contractId === stopProfitLossRow.value?.contractId && ['TAKE_PROFIT_LIMIT', 'STOP_LIMIT', 'TAKE_PROFIT_MARKET', 'STOP_MARKET'].includes(i.type)) || [])?.toSorted?.((a,b) => b.createdTime - a.createdTime)
+  return (
+    perpStore.order?.filter?.(
+      (i) =>
+        i.contractId === stopProfitLossRow.value?.contractId &&
+        ['TAKE_PROFIT_LIMIT', 'STOP_LIMIT', 'TAKE_PROFIT_MARKET', 'STOP_MARKET'].includes(i.type)
+    ) || []
+  )?.toSorted?.((a, b) => b.createdTime - a.createdTime)
 })
 const closePosition = (row, operation) => {
   closePositionVisible.value = true
@@ -164,6 +186,14 @@ onUnmounted(() => {
     cancelAnimationFrame(timer.id)
   }
 })
+
+const getEntryPrice = (contractId, openValue, openSize) => {
+  return formatNumber(new BigNumber(openValue).div(openSize).toString(), {
+    limit: 20,
+    decimals: getPricePrecision(contractId),
+    decimalsHasZero: true,
+  })
+}
 </script>
 
 <template>
@@ -228,13 +258,7 @@ onUnmounted(() => {
       </el-table-column>
       <el-table-column align="right" :label="t('entryPrice')" prop="entryPrice">
         <template #default="{ row }">
-          {{
-            formatNumber(new BigNumber(row.openValue).div(row.openSize).toString(), {
-              limit: 20,
-              decimals: getPricePrecision(row.contractId),
-              decimalsHasZero: true
-            })
-          }}
+          {{ getEntryPrice(row.contractId, row.openValue, row.openSize) }}
         </template>
       </el-table-column>
       <el-table-column align="right" :label="t('oraclePrice')" prop="oraclePrice">
@@ -243,7 +267,7 @@ onUnmounted(() => {
             formatNumber(row.oraclePrice, {
               limit: 20,
               decimals: getPricePrecision(row.contractId),
-              decimalsHasZero: true
+              decimalsHasZero: true,
             })
           }}
         </template>
@@ -251,14 +275,11 @@ onUnmounted(() => {
       <el-table-column align="right" :label="t('estimatedLiquidationPrice')" prop="liquidatePrice">
         <template #default="{ row }">
           {{
-            formatNumber(
-              getPositionLiqPrice(row.contractId) || row.liquidatePrice,
-              {
-                limit: 20,
-                decimals: getPricePrecision(row.contractId),
-                decimalsHasZero: true
-              }
-            )
+            formatNumber(getPositionLiqPrice(row.contractId) || row.liquidatePrice, {
+              limit: 20,
+              decimals: getPricePrecision(row.contractId),
+              decimalsHasZero: true,
+            })
           }}
         </template>
       </el-table-column>
@@ -269,10 +290,23 @@ onUnmounted(() => {
               >{{ addSign(row.unrealizedPnl)
               }}{{ formatNumber(Math.abs(row.unrealizedPnl), 2) }}</span
             >
-            <span :class="getColorClass(row.unrealizedPnlRate)"
-              >({{ addSign(row.unrealizedPnlRate)
-              }}{{ formatNumber(Math.abs(row.unrealizedPnlRate), 2) }}%)</span
-            >
+            <span class="flex items-center justify-end gap-4px">
+              <span :class="getColorClass(row.unrealizedPnlRate)"
+                >({{ addSign(row.unrealizedPnlRate)
+                }}{{ formatNumber(Math.abs(row.unrealizedPnlRate), 2) }}%)</span
+              >
+              <Share
+                :statistics="{
+                  leverage: getLeverageFromContractId(row.contractId) || row.maxLeverage,
+                  openValue: row.openValue,
+                  entryPrice: getEntryPrice(row.contractId, row.openValue, row.openSize),
+                  unrealizedPnl: row.unrealizedPnl,
+                  unrealizedPnlRate: row.unrealizedPnlRate,
+                  name: typeDict[row.contractId]?.replace?.('USD', ''),
+                  logo_url: perpStore.contractList.find((item) => item.contractId === row.contractId)?.baseCoinIcon,
+                }"
+              />
+            </span>
           </div>
         </template>
       </el-table-column>
@@ -326,11 +360,7 @@ onUnmounted(() => {
     </el-table>
   </div>
   <StopProfitLoss v-model:visible="stopProfitLossVisible" :row="stopProfitLossRow" />
-  <StopTable
-    v-model:visible="stopTableVisible"
-    :orderList="orderList"
-    @add="addStop"
-  />
+  <StopTable v-model:visible="stopTableVisible" :orderList="orderList" @add="addStop" />
   <ClosePosition
     v-model:visible="closePositionVisible"
     :token="typeDict[stopProfitLossRow?.contractId] || ''"

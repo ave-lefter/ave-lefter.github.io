@@ -85,12 +85,7 @@
         </div>
 
         <!-- 表格内容 -->
-        <UseVirtualList v-if="filterTableList.length > 0" :key="klineHeight" :list="filterTableList" :options="{itemHeight:24}" style="margin-right: -12px;padding-right: 12px;" class="scrollbar-hide" :height="`${(klineHeight ?? 200) - 75}px`" ref="scroller">
-          <!-- <div v-for="(row, index) in filterTableList" :key="index"
-            class="relative overflow-hidden cursor-pointer mt-1px first:mt-0" @mouseenter="isPausedTxs = true"
-            @mouseleave="isPausedTxs = false" @click="onRowClick({ rowData: row } as any)"> -->
-
-            <!-- 表格内容 -->
+        <UseVirtualList v-if="filterTableList.length > 0" :key="klineHeight" ref="scroller" :list="filterTableList" :options="{itemHeight:24}" style="margin-right: -12px;padding-right: 12px;" class="scrollbar-hide" :height="`${(klineHeight ?? 200) - 75}px`">
             <template #default="{data:row,index}">
               <div
                 class="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] items-center gap-15px h-24px hover:bg-[rgba(255,255,255,.02)] relative z-10 overflow-hidden cursor-pointer mt-1px first:mt-0"
@@ -198,15 +193,9 @@
                   </div>
                 </div>
               </div>
-              <div ref="sentinel" style="height: 1px;"></div>
+              <div v-if="index === filterTableList.length - 1" ref="sentinel" style="height: 1px;" />
             </template>
-          <!-- </div> -->
         </UseVirtualList>
-        <!-- <template v-if="filterTableList.length >0 && showFooter">
-          <div class="flex items-center gap-x-7px">
-            {{ footText || t('loading') }}
-          </div>
-        </template> -->
         <template v-if="filterTableList.length === 0 && !listStatus.loadingTxs">
           <div class="h-full flex flex-col items-center justify-center "
             :style="{ height: `${(klineHeight ?? 200) - 105}px` }">
@@ -215,15 +204,14 @@
         </template>
       </div>
     </div>
-    <!-- status -->
+    <!-- status：仅在有暂停状态（hover 或 升序排序）时展示底部条，避免未暂停时仍显示黑条 -->
     <div
+      v-show="isPausedTxs1"
       class="z-10 absolute bottom-0 h-24px w-100% flex items-center justify-center bg-[--main-input-button-bg] color-[#FFA622]">
-
-      <div v-show="isPausedTxs1" class="flex items-center gap-x-7px">
+      <div class="flex items-center gap-x-7px">
         <Icon name="custom:stop" class="text-14px" />
         <span class="text-xs">{{ t('paused') }}</span>
       </div>
-
     </div>
     <!-- MarkerTooltip -->
     <MarkerTooltip v-model="markerTooltipVisible" :virtual-ref="makerTooltip" :currentRow="currentRow"
@@ -249,7 +237,7 @@
           {{ $t('markerAddress') }}
         </label>
       </div>
-      <el-input id="markerAddress" v-model="dialogFilter.markerAddress" clearable class="text-12px" :placeholder="$t('markerAddress')"/>
+      <el-input id="markerAddress" v-model="dialogFilter.markerAddress"  class="text-12px" :placeholder="$t('markerAddress')"/>
       <div class="mb-10px mt-20px">
         <label>
           {{ $t('filter') }}
@@ -258,7 +246,7 @@
       <div class="flex items-center gap-20px">
         <el-input
           v-model.trim.number="dialogFilter.minVol"
-          clearable
+          
           type="text"
           class="text-12px"
           :placeholder="$t('filterSmallAmount')"
@@ -269,7 +257,7 @@
         </el-input>
         <el-input
           v-model.trim.number="dialogFilter.maxVol"
-          clearable
+          
           type="text"
            class="text-12px"
            :placeholder="$t('filterLargeAmount')"
@@ -300,7 +288,7 @@ import { storeToRefs } from 'pinia'
 import { useTokenStore } from '~/stores/token'
 import { useWSStore } from '~/stores/ws'
 import { getAddressAndChainFromId, formatTimeFromNow, uuid, getChainInfo } from '~/utils'
-import { getTokenTxs, getSimpleTxs,type GetPairLiqResponse, type IGetTokenTxsResponse, type IGetSimpleTxsResponse, } from '~/api/token'
+import { getSimpleTxs,type GetPairLiqResponse, type IGetSimpleTxsResponse, } from '~/api/token'
 import { useRoute } from 'vue-router'
 import { filterLanguage } from '~/pages/token/components/kLine/utils'
 import { WSEventType } from '~/utils/constants'
@@ -308,7 +296,7 @@ import { useThrottleFn,useIntersectionObserver } from '@vueuse/core'
 import { UseVirtualList } from '@vueuse/components'
 import UserRemark from '~/components/userRemark.vue'
 import MarkerTooltip from '../belowChartTable/transactions/markerTooltip.vue'
-import { ElScrollbar, type RowEventHandlerParams } from 'element-plus'
+import type { RowEventHandlerParams } from 'element-plus'
 import type { SimpleWSTx } from '../kLine/types'
 import BigNumber from 'bignumber.js'
 import DateFilterCard from '../dateFilterCard.vue'
@@ -368,25 +356,31 @@ const listStatus = ref({
 // 虚拟列表相关 refs
 const scroller = ref(null)
 const sentinel = ref(null)
+const tokenTxs = shallowRef<ExtendedTxResponse[]>([])
+const wsPairCache = shallowRef<ExtendedTxResponse[]>([])
 
 // 用 IntersectionObserver 监听 sentinel。
 // 特别重要：把 root 指定为虚拟列表的滚动容器 scroller.value
 useIntersectionObserver(
   sentinel,
   ([{ isIntersecting }]) => {
-    if (isIntersecting && !listStatus.value.loadingTxs1 && !listStatus.value.finished) {
-      showFooter.value=true
-      _getTokenTxs()
-    }
+    if (
+      !props.modelValue
+      || !isIntersecting
+      || listStatus.value.loadingTxs
+      || listStatus.value.loadingTxs1
+      || listStatus.value.finished
+      || filterTableList.value.length === 0
+    ) return
+    _getTokenTxs()
   },
   {
     root: scroller, // 注意传 ref（@vueuse/core 会处理）
-    threshold: 0.1,
+    threshold: 0,
+    rootMargin: '0px 0px 120px 0px',
   }
 )
 
-const tokenTxs = shallowRef<ExtendedTxResponse[]>([])
-const wsPairCache = shallowRef<ExtendedTxResponse[]>([])
 const tableFilter = ref({
   markerAddress: '',
   tag_type: 'all',
@@ -489,30 +483,11 @@ function filterSubmit() {
   listStatus.value.page_token = ''
   listStatus.value.loadingTxs = false
   listStatus.value.finished = false
-  //TODO
+  wsPairCache.value = []
   _getTokenTxs()
-  // if(aveTableRef.value) aveTableRef.value.scrollToTop(0)
 }
 
 const tableLoading = computed(() => listStatus.value.loadingTxs1 )
-const showFooter=ref(false)
-const footText = computed(() => {
-  if(listStatus.value.loadingTxs){
-    return t('loading')
-  }else if(listStatus.value.finished){
-    return t('noMore')
-  }else{
-    return ''
-  }
-})
-
-function loadMore(remainDistance:number){
-  console.log('loadMore remainDistance', remainDistance, listStatus.value)
-  showFooter.value=true
-  if ((remainDistance <= 20) && !(listStatus.value.loadingTxs || listStatus.value.finished)) {
-    _getTokenTxs()
-  }
-}
 
 
 const isMeActive = computed(()=>{
@@ -609,6 +584,9 @@ function resetCache() {
   tokenTxs.value = []
   wsPairCache.value = []
   txCount.value = {}
+  listStatus.value.page_token = ''
+  listStatus.value.finished = false
+  listStatus.value.loadingTxs = false
 }
 
 // WebSocket 订阅
@@ -646,18 +624,18 @@ function transferTxsData(row: IGetSimpleTxsResponse) {
   const maker_types = (row.maker_type||'').split(',')
   let lang1='en' as 'tw'|'cn'|'vi'|'tr'|'ru'|'pt'|'ko'|'ja'|'es'|'en'
   if (lang.value === 'zh-tw') {
-    lang1 = 'tw'; // 繁体中文
+    lang1 = 'tw' // 繁体中文
   } else if (lang.value === 'zh-cn') {
-    lang1 = 'cn'; // 简体中文
+    lang1 = 'cn' // 简体中文
   }
   const newTags=tagStore.tagArr.filter(item => maker_types.includes(item.type)).map(i=>{
     return {
-      "type": i.type,
-      "tag_desc": i?.[lang1],
-      "icon": i.icon,
-      "color": i.color,
-      "extra_info": i.extra_info,
-      "nick_name": i.nick_name
+      type: i.type,
+      tag_desc: i?.[lang1],
+      icon: i.icon,
+      color: i.color,
+      extra_info: i.extra_info,
+      nick_name: i.nick_name
     }
   })
   return {
@@ -679,12 +657,14 @@ function transferTxsData(row: IGetSimpleTxsResponse) {
 function resetTx() {
   tokenTxs.value = []
   listStatus.value.page_token = ''
+  txCount.value = {}
+  wsPairCache.value = []
 }
 
 const _getTokenTxs = useThrottleFn(async () => {
   console.log('getTokenTxs',tableFilter.value)
   try {
-    if (listStatus.value.loadingTxs) return
+    if (!props.modelValue || !pairAddress.value || listStatus.value.loadingTxs) return
     listStatus.value.loadingTxs = true
     const { tag_type } = tableFilter.value
     const getPairTxsParams = {
@@ -715,8 +695,6 @@ const _getTokenTxs = useThrottleFn(async () => {
             count: txCount.value[val.maker]
           }
         }).reverse()
-        // 获取tokenTxs.value 最后一项的token_id
-        // listStatus.value.page_token = tokenTxs.value[tokenTxs.value.length - 1]?.page_token || ''
       }else{
         tokenTxs.value = [...tokenTxs.value].concat(data.filter?.(i => tokenTxs.value?.every?.(j => j.txhash !== i.txhash))
             ?.map(i => transferTxsData(i))).reverse().map(val => {
@@ -741,11 +719,10 @@ const _getTokenTxs = useThrottleFn(async () => {
       }
       listStatus.value.finished = true
     }
-  } catch (e) {
+  } catch {
     resetTx()
   } finally {
     listStatus.value.loadingTxs1 = false
-    showFooter.value = false
     listStatus.value.loadingTxs = false
   }
 }, 500)
@@ -1220,14 +1197,11 @@ watchTxUnwatch = watch(() => wsStore.wsResult[WSEventType.TX], data => {
   if(markerAddress && wallet_address !== markerAddress){
     return
   }
-
-  // 检查是否已存在相同的交易（防重复）
   const existingTx = wsPairCache.value.find(tx =>
   (('transaction' in tx && tx.transaction === data.tx.transaction &&
     tx.wallet_address === wallet_address))
   )
   if (existingTx) {
-    console.log('🔄 跳过重复交易:', data.tx.transaction)
     return
   }
   txCount.value[wallet_address] = (txCount.value[wallet_address] || 0) + 1
@@ -1334,7 +1308,6 @@ watchSimpleTxUnwatch = watch(() => wsStore.wsResult[WSEventType.SIMPLE_TX], data
 const updatetokenTxs = useThrottleFn(() => {
   if (wsPairCache.value.length === 0) return
 
-  // 去重处理：检查新数据是否已存在于tokenTxs中
   const newTxs = wsPairCache.value.filter(newTx =>
     !tokenTxs.value.some(existingTx =>
     ('transaction' in existingTx && 'transaction' in newTx && existingTx.transaction === newTx.transaction &&
@@ -1343,7 +1316,6 @@ const updatetokenTxs = useThrottleFn(() => {
   )
 
   if (newTxs.length > 0) {
-    // console.log('📊 更新订单薄数据:', newTxs.length, '条新记录')
     tokenTxs.value.unshift(...newTxs)
 
     // 限制数据量，保持性能
@@ -1352,7 +1324,6 @@ const updatetokenTxs = useThrottleFn(() => {
       listStatus.value.page_token = tokenTxs.value[tokenTxs.value.length - 1]?.page_token||''
     }
   }
-
   wsPairCache.value.length = 0
   triggerRef(tokenTxs)
 }, 500)

@@ -50,6 +50,16 @@ export function handleBotError(err: any, notify: any = ElNotification) {
   notify({ title: 'Error', type: 'error', message: formatBotError(msg) })
 }
 
+/** 是否 createTx 接口返回的“接口即失败”项（status/errorMessage/errorLog） */
+export function hasCreateTxError(item: any): boolean {
+  return item?.status === 'error' || !!item?.errorMessage || !!item?.errorLog
+}
+
+/** createTx 项的错误展示文案，优先 errorMessage */
+export function getCreateTxErrorMsg(item: any): string {
+  return item?.errorMessage || item?.errorLog || 'swap error'
+}
+
 export function tgLogin() {
   let url = 'https://t.me/AveSniperBot?start=lg-'
   // const config = useRuntimeConfig()
@@ -74,6 +84,8 @@ export function tgLogin() {
     'ave-m-test-7.github.io',
     'ave00.com',
     'pro.ave.ai',
+    'pro.avesp.xyz',
+    'pro0.ave.ai',
   ]
   const domain = window.location.hostname
   const index = domains.indexOf(domain) + 1

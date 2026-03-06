@@ -70,6 +70,31 @@ function init() {
   resetListStatus()
 }
 
+// 右键点击事件处理
+function handleClick(e: MouseEvent, row: any) {
+  e.preventDefault()
+  const rightClickAction = globalStore.audioSettings?.wallet?.clickAction
+  // rightClickAction: 0 不打开, 1 新tab打开
+  const url = `/address/${row.user_address}/${row.tokenInfo.chain}`
+  if (rightClickAction === 1) {
+    window.open(url, '_blank')
+  } else{
+    window.open(url, '_self')
+  }
+}
+
+// 右键点击事件处理
+function handleContextMenu(e: MouseEvent, row: any) {
+  e.preventDefault()
+  const rightClickAction = globalStore.audioSettings?.wallet?.rightClickAction
+  // rightClickAction: 0 不打开, 1 新tab打开
+  if (rightClickAction === 1) {
+    const url = `/address/${row.user_address}/${row.tokenInfo.chain}`
+    window.open(url, '_blank')
+  }
+}
+
+
 function resetListStatus() {
   listQuery.value.pageNO = 1
   listQuery.value.max_block_number = 0
@@ -320,7 +345,11 @@ const collect = async () => {
             </div>
           </div>
           <div class="flex items-center gap-6px">
-            <span class="text-12px color-[--secondary-text]">{{
+            <span
+              class="text-12px color-[--secondary-text]"
+              @click.stop="handleClick($event, tokenDetailStore)"
+              @contextmenu.stop="handleContextMenu($event, tokenDetailStore)"
+            >{{
                 tokenDetailStore.user_address.slice(0, 4)
               }}...{{ tokenDetailStore.user_address.slice(-4) }}</span>
             <Icon
@@ -340,6 +369,7 @@ const collect = async () => {
       </div>
       <NuxtLink
         v-if="$route.path.indexOf('/address/') == -1"
+        :target="globalStore.audioSettings?.wallet?.clickAction == 1  ? '_blank' : '_self'"
         :to="`/address/${tokenDetailStore.user_address}/${tokenDetailStore.tokenInfo!.chain}`" class="py-7px px-8px bg-[--border] rounded-4px color-[--main-text] text-12px"
         @click.stop="tokenDetailStore.drawerVisible = false"
       >

@@ -487,7 +487,7 @@ const headlineArr = computed(() => {
     cursor: pointer;
   }
   .on {
-    color: var(--main-text);
+    color: var(--main-text1);
   }
 }
 .tabs {

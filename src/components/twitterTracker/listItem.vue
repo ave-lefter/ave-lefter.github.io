@@ -6,12 +6,12 @@
                     <div class="min-w-0 flex-1 flex items-center gap-7px">
                         <UserAvatar icon-size="32px" class="cursor-pointer"
                             :wallet_logo="{ logo: item.author.profile_pic, name: item.author.name }"
-                            @click="clickAvatar(item.author.twitter_url)" />
+                            @click="clickAvatar(item.author.author_id)" />
                         <div class="flex-1 min-w-0">
                             <div class="gap-8px flex items-center min-w-0">
                                 <span v-tooltip="item.author.name"
                                     class="color-[--main-text] text-16px lh-20px min-w-0 max-w-[calc(100%-80px)] truncate cursor-pointer"
-                                    @click="clickAvatar(item.author.twitter_url)">{{
+                                    @click="clickAvatar(item.author.author_id)">{{
                                         item.author.name
                                     }}</span>
                                 <img v-if="item.verified" :width="12" src="@/assets/images/kol.svg" alt="">
@@ -39,16 +39,18 @@
                 </div>
                 <div v-if="index !== -1" class="gap-8px flex items-center">
                     <div class="w-24px h-24px bg-[--main-list-hover] rounded-4px flex items-center justify-center cursor-pointer"
-                        @click="item.author.follow_status === 1 ? _unfollowKol(item.author.author_id, index) : _followKol(item.author.author_id, index)">
-                        <Icon :name="item.author.follow_status === 1
-                            ? 'custom:twitter-collect'
-                            : 'custom:twitter-uncollect'
-                            " class="text-12px" />
+                        @click="followIdArray.includes(item.author.author_id) ? _unfollowKol(item.author.author_id, index) : _followKol(item.author.author_id, index)">
+                        <Icon :name="followIdArray.includes(item.author.author_id) ? 'custom:twitter-collect' : 'custom:twitter-uncollect'" class="text-12px" />
                     </div>
-                    <Icon :name="`custom:twitter-${item.type}`" class="text-24px" />
+                    <div class="flex items-center gap-4px py-6px px-4px rounded-4px text-12px"
+                    :style="{background: map[item.type]?.bg, color: map[item.type]?.color}"
+                    >
+                        <Icon :name="`custom:twitter-${item.type}`" class="text-13px" />
+                        {{ map[item.type]?.label }}
+                    </div>
                 </div>
             </div>
-            <div class="relative" :class="index !== -1 ? 'ml-40px' : ''">
+            <div v-show="+props.item.type!==typeEnum.retweet" class="relative" :class="index !== -1 ? 'ml-40px' : ''">
                 <div ref="contentEl" :class="[
                     'text-14px lh-22px break-words',
                     { 'line-11': !contentExpanded && isContentOverflow }
@@ -61,8 +63,9 @@
             <div v-for="(media, mediaIndex) in item.medias?.slice?.(0, 1)" :key="mediaIndex"
                 :class="index !== -1 ? 'ml-40px' : ''" class="relative">
                 <!-- <img :src="media.media_url_https" alt="" class="max-w-full rounded-8px cursor-pointer"> -->
-                <el-tooltip :ref="el => { if (el) tooltipRefs[`${mediaIndex}`] = el }" popper-class="tooltip-pd-0"
-                    :show-arrow="false" placement="right" :persistent="false" :popper-options="{
+                <el-tooltip v-if="media.type !== 'video'" :ref="el => { if (el) tooltipRefs[`${mediaIndex}`] = el }"
+                    popper-class="tooltip-pd-0" :show-arrow="false" placement="right"
+                    :persistent="false" :popper-options="{
                         modifiers: [
                             {
                                 name: 'eventListeners',
@@ -72,7 +75,7 @@
                                 }
                             }
                         ]
-}" @show="handleTooltipShow(mediaIndex)">
+                    }" @show="handleTooltipShow(mediaIndex)">
                     <template #default>
                         <img :src="media.media_url_https||media.url" alt="" class="w-full max-h-300px rounded-8px object-cover">
                     </template>
@@ -81,19 +84,43 @@
                             @load="handleImageLoad(mediaIndex)">
                     </template>
                 </el-tooltip>
-                <div v-if="media.type === 'video'" class="absolute top-0 left-0 w-full h-full bg-black/50 rounded-8px">
+                <div v-else>
+                    <!-- <video ref="videoPlayer" :poster="media.media_url_https" :src="findMediaUrl(media)" class="w-full h-full object-cover video-js vjs-default-skin" controls /> -->
+                     <iframe class="w-full" style="border: none; cursor: pointer;height: auto; aspect-ratio: 16 / 9; max-height: 320px;" :srcdoc="`
+                     <html>
+                        <style>
+                            video {
+                                width: 100%;
+                                height: auto;
+                                aspect-ratio: 16 / 9;
+                                max-height: 320px;
+                            }
+                            html, body {
+                                margin: 0;
+                                padding: 0;
+                                overflow:hidden;
+                            }
+                        </style>
+                        <meta name=&quot;referrer&quot; content=&quot;no-referrer&quot; />
+                        <video poster=${media.media_url_https} src=${findMediaUrl(media)} controls 
+                        />
+                     </html>
+                     `" frameborder="0" allowfullscreen="" referrerpolicy="no-referrer"/>
+                </div>
+                <!-- <div v-if="media.type === 'video'" class="absolute top-0 left-0 w-full h-full bg-black/50 rounded-8px">
                     <Icon name="custom:play-circle-line"
                         class="absolute top-50% left-50% transform -translate-x-1/2 -translate-y-1/2 text-48px text-white cursor-pointer"
                         @click="clickVideo(item.url)" />
-                </div>
-
+                </div> -->
             </div>
-            <div v-if="isContentOverflow" :class="index !== -1 ? 'ml-40px' : ''"
+            <div v-if="+props.item.type!==typeEnum.retweet" :class="index !== -1 ? 'ml-40px' : ''"
                 class="justify-between items-center flex">
-                <div class="flex items-center gap-4px cursor-pointer text-12px color-[--secondary-text]">
-                    <!-- <Icon name="custom:translation"/>{{ t('viewTranslation') }} -->
+                <div v-show="showTranslation" class="flex items-center gap-4px cursor-pointer text-12px color-[--secondary-text]" @click="translationVisible=!translationVisible">
+                    <template v-if="props.item.content">
+                        <Icon name="custom:translation" />{{ t(translationVisible ? 'viewOrigin':'viewTranslation') }}
+                    </template>
                 </div>
-                <span class="flex items-center gap-4px cursor-pointer color-[--primary-color] text-12px"
+                <span v-if="isContentOverflow" class="flex items-center gap-4px cursor-pointer color-[--primary-color] text-12px"
                     @click="contentExpanded = !contentExpanded">
                     <Icon name="custom:angle-down" :class="contentExpanded ? 'rotate-180' : ''" />
                     {{ !contentExpanded ? t('Expand') : t('Collapse') }}
@@ -107,8 +134,11 @@ import { useStorage } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { followKol, unfollowKol } from '~/api/twitter'
 import { processTwitterText } from '~/utils'
+import { typeEnum, useTrackerTypes } from './constants'
+
 const emits = defineEmits(['measureElement'])
 const trackerStore = useTwitterTrackerStore()
+const {map} = useTrackerTypes()
 const { t } = useI18n()
 const botStore = useBotStore()
 
@@ -129,10 +159,26 @@ const measureEl = ref(null)
 const contentExpanded = ref(false)
 const isContentOverflow = ref(false)
 const followIds = useStorage('twFollowIds', [])
+const translationVisible = ref(false)
 
+const followIdArray = computed(() => {
+    return followIds.value.map(el => el.author_id)
+})
+const showTranslation = computed(() => {
+    const {lang} = props.item || {}
+    const key = lang === 'en' ? 'content_zh' : 'content_en'
+    return props.item?.[key] && 
+        props.item?.[key] !== props.item.content
+})
 // 处理后的内容，包含可点击的链接
 const processedContent = computed(() => {
-    return processTwitterText(props.item?.content || '')
+    const {lang} = props.item || {}
+    let key = `content_${lang}`
+    if(translationVisible.value){
+        key = lang === 'en' ? 'content_zh' : 'content_en'
+    }
+    const content = props.item?.[key]
+    return processTwitterText(content || props.item.content)
 })
 
 const checkContentOverflow = () => {
@@ -155,12 +201,29 @@ onBeforeUnmount(() => {
     tooltipRefs.value = {}
 })
 
-watch(() => props.item?.content, () => {
+watch(() => [props.item?.content,translationVisible.value], () => {
     checkContentOverflow()
 }, { immediate: true })
 
-const clickAvatar = (twitter_url) => {
-    window.open(twitter_url)
+const twitter_author_id = inject('twitter_author_id')
+const clickAvatar = (author_id) => {
+    twitter_author_id.value = author_id
+}
+
+/**
+ * 
+ * @param {{
+    video_info: {
+        variants: {
+            content_type: 'video/mp4';
+            url: string;
+            bitrate?: number;
+        }
+    }
+}} media 
+ */
+const findMediaUrl = (media) => {
+    return media.video_info?.variants?.find?.(v => v.content_type === 'video/mp4')?.url
 }
 
 const _followKol = async (author_id, index) => {
@@ -193,10 +256,6 @@ const _unfollowKol = async (author_id, index) => {
         ElMessage.error(t('failed'))
         console.error('Error unfollowing KOL:', error)
     }
-}
-
-const clickVideo = (url) => {
-    window.open(url)
 }
 
 const handleTooltipShow = (mediaIndex) => {

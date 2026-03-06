@@ -8,7 +8,7 @@
          <button v-if="swapStore.activeTab === 1" class="max-btn" type="button" @click.stop="handlePercentChange(100)">{{ $t('max') }}</button>
       </div>
       <div class="flex justify-between items-center mt-10px">
-        <el-input v-model="limitAmount1" placeholder="0.0" size="large" clearable class="input-number" input-style="text-align:right"  @update:model-value="value => {limitAmount1 = value?.replace?.(/\-|[^\d.]/g, '');watchLimitAmount1()}" @focus="percentStepRef?.handleClick(0, true)" />
+        <el-input v-model="limitAmount1" placeholder="0.0" size="large"  class="input-number" input-style="text-align:right"  @update:model-value="value => {limitAmount1 = value?.replace?.(/\-|[^\d.]/g, '');watchLimitAmount1()}" @focus="percentStepRef?.handleClick(0, true)" />
       </div>
     </div>
     <div class="card-container bottom mt-10px">
@@ -20,7 +20,7 @@
           $t('max') }}</button>
       </div>
       <div class="flex justify-between items-center mt-10px">
-        <el-input v-model="limitAmount2" placeholder="0.0" size="large" clearable class="input-number" input-style="text-align:right"  @update:model-value="value => {limitAmount2 = value?.replace?.(/\-|[^\d.]/g, '');watchLimitAmount2()}" @focus="percentStepRef?.handleClick(0, true)" />
+        <el-input v-model="limitAmount2" placeholder="0.0" size="large"  class="input-number" input-style="text-align:right"  @update:model-value="value => {limitAmount2 = value?.replace?.(/\-|[^\d.]/g, '');watchLimitAmount2()}" @focus="percentStepRef?.handleClick(0, true)" />
       </div>
     </div>
     <PercentStep ref="percentStepInf" :activeColor="swapStore.activeTab === 0 ? upColor[0]: downColor[0]" @change="handlePercentChange"/>
@@ -30,7 +30,7 @@
         <el-icon><Minus /></el-icon>
       </button>
       <span class="text-14px color-[--d-666-l-999]">$</span>
-      <el-input v-model="triggerPrice" placeholder="0.0"  size="large" clearable class="input-number" input-style="text-align:center"  @update:model-value="value => {triggerPrice = value?.replace?.(/\-|[^\d.]/g, '')}" />
+      <el-input v-model="triggerPrice" placeholder="0.0"  size="large"  class="input-number" input-style="text-align:center"  @update:model-value="value => {triggerPrice = value?.replace?.(/\-|[^\d.]/g, '')}" />
       <button class="limit-price-icon" type="button" :disabled="!triggerPrice" @click.stop="addTriggerPrice">
         <el-icon><Plus /></el-icon>
       </button>
@@ -42,7 +42,7 @@
           <el-icon><Minus /></el-icon>
         </button>
         <span class="text-14px color-[--d-666-l-999]">$</span>
-        <el-input v-model="limitSolanaPriceU" placeholder="0.0" size="large" clearable class="input-number" input-style="text-align:center"  @update:model-value="value => {limitSolanaPriceU = value?.replace?.(/\-|[^\d.]/g, '');watchLimitSolanaPrice()}" />
+        <el-input v-model="limitSolanaPriceU" placeholder="0.0" size="large"  class="input-number" input-style="text-align:center"  @update:model-value="value => {limitSolanaPriceU = value?.replace?.(/\-|[^\d.]/g, '');watchLimitSolanaPrice()}" />
         <button class="limit-price-icon" type="button" :disabled="!limitSolanaPriceU" @click.stop="addLimitSolanaPrice">
            <el-icon><Plus /></el-icon>
         </button>
@@ -55,7 +55,7 @@
            <el-icon><Minus /></el-icon>
         </button>
         <span class="text-14px color-[--d-666-l-999]">$</span>
-        <el-input v-model="limitPrice" placeholder="0.0" size="large" clearable class="input-number" input-style="text-align:center"  @update:model-value="value => {limitPrice = value?.replace?.(/\-|[^\d.]/g, '');watchLimitPrice()}" />
+        <el-input v-model="limitPrice" placeholder="0.0" size="large"  class="input-number" input-style="text-align:center"  @update:model-value="value => {limitPrice = value?.replace?.(/\-|[^\d.]/g, '');watchLimitPrice()}" />
         <button class="limit-price-icon" type="button" :disabled="!limitPrice" @click.stop="addLimitPrice">
           <el-icon><Plus /></el-icon>
         </button>

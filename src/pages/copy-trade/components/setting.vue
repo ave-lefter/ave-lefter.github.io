@@ -69,7 +69,7 @@
       <!-- protection -->
       <div class="flex-between mt-16px">
         <span class="color-[--secondary-text]">{{ $t('protection') }}</span>
-        <el-switch v-model="currentSetting.isPrivate" />
+        <el-switch v-model="currentSetting.isPrivate" :disabled="chain ==='base'"/>
       </div>
 
       <!-- priority fee -->
@@ -81,7 +81,7 @@
           :model-value="currentSetting.priorityFee"
           @update:model-value="onPriorityFeeInput"
           :placeholder="chain === 'solana' ? $t('customFee1') : $t('customEvmFee1')"
-          clearable
+          
           style="width: 221px"
           @input="(val) => onValidateInput(val,'priorityFee')"
         >

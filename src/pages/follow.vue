@@ -6,18 +6,23 @@
      </ul>
      <NuxtPage/>
    </div>
+       <!-- 编辑 -->
+    <TradeDialog v-model="copyTradeVisible" />
  </div>
 </template>
 
 <script setup lang="ts">
+import TradeDialog from './copy-trade/components/tradeDialog.vue'
 const route=useRoute()
 const { t } = useI18n()
 const defaultPath=ref('/follow/token')
 const globalStore = useGlobalStore()
+const { getFollowingInfo, getFollowingAddress } = useCopyTradeStore()
 const height = computed(()=>{
-  return 'calc(100vh - 92px)'
-  // return globalStore.tokenHistoryVisible ? 'calc(100vh - 125px)':'calc(100vh - 92px)'
+  // return 'calc(100vh - 92px)'
+  return globalStore.tokenHistoryVisible ? 'calc(100vh - 125px)':'calc(100vh - 92px)'
 })
+const { copyTradeVisible } = storeToRefs(useCopyTradeStore())
 const tabData=computed(()=>[
   {
     label:t('customToken'),
@@ -32,6 +37,22 @@ const tabData=computed(()=>[
     path:'/follow/remark'
   }
 ])
+watch(
+  () => route.path,
+  (newPath, oldPath) => {
+    console.log('===================', newPath)
+    if (newPath === '/follow/addr' || newPath === '/follow/remark') {
+        getFollowingInfo()
+        getFollowingAddress()
+      }
+  }
+)
+onMounted(() => {
+  if (route.path === '/follow/addr' || route.path === '/follow/remark') {
+    getFollowingInfo()
+    getFollowingAddress()
+  }
+})
 definePageMeta({
   layout: 'default',
    key: (route) => {
@@ -42,7 +63,7 @@ transition: {
   },
   keepalive: true,
   middleware: defineNuxtRouteMiddleware((to) => {
-    if(to.path === '/follow') {
+    if (to.path === '/follow'){
       return navigateTo(defaultPath.value, { replace: true })
     }else{
       defaultPath.value=to.fullPath

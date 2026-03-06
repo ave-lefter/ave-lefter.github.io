@@ -44,6 +44,7 @@ const wsStore = useWSStore()
 const priceV2Store = usePriceV2Store()
 const {token} = storeToRefs(useTokenStore())
 const route = useRoute()
+const {zone} = storeToRefs(useGlobalStore())
 const addressAndChain = computed(() => {
   const id = route.params.id as string
   if (id) {
@@ -65,13 +66,14 @@ watch(
         return {
           ...i,
           current_price_usd: item.uprice,
-          price_change: item.price_change_v2,
+          price_change: item.price_change,
+          price_change_v2: item.price_change_v2,
         }
       }
       return i
     })
     // 排序
-    if(sort.value.sortBy === 'price_change'){
+    if(sort.value.sortBy === 'price_change'||sort.value.sortBy === 'price_change_v2'){
       favoritesList.value.sort((a: any, b: any) => {
         return ((b[sort.value.sortBy!] || 0) - (a[sort.value.sortBy!] || 0)) * sort.value.activeSort
       })
@@ -100,7 +102,7 @@ const activeTab = shallowRef(0)
 const favoriteCondition = useStorage('favoriteCondition', { currentMode: 'mcap' })
 const sort = shallowRef<{
   activeSort: number
-  sortBy: 'symbol' | 'current_price_usd' | 'price_change' | null
+  sortBy: 'symbol' | 'current_price_usd' | 'price_change' | 'price_change_v2' | null
 }>({
   activeSort: 0,
   sortBy: null,
@@ -137,8 +139,8 @@ const columns = computed(() => {
       label:
         (favoriteCondition.value.currentMode === 'mcap' ? t('mCap') : t('price')) +
         '{currentMode}/' +
-        '24h%',
-      value: favoriteCondition.value.currentMode === 'mcap' ? 'price_change' : 'price_change',
+        t('Chg')+'%',
+      value: zone.value === '24h' ? 'price_change_v2' : 'price_change',
       currentMode: favoriteCondition.value.currentMode,
       flex: 'flex-1 justify-end',
       sort: true,
@@ -162,7 +164,7 @@ const sortedFavList = computed(() => {
       return (codeB - codeA) * sort.value.activeSort
     })
   }
-  else if(sort.value.sortBy === 'price_change'){
+  else if(sort.value.sortBy === 'price_change'||sort.value.sortBy === 'price_change_v2'){
     return favoritesList.value.toSorted((a: any, b: any) => {
       return ((b[sort.value.sortBy!] || 0) - (a[sort.value.sortBy!] || 0)) * sort.value.activeSort
     })
@@ -184,13 +186,26 @@ watch(
     setActiveTab(0, 0)
   }
 )
+
+watch(
+  ()=>zone.value,
+  (val2) => {
+    if(sortParam.sort_dir&&(sortParam.sort==='price_change_v2' || sortParam.sort==='price_change')){
+      sortParam.sort=(val2==='24h'?'price_change_v2':'price_change')
+      sort.value.sortBy=(val2==='24h'?'price_change_v2':'price_change')
+      resetListStatus()
+      loadMoreFavorites()
+    }
+  }
+)
+
 watch(
   () => sort.value,
   (val) => {
     console.log('sort changed', val)
-    if(val.sortBy==="price_change"){
+    if(val.sortBy==="price_change" || val.sortBy==="price_change_v2"){
         sortParam.sort_dir=['asc', '', 'desc'][(val.activeSort||0)+1]
-        sortParam.sort='price_change'
+        sortParam.sort=val.sortBy
        
     }else{
       sortParam.sort_dir=''
@@ -274,7 +289,8 @@ async function loadMoreFavorites() {
           ...i,
           id: i.token + '-' + i.chain,
           //TODO price_change_v2
-          price_change: i.price_change_v2,
+          price_change: i.price_change,
+          price_change_v2: i.price_change_v2,
           pool_circulating_supply:
             (i.total - i.lock_amount - i.burn_amount - i.other_amount) * i.current_price_usd,
         }))
@@ -385,7 +401,7 @@ function toggleMode(mode: string) {
             :to="`/token/${row.token}-${row.chain}`"
           >
             <div class="flex items-center flex-1">
-              <TokenImg class="mr-8px" :row="row" v-tooltip="{
+              <TokenImg class="mr-8px" :row="{...row,issue_platform:''}" v-tooltip="{
                 content:{
                   is:TokenImg,
                   props:{
@@ -425,14 +441,14 @@ function toggleMode(mode: string) {
               <div v-else>${{ formatNumber(row.pool_circulating_supply || 0, 2) }}</div>
               <div
                 :class="`flex-1 text-right text-12px
-                ${getColorClass(row.price_change)}
+                ${getColorClass((zone==='24h'? row.price_change_v2 :row.price_change))}
             `"
               >
-                <template v-if="Number(row.price_change) === 0">0%</template>
-                <template v-else-if="!row.price_change || row.price_change === '--'">--</template>
+                <template v-if="Number((zone==='24h'? row.price_change_v2 :row.price_change)) === 0">0%</template>
+                <template v-else-if="!(zone==='24h'? row.price_change_v2 :row.price_change) || (zone==='24h'? row.price_change_v2 :row.price_change) === '--'">--</template>
                 <template v-else>
-                  {{ Number(row.price_change) > 0 ? '+' : '-'
-                  }}{{ formatNumber(Math.abs(Number(row.price_change)) || 0, 2) }}%
+                  {{ Number((zone==='24h'? row.price_change_v2 :row.price_change)) > 0 ? '+' : '-'
+                  }}{{ formatNumber(Math.abs(Number((zone==='24h'? row.price_change_v2 :row.price_change))) || 0, 2) }}%
                 </template>
               </div>
             </div>

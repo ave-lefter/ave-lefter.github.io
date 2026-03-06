@@ -14,10 +14,11 @@
         'popper-class': 'new-popover',
       }
     }"
-    class="autoSellSetting-btn border-none cursor-pointer mr-8px"
-    :class="{
-      'active': isAutoSellConfig
-    }"
+    class="autoSellSetting-btn border-none cursor-pointer"
+    :class="[
+      rootClass? rootClass : 'mr-8px',
+      { active: isAutoSellConfig },
+    ]"
     >
     <span>{{ $t('autoSell') }}</span>
     <SlippageSet
@@ -42,6 +43,7 @@ import { useAutoSellSettingContent } from './utils'
 
 const props = defineProps({
   chain: { type: String as PropType<BotChain>, default: '' },
+  rootClass: { type: String, default: '' }
 })
 
 const walletStore = useWalletStore()
@@ -73,11 +75,11 @@ onMounted(() => {
   align-items: center;
   font-size: 12px;
   // font-weight: 500;
-  color: var(--main-text);
+  color: var(--main-text1);
   // color: var(--d-999-l-666);
   border: 1px solid transparent;
   &.active {
-    color: var(--main-text);
+    color: var(--main-text1);
     border: 1px solid #3F80F7;
   }
 }

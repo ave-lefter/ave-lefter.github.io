@@ -140,7 +140,7 @@ const activity = ref({
                 "
               >
                  ${$t('txns')}: ${value?.txns}
-                 <div>
+                 <div class="flex-start">
                   ${tokens
                     .slice(0, 4)
                     .map((el) => {

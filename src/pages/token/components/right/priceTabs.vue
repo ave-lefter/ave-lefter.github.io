@@ -1,9 +1,10 @@
 <template>
-  <div class="tabs">
+  <div class="bg-[--secondary-bg] h-64px" @mouseleave="mouseLeave" v-if="!volumeVisible">
+    <div class="tabs pt-11px pb-10px px-15px">
     <button
       v-for="item in tabs"
       :key="item.id"
-      class="tab-button clickable-btn"
+      class="tab-button clickable-btn bg-[--secondary-bg]"
       :class="{ active: modelValue === item.id }"
       @click.stop="$emit('update:modelValue', item.id)"
     >
@@ -12,16 +13,29 @@
         {{!!tokenStore.pair ? formatNumber(tokenStore.pair?.[`price_change_${item?.id}`], 2) : '--' }}%
       </div>
     </button>
+   </div>
+  </div>
+  <div v-else @mouseenter="volumeVisible=false;console.log('mouseEnter')" class="bg-[--secondary-bg] py-8px px-15px h-64px">
+    <template v-for="item in tabs" :key="item.id">
+      <VolumeStats
+        v-if="modelValue === item.id"
+        :tabActive="item.id"
+        :tabActiveName="item.name"
+      />
+    </template>
   </div>
 </template>
 
 <script setup lang="ts">
 import { formatNumber } from '@/utils/formatNumber'
+
+const VolumeStats = defineAsyncComponent(() => import('./volumeStats.vue'))
 defineProps<{
   modelValue: string
   tabs: { id: '5m' | '1h' | '4h' | '24h'; name: string }[]
 }>()
 
+const volumeVisible = ref(true)
 const $emit = defineEmits(['update:modelValue'])
 const tokenStore = useTokenStore()
 const getColor = (id: string) => {
@@ -31,6 +45,11 @@ const getColor = (id: string) => {
   if (val < 0) return '#F6465D'
   return '#999'
 }
+const mouseLeave = () => {
+  setTimeout(() => {
+    volumeVisible.value = true
+  }, 16.7)
+}
 
 
 </script>
@@ -39,7 +58,7 @@ const getColor = (id: string) => {
   .tabs {
     display: flex;
     align-items: center;
-     background: var(--main-list-hover);
+    //  background: var(--main-list-hover);
     .tab-button {
       display: flex;
       flex-direction: column;
@@ -47,8 +66,8 @@ const getColor = (id: string) => {
       justify-content: center;
       cursor: pointer;
       border: none;
-      background: var(--main-list-hover);
-      color: var(--main-text);
+      // background: var(--main-list-hover);
+      color: var(--main-text1);
       flex: 1;
       min-height: 44px;
       &:first-child {
@@ -65,7 +84,7 @@ const getColor = (id: string) => {
         margin-top: 2px;
       }
       &.active {
-        background: var(--tab-active-bg);
+        background: var(--main-list-hover);
       }
     }
   }

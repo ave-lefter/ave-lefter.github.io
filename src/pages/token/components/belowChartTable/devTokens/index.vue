@@ -7,7 +7,7 @@
                 prop: conditions.sort,
                 order: conditions.sort_dir ? conditions.sort_dir + 'ending' : null,
             }" fit header-row-class-name="text-12px"
-row-class-name="cursor-pointer color-[--secondary-text] text-12px"
+              row-class-name="cursor-pointer color-[--secondary-text] text-12px"
                 @sort-change="handleSortChange">
                 <template #empty>
                     <AveEmpty v-if="!loadingRun" class="table-empty">
@@ -15,9 +15,9 @@ row-class-name="cursor-pointer color-[--secondary-text] text-12px"
                     </AveEmpty>
                 </template>
                 <TokenColumn subImgKey="issue_platform" :column-props="{
-                    label: $t('walletToken'),
-    width: '170',
-                    fixed: 'left',
+                  label: $t('walletToken'),
+                  width: '170',
+                  fixed: 'left',
                 }" />
                 <el-table-column align="right" :width="100" sortable="custom"
                     :sort-orders="['descending', 'ascending', null]" :label="$t('time')" prop="created_at">

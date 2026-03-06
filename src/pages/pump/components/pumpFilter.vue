@@ -1,5 +1,5 @@
 <template>
-  <el-dialog v-model="localVisible" header-class="hidden"
+  <el-dialog align-center v-model="localVisible" header-class="hidden"
     class="[--el-bg-color:--pump-bg] border-1px border-solid border-[--main-divider] dialog" title="" :width="488"
     style="padding: 0" append-to-body :persistent="false" :show-close="false">
     <template #default>
@@ -184,7 +184,7 @@
 
               <template v-else>
                 <div :class="['formItem', column.type]">
-                  <el-input v-model="form[column.prop]" clearable>
+                  <el-input v-model="form[column.prop]" >
                     <template v-if="column.suffix" #suffix>
                       <span>{{ column.suffix }}</span>
                     </template>

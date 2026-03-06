@@ -16,6 +16,14 @@ export interface PumpConfig {
 }
 
 export interface PumpObj {
+  summary_score: number | undefined
+  following: number
+  followers: number
+  headline_en: string
+  headline_cn: string
+  headline_en: string
+  headline_cn: string
+  co_holders_count: string
   buy_tax: any
   sell_tax: any
   dev_migrated_count?: number
@@ -155,7 +163,7 @@ export type CategoryKey = 'new' | 'soon' | 'graduated'
 
 export type pumpBlack = {
   address: string,
-  type: 'ca'|'dev'| 'keyword'
+  type: 'ca'|'dev'| 'keyword'| 'twitter'
 }
 export type Size ='mini'| 'small' | 'medium' | 'large'
 

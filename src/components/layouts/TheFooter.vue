@@ -39,24 +39,41 @@
           <div class="flex items-center justify-center text-14px">
             <Icon name="custom:twitter2" />
           </div>
-          {{ t('twitterTracker') }}
+          {{ t('socialMediaTracker') }}
         </div>
       </el-badge>
-      <div class="flex items-center gap-8px ml-12px whitespace-nowrap">
+      <el-popover popper-style="padding: 0;border-radius: 8px;" width="auto" placement="top" :teleported="false" trigger="hover">
+        <template #reference>
+          <div
+            class="group flex items-center cursor-pointer ml-12px relative"
+          >
+            <div class="relative w-44px h-24px flex-shrink-0 flex items-center justify-center">
+              <img :src="marketNavIcon" alt="market nav" class="w-full h-full object-contain absolute inset-0 opacity-100 group-hover:opacity-0 transition-opacity">
+              <img :src="marketNavHoverIcon" alt="market nav hover" class="w-full h-full object-contain absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity">
+            </div>
+          </div>
+        </template>
+        <Dashborad />
+      </el-popover>
+      <div class="flex items-center gap-12px ml-12px whitespace-nowrap footer-main-coins">
         <NuxtLink
           v-for="item in mainCoins"
           :key="item.symbol || item.logo_url"
-          class="flex items-center gap-6px"
+          class="flex items-center gap-4px text-12px"
           :to="`/token/${item.id}`"
         >
+          <img
+            v-if="mainCoinLogos[item.symbol]"
+            :src="mainCoinLogos[item.symbol]"
+            :alt="item.symbol"
+            class="w-16px h-16px flex-shrink-0 block rounded-full"
+          >
           <TokenImg
-            :row="{
-              logo_url: item.logo_url,
-              chain: '',
-            }"
+            v-else
+            :row="{ logo_url: item.logo_url, chain: '' }"
             token-class="w-16px h-16px [&&]:mr-0"
           />
-          <span :class="item.isUp ? 'color-[--up-color]' : 'color-[--down-color]'">{{
+          <span class="footer-coin-price" :style="{ color: mainCoinColors[item.symbol] }">{{
             '$' + formatDec(item?.current_price_usd || 0, 2)
           }}</span>
         </NuxtLink>
@@ -89,7 +106,7 @@
         <a target="_blank" href="https://cloud.ave.ai">API</a>
       </li>
       <el-popover
-:persistent="false"
+        :persistent="false"
         popper-style="padding: 12px;min-width: 50px;width:auto"
         placement="top"
         :teleported="false"
@@ -165,6 +182,14 @@ import UserAvatar from '../userAvatar.vue'
 import type { IMonitorWsResponse } from '~/api/types/ws'
 import bellImg from '@/assets/images/bell.svg'
 import bellImg3 from '@/assets/images/bell3.svg'
+import btcIcon from '@/assets/icons/footer/btc.svg?url'
+import ethIcon from '@/assets/icons/footer/eth.svg?url'
+import bscIcon from '@/assets/icons/footer/bsc.svg?url'
+import solIcon from '@/assets/icons/footer/sol.svg?url'
+import navIcon from '@/assets/icons/footer/nav.svg?url'
+import navHoverIcon from '@/assets/icons/footer/nav-hover.svg?url'
+import navWhiteIcon from '@/assets/icons/footer/nav-white.svg?url'
+import navWhiteHoverIcon from '@/assets/icons/footer/nav-white-hover.svg?url'
 import { TokenImg, QuickSwap } from '#components'
 // import QuickSwap from '../quickSwapTsx.vue'
 
@@ -172,17 +197,20 @@ const { t } = useI18n()
 const { visible, hasRing } = storeToRefs(useMonitorStore())
 const signalStore = useSignalStore()
 const trackerStore = useTwitterTrackerStore()
+const themeStore = useThemeStore()
 const globalStore = useGlobalStore()
 const botStore = useBotStore()
 const dragPumpStore = usePumpStore()
 const configStore = useConfigStore()
 const audioElement = ref<HTMLAudioElement | null>(null)
 const { lang } = storeToRefs(globalStore)
-const { token } = storeToRefs(useTokenStore())
-const route = useRoute()
 const isEn = computed(() => {
   return lang.value === 'en'
 })
+
+// 市场导航图标：深色主题用 nav，白色主题用 nav-white
+const marketNavIcon = computed(() => (themeStore.isDark ? navIcon : navWhiteIcon))
+const marketNavHoverIcon = computed(() => (themeStore.isDark ? navHoverIcon : navWhiteHoverIcon))
 
 // 获取pump配置
 const pumpConfig = computed(() => dragPumpStore.pumpConfig)
@@ -214,6 +242,22 @@ const getIconByPlatform = (platform: string) => {
   return `${configStore.token_logo_url}${icon}`
 }
 // console.log('platformOptions', platformOptions.value)
+
+// 底部主币价格颜色：BTC / ETH / BSC(BNB) / SOL
+const mainCoinColors: Record<string, string> = {
+  BTC: '#F7931A',
+  ETH: '#5571FF',
+  BNB: '#D29F00',
+  SOL: '#42BCBE',
+}
+
+// 底部主币 Logo：使用本地 assets/icons/footer 下的 SVG
+const mainCoinLogos: Record<string, string> = {
+  BTC: btcIcon,
+  ETH: ethIcon,
+  BNB: bscIcon,
+  SOL: solIcon,
+}
 
 const ids = [
   '0x7130d2a12b9bcbfae4f2634d864a1ee1ce3ead9c-bsc',
@@ -722,5 +766,13 @@ const audioUrl = computed(() => {
   .el-icon.el-message__icon {
     display: none;
   }
+}
+
+/* 底部主币：价格颜色由 mainCoinColors 控制，不被链接样式覆盖 */
+.footer-main-coins a {
+  text-decoration: none;
+}
+.footer-main-coins .footer-coin-price {
+  font-size: 12px;
 }
 </style>

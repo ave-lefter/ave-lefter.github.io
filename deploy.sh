@@ -47,6 +47,11 @@ git add -A;
 git commit --amend --no-edit;
 git push -f https://$GITHUB_ACCESS_TOKEN2@github.com/suyogzt0/suyogzt0.github.io.git master:main;
 
+echo 'pro0.ave.ai' > CNAME;
+git add -A;
+git commit --amend --no-edit;
+git push -f https://$GITHUB_ACCESS_TOKEN2@github.com/pro0aveai/pro0aveai.github.io.git master:main;
+
 # git commit --amend --no-edit;
 
 ENDSSH

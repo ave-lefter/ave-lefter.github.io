@@ -1,7 +1,7 @@
 <template>
   <div v-show="globalStore.showRight">
       <div class="flex flex-col h-[calc(100vh-94px)] v-scroller-container">
-        <div class="p-15px bg-[--secondary-bg]">
+        <!-- <div class="p-15px bg-[--secondary-bg]">
           <PriceTabs v-model="tabActive" :tabs="tabs" />
           <template v-for="item in tabs" :key="item.id">
             <VolumeStats
@@ -10,7 +10,8 @@
               :tabActiveName="item.name"
             />
           </template>
-        </div>
+        </div> -->
+        <PriceTabs v-model="tabActive" :tabs="tabs" />
         <!-- <div class="flex items-center justify-around color-[--main-text] p-15px bg-[--secondary-bg] mt-4px">
         <div class="text-center">
           <div class="text-14px mb-5px">${{ formatNumber(token?.open_price || 0, 3) }}</div>
@@ -25,17 +26,17 @@
           <div class="text-12px color-[--third-text]">DEV</div>
         </div>
       </div> -->
-        <div class="p-15px bg-[--secondary-bg] mt-1px">
+        <div class="p-15px bg-[--secondary-bg] mt-.5px">
           <!-- <BotSwap /> -->
           <component :is="SwapCom" :key="walletStore.address ? 'Swap' : 'BotSwap'" />
         </div>
         <div class="p-15px pb-5px bg-[--secondary-bg] mt-1px">
-          <div
+          <!-- <div
             class="flex justify-between border-b-1px border-b-solid border-b-[--main-divider] pb-8px mb-8px text-12px"
           >
             <span class="text-12px color-[--main-text]">{{ $t('totalPair') }}</span>
             {{ formatNumber(tokenStore.token?.main_pair_tvl || 0, 1) }}
-          </div>
+          </div> -->
           <Pairs @openFilterModal="openFilterModal" />
         </div>
         <Overview class="px-15px pb-10px pr-0 bg-[--secondary-bg] mt-1px" />
@@ -81,7 +82,6 @@ const SwapCom = computed(() => {
     return BotSwap
   }
 })
-const VolumeStats = defineAsyncComponent(() => import('./volumeStats.vue'))
 const tabs: { id: '5m' | '1h' | '4h' | '24h'; name: string }[] = [
   { id: '5m', name: '5M' },
   { id: '1h', name: '1H' },

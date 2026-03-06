@@ -14,7 +14,7 @@
       v-model.trim="query"
       class="search-input search-input2 px-20px"
       :placeholder="$t('enterAddress/token')"
-      clearable
+      
       autofocus
       @keydown.enter="tokenSearch"
     >

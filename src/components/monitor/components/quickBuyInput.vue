@@ -60,9 +60,9 @@ function handleBlurBuyValue() {
     :style="inputStyle"
     v-model.trim="quickBuyValue"
     :size="size"
-    clearable
+    
     placeholder="0"
-    class="[&&]:[--el-input-bg-color:--dialog-list-hover] [--el-component-size-small:22px] [&&]:[--el-input-width:88px] [--el-text-color-regular:--secondary-text] [--el-input-icon-color:--secondary-text] [--el-text-color-placeholder:--secondary-text] [--el-border-color:transparent]"
+    class="[&&]:[--el-input-bg-color:--dialog-list-hover] [--el-component-size-small:22px] [&&]:[--el-input-width:68px] [--el-text-color-regular:--secondary-text] [--el-input-icon-color:--secondary-text] [--el-text-color-placeholder:--secondary-text] [--el-border-color:transparent]"
     @input="handleInput"
     @blur="handleBlurBuyValue"
   >
@@ -86,5 +86,10 @@ function handleBlurBuyValue() {
 </template>
 
 <style scoped lang="scss">
-
+  :deep() .el-input__prefix-inner > :last-child{
+    margin-right: 4px;
+  }
+  :deep() .el-input__wrapper{
+    padding: 2px 4px;
+  }
 </style>

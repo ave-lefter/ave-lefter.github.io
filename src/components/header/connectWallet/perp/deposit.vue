@@ -61,7 +61,7 @@
     </el-select>
     <el-input v-model="depositForm.amount"
       class="text-right"
-      inputmode="decimal" clearable placeholder="0.00"
+      inputmode="decimal"  placeholder="0.00"
       size="large"
       @input="value => depositForm.amount = value.replace(/\-|[^\d.]/g, '')">
       <template #prefix>

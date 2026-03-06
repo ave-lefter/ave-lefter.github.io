@@ -48,9 +48,9 @@ const elseHeight = computed(() => {
   let substractHeight = 302
   const tokenHisHeight = 33
   const activeCheckHeight = 32
-  // if (globalStore.tokenHistoryVisible) {
-  //   substractHeight += tokenHisHeight
-  // }
+  if (globalStore.tokenHistoryVisible) {
+    substractHeight += tokenHisHeight
+  }
   if (props.dialogValues.type === 'activeList') {
     substractHeight += activeCheckHeight
   }
@@ -150,7 +150,7 @@ const elseHeight = computed(() => {
     </ElCheckboxGroup>
     <div class="flex items-center text-12px lh-16px color-[--third-text] mb-8px">
       <span :class="activeColumns[0]">
-        {{ $t('name') }}
+        {{ $t('wallet') }}
       </span>
       <span :class="activeColumns[1]">
         {{ $t('7DayProfitLoss') }}
@@ -170,7 +170,7 @@ const elseHeight = computed(() => {
         class="flex items-center h-32px mb-4px"
       >
         <div
-          class="flex items-center text-12px gap-8px cursor-pointer whitespace-nowrap overflow-hidden text-ellipsis"
+          class="flex h-full items-center text-12px gap-8px cursor-pointer whitespace-nowrap overflow-hidden text-ellipsis"
           :class="activeColumns[0]"
           @click="navigateTo(`/address/${row.user_address}/${props.activeChain}`)"
         >

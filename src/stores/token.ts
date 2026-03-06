@@ -6,7 +6,7 @@ import { BigNumber } from 'bignumber.js'
 import type { GetTotalHoldersResponse} from '~/api/stats'
 import {getTotalHolders} from '~/api/stats'
 import { ElMessage } from 'element-plus'
-import {DefaultHeight} from '~/utils/constants'
+import { DefaultHeight, SupportTokenKlineLaunchpad, SupportTokenKlineChains } from '~/utils/constants'
 import { getXType } from '~/api/x'
 
 type Token = {
@@ -25,6 +25,7 @@ export const useTokenStore = defineStore('token', () => {
   const tokenInfoExtra = shallowRef<null | TokenInfoExtra>(null)
   const twitterType = ref<0 | 1 | 2 | 3>(0)
   const { $i18n } = useNuxtApp()
+  const globalStore = useGlobalStore()
   const tokenWarningObj = useLocalStorage<Record<string, boolean>>(
     'tokenWarningNotice',
     {}
@@ -35,7 +36,7 @@ export const useTokenStore = defineStore('token', () => {
   const token = computed(() => tokenInfo.value?.token)
   const pairs = computed(() => tokenInfo.value?.pairs)
   const pairAddress = useSessionStorage('token_pairAddress', '')
-  const selectedToken =  useSessionStorage('token_selectedToken', false)
+  const selectedToken =  useSessionStorage('token_selectedToken', true)
   const pair = computed(() => {
     if (pairAddress.value) {
       return pairs.value?.find(pair => pair.pair === pairAddress.value) || null
@@ -44,7 +45,8 @@ export const useTokenStore = defineStore('token', () => {
   })
 
   const tokenAllPair = computed(() => {
-    if (!SupportTokenKlineChains?.includes?.(token.value?.chain || '')) {
+    const isSupportTokenKlineLaunchpad = SupportTokenKlineLaunchpad?.includes?.(token.value?.chain + '-' + (token.value?.launchpad || ''))
+    if (!(SupportTokenKlineChains?.includes?.(token.value?.chain || '') || isSupportTokenKlineLaunchpad)) {
       return null
     }
     const _pairs = tokenInfo.value?.pairs
@@ -84,10 +86,25 @@ export const useTokenStore = defineStore('token', () => {
     if (val) {
       if (route.fullPath?.includes?.('/token')) {
         // useHead({ title: '$' + formatNumber(val, 4) + ' ' + token.value?.symbol + ' | Ave' })
-        document.title = '$' + formatNumber(val, 4) + ' ' + token.value?.symbol + ' | Ave'
+        if (globalStore.showMarket) {
+          document.title = '$' + formatNumber(marketCap.value, 2) + ' ' + token.value?.symbol + ' | Ave'
+        } else {
+          document.title = '$' + formatNumber(val, 4) + ' ' + token.value?.symbol + ' | Ave'
+        }
       }
     }
   })
+ watch(()=>globalStore.showMarket, (val) => {
+    if (route.fullPath?.includes?.('/token')) {
+      // useHead({ title: '$' + formatNumber(val, 4) + ' ' + token.value?.symbol + ' | Ave' })
+      if (val) {
+        document.title =
+          '$' + formatNumber(marketCap.value, 2) + ' ' + token.value?.symbol + ' | Ave'
+      } else {
+        document.title = '$' + formatNumber(price.value || 0, 4) + ' ' + token.value?.symbol + ' | Ave'
+      }
+    }
+ })
   const centerTopHeight = shallowRef(DefaultHeight.KLINE)
   const {height} = useWindowSize()
   const commonHeight = computed(() => height.value - centerTopHeight.value)
@@ -290,7 +307,14 @@ export const useTokenStore = defineStore('token', () => {
         }
       })
       tokenInfo.value?.pairs.unshift(newPair)
-      switchPair(newPair.pair)
+
+
+    const isSupportTokenKlineLaunchpad = SupportTokenKlineLaunchpad?.includes?.(token.value?.chain + '-' + (token.value?.launchpad || ''))
+      if (SupportTokenKlineChains?.includes?.(token.value?.chain || '') || isSupportTokenKlineLaunchpad) {
+        switchPair(true)
+      } else {
+        switchPair(newPair.pair)
+      }
     }
   }
 

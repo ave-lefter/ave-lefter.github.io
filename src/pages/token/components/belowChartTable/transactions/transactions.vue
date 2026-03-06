@@ -238,10 +238,15 @@ const tableFilterVisible = ref({
 const makerTooltip = ref()
 const markerTooltipVisible = shallowRef(false)
 const currentRow = shallowRef<IGetSimpleTxsResponse & { senderProfile: Profile, maker_bal?: number }>({} as any)
+const isKeyScrolling = shallowRef(false)
+let keyScrollTimer: ReturnType<typeof setTimeout> | null = null
+
 const isPausedTxs = computed(() => {
   return isHoverTable.value
     || tokenDetailSStore.drawerVisible
-    || markerTooltipVisible.value || (sortConditions.value.sort_dir ==='asc')
+    || markerTooltipVisible.value
+    || (sortConditions.value.sort_dir === 'asc')
+    || isKeyScrolling.value
 })
 
 const addressAndChain = computed(() => {
@@ -370,6 +375,8 @@ watch(() => klineDateFilter?.value, (val) => {
 watch(() => tokenStore.pairAddress, (pair, oldPair) => {
   console.log('watch pair', pair, oldPair)
   if (tokenStore.pairAddress) {
+    tableFilter.value.tag_type = 'all'
+    activeTab.value = 'all'
     listStatus.value.loadingTxs1 = true
     resetCache()
     _getPairLiq()
@@ -616,6 +623,7 @@ function transferTxsData(row: IGetSimpleTxsResponse) {
   }
   const newTags=tagStore.tagArr.filter(item => maker_types.includes(item.type)).map(i=>{
     return {
+      ...i,
       'type': i.type,
       'tag_desc': i?.[lang1],
       'icon': i.icon,
@@ -857,30 +865,66 @@ function getGradient(row: IGetSimpleTxsResponse) {
 function openMarkerTooltip(row: IGetSimpleTxsResponse & { senderProfile: Profile }, e: MouseEvent) {
   if (row && SupportFullDataChain.includes(row.chain)) {
     makerTooltip.value = e.currentTarget
-    if (currentRow.value?.wallet_address === row.wallet_address) {
-      return
-    }
+    // if (currentRow.value?.wallet_address === row.wallet_address) {
+    //   return
+    // }
     currentRow.value = row
   }
 }
 
 function goBrowser(row: IGetSimpleTxsResponse) {
+  const rightClickAction = globalStore.audioSettings?.wallet?.clickAction
+  let targe = '_self'
+  if (rightClickAction === 1) {
+    targe ='_blank'
+  }
   window.open(
-    formatExplorerUrl(row.chain, row.transaction, 'tx')
+    formatExplorerUrl(row.chain, row.transaction, 'tx'), targe
   )
 }
 
 const tabsContainer = ref<HTMLElement | null>(null)
+
+const SCROLL_STEP = 80
+let _localScrollTop = 0
+
+const onKeyDown = useThrottleFn((e: KeyboardEvent) => {
+  if (e.key !== 'ArrowUp' && e.key !== 'ArrowDown') return
+  if (!isHoverTable.value) return
+  e.preventDefault()
+
+  isKeyScrolling.value = true
+  if (keyScrollTimer) clearTimeout(keyScrollTimer)
+  keyScrollTimer = setTimeout(() => {
+    isKeyScrolling.value = false
+    if (wsPairCache.value.length) updatePairTxs()
+    if (wsLiqCache.value.length) updateLiqList()
+  }, 300)
+
+  const delta = e.key === 'ArrowDown' ? SCROLL_STEP : -SCROLL_STEP
+  _localScrollTop = Math.max(0, _localScrollTop + delta)
+  aveTableRef.value?.scrollToTop?.(_localScrollTop)
+}, 60, true, false)
+
+onMounted(() => {
+  window.addEventListener('keydown', onKeyDown)
+})
+onUnmounted(() => {
+  window.removeEventListener('keydown', onKeyDown)
+  if (keyScrollTimer) clearTimeout(keyScrollTimer)
+})
 function setActiveTab(val: string,index:number) {
+  if(val===activeTab.value) return
   activeTab.value = val
   // if (val === '-100' && !followStore.currentAddress) {
   //   return
   // }
-  txCount.value = {}
   tableFilter.value.tag_type = val
   if (val !== 'liquidity') {
+    listStatus.value.loadingTxs1 = true
     filterSubmit()
   } else {
+    listStatus.value.loadingLiq = true
     _getPairLiq()
   }
   scrollTabToCenter(tabsContainer,index)
@@ -1012,14 +1056,14 @@ onUnmounted(() => {
           v-tooltip="holdersTooltip(t)[item.type]"
           href="javascript:;"
           :class="`decoration-none shrink-0 text-12px lh-16px text-center px-12px py-4px rounded-4px
-         ${activeTab === item.value ? 'bg-[--border] color-[--main-text]' : 'color-[--third-text]'}`" @click="setActiveTab(item.value,index)">
+         ${activeTab === item.value ? 'bg-[--border] color-[--main-text1]!' : 'color-[--third-text]'}`" @click="setActiveTab(item.value,index)">
           {{ item.label }}
         </a>
         <a
           v-else
           href="javascript:;"
           :class="`decoration-none shrink-0 text-12px lh-16px text-center px-12px py-4px rounded-4px
-         ${activeTab === item.value ? 'bg-[--border] color-[--main-text]' : 'color-[--third-text]'}`" @click="setActiveTab(item.value,index)">
+         ${activeTab === item.value ? 'bg-[--border] color-[--main-text1]!' : 'color-[--third-text]'}`" @click="setActiveTab(item.value,index)">
           {{ item.label }}
         </a>
       </template>
@@ -1082,6 +1126,7 @@ onUnmounted(() => {
         onMouseleave:()=>isHoverTable=false,
         onClick: onRowClick
       }"
+        @scroll="({ scrollTop }: { scrollTop: number }) => { _localScrollTop = scrollTop }"
         @endReached="loadMore">
         <template  #empty>
           <div v-if="!tableLoading" class="h-full flex flex-col items-center justify-center pt-100px">

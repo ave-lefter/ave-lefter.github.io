@@ -1,7 +1,7 @@
 <template>
   <div
     class="bg-[--secondary-bg] flex-1 w-100% px-200px pt-40px overflow-y-auto bot-manage"
-    style="height: calc(100vh - 150px)"
+    style="height: calc(100vh - 90px)"
   >
     <div class="mb-8px flex-between items-center">
       <span class="text-16px font-500">{{ $t('walletList') }}</span>
@@ -100,9 +100,9 @@
 </template>
 
 <script setup lang="ts">
-import List from './list.vue'
-import Import from './import.vue'
-import Record from './record.vue'
+import List from './components/list.vue'
+import Import from './components/import.vue'
+import Record from './components/record.vue'
 import {
   _getMultiWalletsAllChain,
   _generateWallet,
