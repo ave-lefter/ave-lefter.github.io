@@ -1618,7 +1618,7 @@ function getFilterData(list: PumpObj[], conditions: any) {
     
     if (conditions?.q) {
       const arr = conditions?.q.split(',')
-      pass = pass && arr?.findIndex(y=> i.target_token == y || i.name == y || i.symbol == y) !== -1
+      pass = pass && arr?.findIndex(y=> i.target_token == y || i.name?.includes?.(y) || i.symbol?.includes?.(y)) !== -1
     }
     if (conditions?.dev_sale_out) {
       const isSellOut = i.max_dev_ratio!==0 &&i.dev_balance_ratio_cur===0
