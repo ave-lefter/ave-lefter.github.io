@@ -49,7 +49,7 @@ watch(() => props.modelValue, () => {
           v-model.trim="tempAddress"
           style="--el-input-bg-color: var(--dialog-list-hover);"
           :placeholder="$t('enterAddress')"
-          clearable
+          
         />
       </div>
       <el-button

@@ -50,7 +50,7 @@
               </template>
               <template #default>
                 <div class="text-14px text-[var(--main-text)]">{{$t('searchKol')}}</div>
-                <el-input v-model="filterForm['keyword'].keyword" class="mt-8px" :placeholder="$t('searchKolPlaceholder')" clearable />
+                <el-input v-model="filterForm['keyword'].keyword" class="mt-8px" :placeholder="$t('searchKolPlaceholder')"  />
                 <div class="mt-12px flex items-center justify-center">
                     <el-button
                       class="flex-1 reset"
@@ -469,7 +469,7 @@
                               filterForm['profit_percent_num'].profit_obj[key].range[0]
                             "
                             :placeholder="$t('minor')"
-                            clearable
+                            
                           />
                           <span class="ml-10px mr-10px">~</span>
                           <el-input
@@ -477,7 +477,7 @@
                               filterForm['profit_percent_num'].profit_obj[key].range[1]
                             "
                             :placeholder="$t('max1')"
-                            clearable
+                            
                           />
                         </div>
                       </template>
@@ -661,12 +661,12 @@
           <template #default="{ row }">
            <div class="flex-end" @click.stop >
               <a v-if="judgeIsCopyTrade(row)" href="" class="trade" @click.stop.prevent="jumpCopyTrade(row)">
-                <img src="@/assets/images/tg1.png" alt="" :width="12">
+                <Icon  name="custom:wallet-fill" class="text-12px mr-4px" />
                  {{ $t('copiedTrade') }}
               </a>
               <a v-else href="" class="trade" @click.stop.prevent="copyTrade(row)">
                 <Icon v-if="botStore.evmAddress" name="custom:wallet-fill" class="mr-4px text-12px"/>
-                <img v-else src="@/assets/images/tg1.png" alt="" :width="12">
+                <img class="mr-4px" v-else src="@/assets/images/tg1.png" alt="" :width="12">
                   {{ $t('copyTrade1') }}
               </a>
             </div>

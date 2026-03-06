@@ -8,6 +8,7 @@ import Pop from '@/assets/audio/pop.wav'
 import Bar from '@/assets/audio/bar.mp3'
 import Message from '@/assets/audio/message.wav'
 import Bong from '@/assets/audio/bong.mp3'
+import Kaching from '@/assets/audio/kaching.mp3'
 import Coin from '@/assets/audio/Coin.wav'
 export const NATIVE_TOKEN = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'
 export const SOLANA_NATIVE_TOKEN = 'So11111111111111111111111111111111111111112'
@@ -131,6 +132,7 @@ export const SupportTokenKlineChains = ['juchain', 'arbitrum', 'optimism']
 export const SupportTokenKlineLaunchpad = [
   'bsc-four.meme',
   'bsc-flap.sh',
+  'bsc-four_agent_meme',
   'solana-dexscreener.com',
   'solana-pump.fun',
   'solana-time.fun',
@@ -142,7 +144,7 @@ export const SupportTokenKlineLaunchpad = [
   'solana-moonshot.com',
   'solana-jup.ag',
   'solana-bags.fm',
-  'solana-cooking.city'
+  'solana-cooking.city',
 ]
 export const SupportCopyTradeChain = ['solana', 'bsc', 'eth', 'base']
 
@@ -213,6 +215,7 @@ export const audioList = [
   'Bar',
   'Message',
   'Bong',
+  'Kaching',
   'Coin'
 ] as const
 export const audioNameToResource = {
@@ -226,6 +229,7 @@ export const audioNameToResource = {
   Bar,
   Message,
   Bong,
+  Kaching,
   Coin
 }
 

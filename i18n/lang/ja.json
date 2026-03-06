@@ -243,7 +243,7 @@
   "trending": "人気銘柄",
   "filterTip": "{address}の{count}件の取引をフィルター",
   "swapT": "市価取引",
-  "limitT": "限価注文(注文)",
+  "limitT": "指値注文",
   "slow": "ゆっくり",
   "normal": "一般",
   "fast": "速い",

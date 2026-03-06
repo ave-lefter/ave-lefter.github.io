@@ -42,7 +42,7 @@
               class="border pb-20px pt-20px"
             >
             <div class="formItem inputRange">
-              <el-input v-model.trim="form.q" class="search-input1"  clearable placeholder="abc,abc,abc" @input="(val) => form.q = val.replace(/\s/g, '')" />
+              <el-input v-model.trim="form.q" class="search-input1"   placeholder="abc,abc,abc" @input="(val) => form.q = val.replace(/\s/g, '')" />
             </div>
 
           </el-form-item>
@@ -65,7 +65,7 @@
                   <el-input
                     v-model.trim.number="form.progress_min"
                     :placeholder="$t('minor')"
-                    clearable
+                    
                     @blur="(val) => handleBlur(['progress_min', 'progress_max'], val, 0)"
                     @input="(val) => handleInput(['progress_min', 'progress_max'], val, 0)"
                   >
@@ -77,7 +77,7 @@
                   <el-input
                     v-model.trim.number="form.progress_max"
                     :placeholder="$t('max1')"
-                    clearable
+                    
                     @blur="(val) => handleBlur(['progress_min', 'progress_max'], val, 1)"
                     @input="(val) => handleInput(['progress_min', 'progress_max'], val, 1)"
                   >
@@ -113,7 +113,7 @@
                   <el-input
                     v-model.trim.number="form[column.prop[0]]"
                     :placeholder="column?.placeholder && column?.placeholder[0]"
-                    clearable
+                    
                     @blur="(val) => handleBlur(column.prop, val, 0)"
                     @input="(val) => handleInput(column.prop, val, 0)"
                   >
@@ -125,7 +125,7 @@
                   <el-input
                     v-model.trim.number="form[column.prop[1]]"
                     :placeholder="column?.placeholder && column?.placeholder[1]"
-                    clearable
+                    
                     @blur="(val) => handleBlur(column.prop, val, 1)"
                     @input="(val) => handleInput(column.prop, val, 1)"
 
@@ -154,7 +154,7 @@
 
               <template v-else>
                 <div :class="['formItem', column.type]">
-                  <el-input v-model="form[column.prop]" clearable>
+                  <el-input v-model="form[column.prop]" >
                     <template v-if="column.suffix" #suffix>
                       <span>{{ column.suffix }}</span>
                     </template>

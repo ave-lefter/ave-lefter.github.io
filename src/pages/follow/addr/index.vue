@@ -90,7 +90,7 @@
                       v-model.trim="searchKeyword"
                       size="large"
                       :placeholder="$t('attentionSearch')"
-                      clearable
+                      
                       @clear="handleFilterQuery()"
                     />
                   </div>
@@ -496,10 +496,19 @@
        <el-table-column :label="t('push')" align="right" :width="!isMonitor ? 180 : 250" fixed="right">
         <template #default="{ row ,$index}">
           <div class="flex flex-row-reverse  items-center" @click.stop>
+            <a v-if="judgeIsCopyTrade(row)" href="" class="flex items-center color-[--secondary-text] trade" @click.stop.prevent="jumpCopyTrade(row)">
+              <Icon  name="custom:wallet-fill" class="text-12px mr-4px" />
+                {{ $t('copiedTrade') }}
+            </a>
             <a
-              class="flex items-center color-[--secondary-text]"
-              :href="`https://t.me/AveSniperBot?start=fs-${row.user_chain}-${row.user_address}`" target="_blank">
-              <Icon name="custom:documentary-wallet" class="text-16px mr-2px" />
+              v-else
+              class="flex items-center color-[--secondary-text] trade"
+              href=""
+              target="_blank"
+              @click.stop.prevent="copyTrade(row)"
+              >
+              <Icon  v-if="botStore.evmAddress && SupportCopyTradeChain?.includes?.(row.user_chain)"  name="custom:wallet-fill" class="text-12px mr-4px" />
+              <img class="mr-4px" v-else src="@/assets/images/tg1.png" alt="" :width="12">
               {{ t('copyTrade') }}
             </a>
             <!-- 监控 -->
@@ -540,10 +549,12 @@
       :virtual-ref="buttonTagRef || undefined"
       virtual-triggering
     />
+
   </div>
 </template>
 
 <script setup lang="ts">
+import { SupportCopyTradeChain } from '@/utils/constants'
 import ProGroups from '../components/proGroups.vue'
 import BigNumber from 'bignumber.js'
 import { downColor, upColor } from '@/utils/constants'
@@ -632,7 +643,8 @@ const filterForm = ref({
 const loading = ref(false)
 const dataSource = ref([] as Array<any>)
 const dataSource2 = ref([] as Array<any>)
-
+const router = useRouter()
+const { activeCopyAddress, copyTradeVisible, form, copyOrder } = storeToRefs(useCopyTradeStore())
 
 const filterDataSource=computed(() => {
   return isMonitor.value?dataSource2.value:dataSource.value
@@ -1023,7 +1035,49 @@ function handleSort(val:any, dir='',sort:string) {
   //     console.log('confirmAttention', form)
   //     return Promise.resolve()
   //   })
-  // }
+// }
+function judgeIsCopyTrade(row: {user_chain: string, user_address: string}) {
+  const supportAddress = activeCopyAddress.value?.[row.user_chain] || []
+  return supportAddress?.some(i => i?.toLowerCase() === row.user_address?.toLowerCase())
+}
+function getCopyTradeId(row: {user_chain: string, user_address: string}) {
+  const order = copyOrder.value?.copyList?.find(i=> i?.followAddress?.toLowerCase() === row.user_address?.toLowerCase() && i.chain == row.user_chain)
+  return order?.id || ''
+}
+
+function jumpCopyTrade(row: {user_chain: string, user_address: string}) {
+  const id = getCopyTradeId(row)
+  const currentUser = botStore?.userInfo?.addresses?.find?.((el) => row?.user_chain == el.chain)
+  if (id && currentUser?.address) {
+    console.log('----currentUser--------',currentUser)
+    const routeData = router.resolve({
+      name: 'copy-trade-wallet',
+      params: {
+        userAddress: row.user_address,
+        chain: row.user_chain,
+      },
+      query: {
+        followAddress: row.user_address,
+        creatorAddress: currentUser?.address,
+        id: id
+      }
+    })
+    window.open(routeData.href, '_blank')
+  } else {
+    const url =`https://t.me/AveSniperBot?start=fs-${row.user_chain}-${row.user_address}`
+    window.open(url, '_blank')
+  }
+}
+function copyTrade(row:  {user_chain: string, user_address: string}) {
+  if (botStore.evmAddress) {
+    copyTradeVisible.value = true
+    form.value.followAddress = row.user_address
+    form.value.chain = row.user_chain
+  } else {
+    const url =`https://t.me/AveSniperBot?start=fs-${row.user_chain}-${row.user_address}`
+    window.open(url, '_blank')
+  }
+}
 </script>
 
 <style scoped lang="scss">
@@ -1337,22 +1391,20 @@ function handleSort(val:any, dir='',sort:string) {
   }
 }
 a.trade {
-  /* background: var(--custom-primary-lighter-13-color); */
-  padding: 5px 7px;
-  border-radius: 6px;
-  font-size: 14px;
-  color: var(--custom-font-1-color);
-  font-family: D-DIN-PRO;
-  font-weight: 500;
+  background:  #3F80F71A;
+  padding: 4px 8px;
+  border-radius: 2px;
+  font-size: 12px;
+  color: var(--main-text);
   white-space: nowrap;
-  .svg {
-    width: 16px;
-    height: 16px;
-    margin-right: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  &:hover {
+    opacity: 0.8;
   }
-  &.disabled:hover{
-    opacity: 1;
-    cursor: not-allowed;
+  img {
+    margin-right: 4px;
   }
 }
 

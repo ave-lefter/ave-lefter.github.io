@@ -101,13 +101,13 @@
         <div class="pump-item  rounded-4px" style="padding-top: 15px;">
           <div class="pump-item_header flex-start px-12px">
             <template v-if="width > 1024">
-              <img
+              <!-- <img
                 class="mr-5px"
                 src="@/assets/images/pump/new.svg"
                 width="24"
                 alt=""
-              >
-              <span class="color-[--d-E0E0E0-l-333] text-14px">{{ $t('new1') }}</span>
+              > -->
+              <span class="color-[--d-F5F5F5-l-333] text-14px">{{ $t('new1') }}</span>
             </template>
             <div v-else class="tabs single" >
               <button
@@ -118,7 +118,7 @@
                 type="button"
                 @click.stop="activeTab = item.id"
               >
-                <img
+                <!-- <img
                   v-if="item.id == 'new'"
                   class="mr-5px"
                   src="@/assets/images/pump/new.svg"
@@ -138,7 +138,7 @@
                   src="@/assets/images/pump/graduated.svg"
                   width="24"
                   alt=""
-                >
+                > -->
                 <span>{{ item.name || '' }}</span>
               </button>
             </div>
@@ -152,7 +152,7 @@
               v-model.trim="pump_query[activeChain].new"
               class="search-input1 px-20px mr-4px"
               size="small"
-              :placeholder="$t('search')"
+              placeholder="abc,abc,abc"
               @input="(val) => pump_query[activeChain].new = val.replace(/\s/g, '')"
             >
               <template #prefix>
@@ -203,13 +203,13 @@
         <div class="pump-item" style="padding-top: 15px;">
           <div class="pump-item_header flex-start px-12px rounded-4px">
             <template v-if="width > 1024">
-              <img
+              <!-- <img
                 class="mr-5px"
                 src="@/assets/images/pump/soon.svg"
                 width="24"
                 alt=""
-              >
-              <span class="color-[--d-E0E0E0-l-333] text-14px">{{ $t('soon') }}</span>
+              > -->
+              <span class="color-[--d-F5F5F5-l-333] text-14px">{{ $t('soon') }}</span>
             </template>
             <div v-else class="tabs single" >
               <button
@@ -220,7 +220,7 @@
                 type="button"
                 @click.stop="activeTab = item.id"
               >
-                <img
+                <!-- <img
                   v-if="item.id == 'new'"
                   class="mr-5px"
                   src="@/assets/images/pump/new.svg"
@@ -240,7 +240,7 @@
                   src="@/assets/images/pump/graduated.svg"
                   width="24"
                   alt=""
-                >
+                > -->
                 <span>{{ item.name || '' }}</span>
               </button>
             </div>
@@ -254,7 +254,7 @@
               v-model.trim="pump_query[activeChain].soon"
               class="search-input1 px-20px mr-4px"
               size="small"
-              :placeholder="$t('search')"
+              placeholder="abc,abc,abc"
               @input="(val) => pump_query[activeChain].soon = val.replace(/\s/g, '')"
             >
               <template #prefix>
@@ -304,13 +304,13 @@
         <div class="pump-item" style="padding-top: 15px;">
           <div class="pump-item_header flex-start px-12px rounded-4px">
             <template v-if="width > 1024">
-              <img
+              <!-- <img
                 class="mr-5px"
                 src="@/assets/images/pump/graduated.svg"
                 width="24"
                 alt=""
-              >
-              <span class="color-[--d-E0E0E0-l-333] text-14px">{{ $t('graduated') }}</span>
+              > -->
+              <span class="color-[--d-F5F5F5-l-333] text-14px">{{ $t('graduated') }}</span>
             </template>
             <div v-else class="tabs single" >
               <button
@@ -321,7 +321,7 @@
                 type="button"
                 @click.stop="activeTab = item.id"
               >
-                <img
+                <!-- <img
                   v-if="item.id == 'new'"
                   class="mr-5px"
                   src="@/assets/images/pump/new.svg"
@@ -341,7 +341,7 @@
                   src="@/assets/images/pump/graduated.svg"
                   width="24"
                   alt=""
-                >
+                > -->
                 <span>{{ item.name || '' }}</span>
               </button>
             </div>
@@ -356,7 +356,7 @@
               v-model.trim="pump_query[activeChain].graduated"
               class="search-input1 px-20px mr-4px"
               size="small"
-              :placeholder="$t('search')"
+              placeholder="abc,abc,abc"
               @input="(val) => pump_query[activeChain].graduated = val.replace(/\s/g, '')"
             >
               <template #prefix>
@@ -486,33 +486,63 @@ const isRotate = ref(false)
 const { pump_notice, pumpV3, pumpFilterDefault, pump_query } = storeToRefs(usePumpStore())
 const pumpAudio = useTemplateRef('pumpAudio')
 const visible_platforms = shallowRef(false)
-const fourmemeListObj = reactive<Record<ChainKey, Record<CategoryKey, PumpObj[]>>>({
-  bsc: {
-    new: [],
-    soon: [],
-    graduated: [],
-  },
-  solana: {
-    new: [],
-    soon: [],
-    graduated: [],
-  },
-  xlayer: {
-    new: [],
-    soon: [],
-    graduated: [],
-  },
-  monad: {
-    new: [],
-    soon: [],
-    graduated: [],
-  },
-  base: {
-    new: [],
-    soon: [],
-    graduated: [],
-  },
-})
+const pumpState = useState('pumpState', () => ({
+  fourmemeListObj: {
+    bsc: {
+      new: [],
+      soon: [],
+      graduated: [],
+    },
+    solana: {
+      new: [],
+      soon: [],
+      graduated: [],
+    },
+    xlayer: {
+      new: [],
+      soon: [],
+      graduated: [],
+    },
+    monad: {
+      new: [],
+      soon: [],
+      graduated: [],
+    },
+    base: {
+      new: [],
+      soon: [],
+      graduated: [],
+    },
+  }
+}))
+const fourmemeListObj = reactive(pumpState.value.fourmemeListObj)
+// const fourmemeListObj = reactive<Record<ChainKey, Record<CategoryKey, PumpObj[]>>>({
+//   bsc: {
+//     new: [],
+//     soon: [],
+//     graduated: [],
+//   },
+//   solana: {
+//     new: [],
+//     soon: [],
+//     graduated: [],
+//   },
+//   xlayer: {
+//     new: [],
+//     soon: [],
+//     graduated: [],
+//   },
+//   monad: {
+//     new: [],
+//     soon: [],
+//     graduated: [],
+//   },
+//   base: {
+//     new: [],
+//     soon: [],
+//     graduated: [],
+//   },
+// })
 
 const isPausedObj = ref({
   new: false,
@@ -564,6 +594,7 @@ type StatisticsItem = {
   headline_cn: string
   followers: number
   following: number
+  summary_score: number
 }
 let portraitTimer: ReturnType<typeof setTimeout> | null = null
 let isPortraitSubscribed = false
@@ -609,8 +640,8 @@ const list1 = computed(() => {
   let list = fourmemeListObj?.[activeChain.value]?.new || []
   const list1 = (wsTableList.value || [])?.filter(i => i.state === 'new' && i.chain === activeChain.value)
   const pumpFilter = localStorage.getItem(`pumpFilter_${activeChain.value}_new`)
-  const wsList = getFilterData(list1, pumpFilter)
-  const wsList1 = wsList?.filter((i: { pair: string }) => !list?.some(j => j.pair === i.pair))
+  // const wsList = getFilterData(list1, pumpFilter)
+  const wsList1 = list1?.filter((i: { pair: string }) => !list?.some(j => j.pair === i.pair))
   let filterList = [...wsList1, ...list].map(i => {
   const baseHash =
     i.target_token === i.token0_address
@@ -678,6 +709,7 @@ const list1 = computed(() => {
         item => !pumpBlackList.value.some(black => hitBlacklist(item, black))
       )
     }
+    filterList = getFilterData(filterList, pumpFilter)
     fourmemeListObj[activeChain.value].new = filterList?.slice?.(0, 100) || []
   }
   return filterList?.slice?.(0, 100)
@@ -686,8 +718,8 @@ const list2 = computed(() => {
   let list = fourmemeListObj?.[activeChain.value]?.soon || []
   const list1 = (wsTableList.value || [])?.filter(i => (i.state === 'migrating') && i.chain === activeChain.value)
   const pumpFilter = localStorage.getItem(`pumpFilter_${activeChain.value}_soon`)
-  const wsList = getFilterData(list1, pumpFilter)
-  const wsList1 = wsList?.filter((i: { pair: string }) => !list?.some(j => j.pair === i.pair))
+  // const wsList = getFilterData(list1, pumpFilter)
+  const wsList1 = list1?.filter((i: { pair: string }) => !list?.some(j => j.pair === i.pair))
   let filterList = [...wsList1, ...list].map(i => {
   const baseHash =
     i.target_token === i.token0_address
@@ -764,6 +796,7 @@ const list2 = computed(() => {
         item => !pumpBlackList.value.some(black => hitBlacklist(item, black))
       )
     }
+     filterList = getFilterData(filterList, pumpFilter)
      fourmemeListObj[activeChain.value].soon = filterList?.slice?.(0, 100) || []
     return filterList?.slice?.(0, 100)
   })
@@ -771,8 +804,8 @@ const list3 = computed(() => {
 let list = fourmemeListObj?.[activeChain.value]?.graduated || []
   const list1 = (wsTableList.value || [])?.filter(i => i.state === 'migrated' && i.chain === activeChain.value)
   const pumpFilter = localStorage.getItem(`pumpFilter_${activeChain.value}_graduated`)
-  const wsList = getFilterData(list1, pumpFilter)
-  const wsList1 = wsList?.filter((i: { pair: string }) => !list?.some(j => j.pair === i.pair))
+  // const wsList = getFilterData(list1, pumpFilter)
+  const wsList1 = list1?.filter((i: { pair: string }) => !list?.some(j => j.pair === i.pair))
   let filterList = [...wsList1, ...list].map(i => {
   const baseHash =
       i.target_token === i.token0_address
@@ -840,6 +873,7 @@ let list = fourmemeListObj?.[activeChain.value]?.graduated || []
         item => !pumpBlackList.value.some(black => hitBlacklist(item, black))
       )
     }
+    filterList = getFilterData(filterList, pumpFilter)
     fourmemeListObj[activeChain.value].graduated = filterList?.slice?.(0, 100) || []
   }
   return filterList?.slice?.(0, 100)
@@ -885,15 +919,27 @@ const playGraduatedAudio = useThrottleFn((val) => {
 }, 300)
 const stopWatchList1 = watch(
   () => list1.value?.[0]?.target_token,
-  playNewAudio
+  (newValue, oldValue)=>{
+    if (oldValue) {
+      playNewAudio(newValue)
+    }
+  }
 )
 const stopWatchList2 = watch(
   () => list2.value?.[0]?.target_token,
-  playSoonAudio
+  (newValue, oldValue)=>{
+    if (oldValue) {
+      playSoonAudio(newValue)
+    }
+  }
 )
 const stopWatchList3 = watch(
   () => list3.value?.[0]?.target_token,
-  playGraduatedAudio
+  (newValue, oldValue)=>{
+    if (oldValue) {
+      playGraduatedAudio(newValue)
+    }
+  }
 )
 
 let onCanPlayHandler: (() => void) | null = null
@@ -1561,10 +1607,10 @@ function getFilterData(list: PumpObj[], conditions: any) {
       pass = pass && i.progress <= Number(conditions.progress_max)
     }
     if (conditions?.lage) {
-      pass = pass && (new Date().getTime()/1000- i.time)/60 >= Number(conditions.lage)
+      pass = pass && (new Date().getTime()/1000- (i.time || i.created_at))/60 >= Number(conditions.lage)
     }
     if (conditions?.rage) {
-      pass = pass && (new Date().getTime()/1000- i.time)/60 <= Number(conditions.rage)
+      pass = pass && (new Date().getTime()/1000 - (i.time || i.created_at))/60 <= Number(conditions.rage)
     }
 
     if (conditions?.progress_min) {
@@ -1599,13 +1645,15 @@ function getFilterData(list: PumpObj[], conditions: any) {
       pass = pass && i.tvl <= Number(conditions.tvl_max)
     }
     if (pumpV3.value[activeChain.value].platforms.length > 0) {
-      pass = pass && pumpV3.value[activeChain.value].platforms.includes(i.platform_id)
+      if (i.platform_id) {
+        pass = pass &&  pumpV3.value[activeChain.value].platforms.includes(i.platform_id)
+      }
     }
     if (conditions?.holder_min) {
-      pass = pass && (i?.holder || 0) >= Number(conditions.holder_min)
+      pass = pass && Number(i?.holders) >= Number(conditions.holder_min)
     }
     if (conditions?.holder_max) {
-      pass = pass && (i?.holder || 0) <= Number(conditions.holder_max)
+      pass = pass && Number(i?.holders) <= Number(conditions.holder_max)
     }
 
     if (conditions?.volume_u_24h_min) {
@@ -1712,7 +1760,7 @@ const DIRECT_MAP: [keyof StatisticsItem, keyof PumpObj][] = [
   ['age_seconds', 'dev_age_seconds'],
   ['headline_cn', 'headline_cn'],
   ['headline_en', 'headline_en'],
-
+  ['summary_score', 'summary_score'],
   ['followers', 'followers'],
   ['following', 'following']
 ]
@@ -1846,7 +1894,8 @@ const MERGE_KEYS = [
   'headline_en',
   'headline_cn',
   'followers',
-  'following'
+  'following',
+  'summary_score'
 ] as const
 
 function mergeStatistics(prev: any, next: any) {

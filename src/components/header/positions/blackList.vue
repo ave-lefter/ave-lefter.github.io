@@ -22,7 +22,7 @@
           class="!text-12px [&&]:[--el-input-bg-color:--border]"
           :placeholder="t('searchContractORName')"
           size="large"
-          clearable
+          
           @clear="getBlackList"
           @keyup.enter="getBlackList"
         >

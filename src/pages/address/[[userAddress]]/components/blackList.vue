@@ -22,7 +22,7 @@
           v-model="query.q"
           class="!text-12px"
           :placeholder="t('searchContractORName')"
-          clearable
+          
           @clear="getBlackList"
           @keyup.enter="getBlackList"
         >

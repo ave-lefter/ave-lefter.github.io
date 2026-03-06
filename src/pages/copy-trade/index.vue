@@ -791,7 +791,14 @@ function add() {
         >
           <el-button class="text-14px"  style="--el-button-bg-color: var(--main-input-button-bg)"> <Icon name="custom:copy-trade-history" class="mr-4px text-16px"/>{{ $t('historyCopyTrade') }}</el-button>
       </NuxtLink>
-    <el-button class="text-14px ml-12px"  style="--el-button-bg-color: var(--x-blue)" @click.stop.prevent="add"> <Icon name="custom:wallet-fill" class="mr-4px text-14px"/> {{ $t('createCopyTrade') }}</el-button>
+    <el-button class="text-14px ml-12px color-#fff hover:opacity-80"  style="
+    --el-button-bg-color: var(--primary-color);
+    --el-button-border-color: var(--primary-color);
+    --el-button-hover-bg-color: var(--primary-color);
+    --el-button-hover-border-color: var(--primary-color);
+    --el-button-active-bg-color: var(--primary-color);
+    color: #fff;
+    " @click.stop.prevent="add"> <Icon name="custom:wallet-fill" class="mr-4px text-14px"/> {{ $t('createCopyTrade') }}</el-button>
       </template>
       <div class="flex-end" v-else>
         <div class="p-2px rounded-4px bg-[--main-input-button-bg] flex color-[--third-text]">

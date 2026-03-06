@@ -104,7 +104,7 @@ function changeActiveGroupId(groupId:number) {
                 <div v-for="item in userFavoriteGroupsWithDefault" :key="item.group_id">
                 <el-checkbox class="[--el-checkbox-height:14px]"  :label="item.name" :modelValue="activeGroupId === item.group_id" @change="changeActiveGroupId(item.group_id)"/>
                 </div>
-                <el-input v-if="inputVisible" v-model.trim="newGroupName" clearable :placeholder="$t('enterGroupName')" :maxlength="20"/>
+                <el-input v-if="inputVisible" v-model.trim="newGroupName"  :placeholder="$t('enterGroupName')" :maxlength="20"/>
                 <el-button :disabled="inputVisible" class="w-full" @click="inputVisible = true">
                     <Icon name="material-symbols:add-circle" class="mr-4px"/>{{ $t('newGroup') }}
                 </el-button>

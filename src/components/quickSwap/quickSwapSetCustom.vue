@@ -28,12 +28,11 @@
       style="
           --el-input-text-color: var(--main-text1);
           border-radius: 4px;
-          width: 88px;
+          width: 65px;
           height: 28px;
           font-size: 12px;
         "
       placeholder="0"
-      clearable
       type="text"
       @input="(value) => {
             quickBuyValue1 = value.replace(/\-|[^\d.]/g, '')
