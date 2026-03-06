@@ -1053,7 +1053,7 @@ onUnmounted(() => {
       <template v-for="(item,index) in tabs" :key="item.value">
         <a
           v-if="holdersTooltip(t)[item.type]"
-          v-tooltip="holdersTooltip(t)[item.type]"
+          v-tooltip:tx="holdersTooltip(t)[item.type]"
           href="javascript:;"
           :class="`decoration-none shrink-0 text-12px lh-16px text-center px-12px py-4px rounded-4px
          ${activeTab === item.value ? 'bg-[--border] color-[--main-text1]!' : 'color-[--third-text]'}`" @click="setActiveTab(item.value,index)">
@@ -1073,7 +1073,7 @@ onUnmounted(() => {
           <Icon name="custom:stop" />
           <span class="ml-3px">{{ $t('paused') }}</span>
         </div>
-        <span v-tooltip="$t(globalStore.isClickKlineFilter?'clickChartHideFilter':'clickChartFilter')" class="flex items-center justify-center w-12px h-12px rounded-2px color-[--reverse-color] text-10px cursor-pointer" :class="globalStore.isClickKlineFilter?'bg-[--primary-color]':'bg-[--third-text] hover:bg-[--secondary-text]'" @click="globalStore.isClickKlineFilter=!globalStore.isClickKlineFilter"><Icon name="custom:chart"/></span>
+        <span v-tooltip:tx="$t(globalStore.isClickKlineFilter?'clickChartHideFilter':'clickChartFilter')" class="flex items-center justify-center w-12px h-12px rounded-2px color-[--reverse-color] text-10px cursor-pointer" :class="globalStore.isClickKlineFilter?'bg-[--primary-color]':'bg-[--third-text] hover:bg-[--secondary-text]'" @click="globalStore.isClickKlineFilter=!globalStore.isClickKlineFilter"><Icon name="custom:chart"/></span>
       </div>
     </div>
     <DateFilterCard v-if="tableFilter.timestamp.length&&tableFilter.timestamp[0]&&tableFilter.timestamp[1]" v-model:timestamp="tableFilter.timestamp" @update:timestamp="filterSubmit"/>
@@ -1181,7 +1181,7 @@ onUnmounted(() => {
             <span  :class="[ '', 'all' ].includes(activeTab)&&'cursor-pointer'">{{ $t('type') }}</span>
             <Icon
               v-if="[ '', 'all' ].includes(activeTab)"
-              v-tooltip="tableView.isShowLiq ? $t('hideLiq') : $t('showLiq')"
+              v-tooltip:tx="tableView.isShowLiq ? $t('hideLiq') : $t('showLiq')"
               name="custom:droplet"
               :class="`cursor-pointer ${!tableView.isShowLiq ? 'color-[--third-text]' : 'color-[--primary-color]'}`" />
           </div>
@@ -1299,16 +1299,16 @@ onUnmounted(() => {
           <template v-if="['solana', 'bsc'].includes(row.chain)  && (row.senderProfile || row.maker_bal)">
             <Icon
               v-if="hasNewAccount(row) && (!(row.newTags||[]).map((i:any)=>i.type).includes('47'))"
-              v-tooltip="{ content: `<span style='color: #85E12F'>${$t('newTokenAccount')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' }}"
+              v-tooltip:tx="{ content: `<span style='color: #85E12F'>${$t('newTokenAccount')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' }}"
               name="custom:new-account"
               class="mr-3px shrink-0"/>
             <Icon
               v-if="hasClearedAccount(row) && (!(row.newTags||[]).map((i:any)=>i.type).includes('46'))"
-              v-tooltip="{ content: `<span style='color: #EB2B4B'>${$t('sellAl')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
+              v-tooltip:tx="{ content: `<span style='color: #EB2B4B'>${$t('sellAl')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
               name="custom:cleared-account" class="mr-3px shrink-0"/>
             <Icon
               v-if="bigWallet(row)"
-              v-tooltip="{ content: `<span style='color: #ccc'>${$t('whales')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
+              v-tooltip:tx="{ content: `<span style='color: #ccc'>${$t('whales')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
               name="custom:big" class="mr-3px shrink-0"/>
           </template>
           <SignalTags tagClass="mr-3px" :tags="(row.newTags||[]).map((el: any)=>tagStore.matchTag(el.type)||el)"
@@ -1345,11 +1345,11 @@ onUnmounted(() => {
         <template #cell-DEX="{ row }">
           <div class="flex justify-end gap-8px">
             <img
-              v-if="row.amm === 'unknown'" v-tooltip="getSwapInfo(row.chain, row.amm)?.show_name"
+              v-if="row.amm === 'unknown'" v-tooltip:tx="getSwapInfo(row.chain, row.amm)?.show_name"
               class="w-16px h-16px cursor-pointer rounded-full" :src="IconUnknown" alt="">
             <img
               v-else
-              v-tooltip="getSwapInfo(row.chain, row.amm)?.show_name"
+              v-tooltip:tx="getSwapInfo(row.chain, row.amm)?.show_name"
               class="w-16px h-16px cursor-pointer rounded-full"
               :src="formatIconSwap(row.amm)" alt="" @click.stop.self="goBrowser(row)">
             <Icon
