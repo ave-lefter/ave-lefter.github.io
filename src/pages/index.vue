@@ -223,11 +223,11 @@
             <el-input
               v-if="pumpSetting?.show_search"
               ref="inputSearch"
-              v-model.trim="pump_query[activeChain].soon"
+              v-model.trim="pumpStore.pumpV3[activeChain].soon.pumpFilter.q"
               class="search-input1 px-20px mr-4px"
               size="small"
-              placeholder="abc,abc,abc"
-              @input="(val) => pump_query[activeChain].soon = val.replace(/\s/g, '')"
+              :placeholder="$t('keywordsPlaceholder')"
+              @input="(val) => pumpStore.pumpV3[activeChain].soon.pumpFilter.q = val.replace(/\s/g, '')"
             >
               <template #prefix>
                 <Icon
@@ -237,10 +237,10 @@
               </template>
               <template #suffix>
                 <Icon
-                  v-if="pump_query[activeChain].soon"
+                  v-if="pumpStore.pumpV3[activeChain].soon.pumpFilter.q"
                   name="pajamas:clear"
                   class="color-[--third-text9] text-12px hover:opacity-70% cursor-pointer mr-10px"
-                  @click="pump_query[activeChain].soon = ''"
+                  @click="pumpStore.pumpV3[activeChain].soon.pumpFilter.q = ''"
                 />
               </template>
             </el-input>
@@ -328,11 +328,11 @@
             <el-input
               v-if="pumpSetting?.show_search"
               ref="inputSearch"
-              v-model.trim="pump_query[activeChain].graduated"
+              v-model.trim="pumpStore.pumpV3[activeChain].graduated.pumpFilter.q"
               class="search-input1 px-20px mr-4px"
               size="small"
-              placeholder="abc,abc,abc"
-              @input="(val) => pump_query[activeChain].graduated = val.replace(/\s/g, '')"
+              :placeholder="$t('keywordsPlaceholder')"
+              @input="(val) => pumpStore.pumpV3[activeChain].graduated.pumpFilter.q = val.replace(/\s/g, '')"
             >
               <template #prefix>
                 <Icon
@@ -342,10 +342,10 @@
               </template>
               <template #suffix>
                 <Icon
-                  v-if="pump_query[activeChain].graduated"
+                  v-if="pumpStore.pumpV3[activeChain].graduated.pumpFilter.q"
                   name="pajamas:clear"
                   class="color-[--third-text] text-12px hover:opacity-70% cursor-pointer mr-10px"
-                  @click="pump_query[activeChain].graduated = ''"
+                  @click="pumpStore.pumpV3[activeChain].graduated.pumpFilter.q = ''"
                 />
               </template>
             </el-input>
@@ -1374,43 +1374,43 @@ function handleFilterVisibleChange(visible: boolean, type: 'new' | 'soon' | 'gra
 }
 
 
-watch(()=>pump_query.value[activeChain.value].new, () => {
-  debouncedFetch('new')
-}, { deep: true })
-watch(()=>pump_query.value[activeChain.value].soon, () => {
-  debouncedFetch('soon')
-}, { deep: true })
-watch(()=>pump_query.value[activeChain.value].graduated, () => {
-  debouncedFetch('graduated')
-}, { deep: true })
+// watch(()=>pump_query.value[activeChain.value].new, () => {
+//   debouncedFetch('new')
+// }, { deep: true })
+// watch(()=>pump_query.value[activeChain.value].soon, () => {
+//   debouncedFetch('soon')
+// }, { deep: true })
+// watch(()=>pump_query.value[activeChain.value].graduated, () => {
+//   debouncedFetch('graduated')
+// }, { deep: true })
 
-const debouncedFetch = useDebounceFn((type) => search(type), 500)
-function search(type: string) {
-  if (type == 'new') {
-    const pumpFilter_new = localStorage.getItem(`pumpFilter_${activeChain.value}_new`)
-    const params1 = {
-      category: 'new',
-      ...(pumpFilter_new ? JSON.parse(pumpFilter_new) : ''),
-    }
-    getPump(params1, true)
-  }
-  if (type == 'soon') {
-    const pumpFilter_soon = localStorage.getItem(`pumpFilter_${activeChain.value}_new`)
-    const params2 = {
-      category: 'soon',
-      ...(pumpFilter_soon ? JSON.parse(pumpFilter_soon) : ''),
-    }
-    getPump(params2, true)
-  }
-  if (type == 'graduated') {
-    const pumpFilter_graduated = localStorage.getItem(`pumpFilter_${activeChain.value}_graduated`)
-    const params3 = {
-      category: 'graduated',
-      ...(pumpFilter_graduated ? JSON.parse(pumpFilter_graduated) : ''),
-    }
-    getPump(params3, true)
-  }
-}
+// const debouncedFetch = useDebounceFn((type) => search(type), 500)
+// function search(type: string) {
+//   if (type == 'new') {
+//     const pumpFilter_new = localStorage.getItem(`pumpFilter_${activeChain.value}_new`)
+//     const params1 = {
+//       category: 'new',
+//       ...(pumpFilter_new ? JSON.parse(pumpFilter_new) : ''),
+//     }
+//     getPump(params1, true)
+//   }
+//   if (type == 'soon') {
+//     const pumpFilter_soon = localStorage.getItem(`pumpFilter_${activeChain.value}_new`)
+//     const params2 = {
+//       category: 'soon',
+//       ...(pumpFilter_soon ? JSON.parse(pumpFilter_soon) : ''),
+//     }
+//     getPump(params2, true)
+//   }
+//   if (type == 'graduated') {
+//     const pumpFilter_graduated = localStorage.getItem(`pumpFilter_${activeChain.value}_graduated`)
+//     const params3 = {
+//       category: 'graduated',
+//       ...(pumpFilter_graduated ? JSON.parse(pumpFilter_graduated) : ''),
+//     }
+//     getPump(params3, true)
+//   }
+// }
 
 
 function handlerFilterConfirm(
@@ -1631,7 +1631,7 @@ function getFilterData(list: PumpObj[], conditions: any) {
         pass = false
       }
     }
-    if(conditions?.base_tokens || !('base_tokens' in conditions)){
+    if(conditions?.base_tokens){
       const baseHash =
         i.target_token === i.token0_address
           ? i.token1_address
@@ -1639,6 +1639,8 @@ function getFilterData(list: PumpObj[], conditions: any) {
       const baseToken = baseTokenMap.value.get(baseHash)
       const isOtherBase = !baseToken
       pass = pass && (conditions?.base_tokens?.includes?.(baseToken?.token) || (isOtherBase && conditions?.base_tokens?.includes?.('other')))
+    } else if(!('base_tokens' in conditions)) {
+      return true
     } else {
       return false
     }
