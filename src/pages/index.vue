@@ -1744,7 +1744,7 @@ function getFilterData(list: PumpObj[], conditions: any) {
       pass = pass && i.insider_balance_ratio_cur <= Number(conditions.rins)
     }
     if(conditions?.sm_list?.length > 0){
-      pass = pass && i.medias?.length > 0 && conditions.sm_list.some(y=> i.medias?.findIndex(i => y.includes(i.icon)) !== -1)
+      pass = pass && i.medias?.length > 0 && conditions.sm_list.some(y=> i.medias?.findIndex(i => y.includes(i.icon) || y.toLowerCase() === i.name.toLowerCase()) !== -1)
     }
     if(conditions?.has_sm){
       pass = pass && i.medias?.length > 0
