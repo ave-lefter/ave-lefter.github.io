@@ -53,6 +53,7 @@ function confirm(params?: [string, string]) {
     <HeadSort :defaultSort="defaultSort" @sort-change="sortChange" />
     <RangePopover
       v-model="popoverVisible"
+      sortKey="rusher_tx_count"
       :width="225"
       :title="$t('snipers_1m')"
       :list="[]"
