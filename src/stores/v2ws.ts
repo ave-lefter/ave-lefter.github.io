@@ -21,7 +21,9 @@ export const useV2WSStore = defineStore('v2ws', () => {
     [WSEventV2Type.PUBLIC_TWITTER]:null,
     [WSEventV2Type.PUBLIC_TWITTER]:null,
     [WSEventV2Type.PUMPSTATE]: null,
-    [WSEventV2Type.TOKEN_UPDATED]: null
+    [WSEventV2Type.TOKEN_UPDATED]: null,
+    [WSEventV2Type.SUB_TOKEN_KLINE_EXTRA]: null
+
   })
 
   // 将 createWebSocket 重命名为 init
@@ -58,6 +60,8 @@ export const useV2WSStore = defineStore('v2ws', () => {
         wsResult[event] = data?.msgs
       } else if (event === WSEventV2Type.TOKEN_UPDATED) {
         wsResult[event] = data?.msg
+      } else if (event === WSEventV2Type.SUB_TOKEN_KLINE_EXTRA) {
+        wsResult[event] = data.updates
       } else {
         wsResult[event] = data
       }

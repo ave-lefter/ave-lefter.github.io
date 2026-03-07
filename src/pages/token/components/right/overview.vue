@@ -1,7 +1,7 @@
 <template>
   <div>
-    <div v-if="!isRank" class="flex-between mr-15px">
-      <div class="tabHeader text-14px py-12px flex flex-row gap-2 color-[--third-text]">
+    <div v-if="!isRank" class="flex-between mr-15px border-b border-b-solid border-[--d-151A22-l-E8F1FF] pb-12px pt-12px" @click="isExpand = !isExpand">
+      <div class="tabHeader text-14px flex flex-row">
         <div
           v-for="item in headerTabs"
           :key="item.id"
@@ -11,6 +11,7 @@
           {{ item.name }}
           <span v-if="item.id === 'devBit'">({{ totalTokens }})</span>
         </div>
+        <Icon class="ml-4px" :name= " isExpand? 'material-symbols:keyboard-arrow-up': 'material-symbols:keyboard-arrow-down'" />
       </div>
       <div v-if="activeTab == 'info'" class="tabs">
         <span
@@ -23,8 +24,9 @@
           <Icon :name="`custom:${item.icon}`" />
         </span>
       </div>
+
     </div>
-    <div v-if="activeTab == 'info'" class="mr-15px overflow-x-hidden">
+    <div v-if="activeTab == 'info' && isExpand" class="mr-15px overflow-x-hidden mt-12px">
       <ul class="text-12px" :class="{ active: active == 'grid' }">
         <li class="flex justify-between mb-12px">
           <span class="color-[--third-text]">{{ $t('name') }}</span>
@@ -290,6 +292,7 @@ const showAll = ref(false)
 const totalTokens = ref(0)
 const active = shallowRef(!props.isRank ? 'col' : 'grid')
 const activeTab = shallowRef('info')
+const isExpand = shallowRef(true)
 const headerTabs = computed(() => {
   return [
     { id: 'info', name: t('tokenInfo') },

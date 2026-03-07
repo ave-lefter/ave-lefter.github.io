@@ -47,9 +47,33 @@
           :src="getChainDefaultIcon(row.chain, row.symbol, 'rect')">
       </template>
     </el-image>
+    <div v-if="similarpic.length" class="p-12px">
+      <div class="flex justify-between">
+        <div class="text-12px lh-12px color-[--third-text] mb-12px">{{ t('similarPic') }}({{ similarpic.length }})</div>
+        <div class="text-12px lh-12px color-[--third-text] mb-12px">{{ t('mcap') }}</div>
+      </div>
+      <div class="flex flex-col gap-8px">
+        <div v-for="token in similarpic" :key="token.id" class="flex items-center gap-8px cursor-pointer"
+          @click="navigateTo(`/token/${token.token}-${token.chain}`)">
+          <div class="flex-1">
+            <div class="lh-16px color-[--main-text]">{{ token.symbol }}</div>
+            <div class="lh-12px">
+              {{ token.token.slice(0, 4) + '...' + token.token.slice(-4) }}
+            </div>
+          </div>
+          <div class="text-12px text-right flex flex-col">
+            <div class="lh-16px" :style="{ color: getDataColor('mc', token.market_cap) }">${{
+              formatNumber(token.market_cap, 1) }}
+              </div>
+            <div v-tooltip="t('createdTime') + ':' + formatDate(token.created_at, 'YYYY-MM-DD HH:mm:ss')"
+              class="justify-end lh-12px color-[--third-text] text-10px">{{ formatTimeFromNow(token.created_at) }}</div>
+            </div>
+        </div>
+      </div>
+    </div>
     <div v-if="!isEmpty" class="p-12px">
       <div class="flex justify-between">
-        <div class="text-12px lh-12px color-[--third-text] mb-12px">{{ t('similarTokens') }}</div>
+        <div class="text-12px lh-12px color-[--third-text] mb-12px">{{ t('similarTokens') }}({{ tokens.length }})</div>
         <div class="text-12px lh-12px color-[--third-text] mb-12px">{{ t('mcap') }}</div>
       </div>
       <div class="flex flex-col gap-8px">
@@ -77,7 +101,7 @@
 </template>
 
 <script setup lang='ts'>
-import { getSimilarTokens } from '~/api/token'
+import { getSimilarTokens, getTokenSimilarpic } from '~/api/token'
 const { t } = useI18n()
 
 const props = defineProps({
@@ -100,6 +124,7 @@ const props = defineProps({
   }
 })
 const tokens = ref([])
+const similarpic = ref([])
 const isEmpty = computed(() => {
   return tokens.value.length === 0
 })
@@ -108,10 +133,17 @@ async function _getSimilarToken() {
   tokens.value = res.tokens || []
 }
 
+async function _getSimilarpic() {
+  const res = await getTokenSimilarpic(props.row.id)
+  similarpic.value = res.tokens || []
+}
+
 _getSimilarToken()
+// _getSimilarpic()
 watch(() => props.row, () => {
   tokens.value = []
   _getSimilarToken()
+  // _getSimilarpic()
 })
 </script>
 

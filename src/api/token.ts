@@ -1338,3 +1338,56 @@ export function getSimilarTokens(token_id:string) {
     }
   })
 }
+// 画像百分比
+export function getTagsRatio(token_id: string) {
+  const { $api } = useNuxtApp()
+  return $api('/v2api/token_info/v1/tags/ratio', {
+    method: 'get',
+    query: {
+      token_id,
+    },
+  })
+}
+
+export interface TagsRatioHover {
+  fav_count: number
+  holders: TagsRatioHoverItem
+  total: number
+  total_balance_ratio: string
+}
+export interface TagsRatioHoverItem {
+  account_address: string
+  balance_ratio: string
+  balance_usd: string
+  logo_url: string
+  remark: string
+  total_profit: string
+  total_profit_ratio: string
+  total_purchase_usd: string
+  total_sold_usd: string
+}
+// 获取画像详情pop
+export function getTagsRatioHover(data: {
+  token_id: string
+  self_address?: string
+  tag_type: number
+  page_size: number
+  page_no: number
+}): Promise<TagsRatioHover> {
+  const { $api } = useNuxtApp()
+  return $api('/v2api/token_info/v1/tags/hover', {
+    method: 'get',
+    query: data,
+  })
+}
+
+// 同图片
+export function getTokenSimilarpic(token_id:string) {
+  const { $api } = useNuxtApp()
+  return $api('/v2api/token/v1/token/similarpic', {
+    method: 'get',
+    query: {
+      token_id
+    }
+  })
+}
