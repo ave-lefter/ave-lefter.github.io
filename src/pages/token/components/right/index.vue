@@ -41,6 +41,7 @@
             <Pairs @openFilterModal="openFilterModal" />
           </div>
           <Info :tagsRatio="tagsRatio" @getTagsRatio="_getTagsRatio"/>
+          <!-- <SimilarPic :tokens="similarpic" /> -->
           <SimilarTokens :tokens="similarTokenList" />
           <Overview class="px-15px pb-10px pr-0 bg-[--secondary-bg]" />
           <div class="bg-[--secondary-bg] flex-1" />
@@ -79,11 +80,13 @@ import BotSwap from './botSwap/index.vue'
 import Swap from './swap/index.vue'
 import Info from './info/index.vue'
 import SimilarTokens from './similarTokens.vue'
-import { getTagsRatio, getSimilarTokens } from '~/api/token'
+import SimilarPic from './similarPic.vue'
+import { getTagsRatio, getSimilarTokens, getTokenSimilarpic } from '~/api/token'
 // const Swap = defineAsyncComponent(() => import('./swap/index.vue'))
 
 const dialogVisible = shallowRef(false)
 const globalStore = useGlobalStore()
+const { tagsRatio } = storeToRefs(useGlobalStore())
 const searchAmm = shallowRef('')
 const walletStore = useWalletStore()
 const tokenStore = useTokenStore()
@@ -114,35 +117,7 @@ const openFilterModal = (search: string) => {
 const wsv2Store = useV2WSStore()
 const route = useRoute()
 const { token, pair } = storeToRefs(tokenStore)
-const tagsRatio = ref<{
-  address_binding_ratio: number
-  bundle_ratio: number
-  dev_age_seconds: number
-  dev_first_transfer_in_from_label: string
-  dev_ratio: number
-  kol_count: number
-  kol_ratio: number,
-  max_dev_ratio: number
-  rat_ratio: number
-  sniper_balance_ratio_cur: number
-  top10_ratio: number
-  smart_wallet_count: number
-  smart_wallet_ratio: number
-}>({
-  address_binding_ratio: 0,
-  bundle_ratio: 0,
-  dev_age_seconds: 0,
-  dev_first_transfer_in_from_label: '',
-  dev_ratio: 0,
-  kol_count: 0,
-  kol_ratio: 0,
-  max_dev_ratio: 0,
-  rat_ratio: 0,
-  sniper_balance_ratio_cur: 0,
-  top10_ratio: 0,
-  smart_wallet_count: 0,
-  smart_wallet_ratio: 0
-})
+
 const id = computed(() => route.params.id as string)
 const chain = computed(() => {
   const { chain } = getAddressAndChainFromId(id.value, 0)
@@ -157,6 +132,7 @@ watch(
   () => {
     if (route.params.id) {
       _getTagsRatio()
+      // _getSimilarpic()
       _getSimilarToken()
     }
   }
@@ -173,6 +149,7 @@ watch(
 )
 onMounted(() => {
   _getTagsRatio()
+  // _getSimilarpic()
   _getSimilarToken()
 })
 async function _getTagsRatio(isTrue?:boolean) {
@@ -248,10 +225,18 @@ function mergeStatistics(source: any) {
   if (source?.smart_wallet_ratio != null) {
     tagsRatio.value.smart_wallet_ratio = source.smart_wallet_ratio
   }
+  if (source?.colluded_cluster_ratio != null) {
+    tagsRatio.value.colluded_cluster_ratio = source.colluded_cluster_ratio
+  }
 }
 const similarTokenList = ref([])
 async function _getSimilarToken() {
   const res = await getSimilarTokens(id.value)
   similarTokenList.value = res.tokens || []
+}
+const similarpic = ref([])
+async function _getSimilarpic() {
+  const res = await getTokenSimilarpic(id.value)
+  similarpic.value = res.tokens || []
 }
 </script>

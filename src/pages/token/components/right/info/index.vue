@@ -8,10 +8,10 @@
       <Icon class="ml-4px" :name= " isExpand? 'material-symbols:keyboard-arrow-up': 'material-symbols:keyboard-arrow-down'" />
       <div class="flex-1"></div>
       <span v-if="countdown > 0" class="text-12px color-[--third-text1]" >{{ countdown }}s</span>
-      <Icon v-else name="material-symbols:sync-outline" class="text-12px color-[--third-text1]" @click.stop.prevent="handleClick"/>
+      <Icon v-else name="custom:refresh1" class="text-12px color-[--third-text1]" @click.stop.prevent="handleClick"/>
     </div>
     <div class="grid-container mt-12px mb-10px mr-15px" v-if="isExpand">
-      <div class="item" @click="openHoler" :class="isNew ? 'cursor-pointer' : ''">
+      <!-- <div class="item" @click="openHoler" :class="isNew ? 'cursor-pointer' : ''">
         <div class="text-12px color-[--secondary-text1] flex items-center justify-center">
           <Icon
             class="iconfont icon-rug mr-4px text-12px vertical-middle color-[--third-text1]"
@@ -22,7 +22,7 @@
           }}</span>
         </div>
         <span class="block color-[--third-text] mt-6px">{{ $t('holders') }}</span>
-      </div>
+      </div> -->
 
       <div class="item cursor-pointer" @mouseover.stop="(e) => showBubbleTooltip(e)">
         <div
@@ -197,35 +197,34 @@
       </HolderRank>
       <HolderRank
         :tokenId="address + '-' + chain"
-        :type="31"
-        :ratio="Number(tagsRatio?.kol_ratio || 0)"
+        :type="35"
+        :ratio="Number(tagsRatio?.colluded_cluster_ratio || 0)"
       >
         <div class="item cursor-pointer">
           <div
             class="text-12px color-[--secondary-text1] flex items-center justify-center"
-            :style="{ color: tagsRatio?.kol_count > 0 ? 'var(--yellow)' : 'var(--third-text1)' }"
+            :style="{
+              color:
+                Number(formatNumber(tagsRatio?.colluded_cluster_ratio || 0, 1)) == 0
+                  ? 'var(--third-text1)'
+                  : Number(tagsRatio?.colluded_cluster_ratio) > 5
+                    ? '#F6465D'
+                    : '#12B886',
+            }"
           >
-            <Icon class="iconfont icon-rug mr-4px text-12px vertical-middle" name="custom:kol2" />
-            <span>{{ formatNumber(tagsRatio?.kol_count || 0, 2) }}</span>
+            <Icon class="iconfont icon-rug mr-4px text-12px vertical-middle" name="custom:cabal" />
+            <span
+              >{{
+                formatNumber(
+                  Number(tagsRatio?.colluded_cluster_ratio) > 0.001
+                    ? tagsRatio?.colluded_cluster_ratio || 0
+                    : 0,
+                  1
+                )
+              }}%</span
+            >
           </div>
-          <span class="block color-[--third-text] mt-6px">KOL</span>
-        </div>
-      </HolderRank>
-
-      <HolderRank
-        :tokenId="address + '-' + chain"
-        :type="30"
-        :ratio="Number(tagsRatio?.smart_wallet_ratio || 0)"
-      >
-        <div class="item cursor-pointer">
-          <div
-            class="text-12px color-[--secondary-text1] flex items-center justify-center"
-            :style="{ color: tagsRatio?.smart_wallet_count > 0 ? 'var(--yellow)' : 'var(--third-text1)' }"
-          >
-            <Icon class="iconfont icon-rug mr-4px text-12px vertical-middle" name="custom:smart-plain" />
-            <span>{{ formatNumber(tagsRatio?.smart_wallet_count || 0, 2) }}</span>
-          </div>
-          <span class="block color-[--third-text] mt-6px">{{ $t('smarter') }}</span>
+          <span class="block color-[--third-text] mt-6px">{{ $t('Cabal') }}</span>
         </div>
       </HolderRank>
     </div>
@@ -320,7 +319,7 @@ const startCountdown = (seconds: number) => {
 .grid-container {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(3, 1fr);
+  grid-template-rows: repeat(2, 1fr);
   gap: 8px;
   .item {
     background-color: var(--main-input-button-bg);

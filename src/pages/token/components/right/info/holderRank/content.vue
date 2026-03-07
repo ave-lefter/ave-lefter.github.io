@@ -1,6 +1,6 @@
 <template>
   <div class="p-12px text-12px">
-    <div class="color-[--main-text] mb-4px">
+    <div class="color-[--main-text]">
       {{ getFilter(type) }}&nbsp;{{ $t('insidersOwned') }}
       <span class="ml-2px" :style="{ color: Number(ratio) > 5 ? '#F6465D' : '#12B886' }">
         {{
@@ -17,7 +17,7 @@
         <div class="text-right">{{ $t('totalProfit') }}</div>
       </div>
       <!-- list -->
-      <el-scrollbar :height="300">
+      <el-scrollbar :max-height="300">
         <el-skeleton
           v-if="loading"
           :rows="5"
@@ -42,7 +42,7 @@
           <div
             v-for="(item, $index) in tableList"
             :key="$index"
-            class="grid grid-cols-[2fr_1fr_1fr_1fr] items-center py-4px mt-8px rounded-8px"
+            class="grid grid-cols-[2fr_1fr_1fr_1fr] items-center mt-8px rounded-8px"
           >
             <!-- 地址 -->
             <div class="flex items-center min-w-0">
@@ -71,7 +71,6 @@
                 >
                     <span class="l text-12px">
                     {{
-                      item.remark ||
                       item.account_address?.slice(0, 6) + '...' + item.account_address?.slice(-4)
                     }}
                   </span>
@@ -122,7 +121,7 @@
             </div>
           </div>
         </template>
-        <ave-empty v-else="!loading && tableList.length === 0" class="pt-100px">
+        <ave-empty v-else="!loading && tableList.length === 0" class="pt-50px pb-50px">
           <span class="color-[--third-text] text-12px lh-16px mt-10px">{{
             $t('emptyNoData')
           }}</span>
@@ -167,16 +166,18 @@ const tabs = computed(() => {
   ]
 })
 const filterMap = {
-  16: 'insiders',
-  19: 'sniper2',
-  30: 'smarter2',
+  16: t('insiders'),
+  19: t('sniper2'),
+  30: t('smarter2'),
   31: 'KOL',
-  36: 'Bundle',
+  35: t('Cabal'),
+  36: t('Bundle'),
+
 } as const
 
 function getFilter(type: number) {
   const key = filterMap[type as keyof typeof filterMap]
-  return key ? t(key) : ''
+  return key ? key : ''
 }
 
 function onTabChange(tagType: number) {

@@ -376,7 +376,7 @@
                     <el-input
                       v-model.trim="remark2"
                       :placeholder="remark"
-                      
+
                     />
                   </div>
                   <div class="mt-20px flex-center">
@@ -623,6 +623,34 @@
                 </div>
               </template>
             </el-popover>
+            <HolderRank
+              v-if="tagsRatio?.kol_count"
+              :tokenId="address + '-' + chain"
+              :type="31"
+              :ratio="Number(tagsRatio?.kol_ratio || 0)"
+            >
+            <div
+              class="minor color-text-2 tag-btn signal cursor-pointer mr-4px bg-btn text-10px"
+              :style="{ color: tagsRatio?.kol_count > 0 ? 'var(--yellow)' : 'var(--third-text1)' }"
+            >
+              <Icon class="iconfont icon-rug mr-2px vertical-middle text-10px" name="custom:kol2" />
+              <span>{{ formatNumber(tagsRatio?.kol_count || 0, 2) }}</span>
+            </div>
+            </HolderRank>
+            <HolderRank
+              v-if="tagsRatio?.smart_wallet_count"
+              :tokenId="address + '-' + chain"
+              :type="30"
+              :ratio="Number(tagsRatio?.smart_wallet_ratio || 0)"
+            >
+            <div
+              class="minor color-text-2 tag-btn signal cursor-pointer mr-4px bg-btn text-10px"
+              :style="{ color: tagsRatio?.smart_wallet_count > 0 ? 'var(--yellow)' : 'var(--third-text1)' }"
+            >
+              <Icon class="iconfont icon-rug mr-2px vertical-middle text-10px" name="custom:smart-plain" />
+              <span>{{ formatNumber(tagsRatio?.smart_wallet_count || 0, 2) }}</span>
+            </div>
+            </HolderRank>
           </div>
         </div>
       </div>
@@ -769,12 +797,12 @@
         >
       </div>
       <div class="item ml-24px">
-        <span>{{ $t('holders') }}</span>
+        <span class="border-b border-b-dashed" :class="isNew ? 'cursor-pointer' : ''" @click="openHoler">{{ $t('holders') }}</span>
         <span class="block mt-8px color-[--main-text1]">{{
           formatNumber(token?.holders || 0, { limit: 10 })
         }}</span>
       </div>
-      <div class="item ml-24px">
+      <!-- <div class="item ml-24px">
         <span>DEV</span>
         <span
           class="block mt-8px color-[--main-text1]"
@@ -793,7 +821,7 @@
               : formatNumber((token?.dev_balance_ratio_cur ?? 0) * 100, 2)
           }}%</span
         >
-      </div>
+      </div> -->
       <div class="item ml-24px cursor-pointer" @click="showCheck = !showCheck">
         <span class="flex-start">
           {{ $t('audit1') }}
@@ -904,6 +932,7 @@
 <script setup lang="ts">
 import BigNumber from 'bignumber.js'
 import Top50 from './top50.vue'
+import HolderRank from '@/pages/token/components/right/info/holderRank/index.vue'
 // import Run from './run.vue'
 import Check from './check.vue'
 import DeBox from './deBox.vue'
@@ -951,7 +980,7 @@ const { evmAddress } = storeToRefs(useBotStore())
 const themeStore = useThemeStore()
 const { t } = useI18n()
 const route = useRoute()
-const { mode, dialogVisible_search, dialogSearchText, showMarket } = storeToRefs(useGlobalStore())
+const { mode, dialogVisible_search, dialogSearchText, showMarket, clickHolderCount, popVisible, tagsRatio } = storeToRefs(useGlobalStore())
 
 const editableGroup = shallowRef(false)
 const groupId = shallowRef(0)
@@ -982,6 +1011,16 @@ const devToken = shallowRef<any>({total_tokens: 0, total_migrated: 0})
 const topEventBus = useEventBus(BusEventType.TOP_FAV_CHANGE)
 const topAddGroupEvent = useEventBus(BusEventType.TOP_ADD_GROUP)
 const devTokensEvent = useEventBus(BusEventType.DEV_TOKENS_TAB)
+const isNew = computed(() => {
+  const { chain } = getAddressAndChainFromId(id.value, 0)
+  return SupportFullDataChain.includes(chain)
+})
+function openHoler() {
+  clickHolderCount.value++
+  if (isNew.value) {
+    popVisible.value = true
+  }
+}
 function handleViewDevTokens() {
   devTokensEvent.emit()
   ElMessage.success(t('devTokensDisplayed'))
@@ -1083,7 +1122,10 @@ const {
 } = storeToRefs(useCheckStore())
 // const id = route.params?.id as string
 const id = computed(() => route.params.id as string)
-
+const address = computed(() => {
+  const { address } = getAddressAndChainFromId(id.value, 0)
+  return address
+})
 const token = computed(() => {
   return tokenStore.token
 })

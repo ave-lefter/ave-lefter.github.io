@@ -4,7 +4,7 @@
       class="flex-start border-b border-b-solid border-[--d-151A22-l-E8F1FF] pb-12px pt-12px mr-15px cursor-pointer"
       @click="isExpand = !isExpand"
     >
-      <span class="text-14px">{{ t('similarTokens') }}</span>
+      <span class="text-14px">{{ t('similarPic') }}({{ tokens?.length }})</span>
       <Icon class="ml-4px" :name= " isExpand? 'material-symbols:keyboard-arrow-up': 'material-symbols:keyboard-arrow-down'" />
       <div class="flex-1"></div>
       <div class="text-12px lh-12px color-[--third-text] mb-12px">{{ t('mcap') }}</div>
@@ -13,16 +13,14 @@
       <div class="flex flex-col gap-8px">
         <div v-for="token in tokens" :key="token.id" class="flex items-center gap-8px cursor-pointer"
           @click="navigateTo(`/token/${token.token}-${token.chain}`)">
-          <TokenImg :row="token" />
           <div class="flex-1">
-            <div class=" color-[--main-text] text-12px">{{ token.symbol }}</div>
-            <div v-tooltip="formatDate(token.last_trade_at, 'YYYY-MM-DD HH:mm:ss')" class="lh-12px"><span
-                class="color-[--third-text] text-10px">{{ t('lastTx') }}:{{
-                  formatTimeFromNow(token.last_trade_at) }}</span>
+            <div class="color-[--main-text] text-12px">{{ token.symbol }}</div>
+            <div class="lh-12px text-10px color-[--third-text]">
+              {{ token.token.slice(0, 4) + '...' + token.token.slice(-4) }}
             </div>
           </div>
           <div class="text-12px text-right flex flex-col">
-            <div class="lh-16px" :style="{ color: getDataColor(token.market_cap) }">${{
+            <div class="lh-16px" :style="{ color: getDataColor('mc', token.market_cap) }">${{
               formatNumber(token.market_cap, 1) }}
               </div>
             <div v-tooltip="t('createdTime') + ':' + formatDate(token.created_at, 'YYYY-MM-DD HH:mm:ss')"

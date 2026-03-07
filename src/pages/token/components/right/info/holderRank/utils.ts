@@ -54,7 +54,7 @@ const contentKey = ref(0)
     target: e.target,
     props: {
       showArrow: false,
-      placement: 'left',
+      placement: 'bottom',
       trigger: 'hover',
       offset: 10,
       'popper-class': 'x--tooltip',

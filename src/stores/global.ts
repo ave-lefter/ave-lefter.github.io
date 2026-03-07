@@ -302,6 +302,37 @@ export const useGlobalStore = defineStore('global', () => {
   const showImport = shallowRef(false)
   const showBotRecord = shallowRef(false)
 
+  const tagsRatio = ref<{
+    address_binding_ratio: number
+    bundle_ratio: number
+    dev_age_seconds: number
+    dev_first_transfer_in_from_label: string
+    dev_ratio: number
+    kol_count: number
+    kol_ratio: number
+    max_dev_ratio: number
+    rat_ratio: number
+    sniper_balance_ratio_cur: number
+    top10_ratio: number
+    smart_wallet_count: number
+    smart_wallet_ratio: number
+    colluded_cluster_ratio: number
+  }>({
+    address_binding_ratio: 0,
+    bundle_ratio: 0,
+    dev_age_seconds: 0,
+    dev_first_transfer_in_from_label: '',
+    dev_ratio: 0,
+    kol_count: 0,
+    kol_ratio: 0,
+    max_dev_ratio: 0,
+    rat_ratio: 0,
+    sniper_balance_ratio_cur: 0,
+    top10_ratio: 0,
+    smart_wallet_count: 0,
+    smart_wallet_ratio: 0,
+    colluded_cluster_ratio: 0
+  })
 
   //  点击图表显示交易历史
    const isClickKlineFilter = useStorage('isClickKlineFilter', true)
@@ -421,6 +452,7 @@ export const useGlobalStore = defineStore('global', () => {
     zoneList,
     showMarket,
     clickHolderCount,
-    popVisible
+    popVisible,
+    tagsRatio,
   }
 })
