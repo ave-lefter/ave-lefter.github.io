@@ -177,11 +177,21 @@ export default defineNuxtConfig({
     },
     $client: {
       optimizeDeps: {
-        include: ['lodash-unified']
+        include: [
+          'lodash-unified',
+          'dayjs',
+          'bignumber.js',
+          'js-cookie',
+        ]
       }
     },
     optimizeDeps: {
-      include: ['lodash-unified']
+      include: [
+        'lodash-unified',
+        'dayjs',
+        'bignumber.js',
+        'js-cookie',
+      ]
     },
     build: {
       minify: 'terser',
@@ -191,6 +201,58 @@ export default defineNuxtConfig({
           drop_console: isProd, // 移除所有 console.log
         },
       },
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            // 区块链 SDK 按链分包 — 避免主包过大
+            if (id.includes('@solana/web3.js') || id.includes('@solana/spl-token')) {
+              return 'vendor-solana'
+            }
+            if (id.includes('tronweb') || id.includes('@tronweb3')) {
+              return 'vendor-tron'
+            }
+            if (id.includes('@mysten/sui') || id.includes('@mysten/wallet-standard')) {
+              return 'vendor-sui'
+            }
+            if (id.includes('@tonconnect') || id.includes('tonweb') || id.includes('tonapi-sdk')) {
+              return 'vendor-ton'
+            }
+            if (id.includes('@7kprotocol') || id.includes('@edgex-fe')) {
+              return 'vendor-defi-sdk'
+            }
+            if (id.includes('@walletconnect')) {
+              return 'vendor-walletconnect'
+            }
+            // ethers 单独分包（较大）
+            if (id.includes('/ethers/') || id.includes('/ethers@')) {
+              return 'vendor-ethers'
+            }
+            // web3.js 单独分包
+            if (id.includes('/web3/') || id.includes('/web3@')) {
+              return 'vendor-web3'
+            }
+            // ECharts 单独分包
+            if (id.includes('/echarts/') || id.includes('/echarts@') || id.includes('/zrender/')) {
+              return 'vendor-echarts'
+            }
+            // Element Plus 单独分包
+            if (id.includes('element-plus') || id.includes('@element-plus')) {
+              return 'vendor-element-plus'
+            }
+            // Vue 生态
+            if (
+              id.includes('/vue/') ||
+              id.includes('/vue@') ||
+              id.includes('@vue/') ||
+              id.includes('vue-router') ||
+              id.includes('pinia') ||
+              id.includes('@vueuse/')
+            ) {
+              return 'vendor-vue'
+            }
+          }
+        }
+      }
     }
   },
   pwa: {
@@ -239,7 +301,7 @@ export default defineNuxtConfig({
     workbox: {
       navigateFallback: null,
       globPatterns: ['**/*.{js,css,ico,png,jpg,jpeg,svg,webp,json,woff2,otf,ttf,woff}'],
-      maximumFileSizeToCacheInBytes: 10 * 1024 * 1024, // 设置为 10 MiB
+      maximumFileSizeToCacheInBytes: 3 * 1024 * 1024, // 3 MiB，避免 SW 缓存超大 chunk
       cleanupOutdatedCaches: true,
       skipWaiting: true,
       clientsClaim: true,

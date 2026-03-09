@@ -2610,6 +2610,10 @@ watch([() => swapStore.fromToken.address, () => swapStore.toToken.address], () =
   resetCountdown()
 })
 
+onBeforeUnmount(() => {
+  if (Timer) { clearTimeout(Timer); Timer = null }
+  if (Timer1) { clearTimeout(Timer1); Timer1 = null }
+})
 
 </script>
 

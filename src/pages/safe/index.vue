@@ -689,6 +689,9 @@ function goToTg() {
   const url = lang.value.includes('zh') ?'https://t.me/ave_community_cn':'https://t.me/aveai_english'
   window.open(url, '_blank')
 }
+onBeforeUnmount(() => {
+  resetCountdown()
+})
 </script>
 <style lang="scss" scoped>
 :deep() .el-input {

@@ -698,7 +698,6 @@ import {
 import { formatExplorerUrl } from '~/utils'
 import BigNumber from 'bignumber.js'
 import QRCode from 'qrcode'
-import html2canvas from 'html2canvas'
 import VIP from '../components/vip.vue'
 
 // 类型定义
@@ -1082,6 +1081,7 @@ const getShareImg = async () => {
   const postersDom = document.querySelector('.share-card-rebate')
   if (postersDom) {
     try {
+      const html2canvas = await import('html2canvas').then(m => m.default)
       const canvas = await html2canvas(postersDom as HTMLElement, {
         backgroundColor: null,
         scale: 3,
@@ -1103,6 +1103,7 @@ const downloadSharePoster = async () => {
   const postersDom = document.querySelector('.share-card-rebate')
   if (postersDom) {
     try {
+      const html2canvas = await import('html2canvas').then(m => m.default)
       const canvas = await html2canvas(postersDom as HTMLElement, {
         backgroundColor: null,
         scale: 3,

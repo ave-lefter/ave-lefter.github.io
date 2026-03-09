@@ -1,13 +1,5 @@
 <script setup lang="ts">
-import * as echarts from 'echarts/core'
-import { LineChart } from 'echarts/charts'
-import {
-  GridComponent,
-  TooltipComponent,
-  LegendComponent,
-  MarkPointComponent,
-} from 'echarts/components'
-import { CanvasRenderer } from 'echarts/renderers'
+import * as echarts from '@/utils/echarts'
 import type {GetTokenDetailMarksResponse} from '~/api/token'
 
 import add_liquidity from 'assets/images/mark/add_liquidity.png'
@@ -18,16 +10,6 @@ import sell from 'assets/images/mark/sell.png'
 import T_Trading from 'assets/images/mark/T_Trading.png'
 import transfer_in from 'assets/images/mark/transfer_in.png'
 import transfer_out from 'assets/images/mark/transfer_out.png'
-
-// 注册使用组件
-echarts.use([
-  LineChart,
-  GridComponent,
-  TooltipComponent,
-  LegendComponent,
-  MarkPointComponent,
-  CanvasRenderer
-])
 const images: any = {
   add_liquidity,
   burn,
