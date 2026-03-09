@@ -2,9 +2,9 @@
   <div class="p-12px text-12px">
     <div class="color-[--main-text]">
       {{ getFilter(type) }}&nbsp;{{ $t('insidersOwned') }}
-      <span class="ml-2px" :style="{ color: Number(ratio) > 5 ? '#F6465D' : '#12B886' }">
+      <span class="ml-2px" :style="{ color: Number(ratio1) > 5 ? '#F6465D' : '#12B886' }">
         {{
-          formatNumber(Number(ratio) >= 0.1 ? ratio || 0 : Number(ratio) == 0 ? '0' : '<0.1', 2)
+          formatNumber(ratio1 || 0, 2)
         }}%
       </span>
     </div>
@@ -165,6 +165,7 @@ const tabs = computed(() => {
     { key: 31, label: 'KOL' },
   ]
 })
+const ratio1 = computed(() => props.ratio?.toFixed(2) || '0')
 const filterMap = {
   16: t('insiders'),
   19: t('sniper2'),
