@@ -370,10 +370,29 @@ export function useBotSwap(type: number = 0, isBatch = false) {
 
   }
 
+  // 添加一个方法 重试多次 getTokenBalance 间隔 3s 3次
+  const retryGetTokenBalance = () => {
+    let retryCount = 0
+    const maxRetries = 3
+    const interval = 3000
+
+    const retry = () => {
+      if (retryCount < maxRetries) {
+          getTokenBalance()
+          retryCount++
+          setTimeout(retry, interval)
+      } else {
+        console.error('Failed to get token balance after multiple attempts')
+      }
+    }
+    retry()
+  }
+
   return {
     loading,
     refreshTokenBalance,
     getTokenBalance,
+    retryGetTokenBalance,
     getTokensPrice: _getTokensPrice,
     getAllowance,
     loadingAllowance,
