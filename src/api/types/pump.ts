@@ -16,6 +16,7 @@ export interface PumpConfig {
 }
 
 export interface PumpObj {
+  colluded_cluster_ratio: any
   summary_score: number | undefined
   following: number
   followers: number
