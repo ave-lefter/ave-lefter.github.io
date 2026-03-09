@@ -227,7 +227,7 @@ export const useGlobalStore = defineStore('global', () => {
       time:3
     },
     audio:{
-      signal:'Bar',
+      signal:'',
       monitor:'Coin',
       marketBuy:'',
       marketSell:'',
