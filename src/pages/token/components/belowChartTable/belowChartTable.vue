@@ -106,7 +106,10 @@ watch(
 )
 
 devTokensEvent.on(() => {
-  activeTab.value = 'DevTokens'
+  if(tokenStore.tokenInfoExtra?.dev_count){
+    previousTab.value = 'DevTokens'
+    activeTab.value = 'DevTokens'
+  }
 })
 
 const tabsList = computed(() => {

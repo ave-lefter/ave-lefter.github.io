@@ -1,5 +1,5 @@
-import Beep from '@/assets/audio/beep.mp3'
-import Bell from '@/assets/audio/bell.mp3'
+// import Beep from '@/assets/audio/beep.mp3'
+// import Bell from '@/assets/audio/bell.mp3'
 // import Ding from '@/assets/audio/ding.wav'
 // import Click from '@/assets/audio/click.wav'
 import Dog from '@/assets/audio/dog.wav'
@@ -220,8 +220,8 @@ export const resolutionMap  = {
 
 export const audioList = [
   '',
-  'Beep',
-  'Bell',
+  // 'Beep',
+  // 'Bell',
   // 'Ding',
   // 'Click',
   'Dog',
@@ -244,8 +244,8 @@ export const audioList = [
   'RedPacket'
 ] as const
 export const audioNameToResource = {
-  Beep,
-  Bell,
+  // Beep,
+  // Bell,
   // Ding,
   // Click,
   Dog,

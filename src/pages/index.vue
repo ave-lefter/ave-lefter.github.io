@@ -916,7 +916,7 @@ const playNewAudio = useThrottleFn((val) => {
   if (newAudio && pumpAudio.value && val) {
     audioUrl.value =
       audioNameToResource[newAudio as keyof typeof audioNameToResource] ||
-      audioNameToResource.Beep
+      audioNameToResource.Handgun
     pumpAudio.value.play().catch(() => {})
   }
 }, 300)
@@ -926,7 +926,7 @@ const playSoonAudio = useThrottleFn((val) => {
   if (soonAudio && pumpAudio.value && val) {
     audioUrl.value =
       audioNameToResource[soonAudio as keyof typeof audioNameToResource] ||
-      audioNameToResource.Beep
+      audioNameToResource.Handgun
     pumpAudio.value.play().catch(() => {})
   }
 }, 300)
@@ -936,7 +936,7 @@ const playGraduatedAudio = useThrottleFn((val) => {
   if (graduatedAudio && pumpAudio.value && val) {
     audioUrl.value =
       audioNameToResource[graduatedAudio as keyof typeof audioNameToResource] ||
-      audioNameToResource.Beep
+      audioNameToResource.Handgun
     pumpAudio.value.play().catch(() => {})
   }
 }, 300)
@@ -989,7 +989,7 @@ pump_notice.value?.[activeChain.value]?.graduated
   if(val.some(el=>!!el)){
     const url = getChangedValue(val, old)
     if (pumpAudio.value && url) {
-      audioUrl.value = audioNameToResource[url as keyof typeof audioNameToResource] || audioNameToResource.Beep
+      audioUrl.value = audioNameToResource[url as keyof typeof audioNameToResource] || audioNameToResource.Handgun
       pumpAudio.value.oncanplay = () => {
         pumpAudio.value?.play().catch(() => {})
       }
