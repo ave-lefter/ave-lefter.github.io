@@ -617,7 +617,7 @@
                       {{ devToken?.total_tokens ? ((devToken.total_migrated ?? 0) / devToken.total_tokens * 100).toFixed(2) : 0 }}%
                     </span>
                   </div>
-                  <span class="flex items-center justify-between clickable text-12px py-4px px-8px color-[--third-text] hover:bg-[--dialog-tab-active]" @click="handleViewDevTokens">
+                  <span v-if="tokenStore.tokenInfoExtra?.dev_count" class="flex items-center justify-between clickable text-12px py-4px px-8px color-[--third-text] hover:bg-[--dialog-tab-active]" @click="handleViewDevTokens">
                     <span>{{ $t('viewDevTokens') }}</span>
                   </span>
                 </div>
@@ -630,7 +630,7 @@
               :ratio="Number(tagsRatio?.kol_ratio || 0)"
             >
             <div
-              class="minor color-text-2 tag-btn signal cursor-pointer mr-4px bg-btn text-10px"
+              class="minor color-text-2 tag-btn signal cursor-pointer mr-4px bg-btn text-10px lh-none"
               :style="{ color: tagsRatio?.kol_count > 0 ? 'var(--yellow)' : 'var(--third-text1)' }"
             >
               <Icon class="iconfont icon-rug mr-2px vertical-middle text-10px" name="custom:kol2" />
@@ -644,7 +644,7 @@
               :ratio="Number(tagsRatio?.smart_wallet_ratio || 0)"
             >
             <div
-              class="minor color-text-2 tag-btn signal cursor-pointer mr-4px bg-btn text-10px"
+              class="minor color-text-2 tag-btn signal cursor-pointer mr-4px bg-btn text-10px lh-none"
               :style="{ color: tagsRatio?.smart_wallet_count > 0 ? 'var(--yellow)' : 'var(--third-text1)' }"
             >
               <Icon class="iconfont icon-rug mr-2px vertical-middle text-10px" name="custom:smart-plain" />
