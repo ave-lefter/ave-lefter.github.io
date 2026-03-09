@@ -19,6 +19,7 @@ import Handgun from '@/assets/audio/Handgun.mp3'
 import Sonumi from '@/assets/audio/Sonumi.mp3'
 import Yes from '@/assets/audio/Yes.mp3'
 import Wechat from '@/assets/audio/Wechat.mp3'
+import RedPacket from '@/assets/audio/RedPacket.mp3'
 
 
 
@@ -239,7 +240,8 @@ export const audioList = [
 
   'Message',
   'Bong',
-  'Coin'
+  'Coin',
+  'RedPacket'
 ] as const
 export const audioNameToResource = {
   Beep,
@@ -263,7 +265,8 @@ export const audioNameToResource = {
 
   Message,
   Bong,
-  Coin
+  Coin,
+  RedPacket
 }
 
 export const SwapType = {
