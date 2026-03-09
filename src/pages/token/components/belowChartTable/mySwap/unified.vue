@@ -434,7 +434,7 @@ const getTxHistory = async () => {
         creatorAddress: props.userAddress,
         token: tokenAddress,
         mode: 1, // 历史交易
-        onlySuccess: false,
+        onlySuccess: true,
         pageSize: 100,
         pageNo: 1,
       })
