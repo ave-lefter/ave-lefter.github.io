@@ -631,6 +631,7 @@ type StatisticsItem = {
   followers: number
   following: number
   summary_score: number
+  colluded_cluster_ratio: number
 }
 let portraitTimer: ReturnType<typeof setTimeout> | null = null
 let isPortraitSubscribed = false
@@ -1886,7 +1887,9 @@ const NUMBER_MAP: [keyof StatisticsItem, keyof PumpObj][] = [
   ['sellers_24h', 'sellers_24h'],
   ['buyers_24h', 'buyers_24h'],
   ['kol_count', 'kol_tag_count'],
-  ['smart_wallet_count', 'smart_wallet_tag_count']
+  ['smart_wallet_count', 'smart_wallet_tag_count'],
+  ['colluded_cluster_ratio', 'colluded_cluster_ratio']
+
 ]
 function mergeStatisticsList(
   statisticsList: Map<string, StatisticsItem>,
@@ -2003,7 +2006,8 @@ const MERGE_KEYS = [
   'headline_cn',
   'followers',
   'following',
-  'summary_score'
+  'summary_score',
+  'colluded_cluster_ratio'
 ] as const
 
 function mergeStatistics(prev: any, next: any) {
