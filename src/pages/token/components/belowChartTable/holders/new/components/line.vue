@@ -159,7 +159,6 @@ const init = () => {
       borderWidth: 0,
       // valueFormatter: value => '$'+formatNumber2(value || 0, 2), // 替换为实际的格式化函数
       formatter: function (params) {
-        console.log('tooltip', params)
         let result = params[0].name + '<br>' // 标题
         params.forEach(item => {
           result += `<div style="display:flex;align-items:center;width:100%; gap:8px"><div>${item.marker} ${item.seriesName}</div><span style="color:${mode.value  === 'light' ? '#333' : '#F5F5F5'}">${item.value}</span><br></div>`// 每行内容
