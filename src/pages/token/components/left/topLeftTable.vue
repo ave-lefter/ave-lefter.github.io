@@ -14,22 +14,22 @@ const activeTab = shallowRef<keyof typeof components>('FavoriteTable')
 const tabs = computed(() => {
   return [
   {name: t('favorites'), component: 'FavoriteTable' as const},
-  {name: t('positions'), component: 'PositionsTable' as const},
+  // {name: t('positions'), component: 'PositionsTable' as const},
   // {name: t('attention1'),  component: 'MyAttentionTable' as const},
   ]
 })
 const components = {
   FavoriteTable,
-  PositionsTable: defineAsyncComponent(() => import('./positionsTable.vue')),
+  // PositionsTable: defineAsyncComponent(() => import('./positionsTable.vue')),
   // MyAttentionTable: defineAsyncComponent(() => import('./myAttentionTable.vue'))
 }
 const Component = computed(() => {
   return components[activeTab.value]
 })
 const activeHeight = computed(() => {
-  if (activeTab.value === 'PositionsTable') {
-    return props.height - 4
-  }
+  // if (activeTab.value === 'PositionsTable') {
+  //   return props.height - 4
+  // }
   return props.height
 })
 </script>
