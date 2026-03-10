@@ -459,8 +459,7 @@ let lastPairPrice = 0
 
 // const LLJEFFY_#_240
 const listenerGuidMap = new Map()
-
-const resolution = shallowRef(localStorage.getItem('tv_resolution') || '15')
+const resolution = useLocalStorage('tv_resolution_token', '15')
 const themeStore = useThemeStore()
 let _widget: null | IChartingLibraryWidget = null
 

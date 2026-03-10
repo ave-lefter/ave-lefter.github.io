@@ -39,7 +39,7 @@ export const usePerpStore = defineStore('perp', () => {
   const _perpKeys = useLocalStorage<{[key: string]: {apiKeys: ApiKeyData; l2KeyPair: L2KeyPair; apiSignature: string; starkSignature: string }}>('perp_keys', {})
   const totalAssets = ref<ProfitResponse>({} as ProfitResponse)
   const lastPrice = shallowRef(0)
-  const resolution = useLocalStorage('tv_resolution', '15')
+  const resolution = useLocalStorage('tv_resolution_perp', '15')
   const unit = ref<CoinInfo | null>(null)
 
   const normalWithdrawableAmount = ref('0')
