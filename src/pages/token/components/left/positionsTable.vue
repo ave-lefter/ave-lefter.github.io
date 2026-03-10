@@ -563,7 +563,7 @@ function handleTxSuccess(res: any, _batchId: string, tokenId: string, row: GetUs
         :infinite-scroll-delay="10"
         :infinite-scroll-immediate="false"
       >
-        <div class="pr-10px pb-20px">
+        <div class="pb-20px pr-30px">
           <NuxtLink
             v-for="(row,$index) in listData" :key="$index"
             class="text-12px flex justify-between pl-10px py-10px cursor-pointer hover:bg-[--dialog-bg]"

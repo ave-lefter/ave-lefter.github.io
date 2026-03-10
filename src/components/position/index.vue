@@ -1,6 +1,5 @@
 <template>
-  <div class="w-monitor bg-[--secondary-bg] w-100% h-100% pl-12px pr-12px relative overflow-hidden"
-    :class="{ 'pr-10px!': isLeftFixed, 'pl-10px!': isRightFixed }">
+  <div class="w-position bg-[--secondary-bg] w-100% h-100% pl-12px pr-12px relative overflow-hidden">
     <!-- <div class="w-100% h-40px absolute pointer-events-auto z-999 drag-handle left-0"/> -->
     <Icon name="custom:drag2" class="absolute top-3px left-50% ml--6px text-6px bg-[--dialog-list-hover] drag-handle" />
     <div
@@ -11,9 +10,9 @@
           @click.self="positionStore.visible = false" />
       </div>
     </div>
-    <template v-if="botStore.evmAddress || walletStore.address">
-      <PositionsTable :height="scrollHeight" class="ml--10px pr-6px mr--6px"/>
-    </template>
+    <div v-if="botStore.evmAddress || walletStore.address" class="w-full relative">
+      <PositionsTable :height="scrollHeight" class="absolute w-[calc(100%+21px)] left--10px" />
+    </div>
     <AveEmpty
       v-else
       :style="{height:`${props.scrollHeight-50}px`}"
