@@ -402,13 +402,13 @@ const collect = async () => {
         </div>
       </div>
       <div class="flex-1 flex flex-col">
-        <span class="color-[--secondary-text] text-12px lh-16px mb-4px">{{ $t('walletTotalBalance') }}</span>
+        <span class="color-[--secondary-text] text-12px lh-16px mb-4px">{{ $t('unrealizedProfit') }}</span>
         <div class="flex text-16px lh-24px items-center color-[--main-text]"
         >
           <ExcludeError
-            :model-value="statistics.balance_amount">
-            {{ formatNumber(statistics.balance_amount, 2) }}(${{
-              formatNumber(statistics.balance_usd, 2)
+            :model-value="statistics.unrealized_profit">
+            {{ formatNumber(statistics.unrealized_profit, 2) }}(${{
+              formatNumber(statistics.unrealized_profit, 2)
             }})
           </ExcludeError>
         </div>
