@@ -464,7 +464,7 @@ import QuickSwapSetCustom from '@/components/quickSwap/quickSwapSetCustom.vue'
 defineOptions({
   name: 'pump' // 显式命名
 })
-
+let timerAutoFresh: number | null = null
 type TimeoutReturnType = ReturnType<typeof setTimeout> | number | null
 const Timer: {
   new: TimeoutReturnType
@@ -1043,7 +1043,7 @@ watch(activeChain, (val, old) => {
 
 const pumpStateBuffer: any[] = []
 const flushPumpState = useThrottleFn(() => {
-  if (!pumpStateBuffer.length || !documentVisible.value) return
+  if (!pumpStateBuffer.length) return
   wsUpdateTableList(pumpStateBuffer)
   subscribePortrait(pumpStateBuffer)
   pumpStateBuffer.length = 0
@@ -1065,7 +1065,7 @@ watchPumpStateUnwatch = watch(() => wsv2Store.wsResult[WSEventV2Type.PUMPSTATE],
 })
 const bufferLogoMap = new Map<string, any>()
 const logoThrottled = useThrottleFn(() => {
-  if (!bufferLogoMap.size || !documentVisible.value) return
+  if (!bufferLogoMap.size) return
   const mergedList = Array.from(bufferLogoMap.values())
   logoList.value = [
     ...mergedList,
@@ -1102,7 +1102,7 @@ function setLRU(map: Map<string, any>, key: string, value: any, limit = 100) {
 }
 
 const flushStatistics = useThrottleFn(() => {
-  if (!mapStatistics.value.size || !documentVisible.value) return
+  if (!mapStatistics.value.size) return
   triggerRef(mapStatistics)
 }, 300)
 // watch(
@@ -1154,14 +1154,12 @@ const getChangedValue = (A: string[], B: string[]): string | null => {
 
 let isLeave = true
 
-onMounted(() => {
+function initPage() {
   bindAudioCanPlay()
   isLeave = false
   wsTableListCache = {}
   wsTableList.value = []
-  getPumpConfig().then(() => {
-    getPumpList()
-  })
+
   wsv2Store.send({
     jsonrpc: '2.0',
     method: 'unsubscribe',
@@ -1182,9 +1180,23 @@ onMounted(() => {
     soon: true,
     graduated: true
   }
+}
+
+onMounted(() => {
+  initPage()
+  getPumpConfig().then(() => {
+    getPumpList()
+  })
+  timerAutoFresh = window.setInterval(() => {
+    initPage()
+    getPumpList()
+  }, 10 * 60 * 1000) // 10分钟
 })
 
-onUnmounted(()=>{
+onUnmounted(() => {
+  if (timerAutoFresh) {
+    clearTimeout(timerAutoFresh)
+  }
   // 清理 watch 监听器，防止内存泄漏
   // watchPumpStateUnwatch?.()
   // watchTokenUpdatedUnwatch?.()
@@ -1812,12 +1824,12 @@ const documentVisible = computed(() => {
   return documentVisible1.value === 'visible'
 })
 
-watch(documentVisible, (val) => {
-  if (route.name !== 'index') return
-  if (val) {
-    bufRender()
-  }
-})
+// watch(documentVisible, (val) => {
+//   if (route.name !== 'index') return
+//   if (val) {
+//     bufRender()
+//   }
+// })
 
 // watch(documentVisible, (val) => {
 //   if (route.name !== 'index') return
