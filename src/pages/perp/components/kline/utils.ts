@@ -141,11 +141,13 @@ export function initTradingViewIntervals(currentResolution: string, chain?: stri
   const Sol_LIST = ['1S', ...DEFAULT_LIST]
 
   let list: string[]
+  const stored = localStorage.getItem('perp_' + QUICK_KEY)
+  localStorage.setItem(QUICK_KEY, stored || '[]')
 
-  const stored = localStorage.getItem(QUICK_KEY)
   if (!stored) {
     list = isSupportSecChains ? (chain=='solana'? Sol_LIST: SEC_LIST) : DEFAULT_LIST
     localStorage.setItem(QUICK_KEY, JSON.stringify(list))
+    localStorage.setItem('perp_' + QUICK_KEY, JSON.stringify(list))
     localStorage.setItem('tradingViewIntervalSet', 'true')
   } else {
     list = JSON.parse(stored)
@@ -157,6 +159,7 @@ export function initTradingViewIntervals(currentResolution: string, chain?: stri
           list = list?.filter?.((i) => !i?.endsWith('S')) || []
           list = ['1S'].concat(list)
           localStorage.setItem(QUICK_KEY, JSON.stringify(list))
+          localStorage.setItem('perp_' + QUICK_KEY, JSON.stringify(list))
         }
       }
       // else if (shouldHave1S && ['1S', '5S', '15S', '30S'].some(i => !list?.includes(i)) && chain !== 'solana') {
@@ -168,6 +171,7 @@ export function initTradingViewIntervals(currentResolution: string, chain?: stri
         // list = list.filter((i) => i !== '1S')
         list = list?.filter?.((i) => !i?.endsWith('S')) || []
         localStorage.setItem(QUICK_KEY, JSON.stringify(list))
+        localStorage.setItem('perp_' + QUICK_KEY, JSON.stringify(list))
       }
   }
 
