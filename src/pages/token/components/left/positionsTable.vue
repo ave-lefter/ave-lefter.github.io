@@ -632,7 +632,7 @@ function handleTxSuccess(res: any, _batchId: string, tokenId: string, row: GetUs
               <span v-else class="color-[var(--d-EAECEF-l-333)]">--</span>
             </div>
           </NuxtLink>
-          <AveEmpty
+          <AveEmpty class="mr--30px"
             v-if="listData.length===0&&!listStatus.loading"
           />
         </div>
