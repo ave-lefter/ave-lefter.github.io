@@ -17,7 +17,7 @@
                 <div class="mr-12px relative">
                   <div class="black-container">
                     <span
-                      v-tooltip="$t('BlackListToken')"
+                      v-tooltip="pumpBlackList?.findIndex(i => (i.address == row.token && i.type == 'ca') || (i.address == row.symbol && i.type == 'keyword')) !== -1 ? $t('cancel') + $t('BlackListToken') : $t('BlackListToken')"
                       class="bg-[--d-000-l-FFF] px-2px py-2px color-[--third-text1] block rounded-2px hover:color-[--secondary-text] w-16px h-16px flex items-center justify-center"
                     >
                       <Icon
@@ -41,7 +41,7 @@
                       />
                     </span>
                     <span
-                      v-tooltip="$t('BlackListDev')"
+                      v-tooltip="pumpBlackList?.findIndex(i => i.address == row.token && i.type == 'dev') !== -1 ? $t('cancel') + $t('BlackListDev') : $t('BlackListDev')"
                       class="bg-[--d-000-l-FFF] px-2px py-2px color-[--third-text1] block rounded-2px mt-4px hover:color-[--secondary-text] w-16px h-16px flex items-center justify-center"
                     >
                       <Icon

@@ -43,7 +43,7 @@
       <div class="pump-item_item token-info ml-16px flex items-center color-[--third-text] ">
         <div class="black-container">
           <span
-            v-tooltip="$t('BlackListToken')"
+            v-tooltip="pumpBlackList?.findIndex(i => (i.address == token?.token && i.type == 'ca') || (i.address == token?.symbol && i.type == 'keyword')) !== -1 ? $t('cancel') + $t('BlackListToken') : $t('BlackListToken')"
             class="bg-[--d-000-l-FFF] px-2px py-2px color-[--third-text1] block rounded-2px hover:color-[--secondary-text] w-14px h-14px flex items-center justify-center"
           >
             <Icon
@@ -66,7 +66,7 @@
             />
           </span>
           <span
-            v-tooltip="$t('BlackListDev')"
+            v-tooltip="pumpBlackList?.findIndex(i => i.address == token?.token && i.type == 'dev') !== -1 ? $t('cancel') + $t('BlackListDev') : $t('BlackListDev')"
             class="bg-[--d-000-l-FFF] px-2px py-2px color-[--third-text1] block rounded-2px mt-2px hover:color-[--secondary-text] w-14px h-14px flex items-center justify-center"
           >
             <Icon
@@ -1193,12 +1193,14 @@ const pair = computed(() => {
   return tokenStore.pair
 })
 
+
 const pairTooltipContent = computed(() => {
+  const time = token?.value?.publish_at;
   const migrate_time = globalStore?.migrated?.migrate_time
   if(migrate_time){
-    return `${t('migratedToMarket')}: ${formatDate(migrate_time)} <br/>${t('createdAt')}: ${formatDate(token.value?.opening_at)}`
+    return `${t('migratedToMarket')}: ${formatDate(migrate_time)} <br/>${t('createdAt')}: ${formatDate(token?.value?.publish_at * 1000)}`
   }
-  return `${t('createdAt')}: ${formatDate(token?.value?.opening_at)}`
+  return `${t('createdAt')}: ${formatDate(token?.value?.publish_at * 1000)}`
 })
 
 const price = computed(() => {
