@@ -6,8 +6,8 @@ import OneClick from '../right/botSwap/oneClick.vue'
 import OrderBookButton from '../right/botSwap/orderBookButton.vue'
 import Bubble from './holders/new/bubble.vue'
 import { useBotStore } from '@/stores/bot'
-
-
+import { useEventBus  } from '@vueuse/core'
+const devTokensEvent = useEventBus(BusEventType.DEV_TOKENS_TAB)
 
 // 订单簿状态 - 通过 provide/inject 与父组件通信
 const orderBookVisible = inject<Ref<boolean>>('orderBookVisible', ref(false))
@@ -104,6 +104,13 @@ watch(
   },
   { immediate: true }
 )
+
+devTokensEvent.on(() => {
+  if(tokenStore.tokenInfoExtra?.dev_count){
+    previousTab.value = 'DevTokens'
+    activeTab.value = 'DevTokens'
+  }
+})
 
 const tabsList = computed(() => {
   return tabs.value.filter(item => {

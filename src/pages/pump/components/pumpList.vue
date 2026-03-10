@@ -649,6 +649,24 @@ class="flex-start mr-8px bg-btn"
                         )
                       }}%</span>
                     </div>
+                    <div
+                      v-tooltip="$t('Cabal')"
+                      :style="{
+                        color: Number(formatNumber(row?.colluded_cluster_ratio || 0, 1))==0? 'var(--third-text1)' : (Number(row?.colluded_cluster_ratio) > 5 ? '#F6465D' : '#12B886'),
+                        background: Number(formatNumber(row?.colluded_cluster_ratio || 0, 1))==0? '' : (Number(row?.colluded_cluster_ratio) > 5 ? '#f6465d1a' : '#12b8861a'),
+                      }"
+                      class="flex mr-8px bg-btn"
+                    >
+                      <Icon class="iconfont icon-binding text-12px mr-4px" name="custom:cabal"
+                    />
+                      <span>{{
+                        formatNumber(
+                          Number(row?.colluded_cluster_ratio) > 0.001 ? row?.colluded_cluster_ratio || 0 : 0,
+                          1
+                        )
+                      }}%</span>
+                    </div>
+
                   </div>
                 </div>
               </div>
@@ -893,7 +911,7 @@ const props = defineProps({
 const emit = defineEmits(['clearFilter'])
 const handleClearFilter = () => {
   emit('clearFilter')
-} 
+}
 const { quickBuyValue, loading, isOut, isSoon , type} = toRefs(props)
 const tableList = shallowRef<PumpObj[]>(props.tableList || [])
 

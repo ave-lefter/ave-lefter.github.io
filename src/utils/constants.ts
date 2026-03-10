@@ -1,15 +1,29 @@
-import Beep from '@/assets/audio/beep.mp3'
-import Bell from '@/assets/audio/bell.mp3'
-import Ding from '@/assets/audio/ding.wav'
-import Click from '@/assets/audio/click.wav'
+// import Beep from '@/assets/audio/beep.mp3'
+// import Bell from '@/assets/audio/bell.mp3'
+// import Ding from '@/assets/audio/ding.wav'
+// import Click from '@/assets/audio/click.wav'
 import Dog from '@/assets/audio/dog.wav'
 import Gun from '@/assets/audio/gun.wav'
-import Pop from '@/assets/audio/pop.wav'
-import Bar from '@/assets/audio/bar.mp3'
+// import Pop from '@/assets/audio/pop.wav'
+// import Bar from '@/assets/audio/bar.mp3'
 import Message from '@/assets/audio/message.wav'
 import Bong from '@/assets/audio/bong.mp3'
 import Kaching from '@/assets/audio/kaching.mp3'
 import Coin from '@/assets/audio/Coin.wav'
+
+import Alipay from '@/assets/audio/Alipay.mp3'
+import Boom from '@/assets/audio/Boom.mp3'
+import C from '@/assets/audio/C.mp3'
+import H from '@/assets/audio/H.mp3'
+import Handgun from '@/assets/audio/Handgun.mp3'
+import Sonumi from '@/assets/audio/Sonumi.mp3'
+import Yes from '@/assets/audio/Yes.mp3'
+import Wechat from '@/assets/audio/Wechat.mp3'
+import RedPacket from '@/assets/audio/RedPacket.mp3'
+
+
+
+
 export const NATIVE_TOKEN = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'
 export const SOLANA_NATIVE_TOKEN = 'So11111111111111111111111111111111111111112'
 
@@ -203,34 +217,56 @@ export const resolutionMap  = {
     unit:'s'
   }
 } as const
+
 export const audioList = [
   '',
-  'Beep',
-  'Bell',
-  'Ding',
-  'Click',
+  // 'Beep',
+  // 'Bell',
+  // 'Ding',
+  // 'Click',
   'Dog',
   'Gun',
-  'Pop',
-  'Bar',
+  // 'Pop',
+  // 'Bar',
+  'Handgun',
+  'Kaching',
+  'Yes',
+  'Wechat',
+  'Alipay',
+  'Sonumi',
+  'H',
+  'C',
+  'Boom',
+
   'Message',
   'Bong',
-  'Kaching',
-  'Coin'
+  'Coin',
+  'RedPacket'
 ] as const
 export const audioNameToResource = {
-  Beep,
-  Bell,
-  Ding,
-  Click,
+  // Beep,
+  // Bell,
+  // Ding,
+  // Click,
   Dog,
   Gun,
-  Pop,
-  Bar,
+  // Pop,
+  // Bar,
+  Handgun,
+  Kaching,
+  Yes,
+  Wechat,
+  Alipay,
+  Sonumi,
+  H,
+  C,
+  Boom,
+
+
   Message,
   Bong,
-  Kaching,
-  Coin
+  Coin,
+  RedPacket
 }
 
 export const SwapType = {

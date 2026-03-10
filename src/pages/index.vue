@@ -631,6 +631,7 @@ type StatisticsItem = {
   followers: number
   following: number
   summary_score: number
+  colluded_cluster_ratio: number
 }
 let portraitTimer: ReturnType<typeof setTimeout> | null = null
 let isPortraitSubscribed = false
@@ -916,7 +917,7 @@ const playNewAudio = useThrottleFn((val) => {
   if (newAudio && pumpAudio.value && val) {
     audioUrl.value =
       audioNameToResource[newAudio as keyof typeof audioNameToResource] ||
-      audioNameToResource.Beep
+      audioNameToResource.Handgun
     pumpAudio.value.play().catch(() => {})
   }
 }, 300)
@@ -926,7 +927,7 @@ const playSoonAudio = useThrottleFn((val) => {
   if (soonAudio && pumpAudio.value && val) {
     audioUrl.value =
       audioNameToResource[soonAudio as keyof typeof audioNameToResource] ||
-      audioNameToResource.Beep
+      audioNameToResource.Handgun
     pumpAudio.value.play().catch(() => {})
   }
 }, 300)
@@ -936,7 +937,7 @@ const playGraduatedAudio = useThrottleFn((val) => {
   if (graduatedAudio && pumpAudio.value && val) {
     audioUrl.value =
       audioNameToResource[graduatedAudio as keyof typeof audioNameToResource] ||
-      audioNameToResource.Beep
+      audioNameToResource.Handgun
     pumpAudio.value.play().catch(() => {})
   }
 }, 300)
@@ -989,7 +990,7 @@ pump_notice.value?.[activeChain.value]?.graduated
   if(val.some(el=>!!el)){
     const url = getChangedValue(val, old)
     if (pumpAudio.value && url) {
-      audioUrl.value = audioNameToResource[url as keyof typeof audioNameToResource] || audioNameToResource.Beep
+      audioUrl.value = audioNameToResource[url as keyof typeof audioNameToResource] || audioNameToResource.Handgun
       pumpAudio.value.oncanplay = () => {
         pumpAudio.value?.play().catch(() => {})
       }
@@ -1886,7 +1887,9 @@ const NUMBER_MAP: [keyof StatisticsItem, keyof PumpObj][] = [
   ['sellers_24h', 'sellers_24h'],
   ['buyers_24h', 'buyers_24h'],
   ['kol_count', 'kol_tag_count'],
-  ['smart_wallet_count', 'smart_wallet_tag_count']
+  ['smart_wallet_count', 'smart_wallet_tag_count'],
+  ['colluded_cluster_ratio', 'colluded_cluster_ratio']
+
 ]
 function mergeStatisticsList(
   statisticsList: Map<string, StatisticsItem>,
@@ -2003,7 +2006,8 @@ const MERGE_KEYS = [
   'headline_cn',
   'followers',
   'following',
-  'summary_score'
+  'summary_score',
+  'colluded_cluster_ratio'
 ] as const
 
 function mergeStatistics(prev: any, next: any) {
