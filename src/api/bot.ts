@@ -964,6 +964,9 @@ export const bot_getAddressAllBalances = createCacheRequest(function bot_getAddr
   profit: string
   profitRate: number
 }>> {
+  if (!query?.evmAddress) {
+    return Promise.resolve([])
+  }
   const {$api} = useNuxtApp()
   return $api('/botapi/swap/getAddressAllBalancesV2', {
     method: 'get',
