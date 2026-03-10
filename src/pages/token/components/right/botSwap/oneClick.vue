@@ -6,6 +6,7 @@
   <Teleport to="body">
     <div v-show="botStore.isSupportChains?.includes(chain) && visible && isMounted" class="fixed-one-click flex flex-col" :style="fixedOneClickStyle">
       <template v-if="botStore.isSupportChains?.includes(chain) && visible">
+        <Icon name="ph:dots-six" class="absolute top-3px text-20px left-50% translate-x--50% cursor-move color-[--third-text] hover:color-[--main-text]" />
         <div class="flex-between">
           <div class="flex-start">
             <!-- <span>{{ $t('oneClick') }}</span> -->
@@ -21,7 +22,7 @@
             @click.stop="visible = false" @mousedown.stop />
         </div>
         <el-divider class="b-t-color-[--dialog-divider]! mt-10px! mb-5px!" />
-        <div class="content flex-1 flex flex-col">
+        <div class="content flex-1 flex flex-col cursor-default" @mousedown.stop @mouseup.stop>
           <div class="flex-between mt-10px">
             <span>{{ $t('buy') }}</span>
             <div class="tabs-1 ml-5px mr-auto">
@@ -686,6 +687,9 @@ async function handleSellAmount(item: string, index: number) {
 let mousemoveEvent: ((e: MouseEvent) => void) | null = null
 let mouseupEvent: (() => void) | null = null
 let maskElement: HTMLDivElement | null = null // 存为全局引用以便清理
+// 当前拖动偏移，供 resize 时同步修正
+let dragCurrentX = 0
+let dragCurrentY = 0
 
 const isMounted = ref(false)
 // 拖拽放大相关
@@ -728,9 +732,10 @@ function onResizeMouseDown(e: MouseEvent, direction: 'b'|'r'|'t'|'l'|'tl'|'tr'|'
   const startX = e.clientX
   const startHeight = dialogHeight.value
   const startWidth = dialogWidth.value
+  // 缓存开始时的 translate 偏移（而非依赖 el.style.left/top）
+  const startTranslateX = dragCurrentX
+  const startTranslateY = dragCurrentY
   const el = document.querySelector('.fixed-one-click') as HTMLElement
-  const startTop = parseInt(el?.style.top || '210', 10)
-  const startLeft = parseInt(el?.style.left || '350', 10)
 
   // 1. 用于 rAF 节流的变量
   let rafId: number | null = null
@@ -751,8 +756,8 @@ function onResizeMouseDown(e: MouseEvent, direction: 'b'|'r'|'t'|'l'|'tl'|'tr'|'
 
       let newWidth = startWidth
       let newHeight = startHeight
-      let newTop = startTop
-      let newLeft = startLeft
+      let newTranslateX = startTranslateX
+      let newTranslateY = startTranslateY
 
       // --- 计算逻辑 ---
       if (direction.includes('r')) {
@@ -760,25 +765,29 @@ function onResizeMouseDown(e: MouseEvent, direction: 'b'|'r'|'t'|'l'|'tl'|'tr'|'
       }
       if (direction.includes('l')) {
         newWidth = Math.max(minWidth, Math.min(maxWidth, startWidth - deltaX))
-        // 修正：只有当宽度未达到极限时才允许移动坐标，或者使用计算后的 width 反推 left
-        newLeft = startLeft + (startWidth - newWidth)
+        // 左边拉伸：宽度增加则左移，用 translate 实现而非修改 style.left
+        newTranslateX = startTranslateX + (startWidth - newWidth)
       }
       if (direction.includes('b')) {
         newHeight = Math.max(minHeight, Math.min(maxHeight, startHeight + deltaY))
       }
       if (direction.includes('t')) {
         newHeight = Math.max(minHeight, Math.min(maxHeight, startHeight - deltaY))
-        newTop = startTop + (startHeight - newHeight)
+        // 上边拉伸：高度增加则上移，用 translate 实现而非修改 style.top
+        newTranslateY = startTranslateY + (startHeight - newHeight)
       }
 
       // --- 统一更新 DOM 和 状态 ---
       if (newWidth !== dialogWidth.value) {
         dialogWidth.value = newWidth
-        if (direction.includes('l') && el) el.style.left = `${newLeft}px`
       }
       if (newHeight !== dialogHeight.value) {
         dialogHeight.value = newHeight
-        if (direction.includes('t') && el) el.style.top = `${newTop}px`
+      }
+      if (newTranslateX !== dragCurrentX || newTranslateY !== dragCurrentY) {
+        dragCurrentX = newTranslateX
+        dragCurrentY = newTranslateY
+        if (el) el.style.transform = `translate3d(${dragCurrentX}px, ${dragCurrentY}px, 0)`
       }
     })
   }
@@ -799,21 +808,72 @@ function onResizeMouseDown(e: MouseEvent, direction: 'b'|'r'|'t'|'l'|'tl'|'tr'|'
 
     localStorage.setItem('fixed-one-click-height', String(dialogHeight.value))
     localStorage.setItem('fixed-one-click-width', String(dialogWidth.value))
+    // 缓存缩放后的位置
+    if (el) saveAnchorPos(el)
   }
 
   window.addEventListener('mousemove', onMouseMove)
   window.addEventListener('mouseup', onMouseUp)
 }
 
+/** CSS 中 .fixed-one-click 的初始 left/top，必须与样式保持一致 */
+const DIALOG_ORIGIN_LEFT = 350
+const DIALOG_ORIGIN_TOP = 210
+
+/** 将当前位置转换为「象限锚点」格式并持久化 */
+function saveAnchorPos(label: HTMLElement) {
+  const rect = label.getBoundingClientRect()
+  const vw = window.innerWidth
+  const vh = window.innerHeight
+  // 弹窗中心点在视口中的位置
+  const cx = rect.left + rect.width / 2
+  const cy = rect.top + rect.height / 2
+  // 判断靠近哪条边
+  const anchorRight = cx > vw / 2  // 靠右
+  const anchorBottom = cy > vh / 2 // 靠下
+  // 以最近边为基点，计算距离（弹窗左/右边缘 到 视口左/右边缘）
+  const edgeX = anchorRight ? vw - rect.right : rect.left
+  const edgeY = anchorBottom ? vh - rect.bottom : rect.top
+  localStorage.setItem('fixed-one-click-position', JSON.stringify({
+    edgeX, edgeY, anchorRight, anchorBottom
+  }))
+}
+
+/** 从持久化数据还原 translate 偏移量 */
+function restoreTranslateFromAnchor(): { x: number; y: number } {
+  const saved = localStorage.getItem('fixed-one-click-position')
+  if (!saved) return { x: 0, y: 0 }
+  const data = JSON.parse(saved)
+  if ('edgeX' in data) {
+    const { edgeX, edgeY, anchorRight, anchorBottom } = data
+    const vw = window.innerWidth
+    const vh = window.innerHeight
+    const w = dialogWidth.value
+    const h = dialogHeight.value
+    // 从锚点边缘还原弹窗左上角在视口中的坐标
+    const left = anchorRight ? vw - edgeX - w : edgeX
+    const top = anchorBottom ? vh - edgeY - h : edgeY
+    // 换算成相对于 CSS 初始位置的 translate 偏移
+    return {
+      x: left - DIALOG_ORIGIN_LEFT,
+      y: top - DIALOG_ORIGIN_TOP
+    }
+  }
+  // 旧格式直接使用
+  return { x: data.x || 0, y: data.y || 0 }
+}
+
 function enableDragScroll() {
   const label = document.querySelector('.fixed-one-click') as HTMLElement
   if (!label) return
 
-  const savedPos = localStorage.getItem('fixed-one-click-position')
-  const initialOffset = savedPos ? JSON.parse(savedPos) : { x: 0, y: 0 }
+  const initialOffset = restoreTranslateFromAnchor()
 
   let currentX = initialOffset.x
   let currentY = initialOffset.y
+  // 同步到全局，供 resize 时读取
+  dragCurrentX = currentX
+  dragCurrentY = currentY
   let startX = 0, startY = 0
   let isDragging = false
   let rafId: number
@@ -852,13 +912,18 @@ function enableDragScroll() {
     cancelAnimationFrame(rafId)
     mask.style.display = 'none'
     label.style.cursor = 'grab'
-    localStorage.setItem('fixed-one-click-position', JSON.stringify({ x: currentX, y: currentY }))
+    dragCurrentX = currentX
+    dragCurrentY = currentY
+    saveAnchorPos(label)
   }
 
   label.onmousedown = (e) => {
     // 只允许在非resize-handle区域拖动
     const target = e.target as HTMLElement
     if (target.closest('.resize-handle')) return
+    // 从全局同步最新偏移（resize 可能已修改了 dragCurrentX/Y）
+    currentX = dragCurrentX
+    currentY = dragCurrentY
     isDragging = true
     startX = e.clientX - currentX
     startY = e.clientY - currentY
@@ -877,28 +942,52 @@ function enableDragScroll() {
     const nextX = e.clientX - startX
     const nextY = e.clientY - startY
 
-    // 3. 改进边界算法：使用 offsetLeft/Top（无视 transform）
-    // 视口宽高 - 元素自身宽高 - 元素初始位置 = 可移动的最大范围
-    const rect = label.getBoundingClientRect()
-    const width = rect.width
-    const height = rect.height
-
-    // 计算相对于窗口的初始偏移（不含 transform）
-    const origLeft = label.offsetLeft
-    const origTop = label.offsetTop
-
-    const minX = -origLeft
-    const maxX = window.innerWidth - origLeft - width
-    const minY = -origTop
-    const maxY = window.innerHeight - origTop - height
+    // 边界算法： translate 范围 = [负初始偏移, vw/vh - 初始偏移 - 弹窗宽高]
+    const w = dialogWidth.value
+    const h = dialogHeight.value
+    const minX = -DIALOG_ORIGIN_LEFT
+    const maxX = window.innerWidth - DIALOG_ORIGIN_LEFT - w
+    const minY = -DIALOG_ORIGIN_TOP
+    const maxY = window.innerHeight - DIALOG_ORIGIN_TOP - h
 
     currentX = Math.max(minX, Math.min(nextX, maxX))
     currentY = Math.max(minY, Math.min(nextY, maxY))
+    dragCurrentX = currentX
+    dragCurrentY = currentY
   }
+
+  // 3. 监听窗口缩放，按象限锚点重新换算位置
+  const onResize = () => {
+    const saved = localStorage.getItem('fixed-one-click-position')
+    if (!saved) return
+    const data = JSON.parse(saved)
+    if (!('edgeX' in data)) return
+    const { edgeX, edgeY, anchorRight, anchorBottom } = data
+    const vw = window.innerWidth
+    const vh = window.innerHeight
+    const origLeft = DIALOG_ORIGIN_LEFT
+    const origTop = DIALOG_ORIGIN_TOP
+    const w = dialogWidth.value
+    const h = dialogHeight.value
+    const left = anchorRight ? vw - edgeX - w : edgeX
+    const top = anchorBottom ? vh - edgeY - h : edgeY
+    // 限制不超出屏幕
+    const clampedLeft = Math.max(0, Math.min(left, vw - w))
+    const clampedTop = Math.max(0, Math.min(top, vh - h))
+    currentX = clampedLeft - origLeft
+    currentY = clampedTop - origTop
+    dragCurrentX = currentX
+    dragCurrentY = currentY
+    label.style.transform = `translate3d(${currentX}px, ${currentY}px, 0)`
+  }
+  window.addEventListener('resize', onResize)
 
   label.onblur = mouseupEvent
   window.addEventListener('mousemove', mousemoveEvent)
   window.addEventListener('mouseup', mouseupEvent)
+
+  // 保存 onResize 以便卸载时移除
+  ;(label as any).__onResize = onResize
 }
 
 function disableDragScroll() {
@@ -906,6 +995,11 @@ function disableDragScroll() {
   if (label) {
     label.onmousedown = null
     label.onblur = null
+    const onResize = (label as any).__onResize
+    if (onResize) {
+      window.removeEventListener('resize', onResize)
+      delete (label as any).__onResize
+    }
   }
   // 修正：移除正确的事件监听器
   if (mousemoveEvent) window.removeEventListener('mousemove', mousemoveEvent)
@@ -928,6 +1022,14 @@ watch(visible, (val) => {
     // localStorage.removeItem('fixed-one-click-height')
     // localStorage.removeItem('fixed-one-click-width')
     // localStorage.removeItem('fixed-one-click-position')
+  } else {
+    // 显示时检查是否超出屏幕，超出则修正
+    nextTick(() => {
+      const label = document.querySelector('.fixed-one-click') as HTMLElement
+      if (!label) return
+      const onResize = (label as any).__onResize
+      if (onResize) onResize()
+    })
   }
 })
 
