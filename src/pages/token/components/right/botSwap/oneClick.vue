@@ -160,7 +160,7 @@ const isEnableHotkey = useLocalStorage('isEnableHotkey', false)
 const isEnablePnL = useLocalStorage('isEnablePnL', true)
 const isEnableShowsReflected = useLocalStorage('isEnableShowsReflected', false)
 
-const { getTokenBalance, updateBalanceFromWs } = useBotSwap()
+const { retryGetTokenBalance, updateBalanceFromWs } = useBotSwap()
 
 const chain = computed(() => {
   return (getAddressAndChainFromId(route.params?.id as string)?.chain || tokenStore.token?.chain) as BotChain
@@ -479,8 +479,8 @@ async function submitBotSwap(amount1: string | number, type: 'buy' | 'sell', ind
             }
           }
           setTimeout(() => {
-            getTokenBalance()
-          }, 1000)
+            retryGetTokenBalance()
+          }, 3000)
         })
       }
     }).catch(err => {
@@ -596,8 +596,8 @@ async function submitBotSwap(amount1: string | number, type: 'buy' | 'sell', ind
             }
           }
           setTimeout(() => {
-            getTokenBalance()
-          }, 1000)
+            retryGetTokenBalance()
+          }, 3000)
         })
       }
     }).catch(err => {
