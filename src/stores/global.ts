@@ -205,7 +205,7 @@ export const useGlobalStore = defineStore('global', () => {
     sort: 'created_timestamp',
     sort_dir: 'DESC',
   })
-  const audioSettings = useStorage('audioSettings-v7',{
+  const audioSettings = useStorage('audioSettings-v8',{
     active:'',
     notice:{
       monitor:true,
@@ -237,8 +237,9 @@ export const useGlobalStore = defineStore('global', () => {
       news:''
     },
     wallet:{
-      clickAction:0, // 0: 跳转, 1: 新tab打开
-      rightClickAction:0 // 0: 不打开, 1: 新tab打开
+      clickTokenAction: -1, //-1 不打开 0: 跳转 1: 新tab打开
+      clickAction: 0, // 0: 跳转, 1: 新tab打开
+      rightClickAction: 0 // 0: 不打开, 1: 新tab打开
     }
   })
 
