@@ -1824,52 +1824,52 @@ const documentVisible = computed(() => {
   return documentVisible1.value === 'visible'
 })
 
-// watch(documentVisible, (val) => {
-//   if (route.name !== 'index') return
-//   if (val) {
-//     initPage()
-//     getPumpConfig().then(() => {
-//       getPumpList()
-//     })
-//     timerAutoFresh = window.setInterval(() => {
-//       initPage()
-//       getPumpList()
-//     }, 10 * 60 * 1000) // 10分钟
-//   } else {
-//     if (timerAutoFresh) {
-//       clearTimeout(timerAutoFresh)
-//     }
-//     unbindAudioCanPlay()
-//     isPausedObj.value.new = false
-//     isPausedObj.value.soon = false
-//     isPausedObj.value.graduated = false
-//     isLeave = true
-//     pumpStateBuffer.length = 0
-//     bufferLogoMap.clear()
-//     mapStatistics.value.clear()
-//     logoList.value = []
-//     wsTableListCache = {}
-//     wsTableList.value = []
+watch(documentVisible, (val) => {
+  if (route.name !== 'index') return
+  if (val) {
+    initPage()
+    getPumpConfig().then(() => {
+      getPumpList()
+    })
+    timerAutoFresh = window.setInterval(() => {
+      initPage()
+      getPumpList()
+    }, 10 * 60 * 1000) // 10分钟
+  } else {
+    if (timerAutoFresh) {
+      clearTimeout(timerAutoFresh)
+    }
+    unbindAudioCanPlay()
+    isPausedObj.value.new = false
+    isPausedObj.value.soon = false
+    isPausedObj.value.graduated = false
+    isLeave = true
+    pumpStateBuffer.length = 0
+    bufferLogoMap.clear()
+    mapStatistics.value.clear()
+    logoList.value = []
+    wsTableListCache = {}
+    wsTableList.value = []
 
-//     wsv2Store.send({
-//       jsonrpc: '2.0',
-//       method: 'unsubscribe',
-//       params: ['pumpstatev2',  activeChain.value],
-//       id: 1,
-//     })
-//     for (const key in Timer) {
-//       const timerKey = key as keyof typeof Timer
-//       if (Timer[timerKey]) {
-//         clearTimeout(Timer[timerKey])
-//         Timer[timerKey] = null
-//       }
-//     }
-//     if (portraitTimer) {
-//       clearTimeout(portraitTimer)
-//     }
-//     unsubscribePortrait()
-//   }
-// })
+    wsv2Store.send({
+      jsonrpc: '2.0',
+      method: 'unsubscribe',
+      params: ['pumpstatev2',  activeChain.value],
+      id: 1,
+    })
+    for (const key in Timer) {
+      const timerKey = key as keyof typeof Timer
+      if (Timer[timerKey]) {
+        clearTimeout(Timer[timerKey])
+        Timer[timerKey] = null
+      }
+    }
+    if (portraitTimer) {
+      clearTimeout(portraitTimer)
+    }
+    unsubscribePortrait()
+  }
+})
 
 // watch(documentVisible, (val) => {
 //   if (route.name !== 'index') return
