@@ -857,6 +857,10 @@ export interface GetTokenStatisticsResponse {
   current_price_usd: string;
   main_token_symbol: string;
   main_token_balance_amount: string;
+  unrealized_profit_ratio: number
+  balance_amount_ratio: number
+  last_sold_time: number
+  first_purchase_time: number
 }
 
 export interface WalletLogo {

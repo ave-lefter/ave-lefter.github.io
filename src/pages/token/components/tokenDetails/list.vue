@@ -196,6 +196,9 @@ v-model:visible="visible"
           @click.self="isVolUSDT=!isVolUSDT"
         />
       </div>
+      <div class="flex items-center flex-[2] justify-end gap-3px">
+        <span>{{ $t('gas') }}</span>
+      </div>
       <!--<div class="flex items-center w-50px text-right"/>-->
     </div>
     <div
@@ -265,6 +268,9 @@ v-model:visible="visible"
             <span class="color-[--secondary-text]">{{ row.main_token_symbol }}</span>
           </template>
         </div>
+      </div>
+      <div class="flex items-center flex-[2] justify-end">
+        ${{ formatNumber(row.gas || 0, 2) }}
       </div>
       <!--<div class="flex items-center w-50px text-right"/>-->
     </div>
