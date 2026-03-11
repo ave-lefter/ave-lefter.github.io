@@ -7,6 +7,7 @@ import BigNumber from 'bignumber.js'
 import type { PerpOrderParams } from '~/api/perp/types'
 import { Warning } from '@element-plus/icons-vue'
 import { markRaw } from 'vue'
+import LoginVueDialog from '@/components/perp/connectWallet/main.vue'
 
 
 export function usePerp() {
@@ -113,6 +114,10 @@ export function usePerp() {
         props: {
           'onSuccess': () => {
             $dialog.hide()
+            console.log('login success')
+            if (!localStorage.perp_accessToken) {
+              loginAve()
+            }
           },
           getVisible: () => dialogVisible
         }
@@ -121,6 +126,36 @@ export function usePerp() {
         width: '450px',
         class: 'perp-dialog',
         title: $t('loginPerpAccount'),
+        'onOpened': () => {
+          console.log('open')
+          dialogVisible.value = true
+        },
+        'onClosed': () => {
+          console.log('close')
+          dialogVisible.value = false
+        }
+      }
+    })
+  }
+
+  function loginAve() {
+    const { $dialog } = useNuxtApp()
+    dialogVisible.value = true
+    const themeStore = useThemeStore()
+    $dialog.show({
+      content: {
+        is: LoginVueDialog,
+        props: {
+          'onClose': () => {
+            $dialog.hide()
+          },
+          getVisible: () => dialogVisible
+        }
+      },
+      props: {
+        width: '450px',
+        class: `dialog-connect ${themeStore.theme}`,
+        title: '',
         'onOpened': () => {
           console.log('open')
           dialogVisible.value = true
@@ -299,6 +334,7 @@ export function usePerp() {
     maintenanceMarginRequirement,
     isCanNormalWithdrawableAmount,
     login,
+    loginAve,
     connectAndLogin,
     deposit,
     withdraw,

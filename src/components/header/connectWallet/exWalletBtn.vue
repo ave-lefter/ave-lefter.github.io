@@ -118,6 +118,11 @@
               <Icon name="material-symbols:chevron-right-rounded" class="text-16px mr--5px" />
             </div>
           </div>
+          <div v-if="!perpStore.perpAcc" class="bg-[--border] flex items-center px-10px py-8px text-14px rd-8px mt-12px">
+            <img src="@/assets/images/logo-bg.png" class="rd-50% h-32px mr-8px" alt="" srcset="">
+            <span class="mr-auto">{{ $t('welcomeAve') }}</span>
+            <el-button type="primary" size="small" class="max-h-24px rd-6px!" @click.stop="loginAve">{{ $t('login') }}</el-button>
+          </div>
           <ul class="tg-wallet-list_footer flex flex-col gap-10px mt-20px">
             <li class="flex justify-between h-40px clickable" @click.stop="deposit">
               <div class="color-[--main-text] flex items-center gap-8px">
@@ -166,6 +171,8 @@ const perpStore = usePerpStore()
 const currentAccountSplit = computed(() => {
   return walletStore.address?.replace?.(new RegExp('(.{4})(.+)(.{4})'), '$1...$3') || ''
 })
+
+const { loginAve } = usePerp()
 
 const activeTab = ref(0)
 const balance = ref('0')
