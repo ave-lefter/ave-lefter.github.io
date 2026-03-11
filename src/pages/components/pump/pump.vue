@@ -1,5 +1,8 @@
+<script lang="tsx">
+export default { name: 'PumpRank' }
+</script>
 <script setup lang="tsx">
-import { useStorage } from '@vueuse/core'
+import { useStorage, useSessionStorage } from '@vueuse/core'
 import { getPumpDefault } from './columnRender/pumpColumnsService'
 import { getTreasureList } from '~/api/market'
 import {
@@ -90,25 +93,31 @@ function inBlackList(row) {
   )
 }
 const pageInfo = ref({
-  pageNO: 1,
+  pageNO: useSessionStorage('pump-pageNO', 1).value,
   pageSize: 50,
   total: 0,
 })
+watch(
+  () => pageInfo.value.pageNO,
+  (val) => { useSessionStorage('pump-pageNO', 1).value = val }
+)
 const loading = shallowRef(false)
 const storageKey = computed(() => {
   return props.activeTab + 'Ranks'
 })
 let columns = useStorage(storageKey.value, getPumpDefault(t))
+const isFirstMount = shallowRef(true)
 watch(
-  () => props.activeTab,
+  () => [props.activeTab, props.activeSubTab],
   () => {
     initCache()
     columns = useStorage(storageKey.value, getPumpDefault(t))
-    // sortConditions.value.sort = ''
-    // sortConditions.value.sort_dir = ''
-    // filterForm.value = {}
-    pageInfo.value.pageNO = 1
-    _getTreasureList()
+    // 只在切换 tab 时重置，首次挂载不重置（保留 sessionStorage 的值用于回退恢复）
+    if (!isFirstMount.value) {
+      pageInfo.value.pageNO = 1
+      _getTreasureList()
+    }
+    isFirstMount.value = false
   },
   {
     immediate: true,
@@ -171,6 +180,8 @@ onDeactivated(() => {
   clearTimeout(timer)
 })
 onActivated(() => {
+  // 从 sessionStorage 读取最新页码（markets.vue 切换 tab 时已重置为1）
+  pageInfo.value.pageNO = useSessionStorage('pump-pageNO', 1).value
   initCache()
   clearTimeout(timer)
   timer = window.setTimeout(() => {

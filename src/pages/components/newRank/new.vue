@@ -1,5 +1,8 @@
+<script lang="tsx">
+export default { name: 'NewRank' }
+</script>
 <script setup lang="tsx">
-import { useStorage } from '@vueuse/core'
+import { useStorage, useSessionStorage } from '@vueuse/core'
 import { getNewDefaultColumns } from './columnRender/newColumnsService'
 import { getTreasureList, type IGetTreasureConfig } from '~/api/market'
 import {
@@ -82,20 +85,32 @@ function inBlackList(row) {
     ) !== -1
   )
 }
+
 const pageInfo = ref({
-  pageNO: 1,
+  pageNO: useSessionStorage('new-pageNO', 1).value,
   pageSize: 50,
   total: 0,
 })
+watch(
+  () => pageInfo.value.pageNO,
+  (val) => { useSessionStorage('new-pageNO', 1).value = val }
+)
 const loading = shallowRef(false)
 const storageKey = computed(() => {
   return CategoryTabsCacheKey.new
 })
 let columns = useStorage(storageKey.value, getNewDefaultColumns(t))
+const isFirstMount = shallowRef(true)
 watch(
   () => props.activeTab,
   () => {
     columns = useStorage(storageKey.value, getNewDefaultColumns(t))
+    // 只在切换 tab 时重置，首次挂载不重置（保留 sessionStorage 的值用于回退恢复）
+    if (!isFirstMount.value) {
+      pageInfo.value.pageNO = 1
+      _getTreasureList()
+    }
+    isFirstMount.value = false
     console.log('watch new', columns, storageKey)
   },
   {
@@ -159,6 +174,8 @@ onDeactivated(() => {
   clearTimeout(timer)
 })
 onActivated(() => {
+  // 从 sessionStorage 读取最新页码（markets.vue 切换 tab 时已重置为1）
+  pageInfo.value.pageNO = useSessionStorage('new-pageNO', 1).value
   clearTimeout(timer)
   timer = window.setTimeout(() => {
     _getTreasureList(false)
