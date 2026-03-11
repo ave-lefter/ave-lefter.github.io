@@ -130,11 +130,21 @@ function _getTokenStatistics() {
       if (Number(res?.balance_amount || 0) > 0) {
         balance_amount_ratio = Number(res?.balance_amount || 0) / Number(res?.total_purchase_amount || 0) * 100
       }
+      let mcap_buy = 0
+      if (Number(res?.average_purchase_price_usd || 0) > 0) {
+        mcap_buy = new BigNumber(res.average_purchase_price_usd || 0)?.times(tokenStore?.circulation || 0)?.decimalPlaces(2)?.toNumber()
+      }
+      let mcap_sold = 0
+      if (Number(res?.average_sold_price_usd || 0) > 0) {
+        mcap_sold = new BigNumber(res.average_sold_price_usd || 0)?.times(tokenStore?.circulation || 0)?.decimalPlaces(2)?.toNumber()
+      }
       statistics.value = {
         ...(res || {}),
         progress,
         unrealized_profit_ratio,
-        balance_amount_ratio
+        balance_amount_ratio,
+        mcap_buy,
+        mcap_sold
       }
     })
 }
@@ -271,11 +281,14 @@ const { getFollowingInfo, getFollowingAddress } = useCopyTradeStore()
 
 const id = computed(() => route.params.id as string)
 const chain = computed(() => {
-  const { chain } = getAddressAndChainFromId(id.value, 0)
+  // const { chain } = getAddressAndChainFromId(id.value, 0)
+    const { chain } = tokenDetailStore.tokenInfo!
   return chain
 })
+
 const address = computed(() => {
-  const { address } = getAddressAndChainFromId(id.value, 0)
+  // const { address } = getAddressAndChainFromId(id.value, 0)
+  const { address } = tokenDetailStore.tokenInfo!
   return address
 })
 
@@ -297,7 +310,6 @@ function jumpCopyTrade() {
   const id = getCopyTradeId()
   const currentUser = botStore?.userInfo?.addresses?.find?.((el) => chain.value == el.chain)
   if (id && currentUser?.address) {
-    console.log('----currentUser--------',currentUser)
     const routeData = router.resolve({
       name: 'copy-trade-wallet',
       params: {
@@ -480,9 +492,23 @@ function copyTrade() {
           <ave-data-number :value="statistics?.unrealized_profit" :signVisible="true">
             {{ formatNumber(Math.abs( Number(statistics?.unrealized_profit ?? 0)), 2) }}
           </ave-data-number>
-          <ave-data-number v-if="statistics?.unrealized_profit_ratio" :value="statistics?.unrealized_profit_ratio" :signVisible="false">
+
+            <!-- <ave-data-number v-if="statistics?.unrealized_profit_ratio" :value="statistics?.unrealized_profit_ratio" :signVisible="false">
             ({{ formatNumber(Math.abs( Number(statistics?.unrealized_profit_ratio ?? 0)), 2) }}%)
-          </ave-data-number>
+            </ave-data-number> -->
+            &nbsp;
+            <span
+              v-if="statistics?.unrealized_profit_ratio > 0"
+              class="text-[var(--up-color)]"
+            >
+              (+{{ formatNumber(Math.abs( Number(statistics?.unrealized_profit_ratio ?? 0)), 2) }}%)
+            </span>
+            <span
+              v-else-if="statistics?.unrealized_profit_ratio < 0"
+              class="text-[var(--down-color)]"
+            >
+              (-{{ formatNumber(Math.abs( Number(statistics?.unrealized_profit_ratio ?? 0)), 2) }}%)
+            </span>
         </div>
       </div>
     </div>
@@ -494,7 +520,7 @@ function copyTrade() {
         >
           <ExcludeError
             :model-value="statistics.balance_usd">
-            {{ formatNumber(statistics.balance_usd, 2) }}
+            ${{ formatNumber(statistics.balance_usd, 2) }}
           </ExcludeError>
         </div>
       </div>
@@ -516,20 +542,45 @@ function copyTrade() {
     </div>
 
     <div class="flex items-center mb-20px">
-      <div class="flex-1 flex flex-col">
+      <!-- <div class="flex-1 flex flex-col">
         <span class="color-[--secondary-text] text-12px lh-16px mb-4px">{{ $t('positionTime') }}</span>
         <div class="flex text-14px lh-20px items-center color-[--main-text]"
         >
           <template v-if="Number(statistics?.balance_amount || 0) > 0">
+            <template v-if="statistics?.first_purchase_time > 0 ">
               {{ formatTimeFromNow(statistics?.first_purchase_time || 0, false, true) }}
+            </template>
+            <span v-else class="color-[--third-text]">
+                --
+            </span>
           </template>
           <template v-else-if="statistics?.last_sold_time - statistics?.first_purchase_time">
               {{ formatTime( Number(statistics?.last_sold_time - statistics?.first_purchase_time)) }}
           </template>
-          <span v-else class="color-[--third-text]">
+          <span class="color-[--third-text]">
               --
           </span>
         </div>
+      </div> -->
+      <div class="flex-1 flex flex-col">
+        <span class="color-[--secondary-text] text-12px lh-16px mb-4px">{{ $t('totalBuy') }}</span>
+        <div class="flex text-14px lh-20px items-center color-[--third-text]"
+        >
+          <ExcludeError :model-value="statistics.total_purchase_usd">
+            <span class="color-#12B886">
+              ${{
+                formatNumber(statistics.total_purchase_usd, 2)
+              }}
+            </span>
+          </ExcludeError>
+          <span class="color-[--third-text]">/</span>
+          <ExcludeError :model-value="statistics.total_purchase">
+            <span class="color-[--third-text]">{{ formatNumber(statistics.total_purchase, 2) }} Txs</span>
+          </ExcludeError>
+        </div>
+        <ExcludeError :model-value="statistics.total_purchase_amount">
+          <span class="color-[--secondary-text] text-12px">{{ formatNumber(statistics.total_purchase_amount, 2) }}</span>
+        </ExcludeError>
       </div>
       <div class="flex-1 flex flex-col">
         <span class="color-[--secondary-text] text-12px lh-16px mb-4px">{{ $t('averageMarketBuySell') }}</span>
@@ -539,13 +590,13 @@ function copyTrade() {
         >
           <ExcludeError :model-value="statistics.average_purchase_price_usd">
             <span class="color-#12B886">
-              ${{ new BigNumber(statistics.average_purchase_price_usd || 0)?.times(tokenStore?.circulation || 0)?.decimalPlaces(2)?.toNumber() }}
+              ${{ formatNumber(statistics.mcap_buy, {decimals: 2, l: 4, limit: 3}) }}
             </span>
           </ExcludeError>
           <span class="color-[--secondary-text]">/</span>
           <ExcludeError :model-value="statistics.average_sold_price_usd">
             <span class="color-#F6465D">
-              ${{ new BigNumber(statistics.average_sold_price_usd || 0)?.times(tokenStore?.circulation || 0)?.decimalPlaces(2)?.toNumber() }}
+              ${{ formatNumber(statistics.mcap_sold, {decimals: 2, l: 4, limit: 3}) }}
             </span>
           </ExcludeError>
         </div>
@@ -571,7 +622,7 @@ function copyTrade() {
           </ExcludeError>
         </div>
       </div> -->
-      <div class="flex-1 flex flex-col">
+      <!-- <div class="flex-1 flex flex-col">
         <span class="color-[--secondary-text] text-12px lh-16px mb-4px">{{ $t('totalBuy') }}</span>
         <div class="flex text-14px lh-20px items-center color-[--third-text]"
         >
@@ -584,13 +635,13 @@ function copyTrade() {
           </ExcludeError>
           <span class="color-[--third-text]">/</span>
           <ExcludeError :model-value="statistics.total_purchase">
-            <span class="color-#12B886">{{ formatNumber(statistics.total_purchase, 2) }}</span>
+            <span class="color-#12B886">{{ formatNumber(statistics.total_purchase, 2) }} Txs</span>
           </ExcludeError>
         </div>
         <ExcludeError :model-value="statistics.total_purchase_amount">
           <span class="color-[--secondary-text] text-12px">{{ formatNumber(statistics.total_purchase_amount, 2) }}</span>
         </ExcludeError>
-      </div>
+      </div> -->
 
       <div class="flex-1 flex flex-col">
         <span class="color-[--secondary-text] text-12px lh-16px mb-4px">{{ $t('totalSell') }}</span>
@@ -605,7 +656,7 @@ function copyTrade() {
           </ExcludeError>
           <span class="color-[--third-text]">/</span>
           <ExcludeError :model-value="statistics.total_sold">
-            <span class="color-#F6465D">${{ formatNumber(statistics.total_sold, 2) }}</span>
+            <span class="color-[--third-text]">{{ formatNumber(statistics.total_sold, 2) }} Txs</span>
           </ExcludeError>
         </div>
         <ExcludeError :model-value="statistics.total_sold_amount">
@@ -653,19 +704,19 @@ function copyTrade() {
     </div> -->
     <!-- <a href="" class="bg-[#3F80F7] rounded-8px p-15px w-full block  hover:opacity-80 mt-24px text-center text-14px mb-40px">{{ $t('copyCompleted') }}</a> -->
 
-    <a v-if="judgeIsCopyTrade()" href="" class="flex items-center justify-center bg-[#3F80F7] rounded-8px p-15px w-full block  hover:opacity-80 mt-24px text-center text-14px mb-40px" @click.stop.prevent="jumpCopyTrade">
-      <Icon  name="custom:wallet-fill" class="text-14px mr-4px" />
+    <a v-if="judgeIsCopyTrade()" href="" class="flex items-center justify-center bg-[#3F80F7] !color-white rounded-8px p-15px w-full block  hover:opacity-80 mt-24px text-center text-14px mb-40px" @click.stop.prevent="jumpCopyTrade">
+      <!-- <Icon  name="custom:wallet-fill" class="text-14px mr-4px" /> -->
         {{ $t('copiedTrade') }}
     </a>
     <a
       v-else
-      class="flex items-center justify-center bg-[#3F80F7] rounded-8px p-15px w-full block  hover:opacity-80 mt-24px text-center text-14px mb-40px"
+      class="flex items-center justify-center bg-[#3F80F7] rounded-8px p-15px w-full block !color-white hover:opacity-80 mt-24px text-center text-14px mb-40px"
       href=""
       target="_blank"
       @click.stop.prevent="copyTrade"
       >
-      <Icon  v-if="botStore.evmAddress && SupportCopyTradeChain?.includes?.(chain)"  name="custom:wallet-fill" class="text-14px mr-4px" />
-      <img class="mr-4px" v-else src="@/assets/images/tg1.png" alt="" :width="14">
+      <!-- <Icon  v-if="botStore.evmAddress && SupportCopyTradeChain?.includes?.(chain)"  name="custom:wallet-fill" class="text-14px mr-4px" />
+      <img class="mr-4px" v-else src="@/assets/images/tg1.png" alt="" :width="14"> -->
       {{ t('copyCompleted') }}
     </a>
     <div

@@ -861,6 +861,8 @@ export interface GetTokenStatisticsResponse {
   balance_amount_ratio: number
   last_sold_time: number
   first_purchase_time: number
+  mcap_buy: number
+  mcap_sold: number
 }
 
 export interface WalletLogo {

@@ -71,6 +71,7 @@ import { _toggleFollowOrder, _cancelFollowOrder, _getFollowSwapOrder } from '@/a
 import { Warning } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import BigNumber from 'bignumber.js'
+import { getChainInfo } from '@/utils'
 const botStore = useBotStore()
 const emit = defineEmits(['updataRow'])
 const { copyTradeVisible, form,settingCopyTrade, advancedForm, blacklist , type} = storeToRefs(useCopyTradeStore())
@@ -167,12 +168,13 @@ function getFollowSwapOrder() {
         Object.entries(res).filter(([key]) => key in form.value)
       ),
     }
+    const decimals = currentUser.value?.decimals || getChainInfo(chain.value)?.decimals
     form.value.takeProfitRatio = String(res?.takeProfitRatio / 100)
     form.value.stopLossRatio = String(res?.stopLossRatio / 100)
     form.value.maxBuyRatio = String(res?.maxBuyRatio / 100)
     console.log('--------form.value.buyAmount----',form.value.buyAmount,currentUser.value)
-    form.value.buyAmount = currentUser.value?.decimals ? new BigNumber(form.value.buyAmount || 0).div(
-      10 ** currentUser.value?.decimals) : ''
+    form.value.buyAmount = decimals ? new BigNumber(form.value.buyAmount || 0).div(
+      10 ** decimals) : ''
 
     if (form.value.buyType === 2) {
       form.value.maxBuyRatio = ''
@@ -180,8 +182,8 @@ function getFollowSwapOrder() {
   form.value.slippage = res.slippage /100
   form.value.isPrivate = res.isPrivate
   // form.value.priorityFee = res?.priorityFee
-  form.value.priorityFee = currentUser.value?.decimals ? new BigNumber(res?.priorityFee || 0).div(
-      10 ** 9) : ''
+  form.value.priorityFee = decimals ? new BigNumber(res?.priorityFee || 0).div(
+      10 ** decimals) : ''
   settingCopyTrade.value[res.chain] = {
     slippage: form.value.slippage,
     isPrivate: form.value.isPrivate,

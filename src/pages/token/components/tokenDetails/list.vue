@@ -233,7 +233,7 @@ v-model:visible="visible"
           </span>
       </div>
       <div class="flex items-center w-70px">
-         <span :class="filterType(row.event_type)?.class" class="px-8px h-20px flex items-center">
+         <span :class="filterType(row.event_type)?.class" class="px-8px h-20px flex items-center rounded-4px">
             {{ filterType(row.event_type)?.name }}
           </span>
       </div>
