@@ -115,7 +115,6 @@ class="w-monitor bg-[--secondary-bg] w-100% h-100% pl-12px pr-6px relative overf
                   :quickBuyValue="quickBuyValue"
                   :row="{...row,...{target_token:row?.target_address,token0_address:row?.from_address,token1_address:row?.to_address,symbol:row?._target_Token?.symbol}}"
                   classNames="min-w-70px h-24px! w-quickSwap"
-                  mainNameVisible
                 />
               </template>
             </AveTable>
@@ -172,7 +171,6 @@ class="w-monitor bg-[--secondary-bg] w-100% h-100% pl-12px pr-6px relative overf
                         :quickBuyValue="quickBuyValue"
                         :row="{...row,...{target_token:row?.target_address,token0_address:row?.from_address,token1_address:row?.to_address,symbol:row?._target_Token?.symbol}}"
                         classNames="min-w-70px h-24px!  hidden! group-hover:block! w-quickSwap"
-                        mainNameVisible
                       />
                       <div
                           v-tooltip="formatDate(row?.created_at || row?.time)"
