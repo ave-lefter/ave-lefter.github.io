@@ -44,7 +44,7 @@
         <div class="black-container">
           <span
             v-tooltip="pumpBlackList?.findIndex(i => (i.address == token?.token && i.type == 'ca') || (i.address == token?.symbol && i.type == 'keyword')) !== -1 ? $t('cancel') + $t('BlackListToken') : $t('BlackListToken')"
-            class="bg-[--d-000-l-FFF] px-2px py-2px color-[--third-text1] block rounded-2px hover:color-[--secondary-text] w-14px h-14px flex items-center justify-center"
+            class="bg-[--d-000-l-FFF] cursor-pointer px-2px py-2px color-[--third-text1] block rounded-2px hover:color-[--secondary-text] w-14px h-14px flex items-center justify-center"
           >
             <Icon
               v-if="
@@ -67,7 +67,7 @@
           </span>
           <span
             v-tooltip="pumpBlackList?.findIndex(i => i.address == token?.token && i.type == 'dev') !== -1 ? $t('cancel') + $t('BlackListDev') : $t('BlackListDev')"
-            class="bg-[--d-000-l-FFF] px-2px py-2px color-[--third-text1] block rounded-2px mt-2px hover:color-[--secondary-text] w-14px h-14px flex items-center justify-center"
+            class="bg-[--d-000-l-FFF] cursor-pointer px-2px py-2px color-[--third-text1] block rounded-2px mt-2px hover:color-[--secondary-text] w-14px h-14px flex items-center justify-center"
           >
             <Icon
               v-if="
@@ -88,23 +88,23 @@
           </span>
           <span
             v-if="medias?.filter?.(i => i.icon === 'twitter')?.length > 0 && medias?.filter?.(i => i.icon === 'twitter')?.[0] && formatXUser(medias?.filter?.(i => i.icon === 'twitter')?.[0]?.url)"
-            v-tooltip="$t('BlackListTwitter')"
-            class="bg-[--d-000-l-FFF] px-2px py-2px color-[--third-text1] block rounded-2px mt-2px hover:color-[--secondary-text] w-14px h-14px flex items-center justify-center"
+            v-tooltip="pumpBlackList?.findIndex(i => i.address == formatXUser(medias?.filter?.(m => m.icon === 'twitter')?.[0]?.url) && i.type == 'twitter') !== -1 ? $t('cancel') + $t('BlackListTwitter') : $t('BlackListTwitter')"
+            class="bg-[--d-000-l-FFF] cursor-pointer px-2px py-2px color-[--third-text1] block rounded-2px mt-2px hover:color-[--secondary-text] w-14px h-14px flex items-center justify-center"
           >
             <Icon
               v-if="
                 pumpBlackList?.findIndex(
-                  (i) => i.address == token?.token && i.type == 'twitter'
+                  (i) => i.address == formatXUser(medias?.filter?.(m => m.icon === 'twitter')?.[0]?.url) && i.type == 'twitter'
                 ) !== -1
               "
               name="custom:twitter-visible"
-              class="text-12px"
+              class="text-12px text-[--third-text]"
               @click.stop="addOrRemoveBlaclList('twitter')"
             />
             <Icon
               v-else
               name="custom:twitter-visible"
-              class="text-12px"
+              class="text-12px text-[--third-text]"
               @click.stop="addOrRemoveBlaclList('twitter')"
             />
           </span>

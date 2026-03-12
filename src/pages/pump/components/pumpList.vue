@@ -18,7 +18,7 @@
                   <div class="black-container">
                     <span
                       v-tooltip="pumpBlackList?.findIndex(i => (i.address == row.token && i.type == 'ca') || (i.address == row.symbol && i.type == 'keyword')) !== -1 ? $t('cancel') + $t('BlackListToken') : $t('BlackListToken')"
-                      class="bg-[--d-000-l-FFF] px-2px py-2px color-[--third-text1] block rounded-2px hover:color-[--secondary-text] w-16px h-16px flex items-center justify-center"
+                      class="bg-[--d-000-l-FFF] cursor-pointer px-2px py-2px color-[--third-text1] block rounded-2px hover:color-[--secondary-text] w-16px h-16px flex items-center justify-center"
                     >
                       <Icon
                         v-if="
@@ -42,7 +42,7 @@
                     </span>
                     <span
                       v-tooltip="pumpBlackList?.findIndex(i => i.address == row.token && i.type == 'dev') !== -1 ? $t('cancel') + $t('BlackListDev') : $t('BlackListDev')"
-                      class="bg-[--d-000-l-FFF] px-2px py-2px color-[--third-text1] block rounded-2px mt-4px hover:color-[--secondary-text] w-16px h-16px flex items-center justify-center"
+                      class="bg-[--d-000-l-FFF] cursor-pointer px-2px py-2px color-[--third-text1] block rounded-2px mt-4px hover:color-[--secondary-text] w-16px h-16px flex items-center justify-center"
                     >
                       <Icon
                         v-if="
@@ -63,8 +63,8 @@
                     </span>
                     <span
                       v-if="row?.medias?.filter?.(i => i.icon === 'twitter')?.length > 0 && row?.medias?.filter?.(i => i.icon === 'twitter')?.[0] && formatXUser(row?.medias?.filter?.(i => i.icon === 'twitter')?.[0]?.url)"
-                      v-tooltip="$t('BlackListTwitter')"
-                      class="bg-[--d-000-l-FFF] px-2px py-2px color-[--third-text1] block rounded-2px mt-4px hover:color-[--secondary-text] w-16px h-16px flex items-center justify-center"
+                      v-tooltip="pumpBlackList?.findIndex(i => i.address == row.token && i.type == 'twitter') !== -1 ? $t('cancel') + $t('BlackListTwitter') : $t('BlackListTwitter')"
+                      class="bg-[--d-000-l-FFF] cursor-pointer px-2px py-2px color-[--third-text1] block rounded-2px mt-4px hover:color-[--secondary-text] w-16px h-16px flex items-center justify-center"
                     >
                       <Icon
                         v-if="
