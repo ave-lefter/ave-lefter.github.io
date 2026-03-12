@@ -1829,20 +1829,12 @@ watch(documentVisible, (val) => {
   if (route.name !== 'index') return
   if (val) {
     initPage()
+    if (timerAutoFresh) {
+      clearInterval(timerAutoFresh)
+      timerAutoFresh = null
+    }
     getPumpList()
-    if (timerAutoFresh) {
-      clearInterval(timerAutoFresh)
-      timerAutoFresh = null
-    }
-    timerAutoFresh = window.setInterval(() => {
-      initPage()
-      getPumpList()
-    }, 10 * 60 * 1000) // 10分钟
   } else {
-    if (timerAutoFresh) {
-      clearInterval(timerAutoFresh)
-      timerAutoFresh = null
-    }
     unbindAudioCanPlay()
     isPausedObj.value.new = false
     isPausedObj.value.soon = false
