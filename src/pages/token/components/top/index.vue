@@ -1194,11 +1194,12 @@ const pair = computed(() => {
 
 
 const pairTooltipContent = computed(() => {
+  const publish_at = token?.value?.publish_at * 1000
   const migrate_time = globalStore?.migrated?.migrate_time
   if(migrate_time){
-    return `${t('migratedToMarket')}: ${formatDate(migrate_time)} <br/>${t('createdAt')}: ${formatDate(token?.value?.publish_at * 1000)}`
+    return `${t('migratedToMarket')}: ${formatDate(migrate_time)} <br/>${t('createdAt')}: ${formatDate(publish_at)}`
   }
-  return `${t('createdAt')}: ${formatDate(token?.value?.publish_at * 1000)}`
+  return `${t('createdAt')}: ${formatDate(publish_at)}`
 })
 
 const price = computed(() => {

@@ -655,5 +655,7 @@
   "socialMediaTracker": "Rastreador de medios",
   "ViewFullText": "Ver texto completo",
   "migratedToMarket": "Migrado al mercado",
-  "createdAt": "Creado el"
+  "createdAt": "Creado el",
+  "openMonitorSuccess": "Monitoreo habilitado exitosamente",
+  "cancelMonitorSuccess": "Monitoreo deshabilitado exitosamente"
 }

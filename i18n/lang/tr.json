@@ -629,5 +629,7 @@
   "socialMediaTracker": "Medya Takipçisi",
   "ViewFullText": "Tam metni görüntüle",
   "migratedToMarket": "Pazara taşındı",
-  "createdAt": "Oluşturuldu"
+  "createdAt": "Oluşturuldu",
+  "openMonitorSuccess": "İzleme başarıyla etkinleştirildi",
+  "cancelMonitorSuccess": "İzleme başarıyla devre dışı bırakıldı"
 }

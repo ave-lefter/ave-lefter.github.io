@@ -1482,5 +1482,7 @@
   "socialMediaTracker": "メディアトラッカー",
   "ViewFullText": "全文を表示",
   "migratedToMarket": "市場に移行",
-  "createdAt": "作成日"
+  "createdAt": "作成日",
+  "openMonitorSuccess": "モニタリングが正常に有効になりました",
+  "cancelMonitorSuccess": "監視が正常に無効になりました"
 }

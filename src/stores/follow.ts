@@ -53,9 +53,11 @@ export const useFollowStore = defineStore('follow', () => {
   const addressGroups = useLocalStorage<{ group_id: number; name: string; show_index: number; }[]>('addressGroups', [])
   const currentAddress = computed(() =>  botStore?.evmAddress || walletStore?.address ||'')
   const favAddressPopRef=ref()
-
+  // 监控大页面
   const updateNum1=ref(0)
+  // 关注地址悬浮框
   const updateNum2=ref(0)
+  // 关注地址弹框
   const updateNum3=ref(0)
   const {t} = useI18n()
   watch(currentAddress, (val) => {
