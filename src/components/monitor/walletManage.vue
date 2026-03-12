@@ -34,7 +34,7 @@
           // '--el-table-border':'1px solid #333',
           '--el-table-bg-color':'transparent',
           'overflow':'visible',
-          paddingBottom:!showFooter?'0px':'20px'
+          paddingBottom:(showFooter&&footText)?'20px':'0px'
         }"
         row-class='cursor-pointer group'
         :rowEventHandlers="{
@@ -205,7 +205,7 @@ const footText = computed(() => {
   if(paginationParams.value.loaded){
     return t('loading')
   }else if(paginationParams.value.finished){
-    return t('noMore')
+    return ''
   }else{
     return ''
   }
