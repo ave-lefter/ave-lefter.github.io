@@ -1,7 +1,7 @@
 <template>
   <div class="px-15px pr-0 bg-[--secondary-bg]" v-if="!isEmpty">
     <div
-      class="flex-start border-b border-b-solid border-[--d-151A22-l-E8F1FF] pb-12px pt-12px mr-15px cursor-pointer"
+      class="flex-start border-b border-b-solid border-[--d-151A22-l-E8F1FF] pb-12px pt-12px mr-15px cursor-pointer color-[--main-text1]"
       @click="isExpand = !isExpand"
     >
       <span class="text-14px">{{ t('similarPic') }}({{ tokens?.length }})</span>

@@ -72,7 +72,7 @@
       </div>
     </el-popover> -->
     <template v-else>
-      <Positions/>
+      <!-- <Positions/> -->
       <wallet/>
     </template>
 

@@ -440,26 +440,6 @@
               >
               {{ formatTimeFromNow(pair?.created_at, false, true) }}
               </span>
-            <div
-              v-if="(tokenInfoExtra?.buy_tax??0) > 0 || (tokenInfoExtra?.sell_tax??0) > 0"
-              class="flex-start bg-btn"
-            >
-              <span>{{ $t('tax') }}:</span>
-              <span
-              v-if="(tokenInfoExtra?.buy_tax??0) > 0"
-                class="text-12px tax-text"
-                :style="{ color: upColor[0] }"
-              >
-                {{ formatNumber(tokenInfoExtra?.buy_tax ||0, 1) }}%
-              </span>
-              <span
-                v-if="(tokenInfoExtra?.sell_tax??0) > 0"
-                class="text-12px tax-text ml-4px"
-                :style="{ color: downColor[0] }"
-              >
-                {{ formatNumber(tokenInfoExtra?.sell_tax ||0, 1) }}%
-              </span>
-            </div>
             <!-- <template v-if="pair && getTags(pair)?.signal_arr?.length > 0">
               <div
                 v-for="(i, index) in getTags(pair)?.signal_arr?.slice(0, 3)"
@@ -801,6 +781,25 @@
         <span class="block mt-8px color-[--main-text1]">{{
           formatNumber(token?.holders || 0, { limit: 10 })
         }}</span>
+      </div>
+      <div v-if="(tokenInfoExtra?.buy_tax??0) > 0 || (tokenInfoExtra?.sell_tax??0) > 0" class="item ml-24px">
+        <span v-tooltip="$t('taxTip')" class="border-b border-b-dashed cursor-pointer">{{ $t('totalTax') }}</span>
+        <div class="block mt-8px color-[--third-text]">
+          <span
+            v-if="(tokenInfoExtra?.buy_tax??0) > 0"
+            :style="{ color: upColor[0] }"
+          >
+            {{ formatNumber(tokenInfoExtra?.buy_tax ||0, 1) }}%
+          </span>
+          <span >/</span>
+          <span
+            v-if="(tokenInfoExtra?.sell_tax??0) > 0"
+            :style="{ color: downColor[0] }"
+          >
+            {{ formatNumber(tokenInfoExtra?.sell_tax ||0, 1) }}%
+          </span>
+        </div>
+
       </div>
       <!-- <div class="item ml-24px">
         <span>DEV</span>
