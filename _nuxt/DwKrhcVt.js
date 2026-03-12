@@ -1,0 +1,1 @@
+import{a6 as a,r as e,az as n}from"./D6y-ViDA.js";function o(o,s){const i=n(),t=e(null),l=s||3e5;a(i,a=>{if("hidden"===a&&(t.value=Date.now()),"visible"===a){Date.now()-(t.value||0)>l&&o()}})}export{o as u};
