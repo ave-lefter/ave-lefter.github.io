@@ -127,10 +127,12 @@ export function initTradingViewIntervals(currentResolution: string, chain: strin
   // const QUICK_KEY = 'tradingview.IntervalWidget.quicks'
   // const RESOLUTION_KEY = 'tv_resolution'
   let list: string[]
-  const stored = localStorage.getItem(QUICK_KEY)
+  const stored = localStorage.getItem('token_' + QUICK_KEY)
+  localStorage.setItem(QUICK_KEY, stored || '[]')
   if (!stored) {
     list = isSupportSecChains ? SUPPORT_LIST : DEFAULT_LIST
     localStorage.setItem(QUICK_KEY, JSON.stringify(SUPPORT_LIST))
+    localStorage.setItem('token_' + QUICK_KEY, JSON.stringify(SUPPORT_LIST))
     localStorage.setItem('tradingViewIntervalSet', 'true')
   } else {
     list = JSON.parse(stored)
