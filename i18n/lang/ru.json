@@ -876,5 +876,7 @@
   "twitterTracker2": "Новости",
   "onlyTitle": "Только название",
   "socialMediaTracker": "Медиа-трекер",
-  "ViewFullText": "Посмотреть полный текст"
+  "ViewFullText": "Посмотреть полный текст",
+  "openMonitorSuccess": "Мониторинг успешно включен",
+  "cancelMonitorSuccess": "Мониторинг успешно отключен"
 }

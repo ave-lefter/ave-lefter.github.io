@@ -1480,5 +1480,7 @@
   "twitterTracker2": "ニュース",
   "onlyTitle": "タイトルのみ",
   "socialMediaTracker": "メディアトラッカー",
-  "ViewFullText": "全文を表示"
+  "ViewFullText": "全文を表示",
+  "openMonitorSuccess": "モニタリングが正常に有効になりました",
+  "cancelMonitorSuccess": "監視が正常に無効になりました"
 }

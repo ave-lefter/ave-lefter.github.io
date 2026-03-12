@@ -98,8 +98,8 @@
                 v-if="SupportMonitorChain.includes(row?.user_chain)"
                 class="flex items-center mr-4px cursor-pointer color-[--third-text]"
                 @click.stop.prevent="handleMonitor(row,rowIndex)">
-                <Icon v-if="row?.is_monitored === 1" name="custom:monitor2-icon" class="text-12px mr-2px color-[--third-text] group-hover:color-[--primary-color]" />
-                <Icon v-else name="custom:monitor-icon" class="text-14px mr-2px color-[--third-text] group-hover:color-[--primary-color]" />
+                <Icon v-if="row?.is_monitored === 1" name="custom:monitor2-icon" class="text-12px mr-2px color-[--primary-color]"/>
+                <Icon v-else name="custom:monitor-icon" class="text-12px mr-2px color-[--third-text]"/>
                 <span
                   v-if="props.isLarge"
                   class="overflow-hidden whitespace-nowrap max-w-0 group-hover:max-w-[100px] transition-all duration-500 ease-in-out">
@@ -107,7 +107,7 @@
                 </span>
               </div>
               <div v-else class="flex items-center mr-4px cursor-not-allowed">
-                <Icon name="custom:monitor-icon" class="text-14px mr-2px color-[var(--d-666-l-CCC)]" />
+                <Icon name="custom:monitor-icon" class="text-12px mr-2px color-[var(--d-666-l-CCC)]" />
               </div>
               <Icon name="bx:bxs-trash-alt" class="text-13px color-[--third-text]" @click.stop.prevent="handleDeleteAttention(row)"/>
             </div>
@@ -284,7 +284,7 @@ const handleMonitor=throttle((row:any,index:number=0)=>{
       //   isSelfUpdate: false
       // }
       updateNum2.value++
-      ElMessage.success(t('success'))
+      ElMessage.success(t('cancelMonitorSuccess'))
     }).catch((e) => { ElMessage.error(String(e)) })
     return
   }else{
@@ -296,7 +296,7 @@ const handleMonitor=throttle((row:any,index:number=0)=>{
     }).then(() => {
       monitorList1.value[index].is_monitored = row.is_monitored===0?1:0
       getTableList()
-      ElMessage.success(t('success'))
+      ElMessage.success(t('openMonitorSuccess'))
       // followStore.shouldInitAddressPage={
       //   num: followStore.shouldInitAddressPage.num + 1,
       //   isSelfUpdate: false
@@ -406,7 +406,7 @@ const columns = computed(() => {
       dataKey: 'operate',
       key: 'operate',
       align: 'right',
-      minWidth: 40,
+      minWidth: 65,
     }]
 })
 
