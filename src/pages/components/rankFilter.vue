@@ -10,7 +10,7 @@ const props = defineProps<{
   ammList: IGetTreasureConfig['swaps']
 }>()
 const { t } = useI18n()
-const storeColumns = useStorage(props.storageKey, props.getDefaultColumns(t))
+let storeColumns = useStorage(props.storageKey, props.getDefaultColumns(t))
 const visible = ref(false)
 const searchKey = ref('')
 const tempFilter = ref<Record<string,any>>({})
@@ -45,10 +45,31 @@ const filteredAmmList = computed(()=>{
 const filterNumber = computed(() => {
   return 0
 })
-const modelColumns = computed(() => storeColumns.value?.filter((item: any) =>item.children || item.isVisible))
-const dexVisible = computed(() => modelColumns.value?.find((item: any) => item.key === 'dex')?.isVisible)
+const marketIndicesArr = [
+    'progress',
+    'mCap',
+    'dynamicVolAndTxs'
+  ]
+  let marketIndicesVisible = computed(()=>{
+    return marketIndicesArr.some((item)=>{
+      return !!modelColumns.value?.find((el: any) => el.key === item)?.isVisible
+    })
+  })
+let modelColumns = computed(() => storeColumns.value?.filter((item: any) =>item.children || item.isVisible))
+let dexVisible = computed(() => modelColumns.value?.find((item: any) => item.key === 'dex')?.isVisible)
 
+watch(() => props.storageKey, () => {
+  storeColumns = useStorage(props.storageKey, props.getDefaultColumns(t))
+  modelColumns = computed(() => storeColumns.value?.filter((item: any) =>item.children || item.isVisible))
+  dexVisible = computed(() => modelColumns.value?.find((item: any) => item.key === 'dex')?.isVisible)
+  marketIndicesVisible = computed(()=>{
+    return marketIndicesArr.some((item)=>{
+      return !!modelColumns.value?.find((el: any) => el.key === item)?.isVisible
+    })
+  })
+})
 watch(visible,()=>{
+  activeTab.value = 'chainToken'
   // 打开弹窗同步所有筛选条件
   if(visible.value){
     tempFilter.value = cloneDeep(globalStore.rankConditions[globalStore.rankActiveTab]?.filter)
@@ -170,7 +191,7 @@ function handleBlur(props2: string[], val: string, index: number) {
           </div>
         </div>
         <div class="flex items-center p-4px rounded-4px text-center color-[--third-text] bg-[--border] mb-16px">
-          <span v-for="text in ['chainToken','marketIndices']" :key="text" class="flex-1 lh-28px cursor-pointer" :class="{'color-[--main-text] bg-[--dialog-tab-active-bg]': activeTab === text}" @click.stop="activeTab = text">{{ $t(text) }}</span>
+          <span v-for="text in marketIndicesVisible ? ['chainToken','marketIndices'] : ['chainToken']" :key="text" class="flex-1 lh-28px cursor-pointer" :class="{'color-[--main-text] bg-[--dialog-tab-active-bg]': activeTab === text}" @click.stop="activeTab = text">{{ $t(text) }}</span>
         </div>
         <div v-if="activeTab==='chainToken'" class="flex items-center justify-between text-12px py-6px mb-8px">
           <span class="color-[--secondary-text]">{{ $t('openTime') }}</span>
@@ -319,6 +340,27 @@ function handleBlur(props2: string[], val: string, index: number) {
                 :placeholder="$t('max1')"
                 
                 @blur="(val) => handleBlur(['sniper_tx_count_min', 'sniper_tx_count_max'], val, 1)"
+              />
+            </div>
+          </div>
+          <!-- 开盘人数 -->
+          <div v-if="item.key === 'rusher_tx_count' && item.isVisible" :key="item.key" class="flex items-center justify-between text-12px py-6px mb-8px">
+            <span class="color-[--secondary-text]">{{ $t('snipers_1m') }}</span>
+            <div class="flex items-center gap-8px">
+              <el-input
+                v-model.trim.number="tempFilter.rusher_tx_count_min"
+                class="w-106px"
+                :placeholder="$t('minor')"
+                clearable
+                @blur="(val) => handleBlur(['rusher_tx_count_min', 'rusher_tx_count_max'], val, 0)"
+              />
+              <span class="color-[--third-text]">~</span>
+              <el-input
+                v-model.trim.number="tempFilter.rusher_tx_count_max"
+                class="w-106px"
+                :placeholder="$t('max1')"
+                clearable
+                @blur="(val) => handleBlur(['rusher_tx_count_min', 'rusher_tx_count_max'], val, 1)"
               />
             </div>
           </div>

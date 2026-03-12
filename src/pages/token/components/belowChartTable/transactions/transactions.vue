@@ -19,7 +19,7 @@ import {
 import {formatDate, formatTimeFromNow, getAddressAndChainFromId, getChainInfo, uuid} from '~/utils'
 
 import {useThrottleFn} from '@vueuse/core'
-
+// import { useStorage } from '@vueuse/core'
 import IconUnknown from '@/assets/images/icon-unknown.png'
 import type {AveTable} from '#components'
 import type { SimpleWSTx } from '../../kLine/types'
@@ -171,8 +171,8 @@ const footText = computed(() => {
 
 function loadMore(remainDistance:number){
   console.log('loadMore remainDistance', remainDistance, listStatus.value)
-  showFooter.value=remainDistance <= 20
-  if ((remainDistance <= 20) && !(listStatus.value.loadingTxs || listStatus.value.finished)) {
+  showFooter.value=remainDistance <= 50
+  if ((remainDistance <= 50) && !(listStatus.value.loadingTxs || listStatus.value.finished)) {
     _getTokenTxs()
   }
 }
@@ -238,7 +238,7 @@ const tableFilterVisible = ref({
 const makerTooltip = ref()
 const markerTooltipVisible = shallowRef(false)
 const currentRow = shallowRef<IGetSimpleTxsResponse & { senderProfile: Profile, maker_bal?: number }>({} as any)
-const isKeyScrolling = shallowRef(false)
+// const isKeyScrolling = shallowRef(false)
 let keyScrollTimer: ReturnType<typeof setTimeout> | null = null
 
 const isPausedTxs = computed(() => {
@@ -246,7 +246,7 @@ const isPausedTxs = computed(() => {
     || tokenDetailSStore.drawerVisible
     || markerTooltipVisible.value
     || (sortConditions.value.sort_dir === 'asc')
-    || isKeyScrolling.value
+    // || isKeyScrolling.value
 })
 
 const addressAndChain = computed(() => {
@@ -884,39 +884,39 @@ function goBrowser(row: IGetSimpleTxsResponse) {
 }
 
 const tabsContainer = ref<HTMLElement | null>(null)
+// KLine 高度监听
 
-const SCROLL_STEP = 80
+const SCROLL_STEP = 50
+
 let _localScrollTop = 0
 
 const onKeyDown = useThrottleFn((e: KeyboardEvent) => {
-  if (e.key !== 'ArrowUp' && e.key !== 'ArrowDown') return
+  const validKeys = ['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown']
+  //  'PageDown', 'PageUp','ArrowLeft', 'ArrowRight'
+  if (!validKeys.includes(e.key)) return
   if (!isHoverTable.value) return
   e.preventDefault()
+  console.log('keydown', txsContainer.value)
+  const maxHeight = filterTableList.value.length * 50
+  const SCROLL_STEP2 = txsContainer.value?.offsetHeight?txsContainer.value?.offsetHeight - 98 : 0
+  // isKeyScrolling.value = true
+  // if (keyScrollTimer) clearTimeout(keyScrollTimer)
+  // keyScrollTimer = setTimeout(() => {
+  //   isKeyScrolling.value = false
+  //   if (wsPairCache.value.length) updatePairTxs()
+  //   if (wsLiqCache.value.length) updateLiqList()
+  // }, 300)
 
-  isKeyScrolling.value = true
-  if (keyScrollTimer) clearTimeout(keyScrollTimer)
-  keyScrollTimer = setTimeout(() => {
-    isKeyScrolling.value = false
-    if (wsPairCache.value.length) updatePairTxs()
-    if (wsLiqCache.value.length) updateLiqList()
-  }, 300)
-
-  const isScrollDown = e.key === 'ArrowDown'
-  const delta = isScrollDown ? SCROLL_STEP : -SCROLL_STEP
-  const rowHeight = 50 // AveTable 默认行高
-  const totalHeight = filterTableList.value.length * rowHeight
-  const maxScrollTop = Math.max(0, totalHeight - finalHeight.value)
-  const nextScrollTop = Math.min(Math.max(0, _localScrollTop + delta), maxScrollTop)
-  aveTableRef.value?.scrollToTop?.(nextScrollTop)
-  _localScrollTop = nextScrollTop
-
-  // 只有向下滚动且接近底部时才触发加载更多
-  if (isScrollDown && maxScrollTop > 0) {
-    const remainDistance = maxScrollTop - nextScrollTop
-    if (remainDistance <= 20 && !(listStatus.value.loadingTxs || listStatus.value.finished)) {
-      _getTokenTxs()
-    }
+  let delta = 0
+  const deltaObj={
+    'ArrowUp': -SCROLL_STEP,
+    'ArrowDown': SCROLL_STEP,
+    'PageUp': -SCROLL_STEP2,
+    'PageDown': SCROLL_STEP2
   }
+  delta = deltaObj?.[e.key]
+  _localScrollTop = Math.min(Math.max(0,maxHeight-SCROLL_STEP2),Math.max(0, _localScrollTop + delta))
+  aveTableRef.value?.scrollToTop?.(_localScrollTop)
 }, 60, true, false)
 
 onMounted(() => {
@@ -1066,7 +1066,7 @@ onUnmounted(() => {
       <template v-for="(item,index) in tabs" :key="item.value">
         <a
           v-if="holdersTooltip(t)[item.type]"
-          v-tooltip="holdersTooltip(t)[item.type]"
+          v-tooltip:tx="holdersTooltip(t)[item.type]"
           href="javascript:;"
           :class="`decoration-none shrink-0 text-12px lh-16px text-center px-12px py-4px rounded-4px
          ${activeTab === item.value ? 'bg-[--border] color-[--main-text1]!' : 'color-[--third-text]'}`" @click="setActiveTab(item.value,index)">
@@ -1086,7 +1086,7 @@ onUnmounted(() => {
           <Icon name="custom:stop" />
           <span class="ml-3px">{{ $t('paused') }}</span>
         </div>
-        <span v-tooltip="$t(globalStore.isClickKlineFilter?'clickChartHideFilter':'clickChartFilter')" class="flex items-center justify-center w-12px h-12px rounded-2px color-[--reverse-color] text-10px cursor-pointer" :class="globalStore.isClickKlineFilter?'bg-[--primary-color]':'bg-[--third-text] hover:bg-[--secondary-text]'" @click="globalStore.isClickKlineFilter=!globalStore.isClickKlineFilter"><Icon name="custom:chart"/></span>
+        <span v-tooltip:tx="$t(globalStore.isClickKlineFilter?'clickChartHideFilter':'clickChartFilter')" class="flex items-center justify-center w-12px h-12px rounded-2px color-[--reverse-color] text-10px cursor-pointer" :class="globalStore.isClickKlineFilter?'bg-[--primary-color]':'bg-[--third-text] hover:bg-[--secondary-text]'" @click="globalStore.isClickKlineFilter=!globalStore.isClickKlineFilter"><Icon name="custom:chart"/></span>
       </div>
     </div>
     <DateFilterCard v-if="tableFilter.timestamp.length&&tableFilter.timestamp[0]&&tableFilter.timestamp[1]" v-model:timestamp="tableFilter.timestamp" @update:timestamp="filterSubmit"/>
@@ -1116,6 +1116,8 @@ onUnmounted(() => {
       </template>
     </template>
     <!-- tableLoading:{{tableLoading}} -->
+     <!-- scrollTop:{{ _localScrollTop }}
+     scrollTop:{{ _localScrollTop }} -->
     <div
       v-loading="tableLoading" class="text-12px"
       element-loading-background="transparent">
@@ -1194,7 +1196,7 @@ onUnmounted(() => {
             <span  :class="[ '', 'all' ].includes(activeTab)&&'cursor-pointer'">{{ $t('type') }}</span>
             <Icon
               v-if="[ '', 'all' ].includes(activeTab)"
-              v-tooltip="tableView.isShowLiq ? $t('hideLiq') : $t('showLiq')"
+              v-tooltip:tx="tableView.isShowLiq ? $t('hideLiq') : $t('showLiq')"
               name="custom:droplet"
               :class="`cursor-pointer ${!tableView.isShowLiq ? 'color-[--third-text]' : 'color-[--primary-color]'}`" />
           </div>
@@ -1312,16 +1314,16 @@ onUnmounted(() => {
           <template v-if="['solana', 'bsc'].includes(row.chain)  && (row.senderProfile || row.maker_bal)">
             <Icon
               v-if="hasNewAccount(row) && (!(row.newTags||[]).map((i:any)=>i.type).includes('47'))"
-              v-tooltip="{ content: `<span style='color: #85E12F'>${$t('newTokenAccount')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' }}"
+              v-tooltip:tx="{ content: `<span style='color: #85E12F'>${$t('newTokenAccount')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' }}"
               name="custom:new-account"
               class="mr-3px shrink-0"/>
             <Icon
               v-if="hasClearedAccount(row) && (!(row.newTags||[]).map((i:any)=>i.type).includes('46'))"
-              v-tooltip="{ content: `<span style='color: #EB2B4B'>${$t('sellAl')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
+              v-tooltip:tx="{ content: `<span style='color: #EB2B4B'>${$t('sellAl')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
               name="custom:cleared-account" class="mr-3px shrink-0"/>
             <Icon
               v-if="bigWallet(row)"
-              v-tooltip="{ content: `<span style='color: #ccc'>${$t('whales')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
+              v-tooltip:tx="{ content: `<span style='color: #ccc'>${$t('whales')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
               name="custom:big" class="mr-3px shrink-0"/>
           </template>
           <SignalTags tagClass="mr-3px" :tags="(row.newTags||[]).map((el: any)=>tagStore.matchTag(el.type)||el)"
@@ -1358,11 +1360,11 @@ onUnmounted(() => {
         <template #cell-DEX="{ row }">
           <div class="flex justify-end gap-8px">
             <img
-              v-if="row.amm === 'unknown'" v-tooltip="getSwapInfo(row.chain, row.amm)?.show_name"
+              v-if="row.amm === 'unknown'" v-tooltip:tx="getSwapInfo(row.chain, row.amm)?.show_name"
               class="w-16px h-16px cursor-pointer rounded-full" :src="IconUnknown" alt="">
             <img
               v-else
-              v-tooltip="getSwapInfo(row.chain, row.amm)?.show_name"
+              v-tooltip:tx="getSwapInfo(row.chain, row.amm)?.show_name"
               class="w-16px h-16px cursor-pointer rounded-full"
               :src="formatIconSwap(row.amm)" alt="" @click.stop.self="goBrowser(row)">
             <Icon

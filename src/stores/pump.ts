@@ -82,65 +82,10 @@ export const usePumpStore = defineStore('pumpStore', () => {
   })
 
   const pumpConfig = shallowRef<PumpConfig[]>([])
-
-  function getPumpConfig() {
-    _getPumpConfig().then((res) => {
-      pumpConfig.value = res || []
-      pumpConfig.value.forEach(i => {
-        if (!pumpV3.value[i.chain]?.platforms?.length) {
-          // const platforms = i.platforms.map(y => y?.platform) || []
-          const platforms =
-            i.platforms?.map((y) => {
-              if (i.chain == 'solana') {
-                if (y.platform !== 'believe') {
-                  return y.platform || ''
-                }
-                return ''
-              } else {
-                return y.platform || ''
-              }
-            }) || []
-          pumpV3.value[i.chain] = {
-            ...(pumpV3.value[i.chain] || {}),
-            platforms,
-            new: {
-              count: 0,
-              loading: false,
-              pumpFilter: pumpFilterDefault,
-            },
-            soon: {
-              count: 0,
-              loading: false,
-              pumpFilter: pumpFilterDefault,
-            },
-            graduated: {
-              count: 0,
-              loading: false,
-              pumpFilter: pumpFilterDefault,
-            },
-          }
-
-          if (!pump_notice.value?.[i.chain]) {
-            pump_notice.value[i.chain] = {
-              new: '',
-              soon: '',
-              graduated: '',
-            }
-          }
-          console.log('------pump_notice.value------', pump_notice.value)
-        }
-      })
-    })
-  }
-
-  const pump_solana_platforms = useStorage(
-    'pump_solana_platforms',
-    ['pump', 'moonshot', 'raydium', 'jupstudio', 'moon_new', 'cookingcity', 'bonk', 'bags']
-  )
   const pumpFilterDefault = {
     q: '',
     dev_sale_out: 0,
-    platforms: 'pump,moonshot',
+    platforms: '',
     progress_min: '', //进度
     progress_max: '',
 
@@ -174,25 +119,81 @@ export const usePumpStore = defineStore('pumpStore', () => {
     has_sm: 0,
     sm_list: [],
   }
+
+  function getPumpConfig() {
+    return _getPumpConfig().then((res) => {
+      console.log('----set----',res)
+      pumpConfig.value = res || []
+      pumpConfig.value.forEach(i => {
+        if (!pumpV3.value[i.chain]?.platforms?.length) {
+          // const platforms = i.platforms.map(y => y?.platform) || []
+          const platforms =
+            i.platforms?.map((y) => {
+              if (i.chain == 'solana') {
+                if (y.platform !== 'believe') {
+                  return y.platform || ''
+                }
+                return ''
+              } else {
+                return y.platform || ''
+              }
+            }) || []
+          pumpV3.value[i.chain] = {
+            ...(pumpV3.value[i.chain] || {}),
+            platforms,
+            new: {
+              count: 0,
+              loading: false,
+              pumpFilter: {...pumpFilterDefault},
+            },
+            soon: {
+              count: 0,
+              loading: false,
+              pumpFilter: {...pumpFilterDefault},
+            },
+            graduated: {
+              count: 0,
+              loading: false,
+              pumpFilter: {...pumpFilterDefault},
+            },
+          }
+
+          if (!pump_notice.value?.[i.chain]) {
+            pump_notice.value[i.chain] = {
+              new: '',
+              soon: '',
+              graduated: '',
+            }
+          }
+          console.log('------pump_notice.value------', pump_notice.value)
+        }
+      })
+    })
+  }
+
+  const pump_solana_platforms = useStorage(
+    'pump_solana_platforms',
+    ['pump', 'moonshot', 'raydium', 'jupstudio', 'moon_new', 'cookingcity', 'bonk', 'bags']
+  )
   const pumpV3: RemovableRef<Record<ChainKey, pumpData>> = useStorage(
-    'pumpV14',
+    'pumpV15',
     {
       solana: {
         platforms: [],
         new: {
           count: 0,
           loading: false,
-          // pumpFilter: pumpFilterDefault,
+          pumpFilter: {...pumpFilterDefault},
         },
         soon: {
           count: 0,
           loading: false,
-          // pumpFilter: pumpFilterDefault,
+          pumpFilter: {...pumpFilterDefault},
         },
         graduated: {
           count: 0,
           loading: false,
-          // pumpFilter: pumpFilterDefault,
+          pumpFilter: {...pumpFilterDefault},
         },
       },
       bsc: {
@@ -200,17 +201,17 @@ export const usePumpStore = defineStore('pumpStore', () => {
         new: {
           count: 0,
           loading: false,
-          // pumpFilter: pumpFilterDefault,
+          pumpFilter: {...pumpFilterDefault},
         },
         soon: {
           count: 0,
           loading: false,
-          // pumpFilter: pumpFilterDefault,
+          pumpFilter: {...pumpFilterDefault},
         },
         graduated: {
           count: 0,
           loading: false,
-          // pumpFilter: pumpFilterDefault,
+          pumpFilter: {...pumpFilterDefault},
         },
       },
       xlayer: {
@@ -218,17 +219,17 @@ export const usePumpStore = defineStore('pumpStore', () => {
         new: {
           count: 0,
           loading: false,
-          pumpFilter: pumpFilterDefault,
+          pumpFilter: {...pumpFilterDefault},
         },
         soon: {
           count: 0,
           loading: false,
-          pumpFilter: pumpFilterDefault,
+          pumpFilter: {...pumpFilterDefault},
         },
         graduated: {
           count: 0,
           loading: false,
-          pumpFilter: pumpFilterDefault,
+          pumpFilter: {...pumpFilterDefault},
         },
       },
       monad: {
@@ -236,17 +237,17 @@ export const usePumpStore = defineStore('pumpStore', () => {
         new: {
           count: 0,
           loading: false,
-          pumpFilter: pumpFilterDefault,
+          pumpFilter: {...pumpFilterDefault},
         },
         soon: {
           count: 0,
           loading: false,
-          pumpFilter: pumpFilterDefault,
+          pumpFilter: {...pumpFilterDefault},
         },
         graduated: {
           count: 0,
           loading: false,
-          pumpFilter: pumpFilterDefault,
+          pumpFilter: {...pumpFilterDefault},
         },
       },
       base: {
@@ -254,22 +255,23 @@ export const usePumpStore = defineStore('pumpStore', () => {
         new: {
           count: 0,
           loading: false,
-          pumpFilter: pumpFilterDefault,
+          pumpFilter: {...pumpFilterDefault},
         },
         soon: {
           count: 0,
           loading: false,
-          pumpFilter: pumpFilterDefault,
+          pumpFilter: {...pumpFilterDefault},
         },
         graduated: {
           count: 0,
           loading: false,
-          pumpFilter: pumpFilterDefault,
+          pumpFilter: {...pumpFilterDefault},
         },
       },
     },
     localStorage
   )
+  
   const activeChain = useStorage<ChainKey>(
     'pump_activeChain',
     'bsc',
@@ -360,6 +362,6 @@ export const usePumpStore = defineStore('pumpStore', () => {
     pump_notice,
     shouldHide,
     pumpV3,
-    pumpFilterDefault
+    pumpFilterDefault:ref(pumpFilterDefault)
   }
 })

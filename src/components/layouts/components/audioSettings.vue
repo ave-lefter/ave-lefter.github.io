@@ -213,8 +213,19 @@ watch(dialogVisible, () => {
     // 初始化钱包设置
     if (!settings.wallet) {
       settings.wallet = {
+        clickTokenAction: -1,
         clickAction: 0,
         rightClickAction: 0
+      }
+    } else {
+      if (settings.wallet.clickTokenAction === undefined || settings.wallet.clickTokenAction === null) {
+        settings.wallet.clickTokenAction = -1
+      }
+      if (settings.wallet.clickAction === undefined || settings.wallet.clickAction === null) {
+        settings.wallet.clickAction = 0
+      }
+      if (settings.wallet.rightClickAction === undefined || settings.wallet.rightClickAction === null) {
+        settings.wallet.rightClickAction = 0
       }
     }
     console.log('initPumpPlatforms2', settings)
@@ -462,7 +473,21 @@ function getEstimatedGas() {
     <template #default>
       <div class="mx--20px border-t-solid border-t-1px border-t-[--dialog-divider] mb-20px" />
       <!-- 钱包设置 -->
+
       <div v-if="isWallet" class="text-14px">
+         <div class="flex justify-between items-center mb-24px">
+          <span>{{ $t('clickToken') }}</span>
+          <el-radio-group
+            v-model="audioSettings.wallet.clickTokenAction"
+            class="[&&]:[--el-border:none]"
+            :fill="isDark ? '#282D35' : '#fff'"
+            :text-color="isDark ? '#F5F5F5' : '#111'"
+          >
+            <el-radio-button :label="$t('copyTrade1')" :value="-1" />
+            <el-radio-button :label="$t('jump2')" :value="0" />
+            <el-radio-button :label="$t('openInNewTab')" :value="1" />
+          </el-radio-group>
+        </div>
         <div class="flex justify-between items-center mb-24px">
           <span>{{ $t('clickWalletAddress') }}</span>
           <el-radio-group

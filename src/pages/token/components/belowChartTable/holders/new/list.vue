@@ -61,7 +61,7 @@
                     <el-input
                       v-model.trim="keyword"
                       :placeholder="$t('searchWallet')"
-                      
+
                     />
                   </div>
                   <div class="mt-20px">
@@ -1091,16 +1091,21 @@ const collect = async (row: any,index:number) => {
 
 
 function formatUnrealizedProfit(
-  row: { bought?: number, sold?: number, avg_purchase_price?: number },
+  row: {
+    unrealized_profit: number, bought?: number, sold?: number, avg_purchase_price?: number
+},
   price = 0
 ) {
-  const amount = Math.max((row?.bought || 0) - (row?.sold || 0), 0)
-  return new BigNumber(price - (row?.avg_purchase_price || 0))
-    .times(amount)
-    .toNumber()
+  // const amount = Math.max((row?.bought || 0) - (row?.sold || 0), 0)
+  // return  new BigNumber(price - (row?.avg_purchase_price || 0))
+  //   .times(amount)
+  //   .toNumber()
+  return row?.unrealized_profit || 0
 }
-function formatProfit(row: { bought?: number, sold?: number, avg_purchase_price?: number, realized_profit?: number }, price = 0) {
-  return formatUnrealizedProfit(row, price) + (row?.realized_profit || 0)
+function formatProfit(row: {
+  unrealized_profit: number, bought?: number, sold?: number, avg_purchase_price?: number, realized_profit?: number
+}, price = 0) {
+  return (row?.unrealized_profit || 0) + (row?.realized_profit || 0)
 }
 
 function handleFilterQuery(k: string) {

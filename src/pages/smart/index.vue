@@ -9,7 +9,7 @@ const { t } = useI18n()
 const configStore = useConfigStore()
 const localeStore = useLocaleStore()
 const globalStore = useGlobalStore()
-
+const audioButtonRef = ref()
 const signalContainerRef =
   useTemplateRef<InstanceType<typeof SignalContainer>>('signalContainerRef')
 const smartChains = computed(() => {
@@ -85,7 +85,12 @@ function setActiveChain(value: string) {
           <AutoSellSetting class="ml-8px" :chain="activeChain" />
 
           <Filter :filter-params="signalFilter" @onReset="onReset" @onConfirm="onConfirm" />
-          <el-popover
+          <div class="flex items-center text-12px ml-20px color-[--main-text] cursor-pointer">
+            <Icon ref="audioButtonRef" :name="globalStore.audioSettings.audio.signal ? 'custom:ad' : 'custom:admute'"
+                  class="text-16px mr-4px color-[--secondary-text]" />
+            {{ $t('NewSignalAlert') }}
+          </div>
+          <!-- <el-popover
             v-model:visible="audioVisible"
             trigger="click"
             popper-class="el-select__popper"
@@ -117,7 +122,7 @@ function setActiveChain(value: string) {
                 </li>
               </ul>
             </template>
-          </el-popover>
+          </el-popover> -->
           <div class="flex items-center text-12px ml-20px color-[--main-text]">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -163,6 +168,7 @@ function setActiveChain(value: string) {
       :quickBuyValue="quickBuyValue"
       :filterParams="signalFilter"
     />
+    <AudioPopover v-if="audioButtonRef" :buttonRef="audioButtonRef" type="signal"/>
   </div>
 </template>
 

@@ -406,13 +406,7 @@ function switchTokenKline() {
     resetBotAvgLineId()
     resetKOLLine()
     const isSupportSecChains = (chain.value && supportSecChains.includes(chain.value)) || false
-    const QUICK_KEY = 'tradingview.IntervalWidget.quicks'
-    const preResolutions = localStorage.getItem(QUICK_KEY)
     resolution.value = initTradingViewIntervals(resolution.value, chain.value, isSupportSecChains)
-    const nextResolutions = localStorage.getItem(QUICK_KEY)
-    if (preResolutions !== nextResolutions) {
-      // resetChart()
-    }
     if (_widget && _widget?.activeChart?.()) {
       _widget?.resetCache?.()
       _widget?.activeChart?.()?.clearMarks?.()
@@ -465,8 +459,7 @@ let lastPairPrice = 0
 
 // const LLJEFFY_#_240
 const listenerGuidMap = new Map()
-
-const resolution = shallowRef(localStorage.getItem('tv_resolution') || '15')
+const resolution = useLocalStorage('tv_resolution_token', '15')
 const themeStore = useThemeStore()
 let _widget: null | IChartingLibraryWidget = null
 

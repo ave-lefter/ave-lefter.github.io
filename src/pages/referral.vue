@@ -157,6 +157,68 @@
           </li>
         </ul>
         <div class="section-title mt-80px">
+          <span>{{ $t('tieredCommission') }}</span>
+          <Icon v-tooltip="{
+            content: $t('tieredCommissionTips'),
+            props: {
+              'popper-class': 'max-w-200px',
+            }
+          }" name="line-md:question-circle" color="#697F95" class="ml-5px text-18px clickable" />
+        </div>
+        <ul class="flex items-center justify-between gap-30px">
+          <li class="bg-#FFFFFF0D p-24px rd-4px mt-8px flex-1">
+            <div class="text-16px font-500 color-#fff mb-16px">L1 {{ $t('commissionStatistics') }}</div>
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="color-#697F95 text-14px mb-8px">{{ $t('invitees1') }}</div>
+                <div class="text-14px color-#fff">{{ levelsReferralInfo?.l1?.invited || 0 }}</div>
+              </div>
+              <div>
+                <div class="color-#697F95 text-14px mb-8px">{{ $t('commissionValue') }}</div>
+                <div class="text-14px color-#fff">${{ formatNumber2(levelsReferralInfo?.l1?.refFee || 0, 2) }}</div>
+              </div>
+              <div>
+                <div class="color-#697F95 text-14px mb-8px">{{ $t('totalSwapValue') }}</div>
+                <div class="text-14px color-#fff">${{ formatNumber2(levelsReferralInfo?.l1?.swapValue || 0, 2) }}</div>
+              </div>
+            </div>
+          </li>
+          <li class="bg-#FFFFFF0D p-24px rd-4px mt-8px flex-1">
+            <div class="text-16px font-500 color-#fff mb-16px">L2 {{ $t('commissionStatistics') }}</div>
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="color-#697F95 text-14px mb-8px">{{ $t('invitees1') }}</div>
+                <div class="text-14px color-#fff">{{ levelsReferralInfo?.l2?.invited || 0 }}</div>
+              </div>
+              <div>
+                <div class="color-#697F95 text-14px mb-8px">{{ $t('commissionValue') }}</div>
+                <div class="text-14px color-#fff">${{ formatNumber2(levelsReferralInfo?.l2?.refFee || 0, 2) }}</div>
+              </div>
+              <div>
+                <div class="color-#697F95 text-14px mb-8px">{{ $t('totalSwapValue') }}</div>
+                <div class="text-14px color-#fff">${{ formatNumber2(levelsReferralInfo?.l2?.swapValue || 0, 2) }}</div>
+              </div>
+            </div>
+          </li>
+          <!-- <li class="bg-#FFFFFF0D p-24px rd-4px mt-8px flex-1">
+            <div class="text-16px font-500 color-#fff mb-16px">{{ $t('other') }} {{ $t('commissionStatistics') }}</div>
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="color-#697F95 text-14px mb-8px">{{ $t('invitees1') }}</div>
+                <div class="text-14px color-#fff">{{ levelsReferralInfo?.other?.invited || 0 }}</div>
+              </div>
+              <div>
+                <div class="color-#697F95 text-14px mb-8px">{{ $t('commissionValue') }}</div>
+                <div class="text-14px color-#fff">${{ formatNumber2(levelsReferralInfo?.other?.refFee || 0, 2) }}</div>
+              </div>
+              <div>
+                <div class="color-#697F95 text-14px mb-8px">{{ $t('totalSwapValue') }}</div>
+                <div class="text-14px color-#fff">${{ formatNumber2(levelsReferralInfo?.other?.swapValue || 0, 2) }}</div>
+              </div>
+            </div>
+          </li> -->
+        </ul>
+        <div class="section-title mt-80px">
           <!-- <img width="28" height="28" src="@/assets/images/referral/data.svg" alt="" srcset="" > -->
           <span>{{ $t('myRecord') }}</span>
         </div>
@@ -519,6 +581,7 @@ import {
   getInviteeList as getInviteeListApi,
   createWithdrawIncomeOrder as createWithdrawIncomeOrderApi,
   getWithdrawRecordList as getWithdrawRecordListApi,
+  getLevelsReferralInfo
 } from '~/api/referral'
 import { formatExplorerUrl } from '~/utils'
 import BigNumber from 'bignumber.js'
@@ -700,12 +763,20 @@ const withdrawRecordListPage = computed(() => {
   )
 })
 
+const levelsReferralInfo = ref<Awaited<ReturnType<typeof getLevelsReferralInfo>> | null>(null)
+function _getLevelsReferralInfo() {
+  getLevelsReferralInfo().then(res => {
+    levelsReferralInfo.value = res
+  })
+}
+
 // 方法
 const init = () => {
   if (botStore.accessToken) {
     getReferralInfo()
     getInviteeList()
     getWithdrawRecordList()
+    _getLevelsReferralInfo()
   } else {
     referralInfo.value = {
       refCode: '',

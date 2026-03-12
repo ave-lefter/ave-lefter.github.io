@@ -156,10 +156,10 @@
                     />
                   </div>
                   <div
-                      v-copy="row.token"
-                      class="color-[--third-text1] text-12px hover:color-[--main-text1]"
-                      :class="pumpSetting.Progress_isCircle == 'horizontal' ? 'mt-20px' : 'mt-10px'">
-                      {{row.token?.slice(0, 4) + '...' + row.token?.slice(-4)}}
+                    class="color-[--third-text1] text-12px hover:color-[--main-text1]"
+                    @click.stop="clickToken(row.token, row.chain)"
+                    :class="pumpSetting.Progress_isCircle == 'horizontal' ? 'mt-20px' : 'mt-10px'">
+                    {{row.token?.slice(0, 4) + '...' + row.token?.slice(-4)}}
                   </div>
                 </div>
                 <div class="flex flex-col self-stretch relative">
@@ -303,16 +303,17 @@
                       v-if="
                         row?.medias?.length > 0 && pumpSetting?.define?.some((i) => i === 'media')
                       "
-                      class="flex text-12px"
+                      class="flex text-12px items-center"
                     >
-                      <div v-for="(item, index) in row?.medias" :key="index">
+                      <div v-for="(item, index) in row?.medias" :key="index" class="flex ">
                         <template v-if="item.url">
-                          <span v-if="item.name === 'QQ'" v-tooltip="item.url" class="mr-8px">
-                            <Icon
-                              :name="`custom-media:${item.icon}`"
-                              class="text-[--third-text1] h-12px"
-                            />
-                          </span>
+                          <Icon
+                            v-if="item.name === 'QQ'" v-tooltip="item.url"
+                            :name="`custom-media:${item.icon}`"
+                            class="text-[--third-text1] h-12px leading-12px mr-8px"
+                          />
+                          <!-- <span v-if="item.name === 'QQ'" v-tooltip="item.url" class="mr-8px h-12px leading-12px">
+                          </span> -->
                           <XPopup
                             v-else-if="item.icon === 'twitter'"
                             :tokenId="(row.token + '-' + row.chain)"
@@ -647,6 +648,24 @@ class="flex-start mr-8px bg-btn"
                         )
                       }}%</span>
                     </div>
+                    <div
+                      v-tooltip="$t('Cabal')"
+                      :style="{
+                        color: Number(formatNumber(row?.colluded_cluster_ratio || 0, 1))==0? 'var(--third-text1)' : (Number(row?.colluded_cluster_ratio) > 5 ? '#F6465D' : '#12B886'),
+                        background: Number(formatNumber(row?.colluded_cluster_ratio || 0, 1))==0? '' : (Number(row?.colluded_cluster_ratio) > 5 ? '#f6465d1a' : '#12b8861a'),
+                      }"
+                      class="flex mr-8px bg-btn"
+                    >
+                      <Icon class="iconfont icon-binding text-12px mr-4px" name="custom:cabal"
+                    />
+                      <span>{{
+                        formatNumber(
+                          Number(row?.colluded_cluster_ratio) > 0.001 ? row?.colluded_cluster_ratio || 0 : 0,
+                          1
+                        )
+                      }}%</span>
+                    </div>
+
                   </div>
                 </div>
               </div>
@@ -781,6 +800,9 @@ class="flex-start mr-8px bg-btn"
           </li>
       </div>
        <AveEmpty v-if="tableList?.length == 0 && !loading" class="mt-200px" />
+       <div class="flex justify-center">
+        <el-button class="w-266px mt-20px" v-if="hasFilter && tableList?.length == 0 && !loading" @click="handleClearFilter">{{ $t('clearPumpFilter') }}</el-button>
+       </div>
     </ul>
     <transition name="fade">
       <span v-if="showBackTop" class="back-top text-12px flex items-center bg-[--main-bg] cursor-pointer" @click="scrollToTop">
@@ -875,13 +897,20 @@ const props = defineProps({
     type: String,
     default: () => '',
   },
+  hasFilter: {
+    type: Boolean,
+    default: () => false,
+  },
 })
 
 // const showPop = ref(false)
 // const selected = ref<PumpObj | null>(null)
 // const btnRefs = ref<Record<string, HTMLElement | null>>({})
 // const currentBtnRef = ref<HTMLElement | null>(null)
-
+const emit = defineEmits(['clearFilter'])
+const handleClearFilter = () => {
+  emit('clearFilter')
+}
 const { quickBuyValue, loading, isOut, isSoon , type} = toRefs(props)
 const tableList = shallowRef<PumpObj[]>(props.tableList || [])
 
@@ -953,6 +982,23 @@ function tableRowClick(row: { target_token: string; chain: string }) {
     name: 'token-id',
     params: { id: row.target_token + '-' + row.chain },
   })
+}
+function clickToken(token: string, chain: string) {
+  const action = globalStore.audioSettings.wallet?.clickTokenAction ?? -1
+  if (action === -1) {
+    navigator.clipboard.writeText(token)
+    ElMessage.success(t('copySuccess'))
+    return
+  }
+  const url = router.resolve({
+    name: 'token-id',
+    params: { id: token + '-' + chain },
+  }).href
+  if (action === 1) {
+    window.open(url, '_blank')
+  } else {
+    router.push(url)
+  }
 }
 function addOrRemoveBlaclList(item: { token: string , medias: any[]}, type: 'ca' | 'dev' | 'keyword'| 'twitter') {
   if (pumpBlackList.value?.length > 499) {
@@ -1198,6 +1244,10 @@ function getLiqTooltip(row: PumpObj) {
     </div>
   `
 }
+
+defineExpose({
+  scrollToTop
+})
 </script>
 
 <style lang="scss" scoped>

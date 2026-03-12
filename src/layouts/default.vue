@@ -28,6 +28,7 @@
     </div>
     <SignalDraggable v-if="!signalStore.shouldHide" />
     <MonitorDragger v-show="monitorStore.visible" />
+    <PositionDragger v-show="positionStore.visible" />
     <!-- <DragPump v-show="dragPumpStore.visible && !dragPumpStore.shouldHide" /> -->
     <TrackerDragger/>
     <FavAddressPop
@@ -51,6 +52,8 @@ import TheHeader from '@/components/layouts/TheHeader.vue'
 import TheFooter from '@/components/layouts/TheFooter.vue'
 
 import SignalDraggable from '~/components/signal/signalDraggable.vue'
+// import PositionDragger from '~/components/position/positionDragger.vue'
+
 import { useEventBus } from '@vueuse/core'
 const PnlTracker = defineAsyncComponent(() => import('./components/pnlTracker.vue'))
 const TrackerDragger = defineAsyncComponent(() => import('~/components/twitterTracker/index.vue'))
@@ -62,6 +65,7 @@ const monitorStore = useMonitorStore()
 const globalStore = useGlobalStore()
 const dragPumpStore = usePumpStore()
 const trackerStore = useTwitterTrackerStore()
+const positionStore = usePositionStore()
 const route = useRoute()
 
 const _style = computed(() => {
@@ -74,7 +78,7 @@ const _style = computed(() => {
       paddingRight += signalStore.fixedWidth + 1
     }
   }
-  ;[monitorStore, dragPumpStore, trackerStore].forEach((storeItem) => {
+  ;[monitorStore, dragPumpStore, trackerStore,positionStore].forEach((storeItem) => {
     // 不存在 shouldHide 属性或者 shouldHide 为 false
     if (storeItem.visible && (!('shouldHide' in storeItem) || !storeItem.shouldHide)) {
       if (storeItem.isLeftFixed) {

@@ -164,6 +164,8 @@ export const useGlobalStore = defineStore('global', () => {
     jump: 'close',
     border: '',
   })
+  const clickHolderCount = shallowRef(0)
+  const popVisible = shallowRef<boolean>(false)
   // 涨跌幅时区
   const zone=useStorage('zone','24h')
 
@@ -203,7 +205,7 @@ export const useGlobalStore = defineStore('global', () => {
     sort: 'created_timestamp',
     sort_dir: 'DESC',
   })
-  const audioSettings = useStorage('audioSettings-v5',{
+  const audioSettings = useStorage('audioSettings-v8',{
     active:'',
     notice:{
       monitor:true,
@@ -225,18 +227,19 @@ export const useGlobalStore = defineStore('global', () => {
       time:3
     },
     audio:{
-      signal:'Bar',
+      signal:'RedPacket',
       monitor:'Coin',
-      marketBuy:'',
-      marketSell:'',
+      marketBuy:'Handgun',
+      marketSell:'Kaching',
       limit:'',
       volume:50,
       twitter:'',
       news:''
     },
     wallet:{
-      clickAction:0, // 0: 跳转, 1: 新tab打开
-      rightClickAction:0 // 0: 不打开, 1: 新tab打开
+      clickTokenAction: -1, //-1 不打开 0: 跳转 1: 新tab打开
+      clickAction: 0, // 0: 跳转, 1: 新tab打开
+      rightClickAction: 0 // 0: 不打开, 1: 新tab打开
     }
   })
 
@@ -307,6 +310,37 @@ export const useGlobalStore = defineStore('global', () => {
     mcap: number
   })
 
+  const tagsRatio = ref<{
+    address_binding_ratio: number
+    bundle_ratio: number
+    dev_age_seconds: number
+    dev_first_transfer_in_from_label: string
+    dev_ratio: number
+    kol_count: number
+    kol_ratio: number
+    max_dev_ratio: number
+    rat_ratio: number
+    sniper_balance_ratio_cur: number
+    top10_ratio: number
+    smart_wallet_count: number
+    smart_wallet_ratio: number
+    colluded_cluster_ratio: number
+  }>({
+    address_binding_ratio: 0,
+    bundle_ratio: 0,
+    dev_age_seconds: 0,
+    dev_first_transfer_in_from_label: '',
+    dev_ratio: 0,
+    kol_count: 0,
+    kol_ratio: 0,
+    max_dev_ratio: 0,
+    rat_ratio: 0,
+    sniper_balance_ratio_cur: 0,
+    top10_ratio: 0,
+    smart_wallet_count: 0,
+    smart_wallet_ratio: 0,
+    colluded_cluster_ratio: 0
+  })
 
   //  点击图表显示交易历史
    const isClickKlineFilter = useStorage('isClickKlineFilter', true)
@@ -425,6 +459,8 @@ export const useGlobalStore = defineStore('global', () => {
     zone,
     zoneList,
     showMarket,
-    migrated
+    clickHolderCount,
+    popVisible,
+    tagsRatio,
   }
 })

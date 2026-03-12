@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { useStorage } from '@vueuse/core'
+definePageMeta({ keepalive: true })
+import { useStorage, useSessionStorage } from '@vueuse/core'
 import CategoryTabs from './components/categoryTabs.vue'
 import hot from './components/hotRank/hot.vue'
 import newRank from './components/newRank/new.vue'
@@ -31,7 +32,7 @@ const globalStore = useGlobalStore()
 const activeTab = storeToRefs(globalStore).rankActiveTab
 const activeSubTab = useStorage('rankSubTab', 'pump_in_hot')
 const activeChain = useStorage('rankChain', 'AllChains')
-const chains = shallowRef<IGetTreasureConfig[]>([])
+const chains = useSessionStorage<IGetTreasureConfig[]>('treasureConfig', [])
 const currentChainObj = computed(() => {
   return chains.value.find((el) => el.net_name === activeChain.value)
 })
@@ -49,6 +50,29 @@ const walletAddress = computed(() => {
   return botStore.evmAddress || walletStore.address
 })
 
+// 切换 tab 时重置该 tab 的 pageNO sessionStorage，确保子组件下次加载从第1页开始
+const pageNOKeys: Record<string, string> = {
+  hot: 'hot-pageNO',
+  new: 'new-pageNO',
+  inclusion: 'inclusion-pageNO',
+  gainer: 'gainer-pageNO',
+  pump: 'pump-pageNO',
+  binance_alpha: 'activity-pageNO',
+  cto: 'activity-pageNO',
+  xstocks: 'activity-pageNO',
+  volume: 'activity-pageNO',
+  clanker: 'activity-pageNO',
+}
+watch(
+  () => activeTab.value,
+  (newTab) => {
+    const key = pageNOKeys[newTab]
+    if (key) sessionStorage.setItem(key, '1')
+  }
+)
+onActivated(() => {
+  _getTreasureConfig()
+})
 onMounted(() => {
   _getTreasureConfig()
   if (walletAddress.value) {

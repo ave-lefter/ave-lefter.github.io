@@ -157,7 +157,7 @@ watch(() => wsStore.wsResult[WSEventType.PUMPSTATE], (val: WSPump[]) => {
           : i?.pair.token1_logo_url,
 
     }))
-    const addList = getFilterData(list, localStorage.getItem(`pumpFilter_${pumpStore.activeChain}_${activeTab.value}`))
+    const addList = getFilterData(list, pumpStore.pumpV3[pumpStore.activeChain][activeTab.value]?.pumpFilter)
     if(addList.length > 0 && pumpStore.pump_notice[pumpStore.activeChain][activeTab.value] && pumpAudio.value){
       pumpAudio.value.play()
     }
@@ -212,8 +212,7 @@ const debouncedSearch = useDebounceFn(() => {
 }, 500)
 
 function init(isFilter = false) {
-  const params = localStorage.getItem(`pumpFilter_${pumpStore.activeChain}_${activeTab.value}`)
-  getPump(JSON.parse(params || '{}'), isFilter)
+  getPump(pumpStore.pumpV3[pumpStore.activeChain][activeTab.value]?.pumpFilter || {}, isFilter)
 }
 
 function confirmFilter(
@@ -555,8 +554,9 @@ name="custom:close" class="text-14px shrink-0 cursor-pointer color-[--main-text]
           </template>
         </el-input>
         <PumpFilter
-          :key="`pumpFilter_${pumpStore.activeChain}_${activeTab}`"
-          hideReferenceText :storage="`pumpFilter_${pumpStore.activeChain}_${activeTab}`"
+          :activeChain="pumpStore.activeChain"
+          :activeFilterType="activeTab"
+          hideReferenceText
           @update:filterData="confirmFilter" />
       </div>
     </div>

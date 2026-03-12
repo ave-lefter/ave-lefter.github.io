@@ -1265,12 +1265,32 @@ export interface IGetAllTagsResponse {
   nick_name: string;
 }
 
-export function getAllTags(): Promise<IGetAllTagsResponse[]> {
-  const {$api} = useNuxtApp()
-  return $api('/v2api/token_info/v1/tags', {
-    method: 'get',
-  })
+// export async function getAllTags(): Promise<IGetAllTagsResponse[]> {
+//   const cacheKey = '/v2api/token_info/v1/tags'
+//   // 加上缓存时间，缓存时间为 24 小时
+//   const cacheTime = 24 * 60 * 60 * 1000
+//   const cachedData = await localforage.getItem(cacheKey)
+//   if (cachedData) {
+//     const { data, timestamp } = cachedData as { data: IGetAllTagsResponse[]; timestamp: number }
+//     if (Date.now() - timestamp < cacheTime) {
+//       return data
+//     }
+//   }
+//   const {$api} = useNuxtApp()
+//   return $api('/v2api/token_info/v1/tags', {
+//     method: 'get',
+//   }).then(async res => {
+//     await localforage.setItem(cacheKey, { data: res, timestamp: Date.now() })
+//     return res
+//   })
+// }
+
+export async function getAllTags(): Promise<IGetAllTagsResponse[]> {
+  const { $api } = useNuxtApp()
+  const url = '/v2api/token_info/v1/tags'
+  return withCache(url, () => $api(url, { method: 'get' }), 24 * 60 * 60 * 1000)
 }
+
 
 export interface AiSummaryResponse{
   summary:string;
@@ -1312,6 +1332,59 @@ export function getBestToken(token_id:string) {
 export function getSimilarTokens(token_id:string) {
   const { $api } = useNuxtApp()
   return $api('/v2api/token/v1/token/similar', {
+    method: 'get',
+    query: {
+      token_id
+    }
+  })
+}
+// 画像百分比
+export function getTagsRatio(token_id: string) {
+  const { $api } = useNuxtApp()
+  return $api('/v2api/token_info/v1/tags/ratio', {
+    method: 'get',
+    query: {
+      token_id,
+    },
+  })
+}
+
+export interface TagsRatioHover {
+  fav_count: number
+  holders: TagsRatioHoverItem
+  total: number
+  total_balance_ratio: string
+}
+export interface TagsRatioHoverItem {
+  account_address: string
+  balance_ratio: string
+  balance_usd: string
+  logo_url: string
+  remark: string
+  total_profit: string
+  total_profit_ratio: string
+  total_purchase_usd: string
+  total_sold_usd: string
+}
+// 获取画像详情pop
+export function getTagsRatioHover(data: {
+  token_id: string
+  self_address?: string
+  tag_type: number
+  page_size: number
+  page_no: number
+}): Promise<TagsRatioHover> {
+  const { $api } = useNuxtApp()
+  return $api('/v2api/token_info/v1/tags/hover', {
+    method: 'get',
+    query: data,
+  })
+}
+
+// 同图片
+export function getTokenSimilarpic(token_id:string) {
+  const { $api } = useNuxtApp()
+  return $api('/v2api/token/v1/token/similarpic', {
     method: 'get',
     query: {
       token_id

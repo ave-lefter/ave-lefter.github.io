@@ -14,7 +14,7 @@
           id="monitor"
           class="flex items-center gap-4px cursor-pointer hover:color-[--main-text]"
           :class="visible ? 'color-[--main-text]' : 'color-[--secondary-text]'"
-          @click="visible = !visible"
+          @click="handleClickDrag('monitor')"
         >
           <Icon name="mingcute:wallet-fill" />
           {{ $t('walletMonitor') }}
@@ -24,22 +24,34 @@
         <div
           class="flex items-center gap-4px cursor-pointer hover:color-[--main-text]"
           :class="signalStore.signalVisible ? 'color-[--main-text]' : 'color-[--secondary-text]'"
-          @click="signalStore.signalVisible = !signalStore.signalVisible"
+          @click="handleClickDrag('signal')"
         >
           <Icon name="ri:signal-tower-fill" />
           {{ $t('signal') }}
         </div>
       </el-badge>
-      <el-badge :is-dot="isTwitterDotted">
+      <el-badge :is-dot="isTwitterDotted" class="mr-12px">
         <div
           class="flex items-center gap-4px cursor-pointer hover:color-[--main-text]"
           :class="trackerStore.visible ? 'color-[--main-text]' : 'color-[--secondary-text]'"
-          @click="trackerStore.visible = !trackerStore.visible"
+          @click="handleClickDrag('tracker')"
         >
           <div class="flex items-center justify-center text-14px">
             <Icon name="custom:twitter2" />
           </div>
           {{ t('socialMediaTracker') }}
+        </div>
+      </el-badge>
+      <el-badge :is-dot="false">
+        <div
+          class="flex items-center gap-4px cursor-pointer hover:color-[--main-text]"
+          :class="positionStore.visible ? 'color-[--main-text]' : 'color-[--secondary-text]'"
+          @click="handleClickDrag('position')"
+        >
+          <div class="flex items-center justify-center text-14px">
+            <Icon name="custom:holding" />
+          </div>
+           {{t('holding')}}
         </div>
       </el-badge>
       <el-popover popper-style="padding: 0;border-radius: 8px;" width="auto" placement="top" :teleported="false" trigger="hover">
@@ -195,8 +207,11 @@ import { TokenImg, QuickSwap } from '#components'
 
 const { t } = useI18n()
 const { visible, hasRing } = storeToRefs(useMonitorStore())
-const signalStore = useSignalStore()
+const dragStore = useDragStore()
+const monitorStore = useMonitorStore() 
+const signalStore = useSignalStore() 
 const trackerStore = useTwitterTrackerStore()
+const positionStore = usePositionStore()
 const themeStore = useThemeStore()
 const globalStore = useGlobalStore()
 const botStore = useBotStore()
@@ -339,6 +354,7 @@ const twitterTrackerStore = useTwitterTrackerStore()
 const isDoted = shallowRef(!signalStore.signalVisible)
 const isDoted2 = shallowRef(!visible.value)
 const isTwitterDotted = ref(!twitterTrackerStore.visible)
+// const isTwitterDotted2 = ref(!positionStore.visible)
 // 点击信号广场，悬浮窗打开状态，小红点消失
 watch(
   () => signalStore.signalVisible,
@@ -706,6 +722,41 @@ const audioUrl = computed(() => {
     ] || audioNameToResource.Coin
   )
 })
+
+function handleClickDrag(type:'monitor'|'signal'|'tracker'|'position') {
+  switch (type) {
+    case 'monitor':
+      if((monitorStore.isLeftFixed||monitorStore.isRightFixed) && (dragStore.fixedCount >= 3) &&!monitorStore.visible){
+        monitorStore.isLeftFixed = false
+        monitorStore.isRightFixed = false
+      }
+      monitorStore.visible = !monitorStore.visible
+      break
+    case 'signal':
+      if((signalStore.isLeftFixed||signalStore.isRightFixed) && (dragStore.fixedCount >= 3) &&!signalStore.signalVisible){
+        signalStore.isLeftFixed = false
+        signalStore.isRightFixed = false
+      }
+      signalStore.signalVisible = !signalStore.signalVisible
+      break
+    case 'tracker':
+      if((trackerStore.isLeftFixed||trackerStore.isRightFixed) && (dragStore.fixedCount >= 3) &&!trackerStore.visible){
+        trackerStore.isLeftFixed = false
+        trackerStore.isRightFixed = false
+      }
+      trackerStore.visible = !trackerStore.visible
+      break
+    case 'position':
+      if((positionStore.isLeftFixed||positionStore.isRightFixed) && (dragStore.fixedCount >= 3) &&!positionStore.visible){
+        positionStore.isLeftFixed = false
+        positionStore.isRightFixed = false
+      }
+      positionStore.visible = !positionStore.visible
+      break
+    default:
+      break
+  }
+}
 </script>
 
 <style scoped lang="scss">

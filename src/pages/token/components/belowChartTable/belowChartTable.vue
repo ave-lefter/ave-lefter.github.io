@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import Transactions from './transactions/transactions.vue'
+import Holders from './holders/index.vue'
 import OrdersTab from './orders/index.vue'
 import OneClick from '../right/botSwap/oneClick.vue'
 import OrderBookButton from '../right/botSwap/orderBookButton.vue'
 import Bubble from './holders/new/bubble.vue'
 import { useBotStore } from '@/stores/bot'
-
-
+import { useEventBus  } from '@vueuse/core'
+const devTokensEvent = useEventBus(BusEventType.DEV_TOKENS_TAB)
 
 // 订单簿状态 - 通过 provide/inject 与父组件通信
 const orderBookVisible = inject<Ref<boolean>>('orderBookVisible', ref(false))
@@ -20,7 +21,7 @@ const {token, tokenInfoExtra ,pairAddress,commonHeight} = storeToRefs(useTokenSt
 const activeTab = shallowRef<keyof typeof components | 'Orders'>('Transactions')
 const components = {
   Transactions,
-  Holders: defineAsyncComponent(() => import('./holders/index.vue')),
+  Holders: Holders,
   LP: defineAsyncComponent(() => import('./lp/index.vue')),
   Attention: defineAsyncComponent(() => import('./attention/index.vue')),
   Orders: OrdersTab,
@@ -73,7 +74,11 @@ watch(
     }
   }
 )
-
+watch(() => globalStore.clickHolderCount, (val) => {
+  if (val) {
+    activeTab.value = 'Holders'
+  }
+})
 // 保存订单薄打开前的标签状态
 const previousTab = ref<keyof typeof components>('Transactions')
 
@@ -99,6 +104,13 @@ watch(
   },
   { immediate: true }
 )
+
+devTokensEvent.on(() => {
+  if(tokenStore.tokenInfoExtra?.dev_count){
+    previousTab.value = 'DevTokens'
+    activeTab.value = 'DevTokens'
+  }
+})
 
 const tabsList = computed(() => {
   return tabs.value.filter(item => {
@@ -154,7 +166,7 @@ const comProps = computed(() => {
     MySwap: {},
   }[activeTab.value] || {}
 })
-onMounted(() => {
+onMounted  (() => {
   globalStore.getFollowsNum()
 })
 

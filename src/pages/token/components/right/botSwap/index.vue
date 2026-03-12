@@ -53,7 +53,7 @@
         <SlippageSet :canSetAuto="true" :isAutoSell="swapType === 'market'" :chain="(tokenStore.tokenInfo?.token?.chain as BotChain)" :setting="botSettingStore?.botSettings[chain]" :initSwapType="activeTab" />
       </div> -->
     </div>
-    <Swap ref="swap" :activeTab="activeTab" :swapType="swapType" :tabs1="tabs1" :tabs2="tabs2" @getTokenBalance="getTokenBalance"/>
+    <Swap ref="swap" :activeTab="activeTab" :swapType="swapType" :tabs1="tabs1" :tabs2="tabs2" @getTokenBalance="retryGetTokenBalance"/>
     <el-popover
       v-model:visible="visible"
       popper-class="new-popover"
@@ -115,7 +115,7 @@ import RefreshBalance from './refreshBalance.vue'
 import type { WalletTokenInfo } from '~/api/types/token'
 
 // 创建对子组件的引用
-const swap = ref(null);
+const swap = ref(null)
 const { t } = useI18n()
 const route = useRoute()
 const botSettingStore = useBotSettingStore()
@@ -136,7 +136,7 @@ const currentBtnRef = ref<HTMLElement | null>(null)
 
 const walletTokenInfo=ref<WalletTokenInfo | null>(null)
 
-const { getTokenBalance } = useBotSwap()
+const { getTokenBalance, retryGetTokenBalance } = useBotSwap()
 
 const chain = computed(() => {
   return (getAddressAndChainFromId(route.params?.id as string)?.chain || tokenStore.token?.chain) as BotChain
