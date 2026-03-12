@@ -99,6 +99,7 @@ watch(
   () => pageInfo.value.pageNO,
   (val) => { useSessionStorage('inclusion-pageNO', 1).value = val }
 )
+const tableRef = shallowRef()
 const loading = shallowRef(false)
 const storageKey = computed(() => {
   return CategoryTabsCacheKey.inclusion
@@ -160,6 +161,7 @@ async function _getTreasureList(shouldLoading = true) {
     })
     pageInfo.value.total = res.total
     listData.value = (res.data || []).map(props.listMapFunction)
+    nextTick(() => tableRef.value?.scrollToTop(0))
     if (shouldLoading) {
       initWs()
     }
@@ -345,6 +347,7 @@ const cellRenderer = computed(() => {
 <template>
   <div v-loading="loading" :style="`height:${height}`">
     <AveTable
+      ref="tableRef"
       row-key="pair_id"
       :loading="loading"
       :data="filteredListData"

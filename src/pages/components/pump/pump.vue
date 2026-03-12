@@ -101,6 +101,7 @@ watch(
   () => pageInfo.value.pageNO,
   (val) => { useSessionStorage('pump-pageNO', 1).value = val }
 )
+const tableRef = shallowRef()
 const loading = shallowRef(false)
 const storageKey = computed(() => {
   return props.activeTab + 'Ranks'
@@ -162,6 +163,7 @@ async function _getTreasureList(shouldLoading = true) {
     })
     pageInfo.value.total = res.total
     listData.value = (res.data || []).map(props.listMapFunction)
+    nextTick(() => tableRef.value?.scrollToTop(0))
     if (shouldLoading) {
       initWs()
     }
@@ -352,6 +354,7 @@ function initCache() {
 <template>
   <div v-loading="loading" :style="`height:${height}`">
     <AveTable
+      ref="tableRef"
       :key="activeTab"
       row-key="pair_id"
       :loading="loading"

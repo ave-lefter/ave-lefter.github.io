@@ -988,7 +988,7 @@ function clickToken(token: string, chain: string) {
   const action = globalStore.audioSettings.wallet?.clickTokenAction ?? -1
   if (action === -1) {
     navigator.clipboard.writeText(token)
-    ElMessage.success(t('copyCompleted'))
+    ElMessage.success(t('copySuccess'))
     return
   }
   const url = router.resolve({

@@ -104,6 +104,8 @@ watch(
   (val) => { useSessionStorage('gainer-pageNO', 1).value = val }
 )
 
+const tableRef = shallowRef()
+
 const loading = shallowRef(false)
 const columns = useStorage(CategoryTabsCacheKey.gainer, getGainDefaultColumns(t))
 
@@ -246,6 +248,7 @@ async function _getTreasureList(shouldLoading = true) {
 
     const processedData = (res.data || []).map(props.listMapFunction)
     listData.value = processedData
+    nextTick(() => tableRef.value?.scrollToTop(0))
 
     // 更新缓存
     tableDataCache[cacheKey] = {
@@ -464,6 +467,7 @@ const cellRenderer = computed(() => {
 <template>
   <div v-loading="loading" :style="`height:${height}`">
     <AveTable
+      ref="tableRef"
       row-key="pair_id"
       :data="filteredListData"
       :columns="visibleColumns"
