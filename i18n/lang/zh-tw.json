@@ -1988,10 +1988,10 @@
   "joined": "加入時間",
   "hideLiq": "點擊隱藏池子信息",
   "showLiq": "點擊顯示池子信息",
-  "indicator": "指标",
+  "indicator":  "指标",
   "socialMedia": "社交媒體",
-  "devClose": "DEV清倉",
-  "devNotClose": "DEV未清倉",
+  "devClose":  "DEV清倉",
+  "devNotClose":  "DEV未清倉",
   "noRepeatAvatar": "頭像不重複",
   "noRepeatSocialMedia": "社媒不重複",
   "DEVBurn": "DEV燒幣",
@@ -2061,5 +2061,7 @@
   "commissionValue": "返佣金額",
   "totalSwapValue": "總交易額",
   "openMonitorSuccess": "開啟監控成功",
-  "cancelMonitorSuccess": "取消監控成功"
+  "cancelMonitorSuccess": "取消監控成功",
+  "totalTax": "總稅率",
+  "taxTip": "總稅率：代幣稅率"
 }

@@ -1195,7 +1195,8 @@ onMounted(() => {
 
 onUnmounted(() => {
   if (timerAutoFresh) {
-    clearTimeout(timerAutoFresh)
+    clearInterval(timerAutoFresh)
+    timerAutoFresh = null
   }
   // 清理 watch 监听器，防止内存泄漏
   // watchPumpStateUnwatch?.()
@@ -1828,17 +1829,12 @@ watch(documentVisible, (val) => {
   if (route.name !== 'index') return
   if (val) {
     initPage()
-    getPumpConfig().then(() => {
-      getPumpList()
-    })
-    timerAutoFresh = window.setInterval(() => {
-      initPage()
-      getPumpList()
-    }, 10 * 60 * 1000) // 10分钟
-  } else {
     if (timerAutoFresh) {
-      clearTimeout(timerAutoFresh)
+      clearInterval(timerAutoFresh)
+      timerAutoFresh = null
     }
+    getPumpList()
+  } else {
     unbindAudioCanPlay()
     isPausedObj.value.new = false
     isPausedObj.value.soon = false

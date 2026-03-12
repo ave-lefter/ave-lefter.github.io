@@ -2012,7 +2012,7 @@
   "hideLiq": "Click to hide pool information",
   "showLiq": "Click to display pool information",
   "filter": "Filter",
-  "indicator": "Indicator",
+  "indicator":  "Indicator",
   "socialMedia": "Social Media",
   "devClose": "DEV Close",
   "devNotClose": "DEV Not Close",
@@ -2083,6 +2083,8 @@
   "commissionStatistics": "Commission Statistics",
   "commissionValue": "Commission Value",
   "totalSwapValue": "Total Volume",
+  "totalTax": "Total tax",
+  "taxTip": "Total tax rate: Token tax rate",
   "openMonitorSuccess": "Monitoring successfully enabled",
   "cancelMonitorSuccess": "Monitoring successfully disabled"
 }
