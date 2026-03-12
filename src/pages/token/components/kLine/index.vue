@@ -342,7 +342,7 @@ watch(
     if (!val) return
 
     migrated.value = {
-      migrate_time: 0,
+      migrate_time: null,
       migrate_uprice: '0',
       showMarket: false,
       mcap: 0,
