@@ -8,7 +8,7 @@ import { getRemarksDetail } from '~/api/fav'
 // import { deleteAttention, updateWhaleRemark, addAttention, addAddressMonitor, favUsersPauseMonitor } from '~/api/attention'
 import { deleteAttention, updateWhaleRemark, addAttentionNew, addAddressMonitor, favUsersPauseMonitor } from '~/api/attention'
 const globalStore = useGlobalStore()
-const { updateNum3 } = storeToRefs(useFollowStore())
+const { updateNum1, updateNum2, updateNum3 } = storeToRefs(useFollowStore())
 const botStore = useBotStore()
 const walletStore = useWalletStore()
 const router = useRouter()
@@ -57,7 +57,7 @@ watch(() => walletStore.walletSignature[walletStore.address], (newValue) => {
   }
 })
 
-watch(() => updateNum3.value, () => {
+watch(() => updateNum2.value+updateNum3.value, () => {
   getList()
 })
 
@@ -93,6 +93,7 @@ const handleMonitor = async (row: any) => {
     }).then(() => {
       ElMessage.success(t('openMonitorSuccess'))
       getList()
+      updateNum1.value++
     }).catch((e) => {
       ElMessage.error(String(e))
     })
@@ -103,6 +104,7 @@ const handleMonitor = async (row: any) => {
     }).then(() => {
       ElMessage.success(t('cancelMonitorSuccess'))
       getList()
+      updateNum1.value++
     })
   }
 }
