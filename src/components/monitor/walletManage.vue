@@ -406,7 +406,7 @@ const columns = computed(() => {
       dataKey: 'operate',
       key: 'operate',
       align: 'right',
-      minWidth: 65,
+      minWidth: 40,
     }]
 })
 
