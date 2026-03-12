@@ -459,6 +459,7 @@ export const useGlobalStore = defineStore('global', () => {
     zone,
     zoneList,
     showMarket,
+    migrated,
     clickHolderCount,
     popVisible,
     tagsRatio,
