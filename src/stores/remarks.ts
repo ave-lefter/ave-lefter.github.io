@@ -5,7 +5,8 @@ import { useBotStore } from './bot'
 
 export const useRemarksStore = defineStore('remarks', () => {
   const botStore = useBotStore()
-  const self_address = computed(() =>  botStore.userInfo?.evmAddress || '')
+  const walletStore = useWalletStore()
+  const self_address = computed(() =>  botStore.userInfo?.evmAddress || walletStore.address || '')
   let remarks: Ref<Array<{remark: string, user_address: string, user_chain: string, self_address: string}>> = useLocalforage(`ave_remark_${self_address.value}`, [])
 
 
@@ -45,6 +46,9 @@ export const useRemarksStore = defineStore('remarks', () => {
   }
 
   async function getRemarks() {
+    if (self_address.value) {
+      remarks = useLocalforage(`ave_remark_${self_address.value}`, [])
+    }
     const res = await getFavUserRemarks({ address: self_address.value })
     remarks.value = res || []
     refreshRemarkObj()
