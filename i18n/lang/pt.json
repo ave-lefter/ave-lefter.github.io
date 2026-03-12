@@ -631,5 +631,7 @@
   "twitterTracker2": "Notícias",
   "onlyTitle": "Apenas título",
   "socialMediaTracker": "Rastreador de mídia",
-  "ViewFullText": "Ver texto completo"
+  "ViewFullText": "Ver texto completo",
+  "openMonitorSuccess": "Monitoramento ativado com sucesso",
+  "cancelMonitorSuccess": "Monitoramento desativado com sucesso"
 }

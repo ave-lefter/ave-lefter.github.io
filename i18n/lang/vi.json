@@ -871,5 +871,7 @@
   "twitterTracker2": "Tin tức",
   "onlyTitle": "Chỉ tiêu đề",
   "socialMediaTracker": "Trình theo dõi phương tiện",
-  "ViewFullText": "Xem toàn văn"
+  "ViewFullText": "Xem toàn văn",
+  "openMonitorSuccess": "Đã bật giám sát thành công",
+  "cancelMonitorSuccess": "Đã vô hiệu hóa giám sát thành công"
 }

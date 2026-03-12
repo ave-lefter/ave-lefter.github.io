@@ -2013,10 +2013,10 @@
   "topPlatforms": "顶级发射平台",
   "hideLiq": "点击隐藏池子信息",
   "showLiq": "点击显示池子信息",
-  "indicator": "指标",
+  "indicator":  "指标",
   "socialMedia": "社交媒体",
-  "devClose": "DEV清仓",
-  "devNotClose": "DEV未清仓",
+  "devClose":  "DEV清仓",
+  "devNotClose":  "DEV未清仓",
   "noRepeatAvatar": "头像不重复",
   "noRepeatSocialMedia": "社媒不重复",
   "DEVBurn": "DEV烧币",
@@ -2086,6 +2086,8 @@
   "commissionStatistics": "返佣统计",
   "commissionValue": "返佣金额",
   "totalSwapValue": "总交易额",
+  "openMonitorSuccess": "开启监控成功",
+  "cancelMonitorSuccess": "取消监控成功",
   "totalTax": "总税率",
   "taxTip": "总税率：代币税率"
 }

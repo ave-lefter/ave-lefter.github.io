@@ -113,12 +113,12 @@ const props2=computed(()=>{
   if(placement.value==='center'){
     data={
       class:'border-1px border-solid border-[--d-1A1A1A-l-F2F2F2] shadow-[0_5px_10px_0_var(--d-FFFFFF14-l-00000014)]',
-      scrollHeight:positionStore.positionBoundingRect.height-20, 
+      scrollHeight:positionStore.positionBoundingRect.height-15, 
       isLarge:positionStore.positionBoundingRect.width>720
     }
   }else{
     data={
-      scrollHeight:positionStore.winHeight-120,
+      scrollHeight:positionStore.winHeight-90,
     }
   }
   return data
