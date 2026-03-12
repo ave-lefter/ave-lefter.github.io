@@ -40,7 +40,75 @@
         @click="collect"
       /> -->
       <Collect iconClass="text-16px cursor-pointer" :isCollected="collected" :userFavoriteGroups="userFavoriteGroups" @confirmSwitchGroup="confirmSwitchGroup" @collect="collect" @newGroupAndCollect="newGroupAndCollect"/>
-      <div class="token-info ml-16px flex items-center color-[--third-text]">
+      <div class="pump-item_item token-info ml-16px flex items-center color-[--third-text] ">
+        <div class="black-container">
+          <span
+            v-tooltip="pumpBlackList?.findIndex(i => (i.address == token?.token && i.type == 'ca') || (i.address == token?.symbol && i.type == 'keyword')) !== -1 ? $t('cancel') + $t('BlackListToken') : $t('BlackListToken')"
+            class="bg-[--d-000-l-FFF] cursor-pointer px-2px py-2px color-[--third-text1] block rounded-2px hover:color-[--secondary-text] w-14px h-14px flex items-center justify-center"
+          >
+            <Icon
+              v-if="
+                pumpBlackList?.findIndex(
+                  (i) =>
+                    (i.address == token?.token && i.type == 'ca') ||
+                    (i.address == token?.symbol && i.type == 'keyword')
+                ) !== -1
+              "
+              name="custom:key-visible"
+              class="text-12px"
+              @click.stop="addOrRemoveBlaclList('ca')"
+            />
+            <Icon
+              v-else
+              name="custom:key-invisible"
+              class="text-12px"
+              @click.stop="addOrRemoveBlaclList('ca')"
+            />
+          </span>
+          <span
+            v-tooltip="pumpBlackList?.findIndex(i => i.address == token?.token && i.type == 'dev') !== -1 ? $t('cancel') + $t('BlackListDev') : $t('BlackListDev')"
+            class="bg-[--d-000-l-FFF] cursor-pointer px-2px py-2px color-[--third-text1] block rounded-2px mt-2px hover:color-[--secondary-text] w-14px h-14px flex items-center justify-center"
+          >
+            <Icon
+              v-if="
+                pumpBlackList?.findIndex(
+                  (i) => i.address == token?.token && i.type == 'dev'
+                ) !== -1
+              "
+              name="custom:dev"
+              class="text-12px"
+              @click.stop="addOrRemoveBlaclList('dev')"
+            />
+            <Icon
+              v-else
+              name="custom:dev-invisible"
+              class="text-12px"
+              @click.stop="addOrRemoveBlaclList('dev')"
+            />
+          </span>
+          <span
+            v-if="medias?.filter?.(i => i.icon === 'twitter')?.length > 0 && medias?.filter?.(i => i.icon === 'twitter')?.[0] && formatXUser(medias?.filter?.(i => i.icon === 'twitter')?.[0]?.url)"
+            v-tooltip="pumpBlackList?.findIndex(i => i.address == token?.token && i.type == 'twitter') !== -1 ? $t('cancel') + $t('BlackListTwitter') : $t('BlackListTwitter')"
+            class="bg-[--d-000-l-FFF] cursor-pointer px-2px py-2px color-[--third-text1] block rounded-2px mt-2px hover:color-[--secondary-text] w-14px h-14px flex items-center justify-center"
+          >
+            <Icon
+              v-if="
+                pumpBlackList?.findIndex(
+                  (i) => i.address == token?.token && i.type == 'twitter'
+                ) !== -1
+              "
+              name="custom:twitter-visible"
+              class="text-12px text-[--third-text]"
+              @click.stop="addOrRemoveBlaclList('twitter')"
+            />
+            <Icon
+              v-else
+              name="custom:twitter-visible"
+              class="text-12px text-[--third-text]"
+              @click.stop="addOrRemoveBlaclList('twitter')"
+            />
+          </span>
+        </div>
         <el-tooltip  v-if="getSymbolDefaultIcon(token)" popper-class="tooltip-pd-0" placement="bottom-start" :show-arrow="false" :persistent="false">
           <template #content>
             <el-image
@@ -376,7 +444,6 @@
                     <el-input
                       v-model.trim="remark2"
                       :placeholder="remark"
-
                     />
                   </div>
                   <div class="mt-20px flex-center">
@@ -435,9 +502,9 @@
             </span>
             <span
               v-if="pair"
-              v-tooltip="formatDate(pair?.created_at)"
+              v-tooltip.raw="pairTooltipContent"
               class="ml-5px hover:color-[--main-text] leading-12px font-400 mr-8px"
-              >
+            >
               {{ formatTimeFromNow(pair?.created_at, false, true) }}
               </span>
             <!-- <template v-if="pair && getTags(pair)?.signal_arr?.length > 0">
@@ -597,40 +664,12 @@
                       {{ devToken?.total_tokens ? ((devToken.total_migrated ?? 0) / devToken.total_tokens * 100).toFixed(2) : 0 }}%
                     </span>
                   </div>
-                  <span v-if="tokenStore.tokenInfoExtra?.dev_count" class="flex items-center justify-between clickable text-12px py-4px px-8px color-[--third-text] hover:bg-[--dialog-tab-active]" @click="handleViewDevTokens">
+                  <span class="flex items-center justify-between clickable text-12px py-4px px-8px color-[--third-text] hover:bg-[--dialog-tab-active]" @click="handleViewDevTokens">
                     <span>{{ $t('viewDevTokens') }}</span>
                   </span>
                 </div>
               </template>
             </el-popover>
-            <HolderRank
-              v-if="tagsRatio?.kol_count"
-              :tokenId="address + '-' + chain"
-              :type="31"
-              :ratio="Number(tagsRatio?.kol_ratio || 0)"
-            >
-            <div
-              class="minor color-text-2 tag-btn signal cursor-pointer mr-4px bg-btn text-10px lh-none"
-              :style="{ color: tagsRatio?.kol_count > 0 ? 'var(--yellow)' : 'var(--third-text1)' }"
-            >
-              <Icon class="iconfont icon-rug mr-2px vertical-middle text-10px" name="custom:kol2" />
-              <span>{{ formatNumber(tagsRatio?.kol_count || 0, 2) }}</span>
-            </div>
-            </HolderRank>
-            <HolderRank
-              v-if="tagsRatio?.smart_wallet_count"
-              :tokenId="address + '-' + chain"
-              :type="30"
-              :ratio="Number(tagsRatio?.smart_wallet_ratio || 0)"
-            >
-            <div
-              class="minor color-text-2 tag-btn signal cursor-pointer mr-4px bg-btn text-10px lh-none"
-              :style="{ color: tagsRatio?.smart_wallet_count > 0 ? 'var(--yellow)' : 'var(--third-text1)' }"
-            >
-              <Icon class="iconfont icon-rug mr-2px vertical-middle text-10px" name="custom:smart-plain" />
-              <span>{{ formatNumber(tagsRatio?.smart_wallet_count || 0, 2) }}</span>
-            </div>
-            </HolderRank>
           </div>
         </div>
       </div>
@@ -777,7 +816,7 @@
         >
       </div>
       <div class="item ml-24px">
-        <span class="border-b border-b-dashed" :class="isNew ? 'cursor-pointer' : ''" @click="openHoler">{{ $t('holders') }}</span>
+        <span>{{ $t('holders') }}</span>
         <span class="block mt-8px color-[--main-text1]">{{
           formatNumber(token?.holders || 0, { limit: 10 })
         }}</span>
@@ -820,7 +859,7 @@
               : formatNumber((token?.dev_balance_ratio_cur ?? 0) * 100, 2)
           }}%</span
         >
-      </div> -->
+      </div>
       <div class="item ml-24px cursor-pointer" @click="showCheck = !showCheck">
         <span class="flex-start">
           {{ $t('audit1') }}
@@ -931,7 +970,6 @@
 <script setup lang="ts">
 import BigNumber from 'bignumber.js'
 import Top50 from './top50.vue'
-import HolderRank from '@/pages/token/components/right/info/holderRank/index.vue'
 // import Run from './run.vue'
 import Check from './check.vue'
 import DeBox from './deBox.vue'
@@ -979,8 +1017,7 @@ const { evmAddress } = storeToRefs(useBotStore())
 const themeStore = useThemeStore()
 const { t } = useI18n()
 const route = useRoute()
-const { mode, dialogVisible_search, dialogSearchText, showMarket, clickHolderCount, popVisible, tagsRatio } = storeToRefs(useGlobalStore())
-
+const { mode, dialogVisible_search, dialogSearchText, showMarket, pumpBlackList } = storeToRefs(useGlobalStore())
 const editableGroup = shallowRef(false)
 const groupId = shallowRef(0)
 const selectedGroup = shallowRef(0)
@@ -1010,16 +1047,6 @@ const devToken = shallowRef<any>({total_tokens: 0, total_migrated: 0})
 const topEventBus = useEventBus(BusEventType.TOP_FAV_CHANGE)
 const topAddGroupEvent = useEventBus(BusEventType.TOP_ADD_GROUP)
 const devTokensEvent = useEventBus(BusEventType.DEV_TOKENS_TAB)
-const isNew = computed(() => {
-  const { chain } = getAddressAndChainFromId(id.value, 0)
-  return SupportFullDataChain.includes(chain)
-})
-function openHoler() {
-  clickHolderCount.value++
-  if (isNew.value) {
-    popVisible.value = true
-  }
-}
 function handleViewDevTokens() {
   devTokensEvent.emit()
   ElMessage.success(t('devTokensDisplayed'))
@@ -1089,7 +1116,6 @@ watch(
   }
 )
 
-
 onUnmounted(() => {
   topEventBus.off(handleViewDevTokens)
   favDialogEvent.off(handleFavDialogEvent)
@@ -1103,6 +1129,43 @@ function handleFavDialogEvent({ tokenId, type, groupId }: IFavDialogEventArgs) {
   }
   if (groupId && Number(groupId) === selectedGroup.value) {
     selectedGroup.value = 0
+  }
+}
+
+function addOrRemoveBlaclList(type: 'ca' | 'dev' | 'keyword'| 'twitter') {
+  const item = { token: token.value?.token, medias:medias.value}
+  console.log('item', item)
+  if (pumpBlackList.value?.length > 499) {
+    ElMessage.error(t('blacklistLimit'))
+    return
+  }
+  if (pumpBlackList.value) {
+    if (type == 'twitter') {
+      const twitter = item?.medias?.filter?.(i => i.icon === 'twitter')?.[0]
+      const twitterAccount = formatXUser(twitter?.url)
+      if (twitterAccount) {
+        const findIndex = pumpBlackList.value?.findIndex(
+        (i) => twitterAccount == i.address && i.type == type
+        )
+        if (findIndex !== -1) {
+          pumpBlackList.value.splice(findIndex, 1)
+        } else {
+          pumpBlackList.value.push({ address: twitterAccount, type: type })
+        }
+      }
+    } else {
+      const findIndex = pumpBlackList.value?.findIndex(
+        (i) => item.token == i.address && i.type == type
+      )
+      if (findIndex !== -1) {
+        pumpBlackList.value.splice(findIndex, 1)
+      } else {
+        pumpBlackList.value.push({ address: item.token, type: type })
+      }
+    }
+
+  } else {
+    pumpBlackList.value = [{ address: item.token, type: type }]
   }
 }
 
@@ -1121,15 +1184,22 @@ const {
 } = storeToRefs(useCheckStore())
 // const id = route.params?.id as string
 const id = computed(() => route.params.id as string)
-const address = computed(() => {
-  const { address } = getAddressAndChainFromId(id.value, 0)
-  return address
-})
+
 const token = computed(() => {
   return tokenStore.token
 })
 const pair = computed(() => {
   return tokenStore.pair
+})
+
+
+const pairTooltipContent = computed(() => {
+  const time = token?.value?.publish_at;
+  const migrate_time = globalStore?.migrated?.migrate_time
+  if(migrate_time){
+    return `${t('migratedToMarket')}: ${formatDate(migrate_time)} <br/>${t('createdAt')}: ${formatDate(token?.value?.publish_at * 1000)}`
+  }
+  return `${t('createdAt')}: ${formatDate(token?.value?.publish_at * 1000)}`
 })
 
 const price = computed(() => {
@@ -1597,6 +1667,24 @@ async function handleSearchTokenName() {
   display: flex;
   flex-direction: column;
 }
+.pump-item_item {
+  position: relative;
+  &:hover {
+    .black-container {
+      color: #959a9f;
+      visibility: visible;
+    }
+  }
+  .black-container {
+    position: absolute;
+    visibility: hidden;
+    left: -8px;
+    top: -4px;
+    color: var(--d-666-l-999);
+    z-index: 1;
+  }
+}
+
 @media screen and (max-width: 1080px) {
   .tokenName1{
     display: none;

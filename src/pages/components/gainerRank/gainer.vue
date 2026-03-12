@@ -1,5 +1,8 @@
+<script lang="tsx">
+export default { name: 'GainerRank' }
+</script>
 <script setup lang="tsx">
-import { useStorage } from '@vueuse/core'
+import { useStorage, useSessionStorage } from '@vueuse/core'
 import { getGainDefaultColumns } from './columnRender/gainColumnsService'
 import { getPriceChangeTopTokens, getTreasureList, type IGetTreasureConfig } from '~/api/market'
 import {
@@ -91,10 +94,17 @@ function inBlackList(row) {
 }
 
 const pageInfo = ref({
-  pageNO: 1,
+  pageNO: useSessionStorage('gainer-pageNO', 1).value,
   pageSize: 50,
   total: 0,
 })
+
+watch(
+  () => pageInfo.value.pageNO,
+  (val) => { useSessionStorage('gainer-pageNO', 1).value = val }
+)
+
+const tableRef = shallowRef()
 
 const loading = shallowRef(false)
 const columns = useStorage(CategoryTabsCacheKey.gainer, getGainDefaultColumns(t))
@@ -111,8 +121,8 @@ onMounted(() => {
 onActivated(() => {
   console.log('涨幅榜激活')
   isActive.value = true
-  // filterForm.value = {}
-  pageInfo.value.pageNO = 1
+  // 从 sessionStorage 读取最新页码（markets.vue 切换 tab 时已重置为1）
+  pageInfo.value.pageNO = useSessionStorage('gainer-pageNO', 1).value
 
   const cacheKey = getCacheKey()
   const cachedData = tableDataCache[cacheKey]
@@ -155,7 +165,7 @@ function getCacheKey() {
 const refreshId = ref('')
 
 watch(
-  () => [props.activeChain, localeStore.locale],
+  () => [props.activeChain, props.activeTab, localeStore.locale],
   () => {
     const cacheKey = getCacheKey()
     const cachedData = tableDataCache[cacheKey]
@@ -238,6 +248,7 @@ async function _getTreasureList(shouldLoading = true) {
 
     const processedData = (res.data || []).map(props.listMapFunction)
     listData.value = processedData
+    nextTick(() => tableRef.value?.scrollToTop(0))
 
     // 更新缓存
     tableDataCache[cacheKey] = {
@@ -456,6 +467,7 @@ const cellRenderer = computed(() => {
 <template>
   <div v-loading="loading" :style="`height:${height}`">
     <AveTable
+      ref="tableRef"
       row-key="pair_id"
       :data="filteredListData"
       :columns="visibleColumns"

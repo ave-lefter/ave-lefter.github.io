@@ -157,10 +157,10 @@
                     />
                   </div>
                   <div
-                      v-copy="row.token"
-                      class="color-[--third-text1] text-12px hover:color-[--main-text1]"
-                      :class="pumpSetting.Progress_isCircle == 'horizontal' ? 'mt-20px' : 'mt-10px'">
-                      {{row.token?.slice(0, 4) + '...' + row.token?.slice(-4)}}
+                    class="color-[--third-text1] text-12px hover:color-[--main-text1]"
+                    @click.stop="clickToken(row.token, row.chain)"
+                    :class="pumpSetting.Progress_isCircle == 'horizontal' ? 'mt-20px' : 'mt-10px'">
+                    {{row.token?.slice(0, 4) + '...' + row.token?.slice(-4)}}
                   </div>
                 </div>
                 <div class="flex flex-col self-stretch relative">
@@ -983,6 +983,23 @@ function tableRowClick(row: { target_token: string; chain: string }) {
     name: 'token-id',
     params: { id: row.target_token + '-' + row.chain },
   })
+}
+function clickToken(token: string, chain: string) {
+  const action = globalStore.audioSettings.wallet?.clickTokenAction ?? -1
+  if (action === -1) {
+    navigator.clipboard.writeText(token)
+    ElMessage.success(t('copySuccess'))
+    return
+  }
+  const url = router.resolve({
+    name: 'token-id',
+    params: { id: token + '-' + chain },
+  }).href
+  if (action === 1) {
+    window.open(url, '_blank')
+  } else {
+    router.push(url)
+  }
 }
 function addOrRemoveBlaclList(item: { token: string , medias: any[]}, type: 'ca' | 'dev' | 'keyword'| 'twitter') {
   if (pumpBlackList.value?.length > 499) {
