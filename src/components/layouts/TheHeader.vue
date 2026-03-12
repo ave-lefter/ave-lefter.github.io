@@ -57,7 +57,7 @@
       {{ $t('connectWallet') }}
     </el-button>
     <template v-else-if="walletStore.address">
-      <Positions/>
+      <!-- <Positions/> -->
       <ExWalletBtn />
     </template>
 
