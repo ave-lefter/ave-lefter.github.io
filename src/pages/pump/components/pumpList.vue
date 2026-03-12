@@ -78,7 +78,7 @@
                       />
                       <Icon
                         v-else
-                        name="custom:twitter-visible"
+                        name="custom:twitter-unvisible"
                         class="text-12px"
                         @click.stop="addOrRemoveBlaclList(row, 'twitter')"
                       />
