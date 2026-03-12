@@ -1,15 +1,15 @@
 <template>
-  <div>
+  <div class="w-walletManage">
     <div class="flex justify-between items-center gap-8px h-54px">
-      <el-select v-model="selectGroupId" style="--el-fill-color-blank:var(--dialog-list-hover)" :persistent="false" :mode="mode" @click.stop @change="(val) => filterGroup(val)">
+      <el-select v-model="selectGroupId" style="--el-fill-color-blank:var(--dialog-list-hover)" class="[&&]:[--el-text-color-regular:--d-E0E0E0-l-333]" :persistent="false" :mode="mode" @click.stop @change="(val) => filterGroup(val)">
         <el-option :key="0" :value="0" :label="$t('defaultGroup')" class="[&&]:h-20px [&&]:lh-20px [&&]:text-12px"/>
         <el-option v-for="item in addressGroups" :key="item.group_id" :label="item.name" :value="item.group_id"  class="[&&]:h-20px [&&]:lh-20px [&&]:text-12px"/>
       </el-select>
-      <el-button ref="addButtonRef" class="dialog-button"  style="height: 32px; padding: 8px 10px !important;font-size: 12px;">
+      <el-button ref="addButtonRef" class="dialog-button"  style="height: 32px; padding: 8px 10px !important;font-size: 12px; color:var(--d-E0E0E0-l-333)">
         <Icon name="ic:baseline-person-add-alt-1" class="text-12px  mr-5px"/>
         {{ $t('addWallet') }}
       </el-button>
-      <el-button class="dialog-button" style="height: 32px;padding: 8px 10px !important; margin-left: 0px;font-size: 12px;" @click.stop.prevent="showBatchAddressDetails=true" >
+      <el-button class="dialog-button" style="height: 32px;padding: 8px 10px !important; margin-left: 0px;font-size: 12px; color:var(--d-E0E0E0-l-333)" @click.stop.prevent="showBatchAddressDetails=true" >
         <Icon name="mingcute:new-folder-fill" class="text-12px mr-5px"/>
         {{ $t('bulkImport') }}
       </el-button>
@@ -48,14 +48,14 @@
             <UserAvatar :key="row.user_address+row.user_chain" class="mr-10px" :wallet_logo="row.wallet_logo" :address="row.user_address" :chain="row.user_chain" iconSize="24px" />
             <div>
               <!-- :formatAddress="(address) =>address?.slice(0, 4) + '...' + address?.slice(-4)" -->
-            <UserRemark :key="row.user_address+row.user_chain"  :remark="row.remark" :address="row.user_address" :chain="row.user_chain" addressClass="token-symbol ellipsis" addressStyle="max-width: 60px;font-size: 14px;color:var(--main-text)" iconEditColor="var(--third-text)" iconEditSize="10px" showAddressTitle/>
+            <UserRemark :key="row.user_address+row.user_chain"  :remark="row.remark" :address="row.user_address" :chain="row.user_chain" addressClass="token-symbol ellipsis" addressStyle="max-width: 60px;font-size: 14px;color:var(--d-E0E0E0-l-333)" iconEditColor="var(--third-text)" iconEditSize="10px" showAddressTitle/>
             </div>
          </template>
          <template #header-group>
             <span>{{ $t('group') }}</span>
           </template>
           <template #cell-group="{ row }">
-             <el-select v-model="row.group_id" size="small" :suffix-icon="SuffixIcon" :persistent="false" filterable popper-class="w-addrGroup" class="[&&]:[--el-text-color-regular:--main-text] [&&]:[--el-fill-color-blank:--dialog-list-hover]" @click.stop @change="(val) => getRowGroupChange(val, row)">
+             <el-select v-model="row.group_id" size="small" :suffix-icon="SuffixIcon" :persistent="false" filterable popper-class="w-addrGroup" class="[&&]:[--el-text-color-regular:--d-E0E0E0-l-333] [&&]:[--el-fill-color-blank:--dialog-list-hover]" @click.stop @change="(val) => getRowGroupChange(val, row)">
               <el-option :key="0" :value="0" :label="$t('defaultGroup')" filterable class="[&&]:h-20px [&&]:lh-20px [&&]:text-12px"/>
               <el-option v-for="item in addressGroups" :key="item.group_id" :label="item.name" :value="item.group_id" class="[&&]:h-20px [&&]:lh-20px [&&]:text-12px"/>
             </el-select>
@@ -414,7 +414,7 @@ const columns = computed(() => {
 
 <style scoped lang="scss">
 :deep() .el-table {
-  --el-table-text-color:var(--d-FFF-l-333);
+  --el-table-text-color:var(--d-E0E0E0-l-333);
   --el-table-header-bg-color:transparent;
 }
 </style>
