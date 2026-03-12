@@ -708,7 +708,7 @@
   "sniper_balance_ratio_cur_tips": "狙击者持仓占比：评估狙击地址的持仓情况",
   "graduated": "新外盘",
   "holders4": "持有人",
-  "smarterTxs": "聪明钱交易数",
+  "smarterTxs": "24h聪明钱交易数",
   "aiSummary": "AI叙事",
   "aiIsAnalyzing": "AI正在分析中...",
   "noAi": "暂无AI叙事内容",
@@ -2087,5 +2087,6 @@
   "commissionValue": "返佣金额",
   "totalSwapValue": "总交易额",
   "totalTax": "总税率",
-  "taxTip": "总税率：代币税率"
+  "taxTip": "总税率：代币税率",
+  "smarterAddress": "聪明钱包数"
 }

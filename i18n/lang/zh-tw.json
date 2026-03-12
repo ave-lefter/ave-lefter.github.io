@@ -710,7 +710,7 @@
   "graduated": "新外盤",
   "MC": "市值",
   "holders4": "持有人",
-  "smarterTxs": "聰明錢交易數",
+  "smarterTxs": "24h聰明錢交易數",
   "aiSummary": "AI敘事",
   "noAi": "暂无AI叙事内容",
   "aiIsAnalyzing": "AI分析進行中...",
@@ -2062,5 +2062,6 @@
   "commissionValue": "返佣金額",
   "totalSwapValue": "總交易額",
   "totalTax": "總稅率",
-  "taxTip": "總稅率：代幣稅率"
+  "taxTip": "總稅率：代幣稅率",
+  "smarterAddress": "聪明钱包数"
 }

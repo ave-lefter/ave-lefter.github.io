@@ -277,16 +277,16 @@ const limitData = {
   holder_max: 1000000,
   holders_top10_ratio_min: 0, //top10 持仓%
   holders_top10_ratio_max: 100,
-  lsnip: '',   //狙击人数
-  rsnip: '',
-  smart_money_tx_count_24h_min: 0, // 聪明钱交易数 （买入数+卖出数）
-  smart_money_tx_count_24h_max: 1000000,
+  lsniper_ratio: '',   //狙击%
+  rsniper_ratio: '',
+  smart_wallet_tag_count_min: 0, // 聪明钱钱包数
+  smart_wallet_tag_count_max: 1000000,
   lins: '',  //老鼠仓
   rins: '',
   lkol: '',  //KOL交易人数
   rkol: '',
-  lrug: '', //跑路概率
-  rrug: '',
+  // lrug: '', //跑路概率
+  // rrug: '',
 
   market_cap_min: 0, // 市值
   market_cap_max: 10000000,
@@ -300,7 +300,9 @@ const limitData = {
   lmks: '', //24h 钱包数
   rmks: '',
   sm_list: [],
-  has_sm: 0
+  has_sm: 0,
+  ltvl: '', //池子大小
+  rtvl: ''
 }
 const initForm = {
   q: '',
@@ -319,16 +321,16 @@ const initForm = {
   holder_max: '',
   holders_top10_ratio_min: '', //top10 持仓%
   holders_top10_ratio_max: '',
-  lsnip: '',   //狙击人数
-  rsnip: '',
-  smart_money_tx_count_24h_min: '', // 聪明钱交易数 （买入数+卖出数）
-  smart_money_tx_count_24h_max: '',
+  lsniper_ratio: '',   //狙击人数
+  rsniper_ratio: '',
+  smart_wallet_tag_count_min: '', // 聪明钱钱包数
+  smart_wallet_tag_count_max: '',
   lins: '',  //老鼠仓
   rins: '',
   lkol: '',  //KOL交易人数
   rkol: '',
-  lrug: '', //跑路概率
-  rrug: '',
+  // lrug: '', //跑路概率
+  // rrug: '',
 
   market_cap_min: '', // 市值
   market_cap_max: '',
@@ -341,10 +343,10 @@ const initForm = {
   lmks: '', //卖出交易数
   rmks: '',
   sm_list: [],
-  has_sm: 0
+  has_sm: 0,
 
-  // tvl_min: '',
-  // tvl_max: '',
+  ltvl: '', //池子大小
+  rtvl: '',
 
   // tx_24h_count_min: '',
   // tx_24h_count_max: '',
@@ -486,17 +488,17 @@ const columns = computed(() => {
     },
 
     {
-      label: t('snipers'),
-      prop: ['lsnip', 'rsnip'],
+      label: `${t('sniper2')}(%)`,
+      prop: ['lsniper_ratio', 'rsniper_ratio'],
       placeholder: [t('minor'), t('max1')],
       type: 'inputRange',
       tab: Tabs2Enum.indicator
     },
     {
-      label: t('smarterTxs'),
+      label: t('smarterAddress'),
       prop: [
-        'smart_money_tx_count_24h_min',
-        'smart_money_tx_count_24h_max'
+        'smart_wallet_tag_count_min',
+        'smart_wallet_tag_count_max'
       ],
       placeholder: [t('minor'), t('max1')],
       type: 'inputRange',
@@ -525,17 +527,17 @@ const columns = computed(() => {
       type: 'inputRange',
       tab: Tabs2Enum.indicator
     },
-    {
-      label: `${t('runPullRatio')}`,
-      prop: [
-        'lrug',
-        'rrug'
-      ],
-      placeholder: [t('minor'), t('max1')],
-      type: 'inputRange',
-      suffix: '%',
-      tab: Tabs2Enum.indicator
-    },
+    // {
+    //   label: `${t('runPullRatio')}`,
+    //   prop: [
+    //     'lrug',
+    //     'rrug'
+    //   ],
+    //   placeholder: [t('minor'), t('max1')],
+    //   type: 'inputRange',
+    //   suffix: '%',
+    //   tab: Tabs2Enum.indicator
+    // },
 
     {
       label: `${t('MC')}($)`,
@@ -610,7 +612,7 @@ const columns = computed(() => {
     },
     {
       label: `${t('liquidity')}($)`,
-      prop: ['tvl_min', 'tvl_max'],
+      prop: ['ltvl', 'rtvl'],
       placeholder: [t('minor'), t('max1')],
       type: 'inputRange',
       suffix: '$',
