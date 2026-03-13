@@ -27,7 +27,7 @@
       <el-table-column
         :label="'#' + $t('holder')"
         align="left"
-        :min-width="260"
+        :min-width="300"
         fixed="left"
       >
         <template #header>
@@ -99,13 +99,21 @@
         <template #default="{ row, $index }">
           <div class="flex items-baseline ">
             <div class="flex-start">
-              <span class="color-[--third-text] mr-10px">{{ $index +1 < 10? "0" : '' }}{{ $index + 1 }}</span>
+              <span class="color-[--third-text] w-24px inline-block">{{ $index +1 < 10? "0" : '' }}{{ $index + 1 }}</span>
               <Icon
                 :ref="(el: any) => $refs.buttonRefs[$index] = el" name="custom:attention"
                 :class="row.is_wallet_address_fav === 1 ? 'color-#F45469' : 'color-[--icon-color]'" class="h-16px w-16px clickable shrink-0 mt-4px" @click.stop.prevent="collect(row,$index)" />
             </div>
-            <div class="relative">
+            <div class="relative ml-2px">
               <div class="flex-start">
+                <UserAvatar
+                  :wallet_logo="row.wallet_logo"
+                  :chain="row.chain"
+                  :address="row.user_address"
+                  iconSize="18px"
+                  iconChainSize="10px"
+                  class="rounded-full"
+                />
                 <div
                   style="position: relative; padding: 0 4px 0; line-height: 1"
                 >
@@ -173,7 +181,7 @@
       <el-table-column
         :label="`${getChainInfo(addressAndChain?.chain)?.main_name} ${$t('bal')}`"
         align="right"
-        min-width="90"
+        min-width="80"
       >
         <template #default="{ row }">
           <span
