@@ -1480,5 +1480,9 @@
   "twitterTracker2": "소식",
   "onlyTitle": "제목만",
   "socialMediaTracker": "미디어 추적기",
-  "ViewFullText": "전문 보기"
+  "ViewFullText": "전문 보기",
+  "migratedToMarket": "시장으로 이전",
+  "createdAt": "생성일",
+  "openMonitorSuccess": "모니터링이 활성화되었습니다.",
+  "cancelMonitorSuccess": "모니터링이 비활성화되었습니다"
 }

@@ -344,7 +344,7 @@ function init() {
 
 <template>
   <div class="m-0 text-left w-full">
-    <div ref="lineChartRef" class="w-440px h-200px"/>
+    <div ref="lineChartRef" class="w-680px h-200px"/>
   </div>
 </template>
 

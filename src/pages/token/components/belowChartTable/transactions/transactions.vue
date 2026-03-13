@@ -915,7 +915,7 @@ const onKeyDown = useThrottleFn((e: KeyboardEvent) => {
     'PageDown': SCROLL_STEP2
   }
   delta = deltaObj?.[e.key]
-  _localScrollTop = Math.min(Math.max(0,maxHeight-SCROLL_STEP2),Math.max(0, _localScrollTop + delta)) 
+  _localScrollTop = Math.min(Math.max(0,maxHeight-SCROLL_STEP2),Math.max(0, _localScrollTop + delta))
   aveTableRef.value?.scrollToTop?.(_localScrollTop)
 }, 60, true, false)
 

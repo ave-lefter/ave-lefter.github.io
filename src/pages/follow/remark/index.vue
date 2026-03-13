@@ -8,7 +8,7 @@ import { getRemarksDetail } from '~/api/fav'
 // import { deleteAttention, updateWhaleRemark, addAttention, addAddressMonitor, favUsersPauseMonitor } from '~/api/attention'
 import { deleteAttention, updateWhaleRemark, addAttentionNew, addAddressMonitor, favUsersPauseMonitor } from '~/api/attention'
 const globalStore = useGlobalStore()
-const { updateNum3 } = storeToRefs(useFollowStore())
+const { updateNum1, updateNum2, updateNum3 } = storeToRefs(useFollowStore())
 const botStore = useBotStore()
 const walletStore = useWalletStore()
 const router = useRouter()
@@ -57,7 +57,7 @@ watch(() => walletStore.walletSignature[walletStore.address], (newValue) => {
   }
 })
 
-watch(() => updateNum3.value, () => {
+watch(() => updateNum2.value+updateNum3.value, () => {
   getList()
 })
 
@@ -91,8 +91,9 @@ const handleMonitor = async (row: any) => {
       user_address: addressValue.value,
       website: 1
     }).then(() => {
-      ElMessage.success(t('success'))
+      ElMessage.success(t('openMonitorSuccess'))
       getList()
+      updateNum1.value++
     }).catch((e) => {
       ElMessage.error(String(e))
     })
@@ -101,8 +102,9 @@ const handleMonitor = async (row: any) => {
       address: row.user_address,
       uid: row.id
     }).then(() => {
-      ElMessage.success(t('success'))
+      ElMessage.success(t('cancelMonitorSuccess'))
       getList()
+      updateNum1.value++
     })
   }
 }
@@ -384,15 +386,15 @@ v-copy="row?.user_address" name="bxs:copy" class="clickable text-[--third-text] 
             <div
               v-if="SupportMonitorChain.includes(row?.user_chain)"
               class="flex items-center mr-12px cursor-pointer" @click="handleMonitor(row)">
-              <Icon v-if="row?.is_monitored === 1" name="custom:monitor2-icon" class="text-12px mr-5px  mb--1px color-#999 group-hover:color-#3F80F7"/>
-              <Icon v-else name="custom:monitor-icon" class="text-15px mr-2px mb-1px color-[var(--d-CCC-l-666)] group-hover:color-#3F80F7"/>
+              <Icon v-if="row?.is_monitored === 1" name="custom:monitor2-icon" class="text-12px mr-2px  mb--1px color-#3F80F7"/>
+              <Icon v-else name="custom:monitor-icon" class="text-12px mr-2px mb-1px color-[var(--d-CCC-l-666)]"/>
               <span
                 class="overflow-hidden whitespace-nowrap max-w-0 group-hover:max-w-[100px] transition-all duration-500 ease-in-out color-[--secondary-text]">
                 {{ (row?.is_monitored === 1) ? t('pause') : t('enable') }}
               </span>
             </div>
             <div v-else class="flex items-center mr-12px color-[var(--d-666-l-CCC)] cursor-not-allowed">
-              <Icon name="custom:monitor-icon" class="text-15px mr-2px mb-1px" />
+              <Icon name="custom:monitor-icon" class="text-12px mr-2px mb-1px" />
             </div>
             <!-- 监控 -->
             <!-- <div class="flex items-center mr-12px cursor-pointer color-[#666] group-hover:color-[var(--d-F2F2F2-l-333)]"

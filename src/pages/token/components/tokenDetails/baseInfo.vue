@@ -5,18 +5,20 @@ import {
   getTokenStatistics,
   type GetTokenStatisticsResponse
 } from '~/api/token'
-import {filterLanguage} from '~/pages/token/components/kLine/utils'
+import { filterLanguage } from '~/pages/token/components/kLine/utils'
+import TradeDialog from '@/pages/copy-trade/components/tradeDialog.vue'
 import dayjs from 'dayjs'
 import {addAttention, deleteAttention,addAttention2} from '~/api/attention'
 import ExcludeError from './excludeError.vue'
 import {addSign} from '@/utils'
 import List from './list.vue'
 import BigNumber from 'bignumber.js'
-
+const tokenStore = useTokenStore()
 const tokenDetailStore = useTokenDetailsStore()
 const botStore = useBotStore()
 const walletStore = useWalletStore()
 const globalStore = useGlobalStore()
+const router = useRouter()
 const {t} = useI18n()
 const route = useRoute()
 const listQuery = shallowRef({
@@ -120,9 +122,29 @@ function _getTokenStatistics() {
           .dividedBy(new BigNumber(res?.history_max_balance_amount))
           .multipliedBy(100).toNumber(), 100)
         : 0
+      let unrealized_profit_ratio = 0
+      if (Number(res?.total_profit || 0) > 0) {
+        unrealized_profit_ratio = Number(res?.unrealized_profit || 0) / Number(res?.total_profit || 0) * 100
+      }
+      let balance_amount_ratio = 0
+      if (Number(res?.balance_amount || 0) > 0) {
+        balance_amount_ratio = Number(res?.balance_amount || 0) / Number(res?.total_purchase_amount || 0) * 100
+      }
+      let mcap_buy = 0
+      if (Number(res?.average_purchase_price_usd || 0) > 0) {
+        mcap_buy = new BigNumber(res.average_purchase_price_usd || 0)?.times(tokenStore?.circulation || 0)?.decimalPlaces(2)?.toNumber()
+      }
+      let mcap_sold = 0
+      if (Number(res?.average_sold_price_usd || 0) > 0) {
+        mcap_sold = new BigNumber(res.average_sold_price_usd || 0)?.times(tokenStore?.circulation || 0)?.decimalPlaces(2)?.toNumber()
+      }
       statistics.value = {
         ...(res || {}),
-        progress
+        progress,
+        unrealized_profit_ratio,
+        balance_amount_ratio,
+        mcap_buy,
+        mcap_sold
       }
     })
 }
@@ -254,6 +276,68 @@ const collect = async () => {
   })
 }
 
+const { activeCopyAddress, copyTradeVisible, form, copyOrder } = storeToRefs(useCopyTradeStore())
+const { getFollowingInfo, getFollowingAddress } = useCopyTradeStore()
+
+const id = computed(() => route.params.id as string)
+const chain = computed(() => {
+  // const { chain } = getAddressAndChainFromId(id.value, 0)
+    const { chain } = tokenDetailStore.tokenInfo!
+  return chain
+})
+
+const address = computed(() => {
+  // const { address } = getAddressAndChainFromId(id.value, 0)
+  const { address } = tokenDetailStore.tokenInfo!
+  return address
+})
+
+onMounted(() => {
+  if (!botStore.evmAddress && !walletStore.address) return
+    getFollowingInfo()
+    getFollowingAddress()
+})
+function judgeIsCopyTrade() {
+  const supportAddress = activeCopyAddress.value?.[chain.value] || []
+  return supportAddress?.some(i => i?.toLowerCase() === tokenDetailStore.user_address?.toLowerCase())
+}
+function getCopyTradeId() {
+  const order = copyOrder.value?.copyList?.find(i=> i?.followAddress?.toLowerCase() === tokenDetailStore.user_address?.toLowerCase() && i.chain == chain.value)
+  return order?.id || ''
+}
+
+function jumpCopyTrade() {
+  const id = getCopyTradeId()
+  const currentUser = botStore?.userInfo?.addresses?.find?.((el) => chain.value == el.chain)
+  if (id && currentUser?.address) {
+    const routeData = router.resolve({
+      name: 'copy-trade-wallet',
+      params: {
+        userAddress: tokenDetailStore.user_address,
+        chain: chain.value,
+      },
+      query: {
+        followAddress: tokenDetailStore.user_address,
+        creatorAddress: currentUser?.address,
+        id: id
+      }
+    })
+    window.open(routeData.href, '_blank')
+  } else {
+    const url =`https://t.me/AveSniperBot?start=fs-${chain.value}-${tokenDetailStore.user_address}`
+    window.open(url, '_blank')
+  }
+}
+function copyTrade() {
+  if (botStore.evmAddress) {
+    copyTradeVisible.value = true
+    form.value.followAddress = tokenDetailStore.user_address
+    form.value.chain = chain.value
+  } else {
+    const url =`https://t.me/AveSniperBot?start=fs-${chain.value}-${tokenDetailStore.user_address}`
+    window.open(url, '_blank')
+  }
+}
 </script>
 
 <template>
@@ -380,7 +464,7 @@ const collect = async () => {
       <div class="flex-1 flex flex-col">
         <span class="color-[--secondary-text] text-12px lh-16px mb-4px">{{ $t('total_profit') }}</span>
         <div
-          class="flex text-16px lh-24px items-center"
+          class="flex text-14px lh-20px items-center"
           :class="getColorClass(statistics.total_profit)"
         >
           <ExcludeError :model-value="statistics.total_profit">
@@ -402,20 +486,126 @@ const collect = async () => {
         </div>
       </div>
       <div class="flex-1 flex flex-col">
-        <span class="color-[--secondary-text] text-12px lh-16px mb-4px">{{ $t('walletTotalBalance') }}</span>
-        <div class="flex text-16px lh-24px items-center color-[--main-text]"
+        <span class="color-[--secondary-text] text-12px lh-16px mb-4px">{{ $t('unrealizedProfit') }}</span>
+        <div class="flex text-14px lh-20px items-center color-[--main-text]"
+        >
+          <ave-data-number :value="statistics?.unrealized_profit" :signVisible="true">
+            {{ formatNumber(Math.abs( Number(statistics?.unrealized_profit ?? 0)), 2) }}
+          </ave-data-number>
+
+            <!-- <ave-data-number v-if="statistics?.unrealized_profit_ratio" :value="statistics?.unrealized_profit_ratio" :signVisible="false">
+            ({{ formatNumber(Math.abs( Number(statistics?.unrealized_profit_ratio ?? 0)), 2) }}%)
+            </ave-data-number> -->
+            &nbsp;
+            <span
+              v-if="statistics?.unrealized_profit_ratio > 0"
+              class="text-[var(--up-color)]"
+            >
+              (+{{ formatNumber(Math.abs( Number(statistics?.unrealized_profit_ratio ?? 0)), 2) }}%)
+            </span>
+            <span
+              v-else-if="statistics?.unrealized_profit_ratio < 0"
+              class="text-[var(--down-color)]"
+            >
+              (-{{ formatNumber(Math.abs( Number(statistics?.unrealized_profit_ratio ?? 0)), 2) }}%)
+            </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex items-center mb-20px">
+      <div class="flex-1 flex flex-col">
+        <span class="color-[--secondary-text] text-12px lh-16px mb-4px">{{ $t('currentPosition') }}</span>
+        <div class="flex text-14px lh-20px items-center color-[--main-text]"
         >
           <ExcludeError
-            :model-value="statistics.balance_amount">
-            {{ formatNumber(statistics.balance_amount, 2) }}(${{
-              formatNumber(statistics.balance_usd, 2)
-            }})
+            :model-value="statistics.balance_usd">
+            ${{ formatNumber(statistics.balance_usd, 2) }}
+          </ExcludeError>
+        </div>
+      </div>
+
+      <div class="flex-1 flex flex-col">
+        <span class="color-[--secondary-text] text-12px lh-16px mb-4px">{{ $t('position1') }}%({{ formatNumber(statistics.balance_amount || 0, 2) }} / {{ formatNumber(statistics.total_purchase_amount || 0, 2) }})</span>
+        <div class="flex text-14px lh-20px items-center color-[--up-color]"
+        >
+          <span class="mr-8px">{{ formatNumber(statistics?.balance_amount_ratio || 0, 2) }}%</span>
+          <el-progress
+            :percentage="statistics?.balance_amount_ratio"
+            :stroke-width="4"
+            color="#1CC982"
+            :show-text="false"
+            style="width: 90px"
+          />
+        </div>
+      </div>
+    </div>
+
+    <div class="flex items-center mb-20px">
+      <!-- <div class="flex-1 flex flex-col">
+        <span class="color-[--secondary-text] text-12px lh-16px mb-4px">{{ $t('positionTime') }}</span>
+        <div class="flex text-14px lh-20px items-center color-[--main-text]"
+        >
+          <template v-if="Number(statistics?.balance_amount || 0) > 0">
+            <template v-if="statistics?.first_purchase_time > 0 ">
+              {{ formatTimeFromNow(statistics?.first_purchase_time || 0, false, true) }}
+            </template>
+            <span v-else class="color-[--third-text]">
+                --
+            </span>
+          </template>
+          <template v-else-if="statistics?.last_sold_time - statistics?.first_purchase_time">
+              {{ formatTime( Number(statistics?.last_sold_time - statistics?.first_purchase_time)) }}
+          </template>
+          <span class="color-[--third-text]">
+              --
+          </span>
+        </div>
+      </div> -->
+      <div class="flex-1 flex flex-col">
+        <span class="color-[--secondary-text] text-12px lh-16px mb-4px">{{ $t('totalBuy') }}</span>
+        <div class="flex text-14px lh-20px items-center color-[--third-text]"
+        >
+          <ExcludeError :model-value="statistics.total_purchase_usd">
+            <span class="color-#12B886">
+              ${{
+                formatNumber(statistics.total_purchase_usd, 2)
+              }}
+            </span>
+          </ExcludeError>
+          <span class="color-[--third-text]">/</span>
+          <ExcludeError :model-value="statistics.total_purchase">
+            <span class="color-[--third-text]">{{ formatNumber(statistics.total_purchase, 2) }} Txs</span>
+          </ExcludeError>
+        </div>
+        <ExcludeError :model-value="statistics.total_purchase_amount">
+          <span class="color-[--secondary-text] text-12px">{{ formatNumber(statistics.total_purchase_amount, 2) }}</span>
+        </ExcludeError>
+      </div>
+      <div class="flex-1 flex flex-col">
+        <span class="color-[--secondary-text] text-12px lh-16px mb-4px">{{ $t('averageMarketBuySell') }}</span>
+        <div
+          class="flex text-14px lh-20px items-center"
+          :class="getColorClass(statistics.total_profit)"
+        >
+          <ExcludeError :model-value="statistics.average_purchase_price_usd">
+            <span class="color-#12B886">
+              ${{ formatNumber(statistics.mcap_buy, {decimals: 2, l: 4, limit: 3}) }}
+            </span>
+          </ExcludeError>
+          <span class="color-[--secondary-text]">/</span>
+          <ExcludeError :model-value="statistics.average_sold_price_usd">
+            <span class="color-#F6465D">
+              ${{ formatNumber(statistics.mcap_sold, {decimals: 2, l: 4, limit: 3}) }}
+            </span>
           </ExcludeError>
         </div>
       </div>
     </div>
+
+
     <div class="flex items-center mb-20px">
-      <div class="flex-1 flex flex-col">
+      <!-- <div class="flex-1 flex flex-col">
         <span class="color-[--secondary-text] text-12px lh-16px mb-4px">{{ $t('wallet_detail_transfer_in_out') }}</span>
         <div class="flex text-16px lh-24px items-center color-[--secondary-text]"
         >
@@ -431,10 +621,10 @@ const collect = async () => {
             <span class="color-#F6465D">${{ formatNumber(statistics.total_transfer_out_usd, 2) }}</span>
           </ExcludeError>
         </div>
-      </div>
-      <div class="flex-1 flex flex-col">
-        <span class="color-[--secondary-text] text-12px lh-16px mb-4px">{{ $t('wallet_detail_total_buy_sell') }}</span>
-        <div class="flex text-16px lh-24px items-center color-[--secondary-text]"
+      </div> -->
+      <!-- <div class="flex-1 flex flex-col">
+        <span class="color-[--secondary-text] text-12px lh-16px mb-4px">{{ $t('totalBuy') }}</span>
+        <div class="flex text-14px lh-20px items-center color-[--third-text]"
         >
           <ExcludeError :model-value="statistics.total_purchase_usd">
             <span class="color-#12B886">
@@ -443,14 +633,38 @@ const collect = async () => {
               }}
             </span>
           </ExcludeError>
-          <span class="color-[--secondary-text]">/</span>
-          <ExcludeError :model-value="statistics.total_sold_usd">
-            <span class="color-#F6465D">${{ formatNumber(statistics.total_sold_usd, 2) }}</span>
+          <span class="color-[--third-text]">/</span>
+          <ExcludeError :model-value="statistics.total_purchase">
+            <span class="color-#12B886">{{ formatNumber(statistics.total_purchase, 2) }} Txs</span>
           </ExcludeError>
         </div>
+        <ExcludeError :model-value="statistics.total_purchase_amount">
+          <span class="color-[--secondary-text] text-12px">{{ formatNumber(statistics.total_purchase_amount, 2) }}</span>
+        </ExcludeError>
+      </div> -->
+
+      <div class="flex-1 flex flex-col">
+        <span class="color-[--secondary-text] text-12px lh-16px mb-4px">{{ $t('totalSell') }}</span>
+        <div class="flex text-14px lh-20px items-center color-[--third-text]"
+        >
+          <ExcludeError :model-value="statistics.total_sold_usd">
+            <span class="color-#F6465D">
+              ${{
+                formatNumber(statistics.total_sold_usd, 2)
+              }}
+            </span>
+          </ExcludeError>
+          <span class="color-[--third-text]">/</span>
+          <ExcludeError :model-value="statistics.total_sold">
+            <span class="color-[--third-text]">{{ formatNumber(statistics.total_sold, 2) }} Txs</span>
+          </ExcludeError>
+        </div>
+        <ExcludeError :model-value="statistics.total_sold_amount">
+          <span class="color-[--secondary-text] text-12px">{{ formatNumber(statistics.total_sold_amount, 2) }}</span>
+        </ExcludeError>
       </div>
     </div>
-    <div class="flex items-center mb-20px">
+    <!-- <div class="flex items-center mb-20px">
       <div class="flex-1 flex flex-col">
         <span class="color-[--secondary-text] text-12px lh-16px mb-4px">{{ $t('wallet_detail_buy_sell_avg') }}</span>
         <div
@@ -487,7 +701,24 @@ const collect = async () => {
           </ExcludeError>
         </div>
       </div>
-    </div>
+    </div> -->
+    <!-- <a href="" class="bg-[#3F80F7] rounded-8px p-15px w-full block  hover:opacity-80 mt-24px text-center text-14px mb-40px">{{ $t('copyCompleted') }}</a> -->
+
+    <a v-if="judgeIsCopyTrade()" href="" class="flex items-center justify-center bg-[#3F80F7] !color-white rounded-8px p-15px w-full block  hover:opacity-80 mt-24px text-center text-14px mb-40px" @click.stop.prevent="jumpCopyTrade">
+      <!-- <Icon  name="custom:wallet-fill" class="text-14px mr-4px" /> -->
+        {{ $t('copiedTrade') }}
+    </a>
+    <a
+      v-else
+      class="flex items-center justify-center bg-[#3F80F7] rounded-8px p-15px w-full block !color-white hover:opacity-80 mt-24px text-center text-14px mb-40px"
+      href=""
+      target="_blank"
+      @click.stop.prevent="copyTrade"
+      >
+      <!-- <Icon  v-if="botStore.evmAddress && SupportCopyTradeChain?.includes?.(chain)"  name="custom:wallet-fill" class="text-14px mr-4px" />
+      <img class="mr-4px" v-else src="@/assets/images/tg1.png" alt="" :width="14"> -->
+      {{ t('copyCompleted') }}
+    </a>
     <div
       v-infinite-scroll="_getTokenDetailsList"
       :infinite-scroll-disabled="listStatus.loading || listStatus.finished || listStatus.error"
@@ -509,6 +740,8 @@ const collect = async () => {
         {{ $t('loading') }}
       </div>
     </div>
+    <!-- 编辑 -->
+    <TradeDialog v-model="copyTradeVisible" />
   </div>
 </template>
 

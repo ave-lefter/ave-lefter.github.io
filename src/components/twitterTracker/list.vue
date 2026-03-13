@@ -17,7 +17,7 @@
       <span class="color-[--third-text] text-12px mb-20px mt-4px">{{ t('emptyNoData') }}</span>
     </AveEmpty>
   </div>
-  <div v-else ref="parentRef" class="overflow-y-auto scrollbar-hide" style="height:calc(100% - 120px)" @mouseenter="emits('stop',true)" @mouseleave="emits('stop',false)">
+  <div v-else ref="parentRef" class="overflow-y-auto scrollbar-hide" style="height:calc(100% - 75px)" @mouseenter="emits('stop',true)" @mouseleave="emits('stop',false)">
     <div :style="{
       height: `${totalSize}px`,
       width: '100%',
