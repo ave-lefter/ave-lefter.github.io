@@ -2088,6 +2088,8 @@
   "commissionStatistics": "返佣统计",
   "commissionValue": "返佣金额",
   "totalSwapValue": "总交易额",
+  "positionTime": "持仓时长",
+  "averageMarketBuySell": "平均市值买卖",
   "openMonitorSuccess": "开启监控成功",
   "cancelMonitorSuccess": "取消监控成功",
   "totalTax": "总税率",

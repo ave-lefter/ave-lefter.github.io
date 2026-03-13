@@ -2086,6 +2086,8 @@
   "commissionStatistics": "Commission Statistics",
   "commissionValue": "Commission Value",
   "totalSwapValue": "Total Volume",
+  "positionTime": "Position Time",
+  "averageMarketBuySell": "Average market Buy/Sell",
   "totalTax": "Total tax",
   "taxTip": "Total tax rate: Token tax rate",
   "openMonitorSuccess": "Monitoring successfully enabled",

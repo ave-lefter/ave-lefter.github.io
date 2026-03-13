@@ -2063,6 +2063,8 @@
   "commissionStatistics": "返傭統計",
   "commissionValue": "返佣金額",
   "totalSwapValue": "總交易額",
+  "positionTime": "持倉時長",
+  "averageMarketBuySell": "平均市值買賣",
   "openMonitorSuccess": "開啟監控成功",
   "cancelMonitorSuccess": "取消監控成功",
   "totalTax": "總稅率",
