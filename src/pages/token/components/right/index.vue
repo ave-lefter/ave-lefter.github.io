@@ -41,7 +41,7 @@
             <Pairs @openFilterModal="openFilterModal" />
           </div>
           <Info :tagsRatio="tagsRatio" @getTagsRatio="_getTagsRatio"/>
-          <!-- <SimilarPic :tokens="similarpic" /> -->
+          <SimilarPic :tokens="similarpic" />
           <SimilarTokens :tokens="similarTokenList" />
           <Overview class="px-15px pb-10px pr-0 bg-[--secondary-bg]" />
           <div class="bg-[--secondary-bg] flex-1" />
@@ -132,7 +132,7 @@ watch(
   () => {
     if (route.params.id) {
       _getTagsRatio()
-      // _getSimilarpic()
+      _getSimilarpic()
       _getSimilarToken()
     }
   }
@@ -149,7 +149,7 @@ watch(
 )
 onMounted(() => {
   _getTagsRatio()
-  // _getSimilarpic()
+  _getSimilarpic()
   _getSimilarToken()
 })
 async function _getTagsRatio(isTrue?:boolean) {

@@ -19,7 +19,7 @@ import {
 import {formatDate, formatTimeFromNow, getAddressAndChainFromId, getChainInfo, uuid} from '~/utils'
 
 import {useThrottleFn} from '@vueuse/core'
-
+// import { useStorage } from '@vueuse/core'
 import IconUnknown from '@/assets/images/icon-unknown.png'
 import type {AveTable} from '#components'
 import type { SimpleWSTx } from '../../kLine/types'
@@ -171,8 +171,8 @@ const footText = computed(() => {
 
 function loadMore(remainDistance:number){
   console.log('loadMore remainDistance', remainDistance, listStatus.value)
-  showFooter.value=remainDistance <= 20
-  if ((remainDistance <= 20) && !(listStatus.value.loadingTxs || listStatus.value.finished)) {
+  showFooter.value=remainDistance <= 50
+  if ((remainDistance <= 50) && !(listStatus.value.loadingTxs || listStatus.value.finished)) {
     _getTokenTxs()
   }
 }
@@ -238,7 +238,7 @@ const tableFilterVisible = ref({
 const makerTooltip = ref()
 const markerTooltipVisible = shallowRef(false)
 const currentRow = shallowRef<IGetSimpleTxsResponse & { senderProfile: Profile, maker_bal?: number }>({} as any)
-const isKeyScrolling = shallowRef(false)
+// const isKeyScrolling = shallowRef(false)
 let keyScrollTimer: ReturnType<typeof setTimeout> | null = null
 
 const isPausedTxs = computed(() => {
@@ -246,7 +246,7 @@ const isPausedTxs = computed(() => {
     || tokenDetailSStore.drawerVisible
     || markerTooltipVisible.value
     || (sortConditions.value.sort_dir === 'asc')
-    || isKeyScrolling.value
+    // || isKeyScrolling.value
 })
 
 const addressAndChain = computed(() => {
@@ -884,25 +884,38 @@ function goBrowser(row: IGetSimpleTxsResponse) {
 }
 
 const tabsContainer = ref<HTMLElement | null>(null)
+// KLine 高度监听
 
-const SCROLL_STEP = 80
+const SCROLL_STEP = 50
+
 let _localScrollTop = 0
 
 const onKeyDown = useThrottleFn((e: KeyboardEvent) => {
-  if (e.key !== 'ArrowUp' && e.key !== 'ArrowDown') return
+  const validKeys = ['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown']
+  //  'PageDown', 'PageUp','ArrowLeft', 'ArrowRight'
+  if (!validKeys.includes(e.key)) return
   if (!isHoverTable.value) return
   e.preventDefault()
+  console.log('keydown', txsContainer.value)
+  const maxHeight = filterTableList.value.length * 50
+  const SCROLL_STEP2 = txsContainer.value?.offsetHeight?txsContainer.value?.offsetHeight - 98 : 0
+  // isKeyScrolling.value = true
+  // if (keyScrollTimer) clearTimeout(keyScrollTimer)
+  // keyScrollTimer = setTimeout(() => {
+  //   isKeyScrolling.value = false
+  //   if (wsPairCache.value.length) updatePairTxs()
+  //   if (wsLiqCache.value.length) updateLiqList()
+  // }, 300)
 
-  isKeyScrolling.value = true
-  if (keyScrollTimer) clearTimeout(keyScrollTimer)
-  keyScrollTimer = setTimeout(() => {
-    isKeyScrolling.value = false
-    if (wsPairCache.value.length) updatePairTxs()
-    if (wsLiqCache.value.length) updateLiqList()
-  }, 300)
-
-  const delta = e.key === 'ArrowDown' ? SCROLL_STEP : -SCROLL_STEP
-  _localScrollTop = Math.max(0, _localScrollTop + delta)
+  let delta = 0
+  const deltaObj={
+    'ArrowUp': -SCROLL_STEP,
+    'ArrowDown': SCROLL_STEP,
+    'PageUp': -SCROLL_STEP2,
+    'PageDown': SCROLL_STEP2
+  }
+  delta = deltaObj?.[e.key]
+  _localScrollTop = Math.min(Math.max(0,maxHeight-SCROLL_STEP2),Math.max(0, _localScrollTop + delta))
   aveTableRef.value?.scrollToTop?.(_localScrollTop)
 }, 60, true, false)
 
@@ -1103,6 +1116,8 @@ onUnmounted(() => {
       </template>
     </template>
     <!-- tableLoading:{{tableLoading}} -->
+     <!-- scrollTop:{{ _localScrollTop }}
+     scrollTop:{{ _localScrollTop }} -->
     <div
       v-loading="tableLoading" class="text-12px"
       element-loading-background="transparent">

@@ -1,5 +1,8 @@
+<script lang="tsx">
+export default { name: 'HotRank' }
+</script>
 <script setup lang="tsx">
-import { useStorage } from '@vueuse/core'
+import { useStorage, useSessionStorage } from '@vueuse/core'
 import { getHotDefaultColumns } from './columnRender/hotColumusService'
 import { getTreasureList, klinePreviews, type IGetTreasureConfig } from '~/api/market'
 import {
@@ -95,10 +98,14 @@ function inBlackList(row) {
   )
 }
 const pageInfo = ref({
-  pageNO: 1,
+  pageNO: useSessionStorage('hot-pageNO', 1).value,
   pageSize: 50,
   total: 0,
 })
+watch(
+  () => pageInfo.value.pageNO,
+  (val) => { useSessionStorage('hot-pageNO', 1).value = val }
+)
 const loading = shallowRef(false)
 const columns = useStorage(CategoryTabsCacheKey.hot, getHotDefaultColumns(t))
 
@@ -131,6 +138,8 @@ onUnmounted(() => {
 onActivated(() => {
   console.log('热搜榜激活')
   isActive.value = true
+  // 从 sessionStorage 读取最新页码（markets.vue 切换 tab 时已重置为1）
+  pageInfo.value.pageNO = useSessionStorage('hot-pageNO', 1).value
   resetColumns(false)
   // 延迟重新获取数据，避免快速切换时的冲突
   setTimeout(() => {
@@ -176,7 +185,7 @@ onDeactivated(() => {
 // })
 
 watch(
-  () => [props.activeChain, localeStore.locale],
+  () => [props.activeChain, props.activeTab, localeStore.locale],
   () => {
     pageInfo.value.pageNO = 1
     _getTreasureList()

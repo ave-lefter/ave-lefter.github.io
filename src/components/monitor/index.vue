@@ -115,7 +115,6 @@ class="w-monitor bg-[--secondary-bg] w-100% h-100% pl-12px pr-6px relative overf
                   :quickBuyValue="quickBuyValue"
                   :row="{...row,...{target_token:row?.target_address,token0_address:row?.from_address,token1_address:row?.to_address,symbol:row?._target_Token?.symbol}}"
                   classNames="min-w-70px h-24px! w-quickSwap"
-                  mainNameVisible
                 />
               </template>
             </AveTable>
@@ -172,7 +171,6 @@ class="w-monitor bg-[--secondary-bg] w-100% h-100% pl-12px pr-6px relative overf
                         :quickBuyValue="quickBuyValue"
                         :row="{...row,...{target_token:row?.target_address,token0_address:row?.from_address,token1_address:row?.to_address,symbol:row?._target_Token?.symbol}}"
                         classNames="min-w-70px h-24px!  hidden! group-hover:block! w-quickSwap"
-                        mainNameVisible
                       />
                       <div
                           v-tooltip="formatDate(row?.created_at || row?.time)"
@@ -287,7 +285,7 @@ class="w-monitor bg-[--secondary-bg] w-100% h-100% pl-12px pr-6px relative overf
                 /> -->
               <pro-tag size="small" class="cursor-pointer w-55px" @click="toggleMc=!toggleMc">{{ !toggleMc?'U/Pri':'C/MC' }}<Icon name="lsicon:switch-filled" class="ml-4px text-12px"/></pro-tag>
             </template>
-            <el-button v-if="(activeName===0) && botStore.evmAddress" :ref="(ref)=>addButtonRef=ref" size="small" style="height: 20px;" class="dialog-button"  :dark="isDark" >
+            <el-button v-if="(activeName===0) && botStore.evmAddress" :ref="(ref)=>addButtonRef=ref" size="small" style="height: 20px;color:var(--d-E0E0E0-l-333)" class="dialog-button"  :dark="isDark" >
               <Icon name="ic:baseline-person-add-alt-1" class="text-12px  mr-5px"/>
               {{ $t('addWallet') }}
             </el-button>
@@ -700,7 +698,7 @@ function jumpToken({ e,rowData }: { e: Event; rowData: any }) {
 .m-tabs{
   :deep() .el-tabs__header{
     --el-border-color-light:var(--dialog-list-hover);
-    --el-color-primary:var(--main-text);
+    --el-color-primary:var(--d-E0E0E0-l-333);
     --el-text-color-primary:var(--third-text);
   }
   --el-tabs-header-height:44px;
@@ -709,7 +707,7 @@ function jumpToken({ e,rowData }: { e: Event; rowData: any }) {
     &:hover{
       color:var(--third-text);
       &.is-active{
-        color:var(--main-text);
+        color:var(--d-E0E0E0-l-333);
       }
     }
     &.is-disabled{

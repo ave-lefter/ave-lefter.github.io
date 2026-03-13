@@ -40,7 +40,7 @@
             </div>
         </div>
         <div class="my-16px h-1px bg-[--dialog-divider]" />
-        <div ref="parent" class="overflow-y-auto scrollbar-hide" style="height:calc(100% - 120px)">
+        <div ref="parent" class="overflow-y-auto scrollbar-hide" style="height:calc(100% - 75px)">
             <div :style="{
                 height: `${totalSize}px`,
                 width: '100%',

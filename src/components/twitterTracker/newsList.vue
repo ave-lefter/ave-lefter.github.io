@@ -2,7 +2,7 @@
   <AveEmpty v-if="isEmpty" class="pt-40px">
     <span class="color-[--third-text] text-12px mb-20px mt-4px">{{ t('emptyNoData') }}</span>
   </AveEmpty>
-  <div v-else ref="parentRef" class="overflow-y-auto scrollbar-hide" style="height:calc(100% - 120px)" @mouseenter="emits('stop',true)" @mouseleave="emits('stop',false)">
+  <div v-else ref="parentRef" class="overflow-y-auto scrollbar-hide" style="height:calc(100% - 64px)" @mouseenter="emits('stop',true)" @mouseleave="emits('stop',false)">
     <div :style="{
           height: `${totalSize}px`,
           width: '100%',
