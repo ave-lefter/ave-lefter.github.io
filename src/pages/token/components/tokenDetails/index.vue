@@ -159,7 +159,7 @@ async function _getTokenDetailMarks(type: string) {
     v-model="visible"
     append-to-body
     :with-header="false"
-    size="480"
+    size="720"
     destroy-on-close
     style="--el-drawer-bg-color:transparent"
   >
@@ -167,7 +167,7 @@ async function _getTokenDetailMarks(type: string) {
       class="absolute left-0 right-0 top-0 bottom-0 z-3012 bg-[--dialog-bg] rounded-tl-10px rounded-bl-10px flex flex-col"
     >
       <div
-        class="flex-1 max-w-480px overflow-y-auto overflow-x-hidden"
+        class="flex-1 max-w-720px overflow-y-auto overflow-x-hidden"
       >
         <div class="py-24px px-20px min-h-full">
           <div class="justify-between flex">

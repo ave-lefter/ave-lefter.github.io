@@ -139,11 +139,11 @@ async function _getSimilarpic() {
 }
 
 _getSimilarToken()
-// _getSimilarpic()
+_getSimilarpic()
 watch(() => props.row, () => {
   tokens.value = []
   _getSimilarToken()
-  // _getSimilarpic()
+  _getSimilarpic()
 })
 </script>
 

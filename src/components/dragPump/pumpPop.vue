@@ -444,11 +444,11 @@ function getFilterData(list, conditions) {
     if (conditions?.tx_24h_count_max) {
       pass = pass && i.tx_24h_count <= Number(conditions.tx_24h_count_max)
     }
-    if (conditions?.smart_money_tx_count_24h_min) {
-      pass = pass && ((i.smart_money_sell_count_24h || 0) + (i?.smart_money_buy_count || 0)) >= Number(conditions.smart_money_tx_count_24h_min)
+    if (conditions?.smart_wallet_tag_count_min) {
+      pass = pass && Number(i.smart_wallet_tag_count) >= Number(conditions.smart_wallet_tag_count_min)
     }
-    if (conditions?.smart_money_tx_count_24h_max) {
-      pass = pass && ((i.smart_money_sell_count_24h || 0) + (i?.smart_money_buy_count || 0)) <= Number(conditions.smart_money_tx_count_24h_max)
+    if (conditions?.smart_wallet_tag_count_max) {
+      pass = pass && Number(i.smart_wallet_tag_count) <= Number(conditions.smart_wallet_tag_count_max)
     }
 
     return pass

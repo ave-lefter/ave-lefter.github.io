@@ -1738,11 +1738,17 @@ function getFilterData(list: PumpObj[], conditions: any) {
     if (conditions?.holders_top10_ratio_max) {
       pass = pass && i.holders_top10_ratio <= Number(conditions.holders_top10_ratio_max)
     }
-    if (conditions?.tvl_min) {
-      pass = pass && i.tvl >= Number(conditions.tvl_min)
+    if (conditions?.ltvl) {
+      pass = pass && i.tvl >= Number(conditions.ltvl)
     }
-    if (conditions?.tvl_max) {
-      pass = pass && i.tvl <= Number(conditions.tvl_max)
+    if (conditions?.rtvl) {
+      pass = pass && i.tvl <= Number(conditions.rtvl)
+    }
+    if (conditions?.lbtx) {
+      pass = pass && i.buys_tx_24h_count >= Number(conditions.lbtx)
+    }
+    if (conditions?.rbtx) {
+      pass = pass && i.buys_tx_24h_count <= Number(conditions.rbtx)
     }
     if (conditions?.platforms) {
       pass = pass && (
@@ -1772,17 +1778,17 @@ function getFilterData(list: PumpObj[], conditions: any) {
     if (conditions?.tx_24h_count_max) {
       pass = pass && i.tx_24h_count <= Number(conditions.tx_24h_count_max)
     }
-    if (conditions?.smart_money_tx_count_24h_min) {
-      pass = pass && ((i.smart_money_sell_count_24h || 0) + (i?.smart_money_buy_count || 0)) >= Number(conditions.smart_money_tx_count_24h_min)
+    if (conditions?.smart_wallet_tag_count_min) {
+      pass = pass && Number(i.smart_wallet_tag_count) >= Number(conditions.smart_wallet_tag_count_min)
     }
-    if (conditions?.smart_money_tx_count_24h_max) {
-      pass = pass && ((i.smart_money_sell_count_24h || 0) + (i?.smart_money_buy_count || 0)) <= Number(conditions.smart_money_tx_count_24h_max)
+    if (conditions?.smart_wallet_tag_count_max) {
+      pass = pass && Number(i.smart_wallet_tag_count) <= Number(conditions.smart_wallet_tag_count_max)
     }
-    if(conditions?.lsnip) {
-      pass = pass && i.sniper_balance_ratio_cur >= Number(conditions.lsnip)
+    if(conditions?.lsniper_ratio) {
+      pass = pass && i.sniper_balance_ratio_cur >= Number(conditions.lsniper_ratio)
     }
-    if(conditions?.rsnip) {
-      pass = pass && i.sniper_balance_ratio_cur <= Number(conditions.rsnip)
+    if(conditions?.rsniper_ratio) {
+      pass = pass && i.sniper_balance_ratio_cur <= Number(conditions.rsniper_ratio)
     }
     if(conditions?.lins) {
       pass = pass && i.insider_balance_ratio_cur >= Number(conditions.lins)
@@ -1795,6 +1801,18 @@ function getFilterData(list: PumpObj[], conditions: any) {
     }
     if(conditions?.has_sm){
       pass = pass && i.medias?.length > 0
+    }
+    if(conditions?.lstx) {
+      pass = pass && i.sells_tx_24h_count >= Number(conditions.lstx)
+    }
+    if(conditions?.rstx) {
+      pass = pass && i.sells_tx_24h_count <= Number(conditions.rstx)
+    }
+    if(conditions?.lmks) {
+      pass = pass && i.makers_24h >= Number(conditions.lmks)
+    }
+    if(conditions?.rmks) {
+      pass = pass && i.makers_24h <= Number(conditions.rmks)
     }
     return pass
   })

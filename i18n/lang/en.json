@@ -704,7 +704,7 @@
   "sniper_balance_ratio_cur_tips": "Sniper Holding Ratio: Assess the holdings of sniper addresses",
   "graduated": "Graduated",
   "holders4": "Holder",
-  "smarterTxs": "Smarter Txs",
+  "smarterTxs": "24h smarter Txs",
   "aiSummary": "AI Summary",
   "aiIsAnalyzing": "AI is analyzing...",
   "noAi": "No AI Summary",
@@ -2086,8 +2086,11 @@
   "commissionStatistics": "Commission Statistics",
   "commissionValue": "Commission Value",
   "totalSwapValue": "Total Volume",
+  "positionTime": "Position Time",
+  "averageMarketBuySell": "Average market Buy/Sell",
   "totalTax": "Total tax",
   "taxTip": "Total tax rate: Token tax rate",
+  "smarterAddress": "Smarter Address",
   "openMonitorSuccess": "Monitoring successfully enabled",
   "cancelMonitorSuccess": "Monitoring successfully disabled"
 }

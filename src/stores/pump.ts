@@ -99,7 +99,7 @@ export const usePumpStore = defineStore('pumpStore', () => {
     holders_top10_ratio_max: '',
     lsnip: '', //狙击人数
     rsnip: '',
-    smart_money_tx_count_24h_min: '', // 聪明钱交易数 （买入数+卖出数）
+    smart_money_tx_count_24h_min: '', // 聪明钱钱包数
     smart_money_tx_count_24h_max: '',
     lins: '', //老鼠仓
     rins: '',
@@ -176,7 +176,7 @@ export const usePumpStore = defineStore('pumpStore', () => {
     ['pump', 'moonshot', 'raydium', 'jupstudio', 'moon_new', 'cookingcity', 'bonk', 'bags']
   )
   const pumpV3: RemovableRef<Record<ChainKey, pumpData>> = useStorage(
-    'pumpV15',
+    'pumpV18',
     {
       solana: {
         platforms: [],
@@ -271,7 +271,7 @@ export const usePumpStore = defineStore('pumpStore', () => {
     },
     localStorage
   )
-  
+
   const activeChain = useStorage<ChainKey>(
     'pump_activeChain',
     'bsc',

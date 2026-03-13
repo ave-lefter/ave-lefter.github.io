@@ -848,8 +848,8 @@ export function usePumpTableDataFetching(key = '') {
       holders_top10_ratio_max: '',
       lsnip: '', //狙击人数
       rsnip: '',
-      smart_money_tx_count_24h_min: '', // 聪明钱交易数 （买入数+卖出数）
-      smart_money_tx_count_24h_max: '',
+      smart_wallet_tag_count_min: '', // 聪明钱交易数 （买入数+卖出数）
+      smart_wallet_tag_count_max: '',
       lins: '', //老鼠仓
       rins: '',
       lkol: '', //KOL交易人数
