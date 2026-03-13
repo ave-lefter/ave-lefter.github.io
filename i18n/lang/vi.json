@@ -872,6 +872,8 @@
   "onlyTitle": "Chỉ tiêu đề",
   "socialMediaTracker": "Trình theo dõi phương tiện",
   "ViewFullText": "Xem toàn văn",
+  "migratedToMarket": "Đã chuyển sang thị trường",
+  "createdAt": "Tạo lúc",
   "openMonitorSuccess": "Đã bật giám sát thành công",
   "cancelMonitorSuccess": "Đã vô hiệu hóa giám sát thành công"
 }

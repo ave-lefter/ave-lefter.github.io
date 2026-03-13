@@ -88,13 +88,13 @@
           </span>
           <span
             v-if="medias?.filter?.(i => i.icon === 'twitter')?.length > 0 && medias?.filter?.(i => i.icon === 'twitter')?.[0] && formatXUser(medias?.filter?.(i => i.icon === 'twitter')?.[0]?.url)"
-            v-tooltip="pumpBlackList?.findIndex(i => i.address == token?.token && i.type == 'twitter') !== -1 ? $t('cancel') + $t('BlackListTwitter') : $t('BlackListTwitter')"
+            v-tooltip="pumpBlackList?.findIndex(i => i.address == formatXUser(medias?.filter?.(m => m.icon === 'twitter')?.[0]?.url) && i.type == 'twitter') !== -1 ? $t('cancel') + $t('BlackListTwitter') : $t('BlackListTwitter')"
             class="bg-[--d-000-l-FFF] cursor-pointer px-2px py-2px color-[--third-text1] block rounded-2px mt-2px hover:color-[--secondary-text] w-14px h-14px flex items-center justify-center"
           >
             <Icon
               v-if="
                 pumpBlackList?.findIndex(
-                  (i) => i.address == token?.token && i.type == 'twitter'
+                  (i) => i.address == formatXUser(medias?.filter?.(m => m.icon === 'twitter')?.[0]?.url) && i.type == 'twitter'
                 ) !== -1
               "
               name="custom:twitter-visible"
@@ -103,7 +103,7 @@
             />
             <Icon
               v-else
-              name="custom:twitter-visible"
+              name="custom:twitter-unvisible"
               class="text-12px text-[--third-text]"
               @click.stop="addOrRemoveBlaclList('twitter')"
             />
@@ -1194,12 +1194,12 @@ const pair = computed(() => {
 
 
 const pairTooltipContent = computed(() => {
-  // const time = token?.value?.publish_at;
-  // const migrate_time = globalStore?.migrated?.migrate_time
-  // if(migrate_time){
-  //   return `${t('migratedToMarket')}: ${formatDate(migrate_time)} <br/>${t('createdAt')}: ${formatDate(token?.value?.publish_at * 1000)}`
-  // }
-  return `${formatDate(token?.value?.publish_at * 1000)}`
+  const publish_at = token?.value?.publish_at * 1000
+  const migrate_time = globalStore?.migrated?.migrate_time
+  if(migrate_time){
+    return `${t('migratedToMarket')}: ${formatDate(migrate_time)} <br/>${t('createdAt')}: ${formatDate(publish_at)}`
+  }
+  return `${t('createdAt')}: ${formatDate(publish_at)}`
 })
 
 const price = computed(() => {

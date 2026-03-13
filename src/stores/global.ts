@@ -303,6 +303,13 @@ export const useGlobalStore = defineStore('global', () => {
   const showImport = shallowRef(false)
   const showBotRecord = shallowRef(false)
 
+  const migrated = ref( null as null | {
+    migrate_time: number
+    migrate_uprice: string
+    showMarket: boolean
+    mcap: number
+  })
+
   const tagsRatio = ref<{
     address_binding_ratio: number
     bundle_ratio: number
@@ -452,6 +459,7 @@ export const useGlobalStore = defineStore('global', () => {
     zone,
     zoneList,
     showMarket,
+    migrated,
     clickHolderCount,
     popVisible,
     tagsRatio,

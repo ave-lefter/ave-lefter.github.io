@@ -231,7 +231,7 @@ const route = useRoute()
 const walletStore = useWalletStore()
 const scrollTop = ref(0)
 const wsStore = useWSStore()
-const { showMarket } = storeToRefs(useGlobalStore())
+const { showMarket, migrated } = storeToRefs(useGlobalStore())
 const totalHolders = computed(() => [
   { id: 'trade', name: t('mine') },
   {
@@ -300,12 +300,12 @@ const dialogVisible_remind = ref(false)
 //   year: 50
 // })
 
-const migrated = ref( null as null | {
-  migrate_time: number
-  migrate_uprice: string
-  showMarket: boolean
-  mcap: number
-})
+// const migrated = ref( null as null | {
+//   migrate_time: number
+//   migrate_uprice: string
+//   showMarket: boolean
+//   mcap: number
+// })
 const chain = computed(() => {
   return getAddressAndChainFromId(token.value)?.chain || tokenStore?.token?.chain || ''
 })
@@ -341,12 +341,7 @@ watch(
   (val) => {
     if (!val) return
 
-    migrated.value = {
-      migrate_time: 0,
-      migrate_uprice: '0',
-      showMarket: false,
-      mcap: 0,
-    }
+    migrated.value = null
     if (_widget?.activeChart?.()) {
       _widget?.activeChart?.()?.removeAllShapes?.()
       // const chart = _widget?.activeChart?.()
@@ -885,8 +880,11 @@ async function initChart() {
           }
           loading = true
           const getKlineFunc = isTokenKline ? getTokenKlineHistory : getKlineHistoryData
+          const requestToken = token.value
           getKlineFunc(params)
             .then((res) => {
+              // 防止旧请求覆盖新 token 的 migrated（快速切换时的竞态）
+              if (token.value !== requestToken) return
               if (res?.extra_data?.migrate_time && res?.extra_data?.migrate_uprice) {
                 migrated.value = {
                   migrate_time: new Date(res.extra_data.migrate_time).getTime() / 1000,
@@ -894,6 +892,9 @@ async function initChart() {
                   showMarket: showMarket.value,
                   mcap: new BigNumber(res.extra_data.migrate_uprice || 0).times(tokenStore?.token?.total || 0).toNumber(),
                 }
+              } else {
+                // 新 token 无迁移数据，显式清空防止残留旧值
+                migrated.value = null
               }
               const bars1 = res?.kline_data || []
               const bars =

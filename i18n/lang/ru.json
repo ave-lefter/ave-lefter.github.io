@@ -877,6 +877,8 @@
   "onlyTitle": "Только название",
   "socialMediaTracker": "Медиа-трекер",
   "ViewFullText": "Посмотреть полный текст",
+  "migratedToMarket": "Перемещено на рынок",
+  "createdAt": "Создано",
   "openMonitorSuccess": "Мониторинг успешно включен",
   "cancelMonitorSuccess": "Мониторинг успешно отключен"
 }

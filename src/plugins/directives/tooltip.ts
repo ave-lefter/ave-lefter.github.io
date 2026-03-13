@@ -135,6 +135,11 @@ const tooltipDirective: Directive<HTMLElementDirective, TooltipValue> = {
       if (el.__tooltipContext) {
         el.__tooltipContext.binding = binding
       }
+      el.__lastTooltipValue = binding.value
+      // 如果 tooltip 当前可见，立即刷新内容
+      if (el.visible) {
+        el.__tooltipHandlers?.showTooltip?.()
+      }
     }
   },
 
