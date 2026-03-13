@@ -873,11 +873,11 @@ function openMarkerTooltip(row: IGetSimpleTxsResponse & { senderProfile: Profile
 }
 
 function goBrowser(row: IGetSimpleTxsResponse) {
-  const rightClickAction = globalStore.audioSettings?.wallet?.clickAction
-  let targe = '_self'
-  if (rightClickAction === 1) {
-    targe ='_blank'
-  }
+  // const rightClickAction = globalStore.audioSettings?.wallet?.clickAction
+  const targe = '_blank'
+  // if (rightClickAction === 1) {
+  //   targe ='_blank'
+  // }
   window.open(
     formatExplorerUrl(row.chain, row.transaction, 'tx'), targe
   )
