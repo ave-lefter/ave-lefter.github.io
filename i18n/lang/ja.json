@@ -503,7 +503,7 @@
   "avgBuyPrice": "買いコスト価格",
   "avgSellPrice": "売りコスト価格",
   "trades": "取引",
-  "me": "私の",
+  "me": "あなた",
   "orderBook": "注文簿",
   "abnormalChips": "異常チップ",
   "abnormalChipsTip": "異常チップ比率は重複処理されています",
