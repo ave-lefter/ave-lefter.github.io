@@ -86,10 +86,12 @@
 
             <!-- 持仓 -->
             <div class="text-right">
-              <div class="text-12px color-[--main-text]">
+              <div v-if="Number(item?.balance_usd || 0) > 0" class="text-12px color-[--main-text]">
                 ${{ formatNumber(item?.balance_usd || 0, 2) }}
               </div>
-
+              <div v-else class="text-12px color-[--third-text]">
+                {{ $t('sellAl') }}
+              </div>
               <div class="text-10px color-[--secondary-text]">
                   {{ formatNumber(Math.abs(Number(item.balance_ratio || 0)), 2) }}%
               </div>
