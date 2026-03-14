@@ -514,9 +514,9 @@ const orderSoon = computed(() => {
 const orderGraduated= computed(() => {
   return pumpSetting.value.grid['graduated']?.order
 })
-// const pumpConfig = shallowRef<PumpConfig[]>()
+const pumpConfig = shallowRef<PumpConfig[]>()
 const isRotate = ref(false)
-const { pump_notice, pumpV3, pumpFilterDefault, pump_query, pumpConfig} = storeToRefs(usePumpStore())
+const { pump_notice, pumpV3, pumpFilterDefault, pump_query } = storeToRefs(usePumpStore())
 const pumpAudio = useTemplateRef('pumpAudio')
 const visible_platforms = shallowRef(false)
 const pumpState = useState('pumpState', () => ({
@@ -637,7 +637,12 @@ let portraitTimer: ReturnType<typeof setTimeout> | null = null
 let isPortraitSubscribed = false
 const mapStatistics = shallowRef(new Map<string, StatisticsItem>())
 const platformsList = computed(() => {
-  return pumpV3.value?.[activeChain.value]?.platformsDetails || []
+  const list = pumpConfig?.value?.filter((i) => i?.chain === activeChain.value)
+  return (
+    list?.[0]?.platforms?.filter((i) =>
+      platforms?.value.includes(i.platform)
+    ) || []
+  )
 })
 const platforms = computed(() => {
     return pumpV3.value?.[activeChain.value]?.platforms?.filter?.(Boolean).join(',')
