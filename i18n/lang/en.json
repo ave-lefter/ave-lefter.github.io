@@ -2097,5 +2097,7 @@
   "twitterForHMe": "Twitter-Mine",
   "twitterForHot": "Twitter-Hot",
   "txFilter": "Transaction Filter",
-  "filterWallet2": "Filter Wallet"
+  "filterWallet2": "Filter Wallet",
+  "disabledClickKlineFilter": "Disable time filtering by clicking the chart",
+  "enabledClickKlineFilter": "Enable time filtering by clicking the chart"
 }

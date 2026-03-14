@@ -1489,5 +1489,7 @@
   "twitterForHMe": "ツイッター-マイン",
   "twitterForHot": "ツイッターで話題",
   "txFilter": "トランザクションフィルター",
-  "filterWallet2": "フィルターウォレット"
+  "filterWallet2": "フィルターウォレット",
+  "disabledClickKlineFilter": "クリック チャートのフィルター時間を無効にする",
+  "enabledClickKlineFilter": "クリック チャート フィルター時間を有効にする"
 }

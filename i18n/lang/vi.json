@@ -880,5 +880,7 @@
   "twitterForHMe": "Twitter-Mỏ",
   "twitterForHot": "Twitter-Hot",
   "txFilter": "Bộ lọc giao dịch",
-  "filterWallet2": "Lọc ví"
+  "filterWallet2": "Lọc ví",
+  "disabledClickKlineFilter": "Tắt thời gian lọc biểu đồ nhấp chuột",
+  "enabledClickKlineFilter": "Bật thời gian lọc biểu đồ nhấp chuột"
 }

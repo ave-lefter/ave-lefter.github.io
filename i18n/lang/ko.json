@@ -1489,5 +1489,7 @@
   "twitterForHMe": "트위터-마인",
   "twitterForHot": "트위터-핫",
   "txFilter": "거래 필터",
-  "filterWallet2": "필터 지갑"
+  "filterWallet2": "필터 지갑",
+  "disabledClickKlineFilter": "클릭 차트 필터 시간 비활성화",
+  "enabledClickKlineFilter": "클릭 차트 필터 시간 활성화"
 }

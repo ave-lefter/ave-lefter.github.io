@@ -6,9 +6,15 @@
     !modelValue
     || listStatus.loadingTxs
     || listStatus.loadingTxs1
+    || isLoading
     || listStatus.finished
     || filterTableList.length === 0
-) }} -->
+) }}
+    loadingTxs:{{listStatus.loadingTxs}}
+    loadingTxs1:{{listStatus.loadingTxs1}}
+    finished:{{listStatus.finished}}
+    filterTableList.length:{{filterTableList.length}}
+    <div>{{ klineHeight+activeTab+(isMeActive?1:0) }}</div> -->
     <!-- 筛选标签 -->
     <div class="mx-12px pb-12px flex items-center justify-between lh-none">
       <div class="flex gap-11px color-[--third-text1]">
@@ -24,8 +30,8 @@
         </div>
       </div>
       <div class="flex gap-11px">
-        <span v-tooltip="$t(globalStore.isClickKlineFilter?'clickChartHideFilter':'clickChartFilter')" class="flex items-center justify-center w-12px h-12px rounded-2px color-[--reverse-color] text-10px cursor-pointer" :class="globalStore.isClickKlineFilter?'bg-[--primary-color]':'bg-[--third-text] hover:bg-[--d-E0E0E0-l-333]'" @click="globalStore.isClickKlineFilter=!globalStore.isClickKlineFilter"><Icon name="custom:chart" /></span>
-        <Icon name="custom:filter" class="text-12px cursor-pointer" :class="isFilterActive?'color-[--primary-color]':'color-[--third-text] hover:color-[--d-E0E0E0-l-333]'" @click.self="filterDialogVisible=true"/>
+        <span v-tooltip="$t(globalStore.isClickKlineFilter?'clickChartHideFilter':'clickChartFilter')" class="flex items-center justify-center text-12px cursor-pointer" :class="globalStore.isClickKlineFilter?'color-[--primary-color]':'text-[--third-text] hover:text-[--d-E0E0E0-l-333]'" @click="globalStore.isClickKlineFilter=!globalStore.isClickKlineFilter"><Icon name="custom:chart2" /></span>
+        <Icon name="custom:filter2" class="text-12px cursor-pointer" :class="isFilterActive?'color-[--primary-color]':'color-[--third-text] hover:color-[--d-E0E0E0-l-333]'" @click.self="filterDialogVisible=true"/>
       </div>
     </div>
     <div class="mx-12px pb-12px flex">
@@ -46,7 +52,10 @@
 
     <!-- 表格 -->
     <div class="px-0px">
-      <DateFilterCard v-if="tableFilter.timestamp.length" v-model:timestamp="tableFilter.timestamp" @update:timestamp="filterSubmit"/>
+      <div v-if="tableFilter.timestamp.length&&tableFilter.timestamp[0]&&tableFilter.timestamp[1]" class="flex gap-8px justify-center mb-12px">
+        <DateFilterCard v-model:timestamp="tableFilter.timestamp" @update:timestamp="filterSubmit" class="bg-[transparent]! h-16px! mb-0px!"/>
+        <el-switch v-model="globalStore.isClickKlineFilter" size="small" class="h-16px!" v-tooltip="!globalStore.isClickKlineFilter?t('enabledClickKlineFilter'):t('disabledClickKlineFilter')"/>
+      </div>
       <div v-loading="tableLoading" class="text-12px">
         <!-- 表格头部 -->
         <div
@@ -90,131 +99,147 @@
         </div>
 
         <!-- 表格内容 -->
-        <UseVirtualList :key="klineHeight" ref="scroller" :list="filterTableList" :options="{itemHeight:24}" style="margin-right: -12px;padding-right: 12px;overscroll-behavior-y: contain" class="scrollbar-hide" :height="`${(klineHeight ?? 200) - 110}px`">
-            <template #default="{data:row,index}">
-              <div
-                class="px-12px grid grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] items-center gap-15px h-24px hover:bg-[rgba(255,255,255,.02)] relative z-10 overflow-hidden cursor-pointer mt-1px first:mt-0"
-                :class="{ 'bg-[--tooltip1]': index % 2 === 1 }"
-                @mouseenter="isPausedTxs = true"
-                @mouseleave="isPausedTxs = false"
-                @click="onRowClick({ rowData: row } as any)"
-                >
-                <div class="grid grid-cols-[minmax(0,0.8fr)_minmax(0,1fr)] items-center gap-15px relative h-24px px-2px">
-                  <!-- 整行渐变背景 -->
-                  <div class="absolute inset-0 pointer-events-none"
-                    :style="{ backgroundColor: getFullRowGradient(row), transform: `scaleX(${getAmountBarWidthPercent(row)})`, transformOrigin: 'left' }" />
-                  <!-- Amount -->
-                  <div class="text-left text-nowrap min-w-0">
-                    <div  class="font-medium truncate color-[--d-E0E0E0-l-333]">
-                      <template v-if="globalStore.isUSDT">
-                        <span>
-                          ${{ formatFixedDecimals(getAmount(row, true, true), 2) }}
-                        </span>
-                      </template>
-                      <template v-else>
-                        <span>
-                          {{ formatFixedDecimals(getAmount(row, true, false), 3) }}
-                          <!-- <span class="color-[--third-text1] hidden sm:inline">
-                            {{ getChainInfo(row.chain)?.main_name }}
-                          </span> -->
-                        </span>
-                      </template>
-                    </div>
-                  </div>
-                  <!-- Price -->
-                  <div class="text-left text-nowrap min-w-0 overflow-visible">
-                    <div :class="getRowColor(row)">
-                      <template v-if="tableView.isAmount">
-                        <span>
-                          ${{ formatNumber(getTransactionPrice(row, true), { decimals: 3 }) }}
-                        </span>
-                      </template>
-                      <template v-else>
-                        <span>
-                          ${{ formatNumber(getMcPrice(row), { decimals: 2 }) }}
-                        </span>
-                      </template>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="grid grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] items-center gap-15px h-24px">
-                
-
-                  <!-- Trader -->
-                  <div class="text-left overflow-hidden min-w-0">
-                    <div class="flex items-center justify-start min-w-0">
-                   
-                      <UserRemark :remark="row.remark" :address="row.wallet_address"
-                        :show-address="!(row?.newTags?.length > 1)" :chain="row.chain" :wallet_logo="row.wallet_logo"
-                        :addressClass="`inline-block truncate max-w-full ${
-                          markerTooltipVisible && currentRow.wallet_address===row.wallet_address?'bg-#12B88633':''
-                        }`"
-                        :format-address="(address: string) => windowWidth < 480 ? address?.slice(-3) : '*' + address?.slice(-4)"
-                        class="color-[--d-E0E0E0-l-333] truncate min-w-0 !text-12px"
-                        :mouseoverAddress="e => openMarkerTooltip(row, e)" :canEdit="false"
-                        @update-remark="updateRemark" />
-                      <div v-if="row.count && row.count > 1"
-                        class="color-[--d-E0E0E0-l-333] !text-12px ml-2px whitespace-nowrap">
-                        ({{ row.count }})
-                      </div>
-                      <template v-if="windowWidth >= 480 && ['solana', 'bsc'].includes(row.chain) && row.senderProfile">
-                        <Icon v-if="hasNewAccount(row) && (!(row.newTags||[]).map((i:any)=>i.type).includes('47'))"
-                          v-tooltip="{ content: `<span style='color: #85E12F'>${$t('newTokenAccount')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
-                          name="custom:new-account" class="w-12px h-12px mr-2px shrink-0 icon-hover hidden sm:block" />
-                        <Icon v-if="hasClearedAccount(row) && (!(row.newTags||[]).map((i:any)=>i.type).includes('46'))"
-                          v-tooltip="{ content: `<span style='color: #EB2B4B'>${$t('sellAl')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
-                          name="custom:cleared-account"
-                          class="w-12px h-12px mr-2px shrink-0 icon-hover hidden sm:block" />
-                        <Icon v-if="bigWallet(row)"
-                          v-tooltip="{ content: `<span style='color: #ccc'>${$t('whales')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
-                          name="custom:big" class="w-12px h-12px mr-2px shrink-0 icon-hover hidden sm:block" />
-                      </template>
-                      <SignalTags v-if="windowWidth >= 480" tagClass="mr-3px"
-                        :tags="(row.newTags || []).map((el: any) => tagStore.matchTag(el.type)||el)"
-                        :walletAddress="row.wallet_address" :chain="row.chain" />
-
-                    </div>
-                  </div>
-                  <!-- Time -->
-                  <el-tooltip placement="top" :show-arrow="false" :persistent="false" :content="formatDate(row?.time, 'YYYY-MM-DD HH:mm:ss')">
-                    <div class="text-right min-w-0">
-                      <div class="color-[--third-text1]">
-                        <TimerCount v-if="row.time && Number(formatTimeFromNow(row.time, true)) < 60"
-                          :key="`${row.time}${index}`" :timestamp="row.time" :end-time="60">
-                          <template #default="{ seconds }">
-                            <span class="color-[--third-text1]">
-                              <template v-if="seconds < 60">
-                                {{ seconds }}s
-                              </template>
-                              <template v-else>
-                                {{ formatTimeFromNow(row.time) }}
-                              </template>
-                            </span>
-                          </template>
-                        </TimerCount>
-                        <span v-else class="color-[--third-text1]">
-                          {{ formatTimeFromNow(row.time) }}
-                        </span>
+        <AveEmpty v-if="isEmpty" class="pt-40px">
+          <span class="color-[--third-text] text-12px mb-20px mt-4px">{{ t('emptyNoData') }}</span>
+        </AveEmpty>
+        <!-- :key="klineHeight+activeTab+(isMeActive?1:0)" -->
+        <div v-else ref="scroller" :key="klineHeight"
+          style="margin-right: -12px;padding-right: 12px;overscroll-behavior-y: contain" class="scrollbar-hide overflow-y-auto"
+          :style="{ height: `${(klineHeight ?? 200) - 110}px` }"  @mouseenter="isPausedTxs = true"
+          @mouseleave="isPausedTxs = false">
+          <div :style="{
+            height: `${totalSize}px`,
+            width: '100%',
+            position: 'relative'
+          }">
+            <div v-for="virtualRow in virtualItems" :key="String(virtualRow.key)" :style="{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              transform: `translateY(${virtualRow.start}px)`
+            }">
+              <div :ref="(el) => virtualizer.measureElement(el)"  :data-index="virtualRow.index" class="lh-20px w-full">
+                <div
+                  class="px-12px grid grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] items-center gap-15px h-24px hover:bg-[rgba(255,255,255,.02)] relative z-10 overflow-hidden cursor-pointer mt-1px first:mt-0"
+                  :class="{ 'bg-[--tooltip1]': virtualRow.index % 2 === 1 }" @click="onRowClick({ rowData: getItem(virtualRow) } as any)">
+                  <div class="grid grid-cols-[minmax(0,0.8fr)_minmax(0,1fr)] items-center gap-15px relative h-24px px-2px">
+                    <!-- 整行渐变背景 -->
+                    <div class="absolute inset-0 pointer-events-none"
+                      :style="{ backgroundColor: getFullRowGradient(getItem(virtualRow)), transform: `scaleX(${getAmountBarWidthPercent(getItem(virtualRow))})`, transformOrigin: 'left' }" />
+                    <!-- Amount -->
+                    <div class="text-left text-nowrap min-w-0">
+                      <div class="font-medium truncate color-[--d-E0E0E0-l-333]">
+                        <template v-if="globalStore.isUSDT">
+                          <span>
+                            ${{ formatFixedDecimals(getAmount(getItem(virtualRow), true, true), 2) }}
+                          </span>
+                        </template>
+                        <template v-else>
+                          <span>
+                            {{ formatFixedDecimals(getAmount(getItem(virtualRow), true, false), 3) }}
+                            <!-- <span class="color-[--third-text1] hidden sm:inline">
+                                {{ getChainInfo(getItem(virtualRow).chain)?.main_name }}
+                              </span> -->
+                          </span>
+                        </template>
                       </div>
                     </div>
-                    <!-- <template #default>
-                    </template>
-                    <template #content>
-                      {{}}
-                    </template> -->
-                  </el-tooltip>
+                    <!-- Price -->
+                    <div class="text-left text-nowrap min-w-0 overflow-visible">
+                      <div :class="getRowColor(getItem(virtualRow))">
+                        <template v-if="tableView.isAmount">
+                          <span>
+                            ${{ formatNumber(getTransactionPrice(getItem(virtualRow), true), { decimals: 3 }) }}
+                          </span>
+                        </template>
+                        <template v-else>
+                          <span>
+                            ${{ formatNumber(getMcPrice(getItem(virtualRow)), { decimals: 2 }) }}
+                          </span>
+                        </template>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="grid grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] items-center gap-15px h-24px">
+
+
+                    <!-- Trader -->
+                    <div class="text-left overflow-hidden min-w-0">
+                      <div class="flex items-center justify-start min-w-0">
+
+                        <UserRemark :remark="getItem(virtualRow).remark" :address="getItem(virtualRow).wallet_address"
+                          :show-address="!(getItem(virtualRow)?.newTags?.length > 1)" :chain="getItem(virtualRow).chain" :wallet_logo="getItem(virtualRow).wallet_logo"
+                          :addressClass="`inline-block truncate max-w-full ${markerTooltipVisible && currentRow.wallet_address === getItem(virtualRow).wallet_address ? 'bg-#12B88633' : ''
+                            }`"
+                          :format-address="(address: string) => windowWidth < 480 ? address?.slice(-3) : '*' + address?.slice(-4)"
+                          class="color-[--d-E0E0E0-l-333] truncate min-w-0 !text-12px"
+                          :mouseoverAddress="e => openMarkerTooltip(getItem(virtualRow), e)" :canEdit="false"
+                          @update-remark="updateRemark" />
+                        <div v-if="getItem(virtualRow).count && getItem(virtualRow).count > 1"
+                          class="color-[--d-E0E0E0-l-333] !text-12px ml-2px whitespace-nowrap">
+                          ({{ getItem(virtualRow).count }})
+                        </div>
+                        <template v-if="windowWidth >= 480 && ['solana', 'bsc'].includes(getItem(virtualRow).chain) && getItem(virtualRow).senderProfile">
+                          <Icon v-if="hasNewAccount(getItem(virtualRow)) && (!(getItem(virtualRow).newTags || []).map((i: any) => i.type).includes('47'))"
+                            v-tooltip="{ content: `<span style='color: #85E12F'>${$t('newTokenAccount')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
+                            name="custom:new-account" class="w-12px h-12px mr-2px shrink-0 icon-hover hidden sm:block" />
+                          <Icon v-if="hasClearedAccount(getItem(virtualRow)) && (!(getItem(virtualRow).newTags || []).map((i: any) => i.type).includes('46'))"
+                            v-tooltip="{ content: `<span style='color: #EB2B4B'>${$t('sellAl')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
+                            name="custom:cleared-account"
+                            class="w-12px h-12px mr-2px shrink-0 icon-hover hidden sm:block" />
+                          <Icon v-if="bigWallet(getItem(virtualRow))"
+                            v-tooltip="{ content: `<span style='color: #ccc'>${$t('whales')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
+                            name="custom:big" class="w-12px h-12px mr-2px shrink-0 icon-hover hidden sm:block" />
+                        </template>
+                        <SignalTags v-if="windowWidth >= 480" tagClass="mr-3px"
+                          :tags="(getItem(virtualRow).newTags || []).map((el: any) => tagStore.matchTag(el.type) || el)"
+                          :walletAddress="getItem(virtualRow).wallet_address" :chain="getItem(virtualRow).chain" />
+
+                      </div>
+                    </div>
+                    <!-- Time -->
+                    <el-tooltip placement="top" :show-arrow="false" :persistent="false"
+                      :content="formatDate(getItem(virtualRow)?.time, 'YYYY-MM-DD HH:mm:ss')">
+                      <div class="text-right min-w-0">
+                        <div class="color-[--third-text1]">
+                          <TimerCount v-if="getItem(virtualRow).time && Number(formatTimeFromNow(getItem(virtualRow).time, true)) < 60"
+                            :key="`${getItem(virtualRow).time}${virtualRow.index}`" :timestamp="getItem(virtualRow).time" :end-time="60">
+                            <template #default="{ seconds }">
+                              <span class="color-[--third-text1]">
+                                <template v-if="seconds < 60">
+                                  {{ seconds }}s
+                                </template>
+                                <template v-else>
+                                  {{ formatTimeFromNow(getItem(virtualRow).time) }}
+                                </template>
+                              </span>
+                            </template>
+                          </TimerCount>
+                          <span v-else class="color-[--third-text1]">
+                            {{ formatTimeFromNow(getItem(virtualRow).time) }}
+                          </span>
+                        </div>
+                      </div>
+                      <!-- <template #default>
+                        </template>
+                        <template #content>
+                          {{}}
+                        </template> -->
+                    </el-tooltip>
+                  </div>
                 </div>
               </div>
-              <div v-if="index === filterTableList.length - 1" ref="sentinel" style="height: 1px;" />
-            </template>
-        </UseVirtualList>
-        <template v-if="filterTableList.length === 0 && !listStatus.loadingTxs">
+            </div>
+          </div>
+        </div>
+        <!-- <template v-if="filterTableList.length === 0 && !listStatus.loadingTxs">
           <div class="h-full flex flex-col items-center justify-center "
             :style="{ height: `${(klineHeight ?? 200) - 105}px` }">
             <img src="@/assets/images/empty-black.svg" alt="">
           </div>
-        </template>
+        </template> -->
       </div>
     </div>
     <!-- status：仅在有暂停状态（hover 或 升序排序）时展示底部条，避免未暂停时仍显示黑条 -->
@@ -252,7 +277,7 @@
       </div>
       <div class="flex items-center gap-20px">
         <el-date-picker
-          v-model="tableFilter.timestamp[0]"
+          v-model="dialogFilter.timestamp[0]"
           :disabled-date="disabledStartDate"
           class="[--el-font-size-base:12px]"
           type="datetime"
@@ -263,10 +288,11 @@
           value-format="X"
           prefix-icon="Calendar"
           :teleported="false"
+          :placeholder="t('startTime')"
         />
         <span class="color-[--third-text]">~</span>
         <el-date-picker
-          v-model="tableFilter.timestamp[1]"
+          v-model="dialogFilter.timestamp[1]"
           :disabled-date="disabledEndDate"
           class="[--el-font-size-base:12px]"
           type="datetime"
@@ -277,21 +303,34 @@
           value-format="X"
           prefix-icon="Calendar"
           :teleported="false"
+          :placeholder="t('endTime1')"
         />
       </div>
           <div class="mb-12px mt-20px">
         <label>
-          {{ $t('filter') }}
+          {{ $t('volume') }}($)
         </label>
+      </div>
+      <div class="flex items-center gap-20px  mb-12px">
+        <el-button
+          v-for="(item,idx) in volColumns"
+          :key="idx"
+          plain
+          size="default"
+          class="flex-1 h-30px font-400"
+          @click.stop="dialogFilter.minVol=item.key;dialogFilter.maxVol=''"
+        >
+          {{ item.value }}
+        </el-button>
       </div>
       <div class="flex items-center gap-20px">
         <el-input
           v-model.trim.number="dialogFilter.minVol"
-          
           type="text"
           class="text-12px"
-          :placeholder="$t('filterSmallAmount')"
+          :placeholder="$t('minor')"
           style="--el-input-border-color:var(--border);"
+          @blur="onVolBlur(0)"
           @input="(value) => (dialogFilter.minVol = value.replace(/\-|[^\d.]/g, ''))"
         >
           <template #suffix>$</template>
@@ -302,8 +341,9 @@
           
           type="text"
            class="text-12px"
-           :placeholder="$t('filterLargeAmount')"
+           :placeholder="$t('max1')"
            style="--el-input-border-color:var(--border)"
+          @blur="onVolBlur(1)"
           @input="(value) => (dialogFilter.maxVol = value.replace(/\-|[^\d.]/g, ''))"
         >
           <template #suffix>$</template>
@@ -314,16 +354,26 @@
           {{ $t('filterWallet2') }}
         </label>
       </div>
-      <el-input id="markerAddress" v-model="dialogFilter.markerAddress"  class="text-12px" :placeholder="$t('markerAddress')"/>
-    
-      <div class="mt-20px flex">
+      <div class="flex gap-12px">
+        <el-input id="markerAddress" v-model="dialogFilter.markerAddress"  class="text-12px" :placeholder="$t('markerAddress')"></el-input>
         <el-button
-          class="h-30px flex-1 m-l-auto"
+          plain
+          size="default"
+          class="flex-1 h-32px font-400"
+          @click.stop="toggleClickMe();filterDialogVisible = false"
+        > 
+          {{ $t('filterWallet') }}
+        </el-button>
+      </div>
+    
+      <div class="mt-20px flex gap-8px">
+        <el-button
+          class="h-30px flex-1"
           @click="resetDialogFilter"
         >
           {{ $t('reset') }}
         </el-button>
-        <el-button type="primary" class="h-30px flex-1 m-l-auto" @click="confirmDialogFilter">
+        <el-button type="primary" class="h-30px flex-1" @click="confirmDialogFilter">
           {{ $t('confirm') }}
         </el-button>
       </div>
@@ -343,6 +393,7 @@ import { filterLanguage } from '~/pages/token/components/kLine/utils'
 import { WSEventType } from '~/utils/constants'
 import { useThrottleFn,useIntersectionObserver, useInfiniteScroll } from '@vueuse/core'
 import { UseVirtualList } from '@vueuse/components'
+import { useVirtualizer } from '@tanstack/vue-virtual'
 import UserRemark from '~/components/userRemark.vue'
 import MarkerTooltip from '../belowChartTable/transactions/markerTooltip.vue'
 import type { RowEventHandlerParams } from 'element-plus'
@@ -350,6 +401,7 @@ import type { SimpleWSTx } from '../kLine/types'
 import BigNumber from 'bignumber.js'
 import DateFilterCard from '../dateFilterCard.vue'
 import dayjs from 'dayjs'
+import { cloneDeep } from 'lodash-es'
 const tokenStore = useTokenStore()
 const themeStore = useThemeStore()
 
@@ -410,28 +462,29 @@ const sentinel = ref(null)
 const tokenTxs = shallowRef<ExtendedTxResponse[]>([])
 const wsPairCache = shallowRef<ExtendedTxResponse[]>([])
 
+
 // 用 IntersectionObserver 监听 sentinel。
 // 特别重要：把 root 指定为虚拟列表的滚动容器 scroller.value
-useIntersectionObserver(
-  sentinel,
-  ([{ isIntersecting }]) => {
-    console.log('isIntersecting', isIntersecting,listStatus.value,filterTableList.value.length)
-    if (
-      !props.modelValue
-      || !isIntersecting
-      || listStatus.value.loadingTxs
-      || listStatus.value.loadingTxs1
-      || listStatus.value.finished
-      || filterTableList.value.length === 0
-    ) return
-    _getTokenTxs()
-  },
-  {
-    root: scroller, // 注意传 ref（@vueuse/core 会处理）
-    threshold: 0,
-    rootMargin: '0px 0px 120px 0px',
-  }
-)
+// useIntersectionObserver(
+//   sentinel,
+//   ([{ isIntersecting }]) => {
+//     console.log('isIntersecting', isIntersecting,listStatus.value,filterTableList.value.length)
+//     if (
+//       !props.modelValue
+//       || !isIntersecting
+//       || listStatus.value.loadingTxs
+//       || listStatus.value.loadingTxs1
+//       || listStatus.value.finished
+//       || filterTableList.value.length === 0
+//     ) return
+//     _getTokenTxs()
+//   },
+//   {
+//     root: scroller, // 注意传 ref（@vueuse/core 会处理）
+//     threshold: 0,
+//     rootMargin: '0px 0px 120px 0px',
+//   }
+// )
 
 const tableFilter = ref({
   markerAddress: '',
@@ -454,11 +507,12 @@ const tableView = ref({
 const realAddress = shallowRef(getAddressAndChainFromId(route.params.id as string).address)
 const filterDialogVisible = shallowRef(false)
 const defaultDialogFilter = {
-  markerAddress: '',
-  minVol:'',
-  maxVol:''
-}
-const dialogFilter = ref({...defaultDialogFilter})
+  markerAddress: '' as string,
+  minVol:'' as string,
+  maxVol:'' as string,
+  timestamp:[] as string[]
+} 
+const dialogFilter = ref(cloneDeep(defaultDialogFilter))
 const ignoreWs = computed(() => {
   return !['all'].includes(activeTab.value)
 })
@@ -496,7 +550,7 @@ const tabs = computed(() => {
 })
 
 const isFilterActive = computed(()=>{
-  return tableFilter.value.markerAddress || tableFilter.value.minVol || tableFilter.value.maxVol
+  return tableFilter.value.markerAddress || tableFilter.value.minVol || tableFilter.value.maxVol || tableFilter.value.timestamp.length
 })
 
 const addressAndChain = computed(() => {
@@ -532,26 +586,25 @@ function sortChange(sort_dir: string) {
   filterSubmit()
 }
 
-
-// const { reset,isLoading } = useInfiniteScroll(scroller, ()=>{
-//   console.log('infiniteScroll')
-//   // emits('endReached')
-//   // if (
-//   //   !props.modelValue
-//   //   || listStatus.value.loadingTxs
-//   //   || listStatus.value.loadingTxs1
-//   //   || listStatus.value.finished
-//   //   || filterTableList.value.length === 0
-//   // ) return
-//   _getTokenTxs()
-// }, { distance: 100 , canLoadMore: ()=>!(
-//     !props.modelValue
-//     || listStatus.value.loadingTxs
-//     || listStatus.value.loadingTxs1
-//     || listStatus.value.finished
-//     || isLoading.value
-//     || filterTableList.value.length === 0
-// )})
+const {reset ,isLoading} = useInfiniteScroll(scroller, ()=>{
+  console.log('infiniteScroll')
+  // emits('endReached')
+  // if (
+  //   !props.modelValue
+  //   || listStatus.value.loadingTxs
+  //   || listStatus.value.loadingTxs1
+  //   || listStatus.value.finished
+  //   || filterTableList.value.length === 0
+  // ) return
+  _getTokenTxs()
+}, { distance: 20 ,canLoadMore:()=>!(
+    !props.modelValue
+    || listStatus.value.loadingTxs
+    || listStatus.value.loadingTxs1
+    || listStatus.value.finished
+    || isLoading.value
+    || filterTableList.value.length === 0
+  ) })
 
 async function filterSubmit() {
   console.log('filterSubmit')
@@ -559,14 +612,39 @@ async function filterSubmit() {
   listStatus.value.loadingTxs = false
   listStatus.value.finished = false
   wsPairCache.value = []
-  tokenTxs.value=[]
-  // reset()
-  setTimeout(() => {
-    getTokenTxs()
-  },500)
+  // tokenTxs.value=[]
+  // reCreateChild()
+  getTokenTxs()
   // reCreateChild()
   // getTokenTxs()
 }
+
+const volColumns = [
+  {
+    key:'500',
+    value:'>500',
+  },
+  {
+    key:'1000',
+    value:'>1000',
+  },
+  {
+    key:'5000',
+    value:'>5000',
+  },
+]
+
+function onVolBlur(index: number) {
+  const min = Number(dialogFilter.value.minVol)
+  const max = Number(dialogFilter.value.maxVol)
+  const isMaxLessThanMin = max <= min
+  if (index === 0 && isMaxLessThanMin) {
+    dialogFilter.value.minVol = ''
+  } else if (index === 1 && isMaxLessThanMin) {
+    dialogFilter.value.maxVol = ''
+  }
+}
+
 
 const tableLoading = computed(() => listStatus.value.loadingTxs1 )
 
@@ -616,9 +694,44 @@ const filterTableList = computed(() => {
   return tableList
 })
 
+const shouldRenderChild = shallowRef(true)
+
+const reCreateChild = () => {
+  shouldRenderChild.value = false
+  // 确保 DOM更新
+  nextTick(() => {
+    shouldRenderChild.value = true
+  })
+}
+
+// :key="klineHeight" ref="scroller" :list="filterTableList" :options="{itemHeight:24}" style="margin-right: -12px;padding-right: 12px;overscroll-behavior-y: contain" class="scrollbar-hide" :height="`${(klineHeight ?? 200) - 110}px`"
+const virtualizer = useVirtualizer(
+  computed(() => ({
+    count: filterTableList.value.length,
+    getScrollElement: () => scroller.value,
+    estimateSize: () => 24,
+    overscan: 5,
+    gap: 0
+  }))
+)
+const virtualItems = computed(() => virtualizer.value.getVirtualItems())
+const totalSize = computed(() => virtualizer.value.getTotalSize())
+const isEmpty = computed(() => filterTableList.value.length === 0 && !listStatus.value.loadingTxs && !listStatus.value.loadingTxs1)
+
+const getItem = (virtualRow:any) => {
+  return filterTableList.value[virtualRow.index] || {}
+}
+
+watch(()=> filterTableList.value,()=>{
+  nextTick(() => {
+    reset()
+  })
+})
+
 watch(() => klineDateFilter?.value, (val) => {
   if (val && props.modelValue) {
     tableFilter.value.timestamp = val
+    dialogFilter.value.timestamp = val
     filterSubmit()
   }
 })
@@ -1079,6 +1192,9 @@ function getTransactionPrice(row: IGetSimpleTxsResponse | SimpleWSTx, isVolUSDT 
 
 function setActiveTab(val: string, index: number) {
   console.log('🔄 切换订单薄标签:', val)
+  if(activeTab.value===val){
+    return
+  }
   resetData(val)
   // isMeActive.value = false
   // tableFilter.value.markerAddress = ''
@@ -1259,8 +1375,6 @@ onMounted(async() => {
     subscribeToTxs()
   }
   window.addEventListener('resize', updateWidth)
-  // await nextTick()
-  // reset()
 })
 
 // 保存 watch 监听器的 unwatch 函数，用于组件卸载时清理
@@ -1325,7 +1439,7 @@ watchTxUnwatch = watch(() => wsStore.wsResult[WSEventType.TX], data => {
 })
 
 watchSimpleTxUnwatch = watch(() => wsStore.wsResult[WSEventType.SIMPLE_TX], data => {
-  if (!data || listStatus.value.loadingTxs) {
+  if (!data || listStatus.value.loadingTxs || ignoreWs.value) {
     return
   }
   const simpleWSTx = data.msg as SimpleWSTx
@@ -1433,6 +1547,7 @@ const updatetokenTxs = useThrottleFn(() => {
 }, 500)
 
 function confirmDialogFilter() {
+  console.log('confirmDialogFilter')
   Object.keys(dialogFilter.value).forEach((key)=>{
     tableFilter.value[key as keyof typeof dialogFilter.value] =
     dialogFilter.value[key as keyof typeof dialogFilter.value]
@@ -1450,26 +1565,26 @@ function resetDialogFilter() {
   dialogFilter.value = {
     ...defaultDialogFilter
   }
-
+  console.log('resetDialogFilter',dialogFilter.value)
   confirmDialogFilter()
 }
 
 const disabledStartDate = (date:Date)=>{
-  if(tableFilter.value.timestamp[1]){
-    return dayjs(date).isAfter(dayjs((Number(tableFilter.value.timestamp[1])*1000)))
+  if(dialogFilter.value.timestamp[1]){
+    return dayjs(date).isAfter(dayjs((Number(dialogFilter.value.timestamp[1])*1000)))
   }
   return false
 }
 const disabledEndDate = (date:Date)=>{
-  if(tableFilter.value.timestamp[0]){
-    const filterTime0 = dayjs((Number(tableFilter.value.timestamp[0])*1000))
+  if(dialogFilter.value.timestamp[0]){
+    const filterTime0 = dayjs((Number(dialogFilter.value.timestamp[0])*1000))
     return dayjs(date).isBefore(filterTime0) && !dayjs(date).isSame(filterTime0, 'day')
   }
   return false
 }
 const disabledSave = computed(()=>{
-  if(tableFilter.value.timestamp[1] && tableFilter.value.timestamp[0]){
-    return tableFilter.value.timestamp[1] < tableFilter.value.timestamp[0]
+  if(dialogFilter.value.timestamp[1] && dialogFilter.value.timestamp[0]){
+    return dialogFilter.value.timestamp[1] < dialogFilter.value.timestamp[0]
   }
   return false
 })

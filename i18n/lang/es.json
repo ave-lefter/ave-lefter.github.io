@@ -662,5 +662,7 @@
   "twitterForHMe": "Twitter-mío",
   "twitterForHot": "Twitter-caliente",
   "txFilter": "Filtro de transacciones",
-  "filterWallet2": "Filtrar billetera"
+  "filterWallet2": "Filtrar billetera",
+  "disabledClickKlineFilter": "Deshabilitar el tiempo de filtro del gráfico de clics",
+  "enabledClickKlineFilter": "Habilitar el tiempo de filtrado del gráfico de clics"
 }

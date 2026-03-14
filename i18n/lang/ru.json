@@ -885,5 +885,7 @@
   "twitterForHMe": "Твиттер-Мой",
   "twitterForHot": "Twitter-Горячий",
   "txFilter": "Фильтр транзакций",
-  "filterWallet2": "Фильтровать кошелек"
+  "filterWallet2": "Фильтровать кошелек",
+  "disabledClickKlineFilter": "Отключить время фильтра диаграммы кликов",
+  "enabledClickKlineFilter": "Включить время фильтра диаграммы кликов"
 }

@@ -636,5 +636,7 @@
   "twitterForHMe": "Twitter-Mine",
   "twitterForHot": "Twitter-Sıcak",
   "txFilter": "İşlem Filtresi",
-  "filterWallet2": "Cüzdanı Filtrele"
+  "filterWallet2": "Cüzdanı Filtrele",
+  "disabledClickKlineFilter": "Tıklama grafiği filtre süresini devre dışı bırak",
+  "enabledClickKlineFilter": "Tıklama grafiği filtre süresini etkinleştir"
 }

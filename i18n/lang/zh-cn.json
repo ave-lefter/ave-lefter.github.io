@@ -2099,5 +2099,7 @@
   "twitterForHMe": "推特-我的",
   "twitterForHot": "推特-热门",
   "txFilter": "交易筛选",
-  "filterWallet2": "筛选钱包"
+  "filterWallet2": "筛选钱包",
+  "disabledClickKlineFilter": "禁用点击图表筛选时间",
+  "enabledClickKlineFilter": "启用点击图表筛选时间"
 }
