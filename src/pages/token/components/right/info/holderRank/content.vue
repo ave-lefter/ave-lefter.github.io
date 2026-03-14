@@ -92,8 +92,8 @@
               <div v-else class="text-12px color-[--third-text]">
                 {{ $t('sellAl') }}
               </div>
-              <div class="text-10px color-[--secondary-text]">
-                  {{ formatNumber(Math.abs(Number(item.balance_ratio || 0)), 2) }}%
+              <div class="text-12px color-[--secondary-text]">
+                {{ formatNumber(Math.abs(Number(item.balance_ratio || 0)), 2) }}%
               </div>
             </div>
 
@@ -104,7 +104,7 @@
                   {{ formatNumber( Math.abs(Number(item?.total_profit || 0)|| 0), 2) }}
                 </ave-data-number>
               </div>
-              <div class="text-10px color-[--secondary-text]">
+              <div class="text-12px color-[--secondary-text]">
                   {{ formatNumber(Math.abs(Number(item.total_profit_ratio || 0)), 2) }}%
               </div>
             </div>

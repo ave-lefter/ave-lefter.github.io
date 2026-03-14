@@ -61,7 +61,7 @@
             </div>
           </div>
         </template>
-        <ave-empty v-else="!loading && tableList.length === 0" class="h-200px flex items-center justify-center">
+        <ave-empty v-else class="h-200px flex items-center justify-center">
           <span class="color-[--third-text] text-12px lh-16px">{{ $t('emptyNoData') }}</span>
         </ave-empty>
       </el-scrollbar>
