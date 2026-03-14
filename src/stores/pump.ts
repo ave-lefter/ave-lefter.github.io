@@ -141,20 +141,21 @@ export const usePumpStore = defineStore('pumpStore', () => {
           pumpV3.value[i.chain] = {
             ...(pumpV3.value[i.chain] || {}),
             platforms,
+            platformsDetails: i.platforms,
             new: {
               count: 0,
               loading: false,
-              pumpFilter: {...pumpFilterDefault},
+              pumpFilter: { ...pumpFilterDefault },
             },
             soon: {
               count: 0,
               loading: false,
-              pumpFilter: {...pumpFilterDefault},
+              pumpFilter: { ...pumpFilterDefault },
             },
             graduated: {
               count: 0,
               loading: false,
-              pumpFilter: {...pumpFilterDefault},
+              pumpFilter: { ...pumpFilterDefault },
             },
           }
 
@@ -180,6 +181,7 @@ export const usePumpStore = defineStore('pumpStore', () => {
     {
       solana: {
         platforms: [],
+        platformsDetails: [],
         new: {
           count: 0,
           loading: false,
@@ -198,6 +200,7 @@ export const usePumpStore = defineStore('pumpStore', () => {
       },
       bsc: {
         platforms: [],
+        platformsDetails: [],
         new: {
           count: 0,
           loading: false,
@@ -216,6 +219,7 @@ export const usePumpStore = defineStore('pumpStore', () => {
       },
       xlayer: {
         platforms: [],
+        platformsDetails: [],
         new: {
           count: 0,
           loading: false,
@@ -234,6 +238,7 @@ export const usePumpStore = defineStore('pumpStore', () => {
       },
       monad: {
         platforms: [],
+        platformsDetails: [],
         new: {
           count: 0,
           loading: false,
@@ -252,6 +257,7 @@ export const usePumpStore = defineStore('pumpStore', () => {
       },
       base: {
         platforms: [],
+        platformsDetails: [],
         new: {
           count: 0,
           loading: false,

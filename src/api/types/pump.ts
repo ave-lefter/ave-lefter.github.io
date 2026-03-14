@@ -163,10 +163,10 @@ export type ChainKey = 'solana' | 'bsc' | 'xlayer' | 'monad' | 'base'
 export type CategoryKey = 'new' | 'soon' | 'graduated'
 
 export type pumpBlack = {
-  address: string,
-  type: 'ca'|'dev'| 'keyword'| 'twitter'
+  address: string
+  type: 'ca' | 'dev' | 'keyword' | 'twitter'
 }
-export type Size ='mini'| 'small' | 'medium' | 'large'
+export type Size = 'mini' | 'small' | 'medium' | 'large'
 
 export interface SizeObj {
   flash: string
@@ -178,6 +178,7 @@ export interface pumpObjColor {
 }
 export interface pumpData {
   platforms: string[]
+  platformsDetails: platform[]
   new: {
     count: number
     loading: boolean
@@ -193,4 +194,9 @@ export interface pumpData {
     loading: boolean
     pumpFilter?: {}
   }
+}
+export interface platform {
+  platform: string
+  platform_icon: string
+  platform_show: string
 }
