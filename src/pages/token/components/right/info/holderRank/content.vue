@@ -13,8 +13,8 @@
       <div class="grid grid-cols-[2fr_1fr_1fr_1fr] text-12px color-[--secondary-text]">
         <div>{{ $t('address') }}</div>
         <div class="text-right">{{ $t('positions') }}</div>
-        <div class="text-right">{{ $t('buy') }}/{{ $t('sell') }}</div>
-        <div class="text-right">{{ $t('totalProfit') }}</div>
+        <div class="text-right">{{ $t('profit3') }}</div>
+        <div class="text-right">{{ $t('buy1') }}/{{ $t('sell1') }}</div>
       </div>
       <!-- list -->
       <el-scrollbar :max-height="300">
@@ -97,6 +97,17 @@
               </div>
             </div>
 
+            <!-- 总收益 -->
+            <div class="text-right">
+              <div class="text-12px color-[--main-text]">
+                <ave-data-number :value="item.total_profit" :signVisible="true">
+                  {{ formatNumber( Math.abs(Number(item?.total_profit || 0)|| 0), 2) }}
+                </ave-data-number>
+              </div>
+              <div class="text-10px color-[--secondary-text]">
+                  {{ formatNumber(Math.abs(Number(item.total_profit_ratio || 0)), 2) }}%
+              </div>
+            </div>
             <!-- 买入 / 卖出 -->
             <div class="text-right">
               <div class="text-12px color-[--up-color]">
@@ -105,20 +116,6 @@
 
               <div class="text-12px color-[--down-color]">
                 ${{ formatNumber(item?.total_sold_usd || 0, 2) }}
-              </div>
-            </div>
-
-            <!-- 总收益 -->
-            <div class="text-right">
-              <div class="text-12px color-[--main-text]">
-                <ave-data-number :value="item.total_profit" :signVisible="true">
-                  {{ formatNumber( Math.abs(Number(item?.total_profit || 0)|| 0), 2) }}
-                </ave-data-number>
-              </div>
-
-              <div class="text-10px color-[--secondary-text]">
-                  {{ formatNumber(Math.abs(Number(item.total_profit_ratio || 0)), 2) }}%
-
               </div>
             </div>
           </div>
