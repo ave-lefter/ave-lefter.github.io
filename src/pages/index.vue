@@ -641,7 +641,6 @@ const mapStatistics = shallowRef(new Map<string, StatisticsItem>())
 //   return pumpV3.value?.[activeChain.value]?.platformsDetails || []
 // })
 const platformsList = computed(() => {
-  console.log('----pumpConfig--------', pumpConfig.value?.filter(i=> i.chain == activeChain.value)?.[0]?.platforms || [])
   return pumpConfig.value?.filter(i=> i.chain == activeChain.value)?.[0]?.platforms || []
 })
 const platforms = computed(() => {
