@@ -2093,5 +2093,7 @@
   "smarterAddress": "Smarter Address",
   "openMonitorSuccess": "Monitoring successfully enabled",
   "cancelMonitorSuccess": "Monitoring successfully disabled",
-  "trackerTypeRequired": "Please select at least one content type"
+  "trackerTypeRequired": "Please select at least one content type",
+  "twitterForHMe": "Twitter-Mine",
+  "twitterForHot": "Twitter-Hot"
 }

@@ -33,7 +33,7 @@
 import type { PopoverInstance } from 'element-plus';
 
 const props = defineProps<{
-  type: 'monitor' | 'twitter' | 'signal' | 'news',
+  type: 'monitor' | 'twitter' | 'signal' | 'news' | 'twitterForMe',
   buttonRef: any
 }>()
 

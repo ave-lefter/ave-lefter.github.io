@@ -658,5 +658,7 @@
   "createdAt": "Creado el",
   "openMonitorSuccess": "Monitoreo habilitado exitosamente",
   "cancelMonitorSuccess": "Monitoreo deshabilitado exitosamente",
-  "trackerTypeRequired": "Seleccione al menos un tipo de contenido"
+  "trackerTypeRequired": "Seleccione al menos un tipo de contenido",
+  "twitterForHMe": "Twitter-mío",
+  "twitterForHot": "Twitter-caliente"
 }

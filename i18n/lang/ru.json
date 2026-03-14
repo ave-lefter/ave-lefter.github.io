@@ -881,5 +881,7 @@
   "createdAt": "Создано",
   "openMonitorSuccess": "Мониторинг успешно включен",
   "cancelMonitorSuccess": "Мониторинг успешно отключен",
-  "trackerTypeRequired": "Пожалуйста, выберите хотя бы один тип контента"
+  "trackerTypeRequired": "Пожалуйста, выберите хотя бы один тип контента",
+  "twitterForHMe": "Твиттер-Мой",
+  "twitterForHot": "Twitter-Горячий"
 }

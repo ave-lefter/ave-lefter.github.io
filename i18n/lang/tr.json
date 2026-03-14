@@ -632,5 +632,7 @@
   "createdAt": "Oluşturuldu",
   "openMonitorSuccess": "İzleme başarıyla etkinleştirildi",
   "cancelMonitorSuccess": "İzleme başarıyla devre dışı bırakıldı",
-  "trackerTypeRequired": "Lütfen en az bir içerik türü seçin"
+  "trackerTypeRequired": "Lütfen en az bir içerik türü seçin",
+  "twitterForHMe": "Twitter-Mine",
+  "twitterForHot": "Twitter-Sıcak"
 }

@@ -876,5 +876,7 @@
   "createdAt": "Tạo lúc",
   "openMonitorSuccess": "Đã bật giám sát thành công",
   "cancelMonitorSuccess": "Đã vô hiệu hóa giám sát thành công",
-  "trackerTypeRequired": "Vui lòng chọn ít nhất một loại nội dung"
+  "trackerTypeRequired": "Vui lòng chọn ít nhất một loại nội dung",
+  "twitterForHMe": "Twitter-Mỏ",
+  "twitterForHot": "Twitter-Hot"
 }

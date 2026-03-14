@@ -2095,5 +2095,7 @@
   "totalTax": "总税率",
   "taxTip": "总税率：代币税率",
   "smarterAddress": "聪明钱包数",
-  "trackerTypeRequired": "请至少选择一种内容类型"
+  "trackerTypeRequired": "请至少选择一种内容类型",
+  "twitterForHMe": "推特-我的",
+  "twitterForHot": "推特-热门"
 }

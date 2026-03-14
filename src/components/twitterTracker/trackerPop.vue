@@ -63,8 +63,8 @@
               </div>
             </template>
           </el-popover>
-          <Icon class="cursor-pointer" ref="audioButtonRef"
-                :name="globalStore.audioSettings.audio.twitter ? 'custom:ad' : 'custom:admute'" />
+          <Icon class="cursor-pointer" :ref="!isMine ?'audioButtonRef':'audioButtonRef1'"
+                :name="(isMine ?globalStore.audioSettings.audio.twitterForMe : globalStore.audioSettings.audio.twitter) ? 'custom:ad' : 'custom:admute'" />
           <Icon v-show="isPaused" name="custom:stop"/>
           <!-- <el-dropdown :persistent="false" trigger="click">
               <div class="w-24px h-24px bg-[--main-list-hover] flex items-center justify-center rounded-4px cursor-pointer"><Icon name="material-symbols:language"/></div>
@@ -99,8 +99,11 @@
     </template>
     <div v-else>null</div>
     <AudioPopover v-if="audioButtonRef" :buttonRef="audioButtonRef" type="twitter"/>
+    <AudioPopover v-if="audioButtonRef1" :buttonRef="audioButtonRef1" type="twitterForMe"/>
     <AudioPopover v-if="audioButtonRef2" :buttonRef="audioButtonRef2" type="news"/>
     <audio ref="twitterAudio" controls style="display: none" :src="getAudioUrl(globalStore.audioSettings.audio.twitter)"
+      :volume="+globalStore.audioSettings.audio.volume / 100 || 0.5" />
+    <audio ref="twitterAudio1" controls style="display: none" :src="getAudioUrl(globalStore.audioSettings.audio.twitterForMe)"
       :volume="+globalStore.audioSettings.audio.volume / 100 || 0.5" />
     <audio ref="newsAudio" controls style="display: none" :src="getAudioUrl(globalStore.audioSettings.audio.news)"
       :volume="+globalStore.audioSettings.audio.volume / 100 || 0.5" />
@@ -133,8 +136,10 @@ const isPaused = ref(false)
 const isPaused2 = ref(false)
 const wsCacheArr = shallowRef([])
 const audioButtonRef = ref()
+const audioButtonRef1 = ref()
 const audioButtonRef2 = ref()
 const twitterAudio = useTemplateRef('twitterAudio')
+const twitterAudio1 = useTemplateRef('twitterAudio1')
 const followIds = useStorage('twFollowIds', [])
 
 const {dataSource: dataSource2, getList:getList2,total:total2} = useNews({newsAudio,activeParentTab,isPaused:isPaused2})
@@ -281,8 +286,9 @@ const twitterHandler = async (val) => {
         trackerStore.list.pop()
       }
     }
-    if (twitterAudio.value && globalStore.audioSettings.audio.twitter) {
-      twitterAudio.value.play()
+    const audioEl = isMine.value ? twitterAudio1.value : twitterAudio.value
+    if (audioEl && globalStore.audioSettings.audio[isMine.value ? 'twitterForMe' : 'twitter']) {
+      audioEl.play()
     }
   }
 }
