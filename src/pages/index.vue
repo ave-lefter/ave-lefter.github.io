@@ -1589,6 +1589,9 @@ async function getPump(rawParams: {
       graduated: pumpListRefGraduated.value,
     })[finalParams.category as keyof typeof isInitObj]?.scrollToTop?.()
     }
+    if (!finalParams.platforms) {
+      finalParams.platforms = 'all'
+    }
     const res = await _getPumpList(finalParams)
 
     // 5. 数据转换
