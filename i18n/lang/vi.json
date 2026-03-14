@@ -878,5 +878,7 @@
   "cancelMonitorSuccess": "Đã vô hiệu hóa giám sát thành công",
   "trackerTypeRequired": "Vui lòng chọn ít nhất một loại nội dung",
   "twitterForHMe": "Twitter-Mỏ",
-  "twitterForHot": "Twitter-Hot"
+  "twitterForHot": "Twitter-Hot",
+  "txFilter": "Bộ lọc giao dịch",
+  "filterWallet2": "Lọc ví"
 }

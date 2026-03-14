@@ -2,14 +2,16 @@
   <div v-if="modelValue"
     class="w-orderBook bg-[--d-0B0D12-l-F6F9FF] relative rounded-2px text-14px pt-20px flex flex-col overflow-hidden"
     :style="{ height: `${(klineHeight || 200)}px` }">
-    <!-- 111: {{   !(!modelValue
+    <!-- 111: {{   !(
+    !modelValue
     || listStatus.loadingTxs
     || listStatus.loadingTxs1
     || listStatus.finished
-    || filterTableList.length === 0) }} -->
+    || filterTableList.length === 0
+) }} -->
     <!-- 筛选标签 -->
     <div class="mx-12px pb-12px flex items-center justify-between lh-none">
-      <div class="flex gap-11px color-[--d-5A5E64-l-A9B0BC]">
+      <div class="flex gap-11px color-[--third-text1]">
         <div class="me-btn shrink-0 flex items-center gap-4px sticky right-0 cursor-pointer"
           :class="{ 'active': activeTab==='-100' }" @click="toggleClickFollowed">
           <!-- <Icon name="i-tdesign:user-filled" class="text-md" /> -->
@@ -26,16 +28,16 @@
         <Icon name="custom:filter" class="text-12px cursor-pointer" :class="isFilterActive?'color-[--primary-color]':'color-[--third-text] hover:color-[--d-E0E0E0-l-333]'" @click.self="filterDialogVisible=true"/>
       </div>
     </div>
-    <div class="ml-12px mr-42px pb-12px flex">
+    <div class="mx-12px pb-12px flex">
       <div ref="tabsContainer"
-        class="flex-1 flex items-center gap-x-8px whitespace-nowrap overflow-x-auto scrollbar-hide border-1px border-solid border-[#f2f2f2] dark:border-[#7072754D] rounded-4px">
+        class="flex items-center gap-x-8px whitespace-nowrap overflow-x-auto scrollbar-hide border-1px border-solid b-[--main-divider1] rounded-4px">
         <button v-for="(tab, index) in tabs" :key="tab.value"
           :style="{ backgroundColor: ((activeTab === tab.value) || (activeTab === '-100' && tab.value==='all'))? 'rgba(63, 128, 247, 0.10)' : 'transparent' }"
           :class="[
-            'shrink-0 text-12px px-8px py-4px rounded-4px border-none cursor-pointer',
+            'shrink-0 text-12px px-4px py-4px rounded-4px border-none cursor-pointer',
             ((activeTab === tab.value) || (activeTab === '-100' && tab.value==='all'))
-              ? 'color-[--d-E0E0E0-l-333]'
-              : 'bg-[--d-16181D-l-ECF3FF] color-[--d-5A5E64-l-A9B0BC]'
+              ? 'color-[--main-text1] bg-[--main-divider1]'
+              : 'color-[--third-text1]'
           ]" @click="setActiveTab(tab.value, index)">
           {{ tab.label }}
         </button>
@@ -48,48 +50,34 @@
       <div v-loading="tableLoading" class="text-12px">
         <!-- 表格头部 -->
         <div
-          class="grid grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] items-center gap-15px mt-8px mb-4px text-12px color-[--d-5A5E64-l-A9B0BC] px-12px">
+          class="grid grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] items-center gap-15px mt-8px mb-4px text-12px color-[--third-text1] px-12px">
           <div class="grid grid-cols-[minmax(0,0.8fr)_minmax(0,1fr)] items-center gap-15px">
             <div class="text-left text-nowrap min-w-0">
-              <div class="flex items-center justify-start gap-2px">
+              <div class="flex items-center justify-start gap-2px clickable" @click="globalStore.isUSDT = !globalStore.isUSDT">
                 <span>{{ t('amountU').slice(0, 3) }}</span>
-                <img v-if="!globalStore.isUSDT" :src="`${token_logo_url}chain/${token?.chain}.png`" class="mt-1px border-rd-[50%]" height="11" alt=""></img>
-                <el-button class="p-0 px-2px border-none hover:bg-[transparent] h-auto"
-                  @click="globalStore.isUSDT = !globalStore.isUSDT">
-                  <svg v-if="globalStore.isUSDT" width="10" height="10" viewBox="0 0 10 10" fill="none"
-                    xmlns="http://www.w3.org/2000/svg" class="color-[--d-5A5E64-l-A9B0BC]">
-                    <path
-                      d="M5 0C2.23884 0 0 2.23884 0 5C0 7.76116 2.23884 10 5 10C7.76116 10 10 7.76116 10 5C10 2.23884 7.76116 0 5 0ZM5.24889 7.42411L5.25112 7.7779C5.25112 7.82701 5.21094 7.8683 5.16183 7.8683H4.84486C4.79576 7.8683 4.75558 7.82812 4.75558 7.77902V7.42857C3.76451 7.35491 3.29799 6.79017 3.24777 6.17634C3.24331 6.12388 3.2846 6.07924 3.33706 6.07924H3.85268C3.89621 6.07924 3.93415 6.11049 3.94085 6.1529C3.99777 6.5067 4.27344 6.7712 4.76785 6.83705V5.24442L4.49219 5.17411C3.90848 5.0346 3.35268 4.67076 3.35268 3.9163C3.35268 3.10268 3.97098 2.66518 4.76116 2.58817V2.21986C4.76116 2.17076 4.80134 2.13058 4.85045 2.13058H5.16406C5.21317 2.13058 5.25334 2.17076 5.25334 2.21986V2.58482C6.01786 2.66183 6.59152 3.10826 6.65848 3.80357C6.66406 3.85603 6.62276 3.90179 6.56919 3.90179H6.06808C6.02343 3.90179 5.98549 3.8683 5.97991 3.82478C5.93527 3.49888 5.67411 3.23326 5.24889 3.17522V4.6741L5.53237 4.73996C6.25558 4.91852 6.74777 5.26451 6.74777 6.03907C6.74777 6.87947 6.12277 7.34822 5.24889 7.42411ZM4.04688 3.86496C4.04688 4.14843 4.2221 4.36831 4.59933 4.50446C4.65179 4.52567 4.70424 4.54241 4.76674 4.56026V3.17634C4.35491 3.2288 4.04688 3.45982 4.04688 3.86496ZM5.34709 5.37388C5.31585 5.36718 5.2846 5.35938 5.24889 5.34933V6.84152C5.72433 6.79911 6.05246 6.53795 6.05246 6.10044C6.05246 5.75782 5.875 5.53459 5.34709 5.37388Z"
-                      fill="currentColor" />
-                  </svg>
-                  <template v-else >
-                    <svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg"
-                      class="color-[--d-5A5E64-l-A9B0BC]">
-                      <path fill-rule="evenodd" clip-rule="evenodd"
-                        d="M5 0C7.757 0 10 2.243 10 5C10 7.757 7.757 10 5 10C2.243 10 0 7.757 0 5C0 2.243 2.243 0 5 0ZM5.1 3C4.78 3 4.484 3.114 4.256 3.342L3.342 4.256C3.114 4.484 3 4.78 3 5.1C2.9953 5.41628 3.11864 5.72103 3.342 5.945L4.256 6.858C4.484 7.087 4.78 7.2 5.1 7.2C5.41434 7.19485 5.71531 7.07268 5.945 6.858L6.858 5.945C7.087 5.717 7.201 5.42 7.201 5.1C7.201 4.781 7.087 4.484 6.858 4.256L5.945 3.342C5.717 3.114 5.42 3 5.1 3ZM5.1 3.64C5.23799 3.64449 5.369 3.70176 5.466 3.8L6.379 4.712C6.48602 4.80272 6.54509 4.93783 6.539 5.078C6.53426 5.21564 6.477 5.34624 6.379 5.443L5.465 6.356C5.26 6.539 4.918 6.539 4.735 6.356L3.822 5.443C3.708 5.352 3.662 5.215 3.662 5.078C3.66649 4.94001 3.72376 4.80901 3.822 4.712L4.735 3.8C4.82551 3.69326 4.96018 3.63423 5.1 3.64Z"
-                        fill="currentColor" />
-                    </svg>
-                  </template>
-                </el-button>
+                <!-- <img v-if="!globalStore.isUSDT" :src="`${token_logo_url}chain/${token?.chain}.png`" class="mt-1px border-rd-[50%]" height="11" alt=""></img> -->
+                <Icon v-if="globalStore.isUSDT" name="custom:price2" class="color-[--third-text1] text-10px"/>
+                <Icon v-else name="custom:amount2" class="color-[--third-text1] text-10px"/>
               </div>
             </div>
-            <div class="flex items-center justify-start gap-2px text-nowrap min-w-0">
+            <div class="flex items-center justify-start gap-2px text-nowrap min-w-0 clickable" @click="tableView.isAmount = !tableView.isAmount">
               {{ tableView.isAmount ? t('swapPrice') : t('MC') }}
-              <el-button class="p-0 px-2px border-none hover:bg-[transparent] h-auto"
+              <Icon name="custom:exchange-horizontal" class="color-[--third-text1] text-10px"/>
+              <!-- <div class="p-0 px-2px border-none hover:bg-[transparent] h-auto"
                 @click="tableView.isAmount = !tableView.isAmount">
                 <svg v-if="tableView.isAmount" width="10" height="10" viewBox="0 0 10 10" fill="none"
-                  xmlns="http://www.w3.org/2000/svg" class="color-[--d-5A5E64-l-A9B0BC]">
+                  xmlns="http://www.w3.org/2000/svg" class="color-[--third-text1]">
                   <path
                     d="M5 0C2.23884 0 0 2.23884 0 5C0 7.76116 2.23884 10 5 10C7.76116 10 10 7.76116 10 5C10 2.23884 7.76116 0 5 0ZM5.24889 7.42411L5.25112 7.7779C5.25112 7.82701 5.21094 7.8683 5.16183 7.8683H4.84486C4.79576 7.8683 4.75558 7.82812 4.75558 7.77902V7.42857C3.76451 7.35491 3.29799 6.79017 3.24777 6.17634C3.24331 6.12388 3.2846 6.07924 3.33706 6.07924H3.85268C3.89621 6.07924 3.93415 6.11049 3.94085 6.1529C3.99777 6.5067 4.27344 6.7712 4.76785 6.83705V5.24442L4.49219 5.17411C3.90848 5.0346 3.35268 4.67076 3.35268 3.9163C3.35268 3.10268 3.97098 2.66518 4.76116 2.58817V2.21986C4.76116 2.17076 4.80134 2.13058 4.85045 2.13058H5.16406C5.21317 2.13058 5.25334 2.17076 5.25334 2.21986V2.58482C6.01786 2.66183 6.59152 3.10826 6.65848 3.80357C6.66406 3.85603 6.62276 3.90179 6.56919 3.90179H6.06808C6.02343 3.90179 5.98549 3.8683 5.97991 3.82478C5.93527 3.49888 5.67411 3.23326 5.24889 3.17522V4.6741L5.53237 4.73996C6.25558 4.91852 6.74777 5.26451 6.74777 6.03907C6.74777 6.87947 6.12277 7.34822 5.24889 7.42411ZM4.04688 3.86496C4.04688 4.14843 4.2221 4.36831 4.59933 4.50446C4.65179 4.52567 4.70424 4.54241 4.76674 4.56026V3.17634C4.35491 3.2288 4.04688 3.45982 4.04688 3.86496ZM5.34709 5.37388C5.31585 5.36718 5.2846 5.35938 5.24889 5.34933V6.84152C5.72433 6.79911 6.05246 6.53795 6.05246 6.10044C6.05246 5.75782 5.875 5.53459 5.34709 5.37388Z"
                     fill="currentColor" />
                 </svg>
                 <svg v-else width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg"
-                  class="color-[--d-5A5E64-l-A9B0BC]">
+                  class="color-[--third-text1]">
                   <path
                     d="M9.02589 2.99465C9.33125 3.60428 9.5 4.2861 9.5 5.00802C9.5 7.48663 7.48304 9.5 5 9.5C2.51696 9.5 0.5 7.48663 0.5 5.00802C0.5 2.52941 2.50893 0.516043 5 0.516043V5.31283L9.02589 2.99465ZM5.64286 0.5V4.14171L8.69643 2.38503C7.99732 1.39037 6.90446 0.684492 5.64286 0.5Z"
                     fill="currentColor" />
                 </svg>
-              </el-button>
+              </div> -->
             </div>
           </div>
           <div class="grid grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] items-center gap-15px">
@@ -102,11 +90,11 @@
         </div>
 
         <!-- 表格内容 -->
-        <UseVirtualList :key="klineHeight" ref="scroller" :list="filterTableList" :options="{itemHeight:24}" style="margin-right: -12px;padding-right: 12px;" class="scrollbar-hide" :height="`${(klineHeight ?? 200) - 100}px`">
+        <UseVirtualList :key="klineHeight" ref="scroller" :list="filterTableList" :options="{itemHeight:24}" style="margin-right: -12px;padding-right: 12px;overscroll-behavior-y: contain" class="scrollbar-hide" :height="`${(klineHeight ?? 200) - 110}px`">
             <template #default="{data:row,index}">
               <div
                 class="px-12px grid grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] items-center gap-15px h-24px hover:bg-[rgba(255,255,255,.02)] relative z-10 overflow-hidden cursor-pointer mt-1px first:mt-0"
-                :class="{ 'bg-[#1C1E20]': index % 2 === 1 }"
+                :class="{ 'bg-[--tooltip1]': index % 2 === 1 }"
                 @mouseenter="isPausedTxs = true"
                 @mouseleave="isPausedTxs = false"
                 @click="onRowClick({ rowData: row } as any)"
@@ -126,7 +114,7 @@
                       <template v-else>
                         <span>
                           {{ formatFixedDecimals(getAmount(row, true, false), 3) }}
-                          <!-- <span class="color-[--d-5A5E64-l-A9B0BC] hidden sm:inline">
+                          <!-- <span class="color-[--third-text1] hidden sm:inline">
                             {{ getChainInfo(row.chain)?.main_name }}
                           </span> -->
                         </span>
@@ -191,11 +179,11 @@
                   <!-- Time -->
                   <el-tooltip placement="top" :show-arrow="false" :persistent="false" :content="formatDate(row?.time, 'YYYY-MM-DD HH:mm:ss')">
                     <div class="text-right min-w-0">
-                      <div class="color-[--d-5A5E64-l-A9B0BC]">
+                      <div class="color-[--third-text1]">
                         <TimerCount v-if="row.time && Number(formatTimeFromNow(row.time, true)) < 60"
                           :key="`${row.time}${index}`" :timestamp="row.time" :end-time="60">
                           <template #default="{ seconds }">
-                            <span class="color-[--d-5A5E64-l-A9B0BC]">
+                            <span class="color-[--third-text1]">
                               <template v-if="seconds < 60">
                                 {{ seconds }}s
                               </template>
@@ -205,7 +193,7 @@
                             </span>
                           </template>
                         </TimerCount>
-                        <span v-else class="color-[--d-5A5E64-l-A9B0BC]">
+                        <span v-else class="color-[--third-text1]">
                           {{ formatTimeFromNow(row.time) }}
                         </span>
                       </div>
@@ -255,15 +243,43 @@
       <SignalTags tagClass="mr-3px" :tags="currentRow.newTags" :walletAddress="currentRow.wallet_address"
         :chain="currentRow.chain" />
     </MarkerTooltip>
-    <el-dialog v-if="filterDialogVisible" v-model="filterDialogVisible" :width="440" :title="$t('markerAddressFilter')" destroy-on-close>
+    <el-dialog v-if="filterDialogVisible" v-model="filterDialogVisible" :width="440" :title="$t('txFilter')" destroy-on-close>
       <div class="mx--16px h-1px bg-[--border] mb-20px"/>
-      <div class="mb-10px">
-        <label for="markerAddress">
-          {{ $t('markerAddress') }}
+      <div class="mb-12px mt-20px">
+        <label>
+          {{ $t('filterTime') }}
         </label>
       </div>
-      <el-input id="markerAddress" v-model="dialogFilter.markerAddress"  class="text-12px" :placeholder="$t('markerAddress')"/>
-      <div class="mb-10px mt-20px">
+      <div class="flex items-center gap-20px">
+        <el-date-picker
+          v-model="tableFilter.timestamp[0]"
+          :disabled-date="disabledStartDate"
+          class="[--el-font-size-base:12px]"
+          type="datetime"
+          range-separator="To"
+          start-placeholder="yyyy/mm/dd hh:mm:ss"
+          end-placeholder="yyyy/mm/dd hh:mm:ss"
+          format="YYYY-MM-DD HH:mm:ss"
+          value-format="X"
+          prefix-icon="Calendar"
+          :teleported="false"
+        />
+        <span class="color-[--third-text]">~</span>
+        <el-date-picker
+          v-model="tableFilter.timestamp[1]"
+          :disabled-date="disabledEndDate"
+          class="[--el-font-size-base:12px]"
+          type="datetime"
+          range-separator="To"
+          start-placeholder="yyyy/mm/dd hh:mm:ss"
+          end-placeholder="yyyy/mm/dd hh:mm:ss"
+          format="YYYY-MM-DD HH:mm:ss"
+          value-format="X"
+          prefix-icon="Calendar"
+          :teleported="false"
+        />
+      </div>
+          <div class="mb-12px mt-20px">
         <label>
           {{ $t('filter') }}
         </label>
@@ -280,6 +296,7 @@
         >
           <template #suffix>$</template>
         </el-input>
+        <span class="color-[--third-text]">~</span>
         <el-input
           v-model.trim.number="dialogFilter.maxVol"
           
@@ -292,6 +309,13 @@
           <template #suffix>$</template>
         </el-input>
       </div>
+      <div class="mb-12px mt-20px">
+        <label for="markerAddress">
+          {{ $t('filterWallet2') }}
+        </label>
+      </div>
+      <el-input id="markerAddress" v-model="dialogFilter.markerAddress"  class="text-12px" :placeholder="$t('markerAddress')"/>
+    
       <div class="mt-20px flex">
         <el-button
           class="h-30px flex-1 m-l-auto"
@@ -325,7 +349,7 @@ import type { RowEventHandlerParams } from 'element-plus'
 import type { SimpleWSTx } from '../kLine/types'
 import BigNumber from 'bignumber.js'
 import DateFilterCard from '../dateFilterCard.vue'
-import { set } from 'lodash-es'
+import dayjs from 'dayjs'
 const tokenStore = useTokenStore()
 const themeStore = useThemeStore()
 
@@ -388,25 +412,26 @@ const wsPairCache = shallowRef<ExtendedTxResponse[]>([])
 
 // 用 IntersectionObserver 监听 sentinel。
 // 特别重要：把 root 指定为虚拟列表的滚动容器 scroller.value
-// useIntersectionObserver(
-//   sentinel,
-//   ([{ isIntersecting }]) => {
-//     if (
-//       !props.modelValue
-//       || !isIntersecting
-//       || listStatus.value.loadingTxs
-//       || listStatus.value.loadingTxs1
-//       || listStatus.value.finished
-//       || filterTableList.value.length === 0
-//     ) return
-//     getTokenTxs()
-//   },
-//   {
-//     root: scroller, // 注意传 ref（@vueuse/core 会处理）
-//     threshold: 0,
-//     rootMargin: '0px 0px 120px 0px',
-//   }
-// )
+useIntersectionObserver(
+  sentinel,
+  ([{ isIntersecting }]) => {
+    console.log('isIntersecting', isIntersecting,listStatus.value,filterTableList.value.length)
+    if (
+      !props.modelValue
+      || !isIntersecting
+      || listStatus.value.loadingTxs
+      || listStatus.value.loadingTxs1
+      || listStatus.value.finished
+      || filterTableList.value.length === 0
+    ) return
+    _getTokenTxs()
+  },
+  {
+    root: scroller, // 注意传 ref（@vueuse/core 会处理）
+    threshold: 0,
+    rootMargin: '0px 0px 120px 0px',
+  }
+)
 
 const tableFilter = ref({
   markerAddress: '',
@@ -434,7 +459,9 @@ const defaultDialogFilter = {
   maxVol:''
 }
 const dialogFilter = ref({...defaultDialogFilter})
-
+const ignoreWs = computed(() => {
+  return !['all'].includes(activeTab.value)
+})
 const tabs = computed(() => {
   const arr: Array<{ label: string, value: string }> = []
   if (Array.isArray(totalHolders.value)) {
@@ -506,18 +533,25 @@ function sortChange(sort_dir: string) {
 }
 
 
-const { reset } = useInfiniteScroll(scroller, ()=>{
-  console.log('infiniteScroll')
-  // emits('endReached')
-  if (
-    !props.modelValue
-    || listStatus.value.loadingTxs
-    || listStatus.value.loadingTxs1
-    || listStatus.value.finished
-    || filterTableList.value.length === 0
-  ) return
-  _getTokenTxs()
-}, { distance: 100})
+// const { reset,isLoading } = useInfiniteScroll(scroller, ()=>{
+//   console.log('infiniteScroll')
+//   // emits('endReached')
+//   // if (
+//   //   !props.modelValue
+//   //   || listStatus.value.loadingTxs
+//   //   || listStatus.value.loadingTxs1
+//   //   || listStatus.value.finished
+//   //   || filterTableList.value.length === 0
+//   // ) return
+//   _getTokenTxs()
+// }, { distance: 100 , canLoadMore: ()=>!(
+//     !props.modelValue
+//     || listStatus.value.loadingTxs
+//     || listStatus.value.loadingTxs1
+//     || listStatus.value.finished
+//     || isLoading.value
+//     || filterTableList.value.length === 0
+// )})
 
 async function filterSubmit() {
   console.log('filterSubmit')
@@ -526,7 +560,7 @@ async function filterSubmit() {
   listStatus.value.finished = false
   wsPairCache.value = []
   tokenTxs.value=[]
-  reset()
+  // reset()
   setTimeout(() => {
     getTokenTxs()
   },500)
@@ -1217,7 +1251,7 @@ function bigWallet(row: ExtendedTxResponse) {
 }
 
 // WebSocket 相关功能
-onMounted(() => {
+onMounted(async() => {
   // onTxsLiqMessage()
   // 如果组件挂载时 orderBook 已经打开，则获取数据
   if (props.modelValue && pairAddress.value) {
@@ -1225,6 +1259,8 @@ onMounted(() => {
     subscribeToTxs()
   }
   window.addEventListener('resize', updateWidth)
+  // await nextTick()
+  // reset()
 })
 
 // 保存 watch 监听器的 unwatch 函数，用于组件卸载时清理
@@ -1246,7 +1282,7 @@ onUnmounted(() => {
 })
 
 watchTxUnwatch = watch(() => wsStore.wsResult[WSEventType.TX], data => {
-  if (!data || listStatus.value.loadingTxs) {
+  if (!data || listStatus.value.loadingTxs || ignoreWs.value) {
     return
   }
   const { wallet_address, from_address, to_address } = data.tx
@@ -1417,6 +1453,27 @@ function resetDialogFilter() {
 
   confirmDialogFilter()
 }
+
+const disabledStartDate = (date:Date)=>{
+  if(tableFilter.value.timestamp[1]){
+    return dayjs(date).isAfter(dayjs((Number(tableFilter.value.timestamp[1])*1000)))
+  }
+  return false
+}
+const disabledEndDate = (date:Date)=>{
+  if(tableFilter.value.timestamp[0]){
+    const filterTime0 = dayjs((Number(tableFilter.value.timestamp[0])*1000))
+    return dayjs(date).isBefore(filterTime0) && !dayjs(date).isSame(filterTime0, 'day')
+  }
+  return false
+}
+const disabledSave = computed(()=>{
+  if(tableFilter.value.timestamp[1] && tableFilter.value.timestamp[0]){
+    return tableFilter.value.timestamp[1] < tableFilter.value.timestamp[0]
+  }
+  return false
+})
+
 </script>
 
 <style lang="scss" scoped>
@@ -1430,7 +1487,7 @@ function resetDialogFilter() {
   padding: 2px 0px;
 
   &.active {
-    color: var(--d-E0E0E0-l-333);
+    color: var(--main-text1);
   }
 }
 

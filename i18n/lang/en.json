@@ -2095,5 +2095,7 @@
   "cancelMonitorSuccess": "Monitoring successfully disabled",
   "trackerTypeRequired": "Please select at least one content type",
   "twitterForHMe": "Twitter-Mine",
-  "twitterForHot": "Twitter-Hot"
+  "twitterForHot": "Twitter-Hot",
+  "txFilter": "Transaction Filter",
+  "filterWallet2": "Filter Wallet"
 }

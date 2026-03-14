@@ -1487,5 +1487,7 @@
   "cancelMonitorSuccess": "監視が正常に無効になりました",
   "trackerTypeRequired": "少なくとも 1 つのコンテンツ タイプを選択してください",
   "twitterForHMe": "ツイッター-マイン",
-  "twitterForHot": "ツイッターで話題"
+  "twitterForHot": "ツイッターで話題",
+  "txFilter": "トランザクションフィルター",
+  "filterWallet2": "フィルターウォレット"
 }

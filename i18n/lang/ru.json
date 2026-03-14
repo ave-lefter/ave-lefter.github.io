@@ -883,5 +883,7 @@
   "cancelMonitorSuccess": "Мониторинг успешно отключен",
   "trackerTypeRequired": "Пожалуйста, выберите хотя бы один тип контента",
   "twitterForHMe": "Твиттер-Мой",
-  "twitterForHot": "Twitter-Горячий"
+  "twitterForHot": "Twitter-Горячий",
+  "txFilter": "Фильтр транзакций",
+  "filterWallet2": "Фильтровать кошелек"
 }

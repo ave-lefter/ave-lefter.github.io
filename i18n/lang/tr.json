@@ -634,5 +634,7 @@
   "cancelMonitorSuccess": "İzleme başarıyla devre dışı bırakıldı",
   "trackerTypeRequired": "Lütfen en az bir içerik türü seçin",
   "twitterForHMe": "Twitter-Mine",
-  "twitterForHot": "Twitter-Sıcak"
+  "twitterForHot": "Twitter-Sıcak",
+  "txFilter": "İşlem Filtresi",
+  "filterWallet2": "Cüzdanı Filtrele"
 }

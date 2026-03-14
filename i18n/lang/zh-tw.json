@@ -2072,5 +2072,7 @@
   "smarterAddress": "聪明钱包数",
   "trackerTypeRequired": "請至少選擇一種內容類型",
   "twitterForHMe": "推特-我的",
-  "twitterForHot": "推特-熱門"
+  "twitterForHot": "推特-熱門",
+  "txFilter": "交易篩選",
+  "filterWallet2": "篩選錢包"
 }

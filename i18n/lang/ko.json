@@ -1487,5 +1487,7 @@
   "cancelMonitorSuccess": "모니터링이 비활성화되었습니다",
   "trackerTypeRequired": "콘텐츠 유형을 하나 이상 선택하세요.",
   "twitterForHMe": "트위터-마인",
-  "twitterForHot": "트위터-핫"
+  "twitterForHot": "트위터-핫",
+  "txFilter": "거래 필터",
+  "filterWallet2": "필터 지갑"
 }

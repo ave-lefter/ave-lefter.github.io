@@ -660,5 +660,7 @@
   "cancelMonitorSuccess": "Monitoreo deshabilitado exitosamente",
   "trackerTypeRequired": "Seleccione al menos un tipo de contenido",
   "twitterForHMe": "Twitter-mío",
-  "twitterForHot": "Twitter-caliente"
+  "twitterForHot": "Twitter-caliente",
+  "txFilter": "Filtro de transacciones",
+  "filterWallet2": "Filtrar billetera"
 }
