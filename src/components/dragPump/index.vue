@@ -33,7 +33,7 @@ watch(
 )
 
 onMounted(() => {
-  dragPumpStore.getPumpConfig()
+  // dragPumpStore.getPumpConfig()
   if (dragPumpStore.visible) {
     loadComponent()
   } else {
