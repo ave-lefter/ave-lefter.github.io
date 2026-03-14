@@ -2092,5 +2092,6 @@
   "taxTip": "Total tax rate: Token tax rate",
   "smarterAddress": "Smarter Address",
   "openMonitorSuccess": "Monitoring successfully enabled",
-  "cancelMonitorSuccess": "Monitoring successfully disabled"
+  "cancelMonitorSuccess": "Monitoring successfully disabled",
+  "trackerTypeRequired": "Please select at least one content type"
 }

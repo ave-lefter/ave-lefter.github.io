@@ -880,5 +880,6 @@
   "migratedToMarket": "Перемещено на рынок",
   "createdAt": "Создано",
   "openMonitorSuccess": "Мониторинг успешно включен",
-  "cancelMonitorSuccess": "Мониторинг успешно отключен"
+  "cancelMonitorSuccess": "Мониторинг успешно отключен",
+  "trackerTypeRequired": "Пожалуйста, выберите хотя бы один тип контента"
 }

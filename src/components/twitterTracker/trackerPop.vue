@@ -208,6 +208,10 @@ if (botStore.accessToken) {
 }
 
 const confirmQuery = () => {
+  if(query.value.types.length === 0) {
+    ElMessage.error(t('trackerTypeRequired'))
+    return 
+  }
   filterVisible.value = false
   reset()
   trackerStore.query = {

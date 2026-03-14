@@ -631,5 +631,6 @@
   "migratedToMarket": "Pazara taşındı",
   "createdAt": "Oluşturuldu",
   "openMonitorSuccess": "İzleme başarıyla etkinleştirildi",
-  "cancelMonitorSuccess": "İzleme başarıyla devre dışı bırakıldı"
+  "cancelMonitorSuccess": "İzleme başarıyla devre dışı bırakıldı",
+  "trackerTypeRequired": "Lütfen en az bir içerik türü seçin"
 }

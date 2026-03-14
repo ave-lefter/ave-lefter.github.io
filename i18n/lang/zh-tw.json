@@ -2069,5 +2069,6 @@
   "cancelMonitorSuccess": "取消監控成功",
   "totalTax": "總稅率",
   "taxTip": "總稅率：代幣稅率",
-  "smarterAddress": "聪明钱包数"
+  "smarterAddress": "聪明钱包数",
+  "trackerTypeRequired": "請至少選擇一種內容類型"
 }

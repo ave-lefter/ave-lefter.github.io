@@ -657,5 +657,6 @@
   "migratedToMarket": "Migrado al mercado",
   "createdAt": "Creado el",
   "openMonitorSuccess": "Monitoreo habilitado exitosamente",
-  "cancelMonitorSuccess": "Monitoreo deshabilitado exitosamente"
+  "cancelMonitorSuccess": "Monitoreo deshabilitado exitosamente",
+  "trackerTypeRequired": "Seleccione al menos un tipo de contenido"
 }

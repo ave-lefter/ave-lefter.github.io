@@ -1484,5 +1484,6 @@
   "migratedToMarket": "市場に移行",
   "createdAt": "作成日",
   "openMonitorSuccess": "モニタリングが正常に有効になりました",
-  "cancelMonitorSuccess": "監視が正常に無効になりました"
+  "cancelMonitorSuccess": "監視が正常に無効になりました",
+  "trackerTypeRequired": "少なくとも 1 つのコンテンツ タイプを選択してください"
 }
