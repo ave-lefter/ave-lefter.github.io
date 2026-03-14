@@ -736,8 +736,13 @@ function openConfirmLimit() {
   const decimals = swapStore.activeTab === 0 ? swapStore.token1.decimals : swapStore.token2.decimals
   let slippage = new BigNumber(limitSlippage.value || 0)
   slippage = new BigNumber(1).minus(slippage.div(100))
-  let fee = new BigNumber(LimitContractsFee[limitFromToken.chain || walletStore.chain] || 0).times(5)
-  fee = fee.gte(3) ? (fee.gte(50) ? new BigNumber(50) : fee) : new BigNumber(3)
+  const _chain = limitFromToken.chain || walletStore.chain
+  let fee = new BigNumber(LimitContractsFee[_chain] || 0).times(5)
+  if (_chain === 'eth') {
+    fee = fee = new BigNumber(5)
+  } else {
+    fee = fee.gte(3) ? (fee.gte(50) ? new BigNumber(50) : fee) : new BigNumber(3)
+  }
   const u = new BigNumber(limitFromAmount).times(limitFromToken?.price || 0).gte(fee.times(0.999))
   if (!u) {
     ElMessageBox.alert(t('minimumTransactionAmount', {n: fee.toFixed()}), t('tips'), {
