@@ -27,6 +27,8 @@ import { UniChainsV4 } from './wallet/utils/abi'
 import type { MessageHandler } from 'element-plus'
 import CryptoJS from 'crypto-js'
 import localforage from 'localforage'
+import AvatarDark from '../assets/images/avatar-dark.svg?url'
+import AvatarLight from '../assets/images/avatar-light.svg?url'
 export * from './wallet/utils/index'
 
 export function isJSON(str: string) {
@@ -266,49 +268,55 @@ export function getAi(i: {
 
 // 根据字符串生成头像
 export function generateAvatarIcon(string: string) {
-  const hashBuffer = sha1(string)
-  const hash = hashBuffer.toString()
-  const width = 80
-  const height = 80
-  const pixelSize = 10
-  const canvas = document.createElement('canvas')
-  canvas.width = width
-  canvas.height = height
-  const ctx = canvas.getContext('2d')
-  const color1 = '#' + hash.slice(0, 6)
-  const color2 = '#' + hash.slice(6, 12)
-  const color3 = '#' + hash.slice(12, 18)
-  const columns = Math.floor(width / pixelSize)
-  const rows = Math.floor(height / pixelSize)
-  const halfColumns = Math.floor((columns + 1) / 2)
-  for (let row = 0; row < rows; row++) {
-    for (let column = 0; column < halfColumns; column++) {
-      const xPos = column * pixelSize
-      const yPos = row * pixelSize
-      const colorChoice = (row * halfColumns + column) % 3
-      let color
-      switch (colorChoice) {
-        case 0:
-          color = color1
-          break
-        case 1:
-          color = color2
-          break
-        case 2:
-          color = color3
-          break
-        default:
-          color = color1
-          break
-      }
-      if (ctx) {
-        ctx.fillStyle = color
-        ctx.fillRect(xPos, yPos, pixelSize, pixelSize)
-        ctx.fillRect(width - xPos - pixelSize, yPos, pixelSize, pixelSize)
-      }
-    }
+  const theme = useThemeStore().theme
+  if (theme === 'dark') {
+    return AvatarDark
+  } else {
+    return AvatarLight
   }
-  return canvas.toDataURL('image/png')
+  // const hashBuffer = sha1(string)
+  // const hash = hashBuffer.toString()
+  // const width = 80
+  // const height = 80
+  // const pixelSize = 10
+  // const canvas = document.createElement('canvas')
+  // canvas.width = width
+  // canvas.height = height
+  // const ctx = canvas.getContext('2d')
+  // const color1 = '#' + hash.slice(0, 6)
+  // const color2 = '#' + hash.slice(6, 12)
+  // const color3 = '#' + hash.slice(12, 18)
+  // const columns = Math.floor(width / pixelSize)
+  // const rows = Math.floor(height / pixelSize)
+  // const halfColumns = Math.floor((columns + 1) / 2)
+  // for (let row = 0; row < rows; row++) {
+  //   for (let column = 0; column < halfColumns; column++) {
+  //     const xPos = column * pixelSize
+  //     const yPos = row * pixelSize
+  //     const colorChoice = (row * halfColumns + column) % 3
+  //     let color
+  //     switch (colorChoice) {
+  //       case 0:
+  //         color = color1
+  //         break
+  //       case 1:
+  //         color = color2
+  //         break
+  //       case 2:
+  //         color = color3
+  //         break
+  //       default:
+  //         color = color1
+  //         break
+  //     }
+  //     if (ctx) {
+  //       ctx.fillStyle = color
+  //       ctx.fillRect(xPos, yPos, pixelSize, pixelSize)
+  //       ctx.fillRect(width - xPos - pixelSize, yPos, pixelSize, pixelSize)
+  //     }
+  //   }
+  // }
+  // return canvas.toDataURL('image/png')
 }
 
 export function isValidAddress(address: string, chain = 'eth') {

@@ -125,10 +125,10 @@ export const LimitContracts: Record<string, string> = {
   core: '0x5ef26d780E484A7577e25a3D8c724a5CEffc1A49',
   polygon: '0xD511b30B4a909cf1f17B6e98F5A2A3eE53864C2f',
   eth: '0xD511b30B4a909cf1f17B6e98F5A2A3eE53864C2f',
-  oec: '0xD511b30B4a909cf1f17B6e98F5A2A3eE53864C2f',
-  pego: '0xD511b30B4a909cf1f17B6e98F5A2A3eE53864C2f',
-  pulsechain: '0xD511b30B4a909cf1f17B6e98F5A2A3eE53864C2f',
-  optimism: '0xD511b30B4a909cf1f17B6e98F5A2A3eE53864C2f',
+  // oec: '0xD511b30B4a909cf1f17B6e98F5A2A3eE53864C2f',
+  // pego: '0xD511b30B4a909cf1f17B6e98F5A2A3eE53864C2f',
+  // pulsechain: '0xD511b30B4a909cf1f17B6e98F5A2A3eE53864C2f',
+  // optimism: '0xD511b30B4a909cf1f17B6e98F5A2A3eE53864C2f',
   base: '0x8fCDB0dd83e5AC8Fd8Eb8e7D7Ad16eB8fdc64027',
   opbnb: '0x665161f5a167485f2d74435E480F47445A36F4a4'
 }
@@ -138,7 +138,7 @@ export const LimitContractsFee: Record<string, number> = {
   core: 0.0005,
   arbitrum: 0.5,
   polygon: 0.02,
-  eth: 20,
+  eth: 1,
   oec: 0.01,
   optimism: 1,
   pego: 0.2,

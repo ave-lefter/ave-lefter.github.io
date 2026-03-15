@@ -120,6 +120,7 @@ export default defineNuxtConfig({
     // 添加 gameanalytics
     '@/plugins/core-js.ts',
     '@/plugins/gameanalytics.client.ts',
+    '@/plugins/tooltip.client.ts', // 移到前面，确保在 directives 之前加载
     '@/plugins/directives/index.ts', // 引入自定义指令插件
     '@/plugins/pwa-meta.client.ts', // 引入 pwa-meta 插件
     '@/plugins/i18n-sync.client.ts',
@@ -128,7 +129,6 @@ export default defineNuxtConfig({
     '@/plugins/api/index.ts',
     '@/plugins/vemachine-init.client.ts',
     '@/plugins/tradingview.client.ts',
-    '@/plugins/tooltip.client.ts',
     '@/plugins/popover.client.ts',
     '@/plugins/dialog.client.ts',
     '@/plugins/aliyun-captcha.client.ts',

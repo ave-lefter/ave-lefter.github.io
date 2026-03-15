@@ -172,11 +172,11 @@ export const usePumpStore = defineStore('pumpStore', () => {
   }
 
   const pump_solana_platforms = useStorage(
-    'pump_solana_platforms',
+    'pump_solana_platforms18',
     ['pump', 'moonshot', 'raydium', 'jupstudio', 'moon_new', 'cookingcity', 'bonk', 'bags']
   )
   const pumpV3: RemovableRef<Record<ChainKey, pumpData>> = useStorage(
-    'pumpV18',
+    'pumpV19',
     {
       solana: {
         platforms: [],
@@ -273,11 +273,11 @@ export const usePumpStore = defineStore('pumpStore', () => {
   )
 
   const activeChain = useStorage<ChainKey>(
-    'pump_activeChain',
+    'pump_activeChain18',
     'bsc',
     sessionStorage
   )
-  const pump_query = useStorage('pump_query3', {
+  const pump_query = useStorage('pump_query18', {
     solana: {
       new: '',
       soon: '',
@@ -305,7 +305,7 @@ export const usePumpStore = defineStore('pumpStore', () => {
     },
   })
   const pump_notice = useStorage(
-    'pump_notice5',
+    'pump_notice18',
     {
       solana: {
         new: '',

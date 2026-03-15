@@ -874,13 +874,11 @@ function openMarkerTooltip(row: IGetSimpleTxsResponse & { senderProfile: Profile
 
 function goBrowser(row: IGetSimpleTxsResponse) {
   // const rightClickAction = globalStore.audioSettings?.wallet?.clickAction
-  const targe = '_blank'
+  // let target = '_self'
   // if (rightClickAction === 1) {
-  //   targe ='_blank'
+  //   target ='_blank'
   // }
-  window.open(
-    formatExplorerUrl(row.chain, row.transaction, 'tx'), targe
-  )
+  window.open(formatExplorerUrl(row?.chain || '', row?.transaction || '', 'tx'))
 }
 
 const tabsContainer = ref<HTMLElement | null>(null)
@@ -1366,7 +1364,7 @@ onUnmounted(() => {
               v-else
               v-tooltip:tx="getSwapInfo(row.chain, row.amm)?.show_name"
               class="w-16px h-16px cursor-pointer rounded-full"
-              :src="formatIconSwap(row.amm)" alt="" @click.stop.self="goBrowser(row)">
+              :src="formatIconSwap(row.amm)" alt="">
             <Icon
               name="custom:browser" class="text-16px color-[--third-text] cursor-pointer"
               @click.stop.self="goBrowser(row)" />

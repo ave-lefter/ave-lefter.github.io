@@ -498,6 +498,8 @@ export interface IGetSimpleTxsResponse {
   maker_eth: string;
   page_token: string;
   remark: string;
+  chain?: string;
+  transaction?: string;
 }
 
 // 新版交易历史SimpleTxs

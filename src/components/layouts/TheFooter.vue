@@ -9,6 +9,16 @@
         <Icon name="custom:chart" class="text-12px" />
         {{ $t('PnlTracker') }}
       </div>
+      <el-badge :is-dot="isDoted" class="mr-12px">
+        <div
+          class="flex items-center gap-4px cursor-pointer hover:color-[--main-text]"
+          :class="signalStore.signalVisible ? 'color-[--main-text]' : 'color-[--secondary-text]'"
+          @click="handleClickDrag('signal')"
+        >
+          <Icon name="ri:signal-tower-fill" />
+          {{ $t('signal') }}
+        </div>
+      </el-badge>
       <el-badge :is-dot="!!botStore.evmAddress && isDoted2" class="mr-12px">
         <div
           id="monitor"
@@ -20,16 +30,7 @@
           {{ $t('walletMonitor') }}
         </div>
       </el-badge>
-      <el-badge :is-dot="isDoted" class="mr-12px">
-        <div
-          class="flex items-center gap-4px cursor-pointer hover:color-[--main-text]"
-          :class="signalStore.signalVisible ? 'color-[--main-text]' : 'color-[--secondary-text]'"
-          @click="handleClickDrag('signal')"
-        >
-          <Icon name="ri:signal-tower-fill" />
-          {{ $t('signal') }}
-        </div>
-      </el-badge>
+
       <el-badge :is-dot="isTwitterDotted" class="mr-12px">
         <div
           class="flex items-center gap-4px cursor-pointer hover:color-[--main-text]"
@@ -208,8 +209,8 @@ import { TokenImg, QuickSwap } from '#components'
 const { t } = useI18n()
 const { visible, hasRing } = storeToRefs(useMonitorStore())
 const dragStore = useDragStore()
-const monitorStore = useMonitorStore() 
-const signalStore = useSignalStore() 
+const monitorStore = useMonitorStore()
+const signalStore = useSignalStore()
 const trackerStore = useTwitterTrackerStore()
 const positionStore = usePositionStore()
 const themeStore = useThemeStore()
