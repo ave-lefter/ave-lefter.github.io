@@ -41,6 +41,7 @@ export const usePerpStore = defineStore('perp', () => {
   const lastPrice = shallowRef(0)
   const resolution = useLocalStorage('tv_resolution_perp', '15')
   const unit = ref<CoinInfo | null>(null)
+  const perpAcc = useLocalStorage('perp_accessToken', '')
 
   const normalWithdrawableAmount = ref('0')
   const depthData = reactive<{
@@ -343,6 +344,7 @@ export const usePerpStore = defineStore('perp', () => {
     normalWithdrawableAmount,
     buyList,
     sellList,
-    depthData
+    depthData,
+    perpAcc
   }
 })

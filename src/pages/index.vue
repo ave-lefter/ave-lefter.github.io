@@ -21,7 +21,7 @@
           <!-- <span>{{ item.chain_show || '' }}</span> -->
         </div>
       </div>
-      <el-popover
+      <!-- <el-popover
         v-model:visible="visible_platforms"
         placement="bottom-start"
         popper-class="new-popover"
@@ -83,7 +83,7 @@
             </template>
           </template>
         </template>
-      </el-popover>
+      </el-popover> -->
       <div class="flex-1" />
       <Setting :chain="activeChain" :pumpConfig="pumpConfig"/>
       <BlackList />
@@ -514,9 +514,10 @@ const orderSoon = computed(() => {
 const orderGraduated= computed(() => {
   return pumpSetting.value.grid['graduated']?.order
 })
-const pumpConfig = shallowRef<PumpConfig[]>()
+
+const pumpConfig = useStorage<PumpConfig[]>('pumpConfig', [])
 const isRotate = ref(false)
-const { pump_notice, pumpV3, pumpFilterDefault, pump_query } = storeToRefs(usePumpStore())
+const { pump_notice, pumpV3, pumpFilterDefault, pump_query} = storeToRefs(usePumpStore())
 const pumpAudio = useTemplateRef('pumpAudio')
 const visible_platforms = shallowRef(false)
 const pumpState = useState('pumpState', () => ({
@@ -636,13 +637,11 @@ type StatisticsItem = {
 let portraitTimer: ReturnType<typeof setTimeout> | null = null
 let isPortraitSubscribed = false
 const mapStatistics = shallowRef(new Map<string, StatisticsItem>())
+// const platformsList = computed(() => {
+//   return pumpV3.value?.[activeChain.value]?.platformsDetails || []
+// })
 const platformsList = computed(() => {
-  const list = pumpConfig?.value?.filter((i) => i?.chain === activeChain.value)
-  return (
-    list?.[0]?.platforms?.filter((i) =>
-      platforms?.value.includes(i.platform)
-    ) || []
-  )
+  return pumpConfig.value?.filter(i=> i.chain == activeChain.value)?.[0]?.platforms || []
 })
 const platforms = computed(() => {
     return pumpV3.value?.[activeChain.value]?.platforms?.filter?.(Boolean).join(',')
