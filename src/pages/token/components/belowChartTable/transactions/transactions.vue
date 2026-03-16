@@ -852,7 +852,8 @@ function bigWallet(row: (GetPairLiqResponse | IGetSimpleTxsResponse | SimpleWSTx
 }
 
 function getGradient(row: IGetSimpleTxsResponse) {
-  const str = `${useThemeStore().isDark}-${isBuy(row)}`
+  const str = `true-${isBuy(row)}`
+  // const str = `${useThemeStore().isDark}-${isBuy(row)}`
   const map = {
     'true-true': 'bg-[linear-gradient(270deg,#111_0%,#12654C_70%,#12B886_100%)]',
     'true-false': 'bg-[linear-gradient(270deg,#111_0%,#7F2A36_70%,#F6465D_100%)]',

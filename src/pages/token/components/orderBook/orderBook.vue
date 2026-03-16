@@ -17,7 +17,7 @@
     <div>{{ klineHeight+activeTab+(isMeActive?1:0) }}</div> -->
     <!-- 筛选标签 -->
     <div class="mx-12px pb-12px flex items-center justify-between lh-none">
-      <div class="text-[--main-text1] font-500 text-13px lh-16px flex gap-4px clickable" @click="isExpand = !isExpand">{{ t('orderBook') }} <Icon class="text-13px mt-2px" :name= "isExpand? 'material-symbols:keyboard-arrow-up': 'material-symbols:keyboard-arrow-down'" /></div>
+      <div class="text-[--main-text1] font-500 text-13px lh-16px flex gap-4px clickable" @click="isExpand = !isExpand">{{ t('orderBook') }} <Icon class="text-13px mt-2px origin-center-center transition-transform duration-0.3s ease" :class="isExpand?'rotate-0':'rotate-180'"  name= "material-symbols:keyboard-arrow-up" /></div>
       <div class="flex gap-8px h-14px text-12px color-[--third-text1] items-center">
         <Icon v-if="isPausedTxs1" name="custom:stop" class="text-14px color-[#FFA622]" />
         <div class="me-btn shrink-0 flex items-center gap-4px sticky right-0 cursor-pointer"
@@ -40,20 +40,22 @@
         <Icon name="custom:filter2" class="cursor-pointer" :class="isFilterActive?'color-[--primary-color]':'color-[--third-text] hover:color-[--d-E0E0E0-l-333]'" @click.self="filterDialogVisible=true"/>
       </div>
     </div>
-    <div v-if="isExpand" class="mx-12px pb-12px flex">
-      <div ref="tabsContainer"
-        class="flex items-center gap-x-8px whitespace-nowrap overflow-x-auto scrollbar-hide border-1px border-solid b-[--main-divider1] rounded-4px">
-        <div v-for="(tab, index) in tabs" :key="tab.value"
-          :class="[
-            'shrink-0 text-12px px-8px py-4px rounded-4px border-none cursor-pointer lh-16px font-500',
-            ((activeTab === tab.value) || ((activeTab === '-100' || activeTab === '25') && tab.value==='all'))
-              ? 'color-[--main-text1] bg-[--main-divider1]'
-              : 'color-[--third-text1]'
-          ]" @click="setActiveTab(tab.value, index)">
-          {{ tab.label }}
+    <transition name="collapse">
+      <div v-show="isExpand" class="content mx-12px pb-12px flex">
+        <div ref="tabsContainer"
+          class="flex items-center gap-x-8px whitespace-nowrap overflow-x-auto scrollbar-hide border-1px border-solid b-[--main-divider1] rounded-4px">
+          <div v-for="(tab, index) in tabs" :key="tab.value"
+            :class="[
+              'shrink-0 text-12px px-8px py-4px rounded-4px border-none cursor-pointer lh-16px font-500',
+              ((activeTab === tab.value) || ((activeTab === '-100' || activeTab === '25') && tab.value==='all'))
+                ? 'color-[--main-text1] bg-[--main-divider1]'
+                : 'color-[--third-text1]'
+            ]" @click="setActiveTab(tab.value, index)">
+            {{ tab.label }}
+          </div>
         </div>
       </div>
-    </div>
+    </transition>
 
     <!-- 表格 -->
     <div class="px-0px">
@@ -1664,7 +1666,8 @@ const disabledSave = computed(()=>{
 })
 
 function getGradient(row: IGetSimpleTxsResponse) {
-  const str = `${useThemeStore().isDark}-${isBuy(row)}`
+  const str = `true-${isBuy(row)}`
+  // const str = `${useThemeStore().isDark}-${isBuy(row)}`
   const map = {
     'true-true': 'bg-[linear-gradient(90deg,#111_0%,#12654C_70%,#12B886_100%)]',
     'true-false': 'bg-[linear-gradient(90deg,#111_0%,#7F2A36_70%,#F6465D_100%)]',
@@ -1767,5 +1770,35 @@ function getGradient(row: IGetSimpleTxsResponse) {
     width: 11px;
     height: 11px;
   }
+}
+.collapse-enter-from {
+  max-height: 0;
+  opacity: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+.collapse-enter-to {
+  max-height: 50px; /* 预估最大高度，需根据内容调整 */
+  opacity: 1;
+  padding-bottom: 13px;
+}
+.collapse-enter-active {
+  transition: max-height 0.3s ease, opacity 0.3s ease, padding 0.3s ease;
+}
+
+/* 离开阶段 */
+.collapse-leave-from {
+  max-height: 50px;
+  opacity: 1;
+  padding-bottom: 13px;
+}
+.collapse-leave-to {
+  max-height: 0;
+  opacity: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+.collapse-leave-active {
+  transition: max-height 0.3s ease, opacity 0.3s ease, padding 0.3s ease;
 }
 </style>
