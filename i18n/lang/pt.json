@@ -192,7 +192,6 @@
   "totalBuy": "Total Comprado",
   "totalSell": "Total Vendido",
   "trades": "Negociações",
-  "me": "Você",
   "orderBook": "Livro de Ordens",
   "noMore": "Não mais",
   "seemsNoProblem": "Parece não haver problemas\n",
@@ -642,5 +641,9 @@
   "txFilter": "Filtro de transação",
   "filterWallet2": "Filtrar carteira",
   "disabledClickKlineFilter": "Desativar tempo de filtro do gráfico de cliques",
-  "enabledClickKlineFilter": "Ativar tempo de filtro do gráfico de cliques"
+  "enabledClickKlineFilter": "Ativar tempo de filtro do gráfico de cliques",
+  "onlyFollowed": "Apenas seguido",
+  "OnlyDev": "Somente desenvolvedor",
+  "OnlyYou": "Só você",
+  "you": "Você"
 }

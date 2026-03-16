@@ -1,6 +1,6 @@
 <template>
   <div v-if="modelValue"
-    class="w-orderBook bg-[--d-0B0D12-l-F6F9FF] relative rounded-2px text-14px pt-20px flex flex-col overflow-hidden"
+    class="w-orderBook bg-[--secondary-bg] relative rounded-2px text-14px pt-12px flex flex-col overflow-hidden"
     :style="{ height: `${(klineHeight || 200)}px` }">
     <!-- 111: {{   !(
     !modelValue
@@ -17,36 +17,41 @@
     <div>{{ klineHeight+activeTab+(isMeActive?1:0) }}</div> -->
     <!-- 筛选标签 -->
     <div class="mx-12px pb-12px flex items-center justify-between lh-none">
-      <div class="flex gap-11px color-[--third-text1]">
+      <div class="text-[--main-text1] font-500 text-13px lh-16px flex gap-4px clickable" @click="isExpand = !isExpand">{{ t('orderBook') }} <Icon class="text-13px mt-2px" :name= "isExpand? 'material-symbols:keyboard-arrow-up': 'material-symbols:keyboard-arrow-down'" /></div>
+      <div class="flex gap-8px h-14px text-12px color-[--third-text1] items-center">
+        <Icon v-if="isPausedTxs1" name="custom:stop" class="text-14px color-[#FFA622]" />
         <div class="me-btn shrink-0 flex items-center gap-4px sticky right-0 cursor-pointer"
-          :class="{ 'active': activeTab==='-100' }" @click="toggleClickFollowed">
-          <!-- <Icon name="i-tdesign:user-filled" class="text-md" /> -->
+          :class="{ 'active': activeTab==='-100' }" @click="toggleClickFollowed" v-tooltip="t('onlyFollowed')">
+          <!-- <Icon name="custom:filter2" class="text-12px"/> -->
           <span>{{ t('followed') }}</span>
         </div>
-        <div v-if="botStore?.userInfo?.name" class="me-btn shrink-0 flex items-center gap-4px sticky right-0 cursor-pointer"
-          :class="{ 'active': isMeActive }" @click="toggleClickMe">
+        <div class="me-btn shrink-0 flex items-center gap-4px sticky right-0 cursor-pointer"
+          :class="{ 'active': activeTab==='25' }" @click="toggleClickDEV"  v-tooltip="t('OnlyDev')">
           <!-- <Icon name="i-tdesign:user-filled" class="text-md" /> -->
-          <span>{{ t('me') }}</span>
+          <!-- <Icon name="custom:filter2" class="text-12px"/> -->
+          <span>{{ t('dev4') }}</span>
         </div>
-      </div>
-      <div class="flex gap-11px">
-        <span v-tooltip="$t(globalStore.isClickKlineFilter?'clickChartHideFilter':'clickChartFilter')" class="flex items-center justify-center text-12px cursor-pointer" :class="globalStore.isClickKlineFilter?'color-[--primary-color]':'text-[--third-text] hover:text-[--d-E0E0E0-l-333]'" @click="globalStore.isClickKlineFilter=!globalStore.isClickKlineFilter"><Icon name="custom:chart2" /></span>
-        <Icon name="custom:filter2" class="text-12px cursor-pointer" :class="isFilterActive?'color-[--primary-color]':'color-[--third-text] hover:color-[--d-E0E0E0-l-333]'" @click.self="filterDialogVisible=true"/>
+        <div class="me-btn shrink-0 flex items-center gap-4px sticky right-0 cursor-pointer"
+          :class="{ 'active': isMeActive }" @click="toggleClickMe" v-tooltip="t('OnlyYou')">
+          <!-- <Icon name="custom:user" class="text-12px" /> -->
+          <span>{{ t('you') }}</span>
+        </div>
+        <span v-tooltip="$t(globalStore.isClickKlineFilter?'clickChartHideFilter':'clickChartFilter')" class="flex items-center justify-center cursor-pointer" :class="globalStore.isClickKlineFilter?'color-[--primary-color]':'text-[--third-text] hover:text-[--d-E0E0E0-l-333]'" @click="globalStore.isClickKlineFilter=!globalStore.isClickKlineFilter"><Icon name="custom:chart2" /></span>
+        <Icon name="custom:filter2" class="cursor-pointer" :class="isFilterActive?'color-[--primary-color]':'color-[--third-text] hover:color-[--d-E0E0E0-l-333]'" @click.self="filterDialogVisible=true"/>
       </div>
     </div>
-    <div class="mx-12px pb-12px flex">
+    <div v-if="isExpand" class="mx-12px pb-12px flex">
       <div ref="tabsContainer"
         class="flex items-center gap-x-8px whitespace-nowrap overflow-x-auto scrollbar-hide border-1px border-solid b-[--main-divider1] rounded-4px">
-        <button v-for="(tab, index) in tabs" :key="tab.value"
-          :style="{ backgroundColor: ((activeTab === tab.value) || (activeTab === '-100' && tab.value==='all'))? 'rgba(63, 128, 247, 0.10)' : 'transparent' }"
+        <div v-for="(tab, index) in tabs" :key="tab.value"
           :class="[
-            'shrink-0 text-12px px-4px py-4px rounded-4px border-none cursor-pointer',
-            ((activeTab === tab.value) || (activeTab === '-100' && tab.value==='all'))
+            'shrink-0 text-12px px-8px py-4px rounded-4px border-none cursor-pointer lh-16px font-500',
+            ((activeTab === tab.value) || ((activeTab === '-100' || activeTab === '25') && tab.value==='all'))
               ? 'color-[--main-text1] bg-[--main-divider1]'
               : 'color-[--third-text1]'
           ]" @click="setActiveTab(tab.value, index)">
           {{ tab.label }}
-        </button>
+        </div>
       </div>
     </div>
 
@@ -78,14 +83,14 @@
       <div v-loading="tableLoading" class="text-12px">
         <!-- 表格头部 -->
         <div
-          class="grid grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] items-center gap-15px mt-8px mb-4px text-12px color-[--third-text1] px-12px">
+          class="grid grid-cols-[minmax(0,1.2fr)_minmax(0,1.2fr)] items-center gap-15px mb-12px text-12px color-[--third-text1] px-12px">
           <div class="grid grid-cols-[minmax(0,0.8fr)_minmax(0,1fr)] items-center gap-15px">
             <div class="text-left text-nowrap min-w-0">
               <div class="flex items-center justify-start gap-2px clickable" @click="globalStore.isUSDT = !globalStore.isUSDT">
                 <span>{{ t('amountU').slice(0, 3) }}</span>
-                <img v-if="!globalStore.isUSDT" :src="`${token_logo_url}chain/${token?.chain}.png`" class="mt-1px border-rd-[50%]" height="11" alt=""></img>
+                <img v-if="!globalStore.isUSDT" :src="`${token_logo_url}chain/${token?.chain}.png`" class="mt-1px border-rd-[50%]" height="12" alt=""></img>
                 <!-- <Icon v-if="globalStore.isUSDT" name="custom:price2" class="color-[--third-text1] text-10px"/> -->
-                <Icon v-else name="custom:amount2" class="color-[--third-text1] text-10px"/>
+                <Icon v-else name="custom:price2" class="color-[--third-text1] text-12px"/>
               </div>
             </div>
             <div class="flex items-center justify-start gap-2px text-nowrap min-w-0 clickable" @click="tableView.isAmount = !tableView.isAmount">
@@ -108,7 +113,7 @@
               </div> -->
             </div>
           </div>
-          <div class="grid grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] items-center gap-15px">
+          <div class="grid grid-cols-[minmax(0,1.5fr)_minmax(0,0.8fr)] items-center gap-15px">
             <div class="text-left min-w-0">{{ t('makers') }}</div>
             <div class="min-w-0 text-right cursor-pointer flex items-center justify-end">
               <span @click="sortChange({ asc: '', desc: 'asc', '': 'desc' }[defaultSort] || '')">{{ t('time') }}</span>
@@ -124,7 +129,7 @@
         <!-- :key="klineHeight+activeTab+(isMeActive?1:0)" -->
         <div v-else ref="scroller" :key="klineHeight+activeTab+updateNum"
           style="margin-right: -12px;padding-right: 12px;overscroll-behavior-y: contain" class="scrollbar-hide overflow-y-auto"
-          :style="{ height: `${(klineHeight ?? 200) - 110}px` }"  @mouseenter="isPausedTxs = true"
+          :style="{ height: `${(klineHeight ?? 200) - 102}px` }"  @mouseenter="isPausedTxs = true"
           @mouseleave="isPausedTxs = false">
           <div :style="{
             height: `${totalSize}px`,
@@ -140,12 +145,16 @@
             }">
               <div :ref="(el) => virtualizer.measureElement(el)"  :data-index="virtualRow.index" class="lh-20px w-full">
                 <div
-                  class="px-12px grid grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] items-center gap-15px h-24px hover:bg-[rgba(255,255,255,.02)] relative z-10 overflow-hidden cursor-pointer mt-1px first:mt-0"
+                  class="px-12px grid grid-cols-[minmax(0,1.2fr)_minmax(0,1.2fr)] items-center gap-15px h-28px hover:bg-[rgba(255,255,255,.02)] relative z-10 overflow-hidden cursor-pointer mt-1px first:mt-0"
                   :class="{ 'bg-[--tooltip1]': virtualRow.index % 2 === 1 }" @click="onRowClick({ rowData: getItem(virtualRow) } as any)">
-                  <div class="grid grid-cols-[minmax(0,0.8fr)_minmax(0,1fr)] items-center gap-15px relative h-24px px-2px">
+                  <div class="grid grid-cols-[minmax(0,0.8fr)_minmax(0,1fr)] items-center gap-15px relative h-28px px-2px">
                     <!-- 整行渐变背景 -->
-                    <div class="absolute inset-0 pointer-events-none"
-                      :style="{ backgroundColor: getFullRowGradient(getItem(virtualRow)), transform: `scaleX(${getAmountBarWidthPercent(getItem(virtualRow))})`, transformOrigin: 'left' }" />
+                    <!-- <div class="absolute inset-0 pointer-events-none w-[calc(100%+12px)] ml--12px"
+                      :style="{ backgroundColor: getFullRowGradient(getItem(virtualRow)), transform: `scaleX(${getAmountBarWidthPercent(getItem(virtualRow))})`, transformOrigin: 'left' }" /> -->
+                    <div class="w-[calc(100%+12px)] ml--12px inset-0 pointer-events-none absolute">
+                      <div :class="`absolute h-full  ${getGradient(getItem(virtualRow))} opacity-15`"
+                      :style="`width:${Math.min(getAmount(getItem(virtualRow), true, true) / (addressAndChain.chain === 'solana' ? 10 : 20), 100)}%`" />
+                    </div>
                     <!-- Amount -->
                     <div class="text-left text-nowrap min-w-0">
                       <div class="font-medium truncate color-[--d-E0E0E0-l-333]">
@@ -181,7 +190,7 @@
                     </div>
                   </div>
 
-                  <div class="grid grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] items-center gap-15px h-24px">
+                  <div class="grid grid-cols-[minmax(0,1.5fr)_minmax(0,0.5fr)] items-center gap-15px h-28px">
 
 
                     <!-- Trader -->
@@ -203,25 +212,24 @@
                         <template v-if="windowWidth >= 480 && ['solana', 'bsc'].includes(getItem(virtualRow).chain) && getItem(virtualRow).senderProfile">
                           <Icon v-if="hasNewAccount(getItem(virtualRow)) && (!(getItem(virtualRow).newTags || []).map((i: any) => i.type).includes('47'))"
                             v-tooltip="{ content: `<span style='color: #85E12F'>${$t('newTokenAccount')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
-                            name="custom:new-account" class="w-12px h-12px mr-2px shrink-0 icon-hover hidden sm:block" />
+                            name="custom:new-account" class="w-10px h-10px ml-2px shrink-0 icon-hover hidden sm:block" />
                           <Icon v-if="hasClearedAccount(getItem(virtualRow)) && (!(getItem(virtualRow).newTags || []).map((i: any) => i.type).includes('46'))"
                             v-tooltip="{ content: `<span style='color: #EB2B4B'>${$t('sellAl')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
                             name="custom:cleared-account"
-                            class="w-12px h-12px mr-2px shrink-0 icon-hover hidden sm:block" />
+                            class="w-10px h-10px ml-2px shrink-0 icon-hover hidden sm:block" />
                           <Icon v-if="bigWallet(getItem(virtualRow))"
                             v-tooltip="{ content: `<span style='color: #ccc'>${$t('whales')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
-                            name="custom:big" class="w-12px h-12px mr-2px shrink-0 icon-hover hidden sm:block" />
+                            name="custom:big" class="w-10px h-10px ml-2px shrink-0 icon-hover hidden sm:block" />
                         </template>
-                        <SignalTags v-if="windowWidth >= 480" tagClass="mr-3px"
+                        <SignalTags v-if="windowWidth >= 480" tagClass="mr-2px text-10px" tagHeight="10" class="ml-2px"
                           :tags="(getItem(virtualRow).newTags || []).map((el: any) => tagStore.matchTag(el.type) || el)"
                           :walletAddress="getItem(virtualRow).wallet_address" :chain="getItem(virtualRow).chain" />
-
                       </div>
                     </div>
                     <!-- Time -->
                     <el-tooltip placement="right" :show-arrow="false" :persistent="false"
                       :content="formatDate(getItem(virtualRow)?.time, 'YYYY-MM-DD HH:mm:ss')">
-                      <div class="text-right min-w-0">
+                      <div class="text-right min-w-0 hover:decoration-underline hover:decoration-[--third-text1]">
                         <div class="color-[--third-text1]">
                           <TimerCount v-if="getItem(virtualRow).time && Number(formatTimeFromNow(getItem(virtualRow).time, true)) < 60"
                             :key="`${getItem(virtualRow).time}${virtualRow.index}`" :timestamp="getItem(virtualRow).time" :end-time="60">
@@ -262,30 +270,32 @@
       </div>
     </div>
     <!-- status：仅在有暂停状态（hover 或 升序排序）时展示底部条，避免未暂停时仍显示黑条 -->
-    <div
+    <!-- <div
       v-show="isPausedTxs1"
-      class="z-10 absolute bottom-0 h-24px w-100% flex items-center justify-center bg-[--main-input-button-bg] color-[#FFA622]">
+      class="z-10 absolute bottom-0 h-28px w-100% flex items-center justify-center bg-[--main-input-button-bg] color-[#FFA622]">
       <div class="flex items-center gap-x-7px">
         <Icon name="custom:stop" class="text-14px" />
         <span class="text-xs">{{ t('paused') }}</span>
       </div>
-    </div>
+    </div> -->
     <!-- MarkerTooltip -->
     <MarkerTooltip v-model="markerTooltipVisible" :virtual-ref="makerTooltip" :currentRow="currentRow"
       :addressAndChain="addressAndChain">
-      <template v-if="currentRow.senderProfile">
-        <Icon v-if="hasNewAccount(currentRow) && (!(currentRow.newTags||[]).map((i:any)=>i.type).includes('47'))"
-          v-tooltip="{ content: `<span style='color: #85E12F'>${$t('newTokenAccount')}</span>`, props: { 'raw-content': true, 'popper-class': 'orderbook-icon-tooltip' } }"
-          name="custom:new-account" class="icon-hover" />
-        <Icon v-if="hasClearedAccount(currentRow) && (!(currentRow.newTags||[]).map((i:any)=>i.type).includes('46'))"
-          v-tooltip="{ content: `<span style='color: #EB2B4B'>${$t('sellAl')}</span>`, props: { 'raw-content': true, 'popper-class': 'orderbook-icon-tooltip' } }"
-          name="custom:cleared-account" class="icon-hover" />
-        <Icon v-if="bigWallet(currentRow)"
-          v-tooltip="{ content: `<span style='color: #C5842B'>${$t('whales')}</span>`, props: { 'raw-content': true, 'popper-class': 'orderbook-icon-tooltip' } }"
-          name="custom:big" class="icon-hover" />
-      </template>
-      <SignalTags tagClass="mr-3px" :tags="currentRow.newTags" :walletAddress="currentRow.wallet_address"
-        :chain="currentRow.chain" />
+      <div class="flex">
+        <template v-if="currentRow.senderProfile">
+          <Icon v-if="hasNewAccount(currentRow) && (!(currentRow.newTags||[]).map((i:any)=>i.type).includes('47'))"
+            v-tooltip="{ content: `<span style='color: #85E12F'>${$t('newTokenAccount')}</span>`, props: { 'raw-content': true, 'popper-class': 'orderbook-icon-tooltip' } }"
+            name="custom:new-account" class="icon-hover w-15px h-15px text-15px mr-3px" />
+          <Icon v-if="hasClearedAccount(currentRow) && (!(currentRow.newTags||[]).map((i:any)=>i.type).includes('46'))"
+            v-tooltip="{ content: `<span style='color: #EB2B4B'>${$t('sellAl')}</span>`, props: { 'raw-content': true, 'popper-class': 'orderbook-icon-tooltip' } }"
+            name="custom:cleared-account" class="icon-hover w-15px h-15px text-15px mr-3px" />
+          <Icon v-if="bigWallet(currentRow)"
+            v-tooltip="{ content: `<span style='color: #C5842B'>${$t('whales')}</span>`, props: { 'raw-content': true, 'popper-class': 'orderbook-icon-tooltip' } }"
+            name="custom:big" class="icon-hover w-15px h-15px text-15px mr-3px" />
+        </template>
+        <SignalTags tagClass="mr-3px" :tags="(currentRow.newTags || []).map((el: any) => tagStore.matchTag(el.type) || el)" :walletAddress="currentRow.wallet_address"
+          :chain="currentRow.chain" />
+      </div>
     </MarkerTooltip>
     <el-dialog v-if="filterDialogVisible" v-model="filterDialogVisible" :width="440" :title="$t('txFilter')" destroy-on-close>
       <div class="mx--16px h-1px bg-[--border] mb-20px"/>
@@ -330,13 +340,13 @@
           {{ $t('volume') }}($)
         </label>
       </div>
-      <div class="flex items-center gap-20px  mb-12px">
+      <div class="flex items-center mb-12px">
         <el-button
           v-for="(item,idx) in volColumns"
           :key="idx"
           plain
           size="default"
-          class="flex-1 h-30px font-400"
+          class="flex-1 h-30px font-400 b-[--border] bg-[--main-input-button-bg]"
           @click.stop="dialogFilter.minVol=item.key;dialogFilter.maxVol=''"
         >
           {{ item.value }}
@@ -450,6 +460,7 @@ const { t } = useI18n()
 const route = useRoute()
 const { totalHolders, pairAddress, pair, token, } = storeToRefs(useTokenStore())
 
+const walletStore = useWalletStore()
 const globalStore = useGlobalStore()
 const botStore = useBotStore()
 const wsStore = useWSStore()
@@ -460,6 +471,8 @@ const { mode, token_logo_url, isDark } = storeToRefs(useGlobalStore())
 // 状态管理
 const tabsContainer = ref<HTMLElement | null>(null)
 const activeTab = shallowRef('all')
+
+const isExpand = shallowRef(true)
 const isPausedTxs = shallowRef(false)
 const isPausedTxs1 = computed(() => {
   return isPausedTxs.value ||(sortConditions.value.sort_dir ==='asc')  || tokenDetailSStore.drawerVisible|| markerTooltipVisible.value
@@ -535,17 +548,28 @@ const dialogFilter = ref(cloneDeep(defaultDialogFilter))
 const ignoreWs = computed(() => {
   return !['all'].includes(activeTab.value)
 })
+
+const self_address = computed(() => {
+  if (addressAndChain.value.chain !== 'solana') {
+    return botStore.evmAddress || walletStore.address
+  } else {
+    return botStore.getWalletAddress('solana') || walletStore.address
+  }
+})
+
 const tabs = computed(() => {
   const arr: Array<{ label: string, value: string }> = []
   if (Array.isArray(totalHolders.value)) {
     totalHolders.value.forEach(i => {
       const num = i.total_address
-      if (num > 0) {
-        arr.push({
-          ...i,
-          label: i?.[filterLanguage(useLocaleStore().locale)] + (i.type !== '31' ? `(${num})` : ''),
-          value: i.type
-        })
+      if(i.type !== '25') {
+        if (num > 0) {
+          arr.push({
+            ...i,
+            label: i?.[filterLanguage(useLocaleStore().locale)] + (i.type !== '31' ? `(${num})` : ''),
+            value: i.type
+          })
+        }
       }
     })
   }
@@ -669,7 +693,7 @@ const tableLoading = computed(() => listStatus.value.loadingTxs1 )
 
 
 const isMeActive = computed(()=>{
-  return tableFilter.value.markerAddress === botStore.getWalletAddress(addressAndChain.value.chain)!
+  return tableFilter.value.markerAddress&&(tableFilter.value.markerAddress === self_address.value)
 })
 
 const filterTableListMap = {
@@ -728,7 +752,7 @@ const virtualizer = useVirtualizer(
   computed(() => ({
     count: filterTableList.value.length,
     getScrollElement: () => scroller.value,
-    estimateSize: () => 24,
+    estimateSize: () => 28,
     overscan: 5,
     gap: 0
   }))
@@ -1255,12 +1279,15 @@ function setActiveTab(val: string, index: number) {
 }
 
 function toggleClickMe() {
+  if (!verifyLogin()) {
+    return
+  }
   console.log('🔄 切换"我的交易"筛选')
   if (isMeActive.value) {
     tableFilter.value.markerAddress = ''
     dialogFilter.value.markerAddress = ''
   } else {
-    const walletAddress = botStore.getWalletAddress(addressAndChain.value.chain)!
+    const walletAddress = self_address.value
     tableFilter.value.markerAddress = walletAddress
     dialogFilter.value.markerAddress = walletAddress
   }
@@ -1273,6 +1300,9 @@ function toggleClickMe() {
   filterSubmit()
 }
 function toggleClickFollowed() {
+  if (!verifyLogin()) {
+    return
+  }
   console.log('🔄 切换"已关注"筛选')
   if (isMeActive.value) {
     tableFilter.value.markerAddress = ''
@@ -1282,6 +1312,20 @@ function toggleClickFollowed() {
     resetData('all')
   }else{
     resetData('-100')
+  }
+  filterSubmit()
+}
+
+function toggleClickDEV() {
+  console.log('🔄 切换"dev"筛选')
+  // if (isDEVActive.value) {
+  //   tableFilter.value.markerAddress = ''
+  //   dialogFilter.value.markerAddress = ''
+  // } 
+  if(activeTab.value==='25'){
+    resetData('all')
+  }else{
+    resetData('25')
   }
   filterSubmit()
 }
@@ -1332,7 +1376,7 @@ function updateRemark() {
 }
 
 function openMarkerTooltip(row: ExtendedTxResponse, e: MouseEvent) {
-  if (row && MAKER_SUPPORT_CHAINS.includes(row.chain)) {
+  if (row && SupportFullDataChain.includes(row.chain)) {
     makerTooltip.value = e.currentTarget
     console.log(row)
     if (currentRow.value?.wallet_address === row.wallet_address) {
@@ -1590,7 +1634,10 @@ function resetMakerAddress() {
 
 function resetDialogFilter() {
   dialogFilter.value = {
-    ...defaultDialogFilter
+    markerAddress: '' as string,
+    minVol:'' as string,
+    maxVol:'' as string,
+    timestamp:[] as string[]
   }
   console.log('resetDialogFilter',dialogFilter.value)
   confirmDialogFilter()
@@ -1616,6 +1663,17 @@ const disabledSave = computed(()=>{
   return false
 })
 
+function getGradient(row: IGetSimpleTxsResponse) {
+  const str = `${useThemeStore().isDark}-${isBuy(row)}`
+  const map = {
+    'true-true': 'bg-[linear-gradient(90deg,#111_0%,#12654C_70%,#12B886_100%)]',
+    'true-false': 'bg-[linear-gradient(90deg,#111_0%,#7F2A36_70%,#F6465D_100%)]',
+    'false-false': 'bg-[linear-gradient(90deg,#FFF_0%,#88DBC3_70%,#12B886_100%)]',
+    'false-true': 'bg-[linear-gradient(90deg,#FFF_0%,#FBA2AE_70%,#F6465D_100%)]',
+  } as { [key: string]: string }
+  return map[str]
+}
+
 </script>
 
 <style lang="scss" scoped>
@@ -1625,7 +1683,6 @@ const disabledSave = computed(()=>{
   display: flex;
   align-items: center;
   border: none;
-  font-size: 12px;
   padding: 2px 0px;
 
   &.active {

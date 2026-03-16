@@ -507,7 +507,6 @@
   "avgBuyPrice": " Avg Buy Price",
   "avgSellPrice": " Avg Sell Price",
   "trades": "Trade",
-  "me": "You",
   "orderBook": "Order Book",
   "abnormalChips": "Abnormal Chips",
   "abnormalChipsTip": "Abnormal chip ratio has been reprocessed",
@@ -2099,5 +2098,10 @@
   "txFilter": "Transaction Filter",
   "filterWallet2": "Filter Wallet",
   "disabledClickKlineFilter": "Disable time filtering by clicking the chart",
-  "enabledClickKlineFilter": "Enable time filtering by clicking the chart"
+  "enabledClickKlineFilter": "Enable time filtering by clicking the chart",
+  "dev4": "DEV",
+  "onlyFollowed": "Only Followed",
+  "OnlyDev": "Only Dev",
+  "OnlyYou": "Only You",
+  "you": "You"
 }

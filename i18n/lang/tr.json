@@ -190,7 +190,6 @@
   "totalBuy": "Toplam Alış",
   "totalSell": "Toplam Satış",
   "trades": "İşlemler",
-  "me": "Sen",
   "orderBook": "Emir Defteri",
   "download": "İndir",
   "seemsNoProblem": "Sorun görünmüyor",
@@ -638,5 +637,9 @@
   "txFilter": "İşlem Filtresi",
   "filterWallet2": "Cüzdanı Filtrele",
   "disabledClickKlineFilter": "Tıklama grafiği filtre süresini devre dışı bırak",
-  "enabledClickKlineFilter": "Tıklama grafiği filtre süresini etkinleştir"
+  "enabledClickKlineFilter": "Tıklama grafiği filtre süresini etkinleştir",
+  "onlyFollowed": "Yalnızca Takip Edilenler",
+  "OnlyDev": "Yalnızca Geliştirici",
+  "OnlyYou": "Sadece sen",
+  "you": "Sen"
 }

@@ -503,7 +503,6 @@
   "avgBuyPrice": "買いコスト価格",
   "avgSellPrice": "売りコスト価格",
   "trades": "取引",
-  "me": "あなた",
   "orderBook": "注文簿",
   "abnormalChips": "異常チップ",
   "abnormalChipsTip": "異常チップ比率は重複処理されています",
@@ -1491,5 +1490,9 @@
   "txFilter": "トランザクションフィルター",
   "filterWallet2": "フィルターウォレット",
   "disabledClickKlineFilter": "クリック チャートのフィルター時間を無効にする",
-  "enabledClickKlineFilter": "クリック チャート フィルター時間を有効にする"
+  "enabledClickKlineFilter": "クリック チャート フィルター時間を有効にする",
+  "onlyFollowed": "フォローのみ",
+  "OnlyDev": "開発者のみ",
+  "OnlyYou": "あなただけ",
+  "you": "あなた"
 }
