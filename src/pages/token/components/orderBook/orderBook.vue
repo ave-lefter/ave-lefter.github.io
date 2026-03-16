@@ -1,7 +1,7 @@
 <template>
   <div v-if="modelValue"
     class="w-orderBook bg-[--secondary-bg] relative rounded-2px text-14px pt-12px flex flex-col overflow-hidden"
-    :style="{ height: `${(klineHeight || 200)}px` }">
+    :style="{ height: `${(klineHeight || 200)}px`,'will-change': 'height' }">
     <!-- 111: {{   !(
     !modelValue
     || listStatus.loadingTxs
@@ -17,7 +17,7 @@
     <div>{{ klineHeight+activeTab+(isMeActive?1:0) }}</div> -->
     <!-- 筛选标签 -->
     <div class="mx-12px pb-12px flex items-center justify-between lh-none">
-      <div class="text-[--main-text1] font-500 text-13px lh-16px flex gap-4px clickable" @click="isExpand = !isExpand">{{ t('orderBook') }} <Icon class="text-13px mt-2px origin-center-center transition-transform duration-0.3s ease" :class="isExpand?'rotate-0':'rotate-180'"  name= "material-symbols:keyboard-arrow-up" /></div>
+      <div class="text-[--main-text1] font-500 text-13px lh-16px flex gap-4px"><span>{{ t('orderBook') }}</span> <Icon class="text-13px mt-2px origin-center-center transition-transform duration-0.3s ease clickable" :class="isExpand?'rotate-0':'rotate-180'"  name= "material-symbols:keyboard-arrow-up"  @click="isExpand = !isExpand"/></div>
       <div class="flex gap-8px h-14px text-12px color-[--third-text1] items-center">
         <Icon v-if="isPausedTxs1" name="custom:stop" class="text-14px color-[#FFA622]" />
         <div class="me-btn shrink-0 flex items-center gap-4px sticky right-0 cursor-pointer"
@@ -60,7 +60,7 @@
     <!-- 表格 -->
     <div class="px-0px">
       <div v-if="tableFilter.timestamp.length&&tableFilter.timestamp[0]&&tableFilter.timestamp[1]" class="flex gap-8px justify-center mb-12px">
-        <DateFilterCard v-model:timestamp="tableFilter.timestamp" @update:timestamp="filterSubmit" class="bg-[transparent]! h-16px! mb-0px!"/>
+        <DateFilterCard v-model:timestamp="tableFilter.timestamp" @update:timestamp="filterSubmit" class="bg-[transparent]! h-16px! mb-0px! w-244px! justify-end!"/>
         <el-switch v-model="globalStore.isClickKlineFilter" size="small" class="h-16px!" v-tooltip="!globalStore.isClickKlineFilter?t('enabledClickKlineFilter'):t('disabledClickKlineFilter')"/>
       </div>
       <template v-if="tableFilter.markerAddress">
@@ -131,7 +131,7 @@
         <!-- :key="klineHeight+activeTab+(isMeActive?1:0)" -->
         <div v-else ref="scroller" :key="klineHeight+activeTab+updateNum"
           style="margin-right: -12px;padding-right: 12px;overscroll-behavior-y: contain" class="scrollbar-hide overflow-y-auto"
-          :style="{ height: `${(klineHeight ?? 200) - 102}px` }"  @mouseenter="isPausedTxs = true"
+          :style="{ height: `${(klineHeight ?? 200) - 102}px`,'will-change': 'height' }"  @mouseenter="isPausedTxs = true"
           @mouseleave="isPausedTxs = false">
           <div :style="{
             height: `${totalSize}px`,
