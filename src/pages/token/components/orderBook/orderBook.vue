@@ -56,6 +56,25 @@
         <DateFilterCard v-model:timestamp="tableFilter.timestamp" @update:timestamp="filterSubmit" class="bg-[transparent]! h-16px! mb-0px!"/>
         <el-switch v-model="globalStore.isClickKlineFilter" size="small" class="h-16px!" v-tooltip="!globalStore.isClickKlineFilter?t('enabledClickKlineFilter'):t('disabledClickKlineFilter')"/>
       </div>
+      <template v-if="tableFilter.markerAddress">
+        <div
+          v-if="tableLoading"
+          class="lh-20px text-12px py-0px bg-[transparent] text-center mb-12px font-400">
+          {{ $t('loading') }}
+        </div>
+        <template v-else>
+          <div class="lh-20px text-12px py-0px bg-[transparent] text-center mb-12px flex justify-center text-[--main-text1] font-400">
+            <div
+              v-html="$t('filterTip', {
+              address: `<span>&nbsp;${tableFilter.markerAddress.slice(0, 4)}...${tableFilter.markerAddress.slice(-4)}&nbsp;</span>`,
+              count: `<span  class='color-#3F80F7'>&nbsp;${filterTableList[0]?.count || 0}&nbsp;</span>`
+            })" />
+            <span class='color-#3F80F7 decoration-underline cursor-pointer ml-2px' @click.stop="resetMakerAddress">
+              {{ $t('reset') }}
+            </span>
+          </div>
+        </template>
+      </template>
       <div v-loading="tableLoading" class="text-12px">
         <!-- 表格头部 -->
         <div
@@ -64,8 +83,8 @@
             <div class="text-left text-nowrap min-w-0">
               <div class="flex items-center justify-start gap-2px clickable" @click="globalStore.isUSDT = !globalStore.isUSDT">
                 <span>{{ t('amountU').slice(0, 3) }}</span>
-                <!-- <img v-if="!globalStore.isUSDT" :src="`${token_logo_url}chain/${token?.chain}.png`" class="mt-1px border-rd-[50%]" height="11" alt=""></img> -->
-                <Icon v-if="globalStore.isUSDT" name="custom:price2" class="color-[--third-text1] text-10px"/>
+                <img v-if="!globalStore.isUSDT" :src="`${token_logo_url}chain/${token?.chain}.png`" class="mt-1px border-rd-[50%]" height="11" alt=""></img>
+                <!-- <Icon v-if="globalStore.isUSDT" name="custom:price2" class="color-[--third-text1] text-10px"/> -->
                 <Icon v-else name="custom:amount2" class="color-[--third-text1] text-10px"/>
               </div>
             </div>
@@ -103,7 +122,7 @@
           <span class="color-[--third-text] text-12px mb-20px mt-4px">{{ t('emptyNoData') }}</span>
         </AveEmpty>
         <!-- :key="klineHeight+activeTab+(isMeActive?1:0)" -->
-        <div v-else ref="scroller" :key="klineHeight"
+        <div v-else ref="scroller" :key="klineHeight+activeTab+updateNum"
           style="margin-right: -12px;padding-right: 12px;overscroll-behavior-y: contain" class="scrollbar-hide overflow-y-auto"
           :style="{ height: `${(klineHeight ?? 200) - 110}px` }"  @mouseenter="isPausedTxs = true"
           @mouseleave="isPausedTxs = false">
@@ -170,7 +189,7 @@
                       <div class="flex items-center justify-start min-w-0">
 
                         <UserRemark :remark="getItem(virtualRow).remark" :address="getItem(virtualRow).wallet_address"
-                          :show-address="!(getItem(virtualRow)?.newTags?.length > 1)" :chain="getItem(virtualRow).chain" :wallet_logo="getItem(virtualRow).wallet_logo"
+                          :show-address="true" :chain="getItem(virtualRow).chain" :wallet_logo="getItem(virtualRow).wallet_logo"
                           :addressClass="`inline-block truncate max-w-full ${markerTooltipVisible && currentRow.wallet_address === getItem(virtualRow).wallet_address ? 'bg-#12B88633' : ''
                             }`"
                           :format-address="(address: string) => windowWidth < 480 ? address?.slice(-3) : '*' + address?.slice(-4)"
@@ -200,7 +219,7 @@
                       </div>
                     </div>
                     <!-- Time -->
-                    <el-tooltip placement="top" :show-arrow="false" :persistent="false"
+                    <el-tooltip placement="right" :show-arrow="false" :persistent="false"
                       :content="formatDate(getItem(virtualRow)?.time, 'YYYY-MM-DD HH:mm:ss')">
                       <div class="text-right min-w-0">
                         <div class="color-[--third-text1]">
@@ -443,7 +462,7 @@ const tabsContainer = ref<HTMLElement | null>(null)
 const activeTab = shallowRef('all')
 const isPausedTxs = shallowRef(false)
 const isPausedTxs1 = computed(() => {
-  return isPausedTxs.value ||(sortConditions.value.sort_dir ==='asc')
+  return isPausedTxs.value ||(sortConditions.value.sort_dir ==='asc')  || tokenDetailSStore.drawerVisible|| markerTooltipVisible.value
 })
 const markerTooltipVisible = shallowRef(false)
 // const isMeActive = ref(false)
@@ -455,7 +474,7 @@ const listStatus = ref({
   page_token:'',
   pageSize:100
 })
-
+const updateNum=shallowRef(0)
 // 虚拟列表相关 refs
 const scroller = ref(null)
 const sentinel = ref(null)
@@ -921,6 +940,7 @@ async function _getTokenTxs() {
   } finally {
     listStatus.value.loadingTxs1 = false
     listStatus.value.loadingTxs = false
+    updateNum.value++
   }
 }
 
@@ -1559,6 +1579,13 @@ function confirmDialogFilter() {
 
   filterSubmit()
   filterDialogVisible.value = false
+}
+
+function resetMakerAddress() {
+  dialogFilter.value.markerAddress = ''
+  tableFilter.value.markerAddress = ''
+  resetData(activeTab.value)
+  filterSubmit()
 }
 
 function resetDialogFilter() {
