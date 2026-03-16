@@ -124,6 +124,24 @@
               </span>
             </el-checkbox>
           </div>
+          <div v-show="tabs2Active === Tabs2Enum.indicator" class="px-16px  py-12px">
+            <span class="text-12px">过滤克隆代币</span>
+            <div
+              class="grid grid-cols-2 gap-12px flex-1 px-16px py-12px border">
+              <el-checkbox size="default" :model-value="form.dev_sale_out === 1"
+                @change="(val) => form.dev_sale_out = val ? 1 : 0">
+                <span class="color-[--secondary-text]">
+                  Uxento
+                </span>
+              </el-checkbox>
+              <el-checkbox size="default" :model-value="form.dev_sale_out === 2" @change="(val) => form.dev_sale_out = val ? 2 : 0">
+                <span class="color-[--secondary-text]">
+                  Rap
+                </span>
+              </el-checkbox>
+            </div>
+          </div>
+
           <el-form-item v-if="!storage.value?.includes('_graduated') && tabs2Active===Tabs2Enum.indicator" :label="`${t('progress')}(%)`"
             class="mt-12px px-16px columns-form-item">
 
