@@ -1,12 +1,13 @@
 <template>
   <div class="p-12px text-12px">
-    <div class="color-[--main-text] mb-4px ">
-      {{ type == 'smart' ? $t('smarter2') : 'KOL' }} {{ $t('insidersOwned') }}
+    <div class="color-[--main-text] mb-4px text-12px">
+      <!-- {{ type == 'smart' ? $t('smarter2') : 'KOL' }} {{ $t('insidersOwned') }}
       <span class="ml-2px" :style="{ color: Number(ratio) > 5 ? '#F6465D' : '#12B886' }">
         {{
           formatNumber(Number(ratio) >= 0.1 ? ratio || 0 : Number(ratio) == 0 ? '0' : '<0.1', 2)
         }}%
-      </span>
+      </span> -->
+      {{ $t('kolSummary', {people:tableList.length, type: type == 'smart' ? $t('smarter2') : 'KOL', holders: formatNumber(holders,0), vol: '$'+formatNumber(vol,0),  ratio: formatNumber(Number(ratio) >= 0.1 ? ratio || 0 : Number(ratio) == 0 ? '0' : '<0.1', 2)+ '%'}) }}
     </div>
     <div class="w-full text-12px color-[--main-text]">
       <!-- list -->
@@ -30,7 +31,8 @@
           <div
             v-for="(item, $index) in tableList"
             :key="$index"
-            class="flex items-center mt-8px hover:bg-#141414 rounded-8px"
+            class="flex items-center  py-4px rounded-4px cursor-pointer hover:bg-[--dialog-list-hover]"
+            @click.stop.prevent="jumpBalance(item)"
           >
             <UserAvatar
               class="mr-8px"
@@ -83,12 +85,46 @@ const props = defineProps<{
   tokenId: string
   loading: boolean
   ratio: number
+  symbol: String,
+  logo_url: String,
   type: string
   tableList: HolderRankItem[]
   onFetch: (tokenId: string, tagType?: number) => void
 }>()
 
 const chain = computed(() => getAddressAndChainFromId(props.tokenId)?.chain)
+const token = computed(() => getAddressAndChainFromId(props.tokenId)?.address)
+const holders = computed(() => {
+ return props.tableList?.filter(item => Number(item.balance_usd) > 0)?.length || 0
+})
+const vol = computed(() => {
+ return props.tableList.reduce((sum, item) => sum + Number(item.balance_usd || 0), 0)
+})
+
+const tokenDetailSStore = useTokenDetailsStore()
+const route = useRoute()
+function jumpBalance(row: HolderRankItem) {
+  console.log('-----------wallet_address-------',row.wallet_address)
+  tokenDetailSStore.$patch({
+    drawerVisible: true,
+    tokenInfo: {
+      id: props.tokenId,
+      symbol: props.symbol,
+      logo_url:  props.logo_url,
+      chain: chain.value,
+      address: token.value,
+      remark: row?.remark || '',
+    },
+    pairInfo: {
+      target_token: token.value,
+      token0_address: token.value,
+      token0_symbol:  props.symbol,
+      token1_symbol: '',
+      pairAddress: '',
+    },
+    user_address: row.wallet_address || useBotStore().getWalletAddress(chain.value) || useWalletStore().address,
+  })
+}
 </script>
 
 <style scoped lang="scss"></style>

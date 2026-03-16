@@ -30,7 +30,9 @@ const contentKey = ref(0)
     options?: {
     type?: string
     ratio?: number
-   },
+    symbol?: string
+    logo_url: string
+  },
  isGetData = true) {
     if (isGetData) {
       let tag_type= 0
@@ -51,6 +53,8 @@ const contentKey = ref(0)
       props: {
         type: options?.type,
         ratio: options?.ratio,
+        symbol: options?.symbol,
+        logo_url: options?.logo_url,
         data: contentProps,
         onFetch: getHolderRank,
       },

@@ -2012,7 +2012,7 @@
   "hideLiq": "Click to hide pool information",
   "showLiq": "Click to display pool information",
   "filter": "Filter",
-  "indicator":  "Indicator",
+  "indicator": "Indicator",
   "socialMedia": "Social Media",
   "devClose": "DEV Close",
   "devNotClose": "DEV Not Close",
@@ -2092,5 +2092,6 @@
   "taxTip": "Total tax rate: Token tax rate",
   "smarterAddress": "Smarter Address",
   "openMonitorSuccess": "Monitoring successfully enabled",
-  "cancelMonitorSuccess": "Monitoring successfully disabled"
+  "cancelMonitorSuccess": "Monitoring successfully disabled",
+  "kolSummary": "There are {people} {types} in total, currently {holders} hold positions, {type} holds {vol}, accounting for {ratio}"
 }

@@ -98,7 +98,7 @@
     </div>
     <el-row type="flex" :gutter="pumpSetting.isGutter ? 10 : 2" class="w-full pl-16px" :class="pumpSetting.isGutter? 'pr-6px': 'pr-14px'">
       <el-col v-show="single('new') && pumpSetting.grid['new']?.show" :span="getSpan()" :style="{order: orderNew}">
-        <div class="pump-item  rounded-4px" style="padding-top: 15px;">
+        <div class="pump-item  rounded-4px pt-10px">
           <div class="pump-item_header flex-start px-12px rounded-4px">
             <template v-if="width > 1024">
               <!-- <img
@@ -205,7 +205,7 @@
         </div>
       </el-col>
       <el-col v-show="single('soon') && pumpSetting.grid['soon'].show" :span="getSpan()" :style="{order: orderSoon}">
-        <div class="pump-item" style="padding-top: 15px;">
+        <div class="pump-item pt-10px">
           <div class="pump-item_header flex-start px-12px rounded-4px">
             <template v-if="width > 1024">
               <!-- <img
@@ -312,7 +312,7 @@
         </div>
       </el-col>
       <el-col v-show="single('graduated') && pumpSetting.grid['graduated'].show" :span="getSpan()" :style="{order: orderGraduated}">
-        <div class="pump-item" style="padding-top: 15px;">
+        <div class="pump-item pt-10px">
           <div class="pump-item_header flex-start px-12px rounded-4px">
             <template v-if="width > 1024">
               <!-- <img

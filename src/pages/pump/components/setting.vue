@@ -14,7 +14,7 @@
         <el-button class="btn mr-8px h-28px" :class="{ active: isExit }">
           <Icon name="custom:customized" class="text-13px mr-4px" /> {{ $t('customize') }}
           <Icon
-            :name="isRotate ? 'radix-icons:triangle-up' : 'radix-icons:triangle-down'"
+            :name="visible ? 'radix-icons:triangle-up' : 'radix-icons:triangle-down'"
             class="text-16px ml-4px"
           />
         </el-button>
@@ -229,7 +229,6 @@ const props = withDefaults(
 const isColor = shallowRef(false)
 const { t } = useI18n()
 const visible = shallowRef(false)
-const isRotate = shallowRef(false)
 const globalStore = useGlobalStore()
 const { pumpSetting, token_logo_url, isDark } = storeToRefs(globalStore)
 const defineFontsize = useLocalStorage('defineFontsize', 15)
