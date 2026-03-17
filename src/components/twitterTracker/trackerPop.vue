@@ -63,8 +63,10 @@
               </div>
             </template>
           </el-popover>
-          <Icon class="cursor-pointer" :ref="!isMine ?'audioButtonRef':'audioButtonRef1'"
-                :name="(isMine ?globalStore.audioSettings.audio.twitterForMe : globalStore.audioSettings.audio.twitter) ? 'custom:ad' : 'custom:admute'" />
+          <!-- <Icon class="cursor-pointer" :ref="!isMine ?'audioButtonRef':'audioButtonRef1'"
+                :name="(isMine ?globalStore.audioSettings.audio.twitterForMe : globalStore.audioSettings.audio.twitter) ? 'custom:ad' : 'custom:admute'" /> -->
+          <Icon v-if="!isMine" class="cursor-pointer" ref="audioButtonRef" :name="(globalStore.audioSettings.audio.twitter) ? 'custom:ad' : 'custom:admute'" ></Icon>
+          <Icon v-else class="cursor-pointer" ref="audioButtonRef1" :name="(globalStore.audioSettings.audio.twitterForMe) ? 'custom:ad' : 'custom:admute'" ></Icon>
           <Icon v-show="isPaused" name="custom:stop"/>
           <!-- <el-dropdown :persistent="false" trigger="click">
               <div class="w-24px h-24px bg-[--main-list-hover] flex items-center justify-center rounded-4px cursor-pointer"><Icon name="material-symbols:language"/></div>

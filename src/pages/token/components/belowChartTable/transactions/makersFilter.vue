@@ -14,7 +14,8 @@ const emit = defineEmits(['update:visible', 'confirm', 'reset'])
 const {evmAddress, getWalletAddress} = useBotStore()
 const themeStore = useThemeStore()
 const tempAddress = shallowRef('')
-
+const walletStore = useWalletStore()
+const botStore = useBotStore()
 const computedVisible = computed({
   get() {
     return props.visible
@@ -27,6 +28,20 @@ const computedVisible = computed({
 watch(() => props.modelValue, () => {
   tempAddress.value = props.modelValue
 })
+const self_address = computed(() => {
+  if (props.chain !== 'solana') {
+    return botStore.evmAddress || walletStore.address
+  } else {
+    return botStore.getWalletAddress('solana') || walletStore.address
+  }
+})
+function filterSelfWalletSubmit() {
+  if(!verifyLogin()){
+    return 
+  }
+  console.log('filterSelfWalletSubmit',self_address.value)
+  tempAddress.value=self_address.value
+}
 </script>
 
 <template>
@@ -58,7 +73,7 @@ watch(() => props.modelValue, () => {
         class="h-30px mt-20px w-full"
         size="default"
         color="var(--border)"
-        @click="tempAddress=getWalletAddress(chain)||''"
+        @click="filterSelfWalletSubmit"
       >
         {{ $t('filterWallet') }}
       </el-button>

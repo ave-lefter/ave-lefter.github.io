@@ -1,6 +1,6 @@
 <template>
   <div v-if="modelValue"
-    class="w-orderBook bg-[--secondary-bg] relative rounded-2px text-14px pt-12px flex flex-col overflow-hidden"
+    class="w-orderBook bg-[--d-0B0D12-l-F6F9FF] relative rounded-2px text-14px pt-12px flex flex-col overflow-hidden"
     :style="{ height: `${(klineHeight || 200)}px`,'will-change': 'height' }">
     <!-- 111: {{   !(
     !modelValue
@@ -18,7 +18,7 @@
     <!-- 筛选标签 -->
     <div class="mx-12px pb-12px flex items-center justify-between lh-none">
       <div class="text-[--main-text1] font-500 text-13px lh-16px flex gap-4px"><span>{{ t('orderBook') }}</span> <Icon class="text-13px mt-2px origin-center-center transition-transform duration-0.3s ease clickable" :class="isExpand?'rotate-0':'rotate-180'"  name= "material-symbols:keyboard-arrow-up"  @click="isExpand = !isExpand"/></div>
-      <div class="flex gap-8px h-14px text-12px color-[--third-text1] items-center">
+      <div class="flex gap-8px h-14px text-12px color-[--third-text] items-center">
         <Icon v-if="isPausedTxs1" name="custom:stop" class="text-14px color-[#FFA622]" />
         <div class="me-btn shrink-0 flex items-center gap-4px sticky right-0 cursor-pointer"
           :class="{ 'active': activeTab==='-100' }" @click="toggleClickFollowed" v-tooltip="t('onlyFollowed')">
@@ -49,7 +49,7 @@
               'shrink-0 text-12px px-8px py-4px rounded-4px border-none cursor-pointer lh-16px font-500',
               ((activeTab === tab.value) || ((activeTab === '-100' || activeTab === '25') && tab.value==='all'))
                 ? 'color-[--main-text1] bg-[--main-divider1]'
-                : 'color-[--third-text1]'
+                : 'color-[--third-text]'
             ]" @click="setActiveTab(tab.value, index)">
             {{ tab.label }}
           </div>
@@ -60,7 +60,7 @@
     <!-- 表格 -->
     <div class="px-0px">
       <div v-if="tableFilter.timestamp.length&&tableFilter.timestamp[0]&&tableFilter.timestamp[1]" class="flex gap-8px justify-center mb-12px">
-        <DateFilterCard v-model:timestamp="tableFilter.timestamp" @update:timestamp="filterSubmit" class="bg-[transparent]! h-16px! mb-0px! w-244px! justify-end!"/>
+        <DateFilterCard v-model:timestamp="tableFilter.timestamp" @update:timestamp="dialogFilter.timestamp=[];filterSubmit()" class="bg-[transparent]! h-16px! mb-0px! w-244px! justify-end!"/>
         <el-switch v-model="globalStore.isClickKlineFilter" size="small" class="h-16px!" v-tooltip="!globalStore.isClickKlineFilter?t('enabledClickKlineFilter'):t('disabledClickKlineFilter')"/>
       </div>
       <template v-if="tableFilter.markerAddress">
@@ -85,29 +85,29 @@
       <div v-loading="tableLoading" class="text-12px">
         <!-- 表格头部 -->
         <div
-          class="grid grid-cols-[minmax(0,1.2fr)_minmax(0,1.2fr)] items-center gap-15px mb-12px text-12px color-[--third-text1] px-12px">
+          class="grid grid-cols-[minmax(0,1.2fr)_minmax(0,1.2fr)] items-center gap-15px mb-12px text-12px color-[--third-text] px-12px">
           <div class="grid grid-cols-[minmax(0,0.8fr)_minmax(0,1fr)] items-center gap-15px">
             <div class="text-left text-nowrap min-w-0">
-              <div class="flex items-center justify-start gap-2px clickable" @click="globalStore.isUSDT = !globalStore.isUSDT">
+              <div class="flex items-center justify-start gap-2px clickable group" @click="globalStore.isUSDT = !globalStore.isUSDT">
                 <span>{{ t('amountU').slice(0, 3) }}</span>
                 <img v-if="!globalStore.isUSDT" :src="`${token_logo_url}chain/${token?.chain}.png`" class="mt-1px border-rd-[50%]" height="12" alt=""></img>
-                <!-- <Icon v-if="globalStore.isUSDT" name="custom:price2" class="color-[--third-text1] text-10px"/> -->
-                <Icon v-else name="custom:price2" class="color-[--third-text1] text-12px"/>
+                <!-- <Icon v-if="globalStore.isUSDT" name="custom:price2" class="color-[--third-text] text-10px"/> -->
+                <Icon v-else name="custom:price2" class="color-[--third-text] text-12px group-hover:color-[--d-E0E0E0-l-333]"/>
               </div>
             </div>
-            <div class="flex items-center justify-start gap-2px text-nowrap min-w-0 clickable" @click="tableView.isAmount = !tableView.isAmount">
+            <div class="flex items-center justify-start gap-2px text-nowrap min-w-0 clickable group" @click="tableView.isAmount = !tableView.isAmount">
               {{ tableView.isAmount ? t('swapPrice') : t('MC') }}
-              <Icon name="custom:exchange-horizontal" class="color-[--third-text1] text-10px"/>
+              <Icon name="custom:exchange-horizontal" class="color-[--third-text] text-10px group-hover:color-[--d-E0E0E0-l-333]"/>
               <!-- <div class="p-0 px-2px border-none hover:bg-[transparent] h-auto"
                 @click="tableView.isAmount = !tableView.isAmount">
                 <svg v-if="tableView.isAmount" width="10" height="10" viewBox="0 0 10 10" fill="none"
-                  xmlns="http://www.w3.org/2000/svg" class="color-[--third-text1]">
+                  xmlns="http://www.w3.org/2000/svg" class="color-[--third-text]">
                   <path
                     d="M5 0C2.23884 0 0 2.23884 0 5C0 7.76116 2.23884 10 5 10C7.76116 10 10 7.76116 10 5C10 2.23884 7.76116 0 5 0ZM5.24889 7.42411L5.25112 7.7779C5.25112 7.82701 5.21094 7.8683 5.16183 7.8683H4.84486C4.79576 7.8683 4.75558 7.82812 4.75558 7.77902V7.42857C3.76451 7.35491 3.29799 6.79017 3.24777 6.17634C3.24331 6.12388 3.2846 6.07924 3.33706 6.07924H3.85268C3.89621 6.07924 3.93415 6.11049 3.94085 6.1529C3.99777 6.5067 4.27344 6.7712 4.76785 6.83705V5.24442L4.49219 5.17411C3.90848 5.0346 3.35268 4.67076 3.35268 3.9163C3.35268 3.10268 3.97098 2.66518 4.76116 2.58817V2.21986C4.76116 2.17076 4.80134 2.13058 4.85045 2.13058H5.16406C5.21317 2.13058 5.25334 2.17076 5.25334 2.21986V2.58482C6.01786 2.66183 6.59152 3.10826 6.65848 3.80357C6.66406 3.85603 6.62276 3.90179 6.56919 3.90179H6.06808C6.02343 3.90179 5.98549 3.8683 5.97991 3.82478C5.93527 3.49888 5.67411 3.23326 5.24889 3.17522V4.6741L5.53237 4.73996C6.25558 4.91852 6.74777 5.26451 6.74777 6.03907C6.74777 6.87947 6.12277 7.34822 5.24889 7.42411ZM4.04688 3.86496C4.04688 4.14843 4.2221 4.36831 4.59933 4.50446C4.65179 4.52567 4.70424 4.54241 4.76674 4.56026V3.17634C4.35491 3.2288 4.04688 3.45982 4.04688 3.86496ZM5.34709 5.37388C5.31585 5.36718 5.2846 5.35938 5.24889 5.34933V6.84152C5.72433 6.79911 6.05246 6.53795 6.05246 6.10044C6.05246 5.75782 5.875 5.53459 5.34709 5.37388Z"
                     fill="currentColor" />
                 </svg>
                 <svg v-else width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg"
-                  class="color-[--third-text1]">
+                  class="color-[--third-text]">
                   <path
                     d="M9.02589 2.99465C9.33125 3.60428 9.5 4.2861 9.5 5.00802C9.5 7.48663 7.48304 9.5 5 9.5C2.51696 9.5 0.5 7.48663 0.5 5.00802C0.5 2.52941 2.50893 0.516043 5 0.516043V5.31283L9.02589 2.99465ZM5.64286 0.5V4.14171L8.69643 2.38503C7.99732 1.39037 6.90446 0.684492 5.64286 0.5Z"
                     fill="currentColor" />
@@ -131,7 +131,7 @@
         <!-- :key="klineHeight+activeTab+(isMeActive?1:0)" -->
         <div v-else ref="scroller" :key="klineHeight+activeTab+updateNum"
           style="margin-right: -12px;padding-right: 12px;overscroll-behavior-y: contain" class="scrollbar-hide overflow-y-auto"
-          :style="{ height: `${(klineHeight ?? 200) - 102}px`,'will-change': 'height' }"  @mouseenter="isPausedTxs = true"
+          :style="{ height: `${(klineHeight ?? 200) - (isExpand? 104:66)}px`,'will-change': 'height' }"  @mouseenter="isPausedTxs = true"
           @mouseleave="isPausedTxs = false">
           <div :style="{
             height: `${totalSize}px`,
@@ -159,7 +159,7 @@
                     </div>
                     <!-- Amount -->
                     <div class="text-left text-nowrap min-w-0">
-                      <div class="font-medium truncate color-[--d-E0E0E0-l-333]">
+                      <div class="font-medium truncate color-[--secondary-text]">
                         <template v-if="globalStore.isUSDT">
                           <span>
                             ${{ formatFixedDecimals(getAmount(getItem(virtualRow), true, true), 2) }}
@@ -168,7 +168,7 @@
                         <template v-else>
                           <span>
                             {{ formatFixedDecimals(getAmount(getItem(virtualRow), true, false), 3) }}
-                            <!-- <span class="color-[--third-text1] hidden sm:inline">
+                            <!-- <span class="color-[--third-text] hidden sm:inline">
                                 {{ getChainInfo(getItem(virtualRow).chain)?.main_name }}
                               </span> -->
                           </span>
@@ -185,7 +185,7 @@
                         </template>
                         <template v-else>
                           <span>
-                            ${{ formatNumber(getMcPrice(getItem(virtualRow)), { decimals: 2 }) }}
+                            ${{ formatNumber2(getMcPrice(getItem(virtualRow)), 1) }}
                           </span>
                         </template>
                       </div>
@@ -204,11 +204,11 @@
                           :addressClass="`inline-block truncate max-w-full ${markerTooltipVisible && currentRow.wallet_address === getItem(virtualRow).wallet_address ? 'bg-#12B88633' : ''
                             }`"
                           :format-address="(address: string) => windowWidth < 480 ? address?.slice(-3) : '*' + address?.slice(-4)"
-                          class="color-[--d-E0E0E0-l-333] truncate min-w-0 !text-12px"
+                          class="color-[--secondary-text] truncate min-w-0 !text-12px"
                           :mouseoverAddress="e => openMarkerTooltip(getItem(virtualRow), e)" :canEdit="false"
                           @update-remark="updateRemark" />
                         <div v-if="getItem(virtualRow).count && getItem(virtualRow).count > 1"
-                          class="color-[--d-E0E0E0-l-333] !text-12px ml-2px whitespace-nowrap">
+                          class="color-[--secondary-text] !text-12px ml-2px whitespace-nowrap">
                           ({{ getItem(virtualRow).count }})
                         </div>
                         <template v-if="windowWidth >= 480 && ['solana', 'bsc'].includes(getItem(virtualRow).chain) && getItem(virtualRow).senderProfile">
@@ -231,12 +231,12 @@
                     <!-- Time -->
                     <el-tooltip placement="right" :show-arrow="false" :persistent="false"
                       :content="formatDate(getItem(virtualRow)?.time, 'YYYY-MM-DD HH:mm:ss')">
-                      <div class="text-right min-w-0 hover:decoration-underline hover:decoration-[--third-text1]">
-                        <div class="color-[--third-text1]">
+                      <div class="text-right min-w-0 hover:decoration-underline hover:decoration-[--third-text]">
+                        <div class="color-[--third-text]">
                           <TimerCount v-if="getItem(virtualRow).time && Number(formatTimeFromNow(getItem(virtualRow).time, true)) < 60"
                             :key="`${getItem(virtualRow).time}${virtualRow.index}`" :timestamp="getItem(virtualRow).time" :end-time="60">
                             <template #default="{ seconds }">
-                              <span class="color-[--third-text1]">
+                              <span class="color-[--third-text]">
                                 <template v-if="seconds < 60">
                                   {{ seconds }}s
                                 </template>
@@ -246,7 +246,7 @@
                               </span>
                             </template>
                           </TimerCount>
-                          <span v-else class="color-[--third-text1]">
+                          <span v-else class="color-[--third-text]">
                             {{ formatTimeFromNow(getItem(virtualRow).time) }}
                           </span>
                         </div>
@@ -299,7 +299,7 @@
           :chain="currentRow.chain" />
       </div>
     </MarkerTooltip>
-    <el-dialog v-if="filterDialogVisible" v-model="filterDialogVisible" :width="440" :title="$t('txFilter')" destroy-on-close>
+    <el-dialog v-if="filterDialogVisible" v-model="filterDialogVisible" :width="440" :title="$t('txFilter')" class="w-orderBookDialog" destroy-on-close>
       <div class="mx--16px h-1px bg-[--border] mb-20px"/>
       <div class="mb-12px mt-20px">
         <label>
@@ -348,7 +348,7 @@
           :key="idx"
           plain
           size="default"
-          class="flex-1 h-30px font-400 b-[--border] bg-[--main-input-button-bg]"
+          class="flex-1 h-30px font-400 b-[--border] bg-[--main-input-button-bg] color-[--main-text1]"
           @click.stop="dialogFilter.minVol=item.key;dialogFilter.maxVol=''"
         >
           {{ item.value }}
@@ -390,7 +390,7 @@
         <el-button
           plain
           size="default"
-          class="flex-1 h-32px font-400"
+          class="flex-1 h-32px font-400 color-[--main-text1]"
           @click.stop="toggleClickMe();filterDialogVisible = false"
         > 
           {{ $t('filterWallet') }}
@@ -399,12 +399,12 @@
     
       <div class="mt-20px flex gap-8px">
         <el-button
-          class="h-30px flex-1"
+          class="h-30px flex-1 color-[--main-text1]"
           @click="resetDialogFilter"
         >
           {{ $t('reset') }}
         </el-button>
-        <el-button type="primary" class="h-30px flex-1" @click="confirmDialogFilter">
+        <el-button type="primary" class="h-30px flex-1 color-[--main-text1]" @click="confirmDialogFilter">
           {{ $t('confirm') }}
         </el-button>
       </div>
@@ -534,7 +534,7 @@ const currentRow = shallowRef<ExtendedTxResponse>({} as any)
 // 表格视图状态
 const tableView = ref({
   // isVolUSDT: true,
-  isAmount: true,
+  isAmount: false,
 })
 
 // 只在交易历史接口更新之后更新，防止 route 地址更新导致列表数据更新异常
@@ -1800,5 +1800,13 @@ function getGradient(row: IGetSimpleTxsResponse) {
 }
 .collapse-leave-active {
   transition: max-height 0.3s ease, opacity 0.3s ease, padding 0.3s ease;
+}
+:deep() .w-orderBookDialog.el-dialog{
+   .el-dialog__header .el-dialog__title{
+    color:var(--main-text1)
+  }
+  .el-dialog__body{
+    color:var(--main-text1)
+  }
 }
 </style>
