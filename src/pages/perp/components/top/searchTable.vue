@@ -206,6 +206,8 @@ function onScroll() {
   }
 }
 function tableRowClick(row: PerpInfo) {
+  const perpStore = usePerpStore()
+  perpStore.setContractName(row.contractName)
   $router.push({
     name: 'perp-id',
     params: { name: row.contractName },

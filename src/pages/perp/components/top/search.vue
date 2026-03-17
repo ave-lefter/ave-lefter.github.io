@@ -50,6 +50,8 @@ import SearchTable from './searchTable.vue'
 import type { PerpInfo } from '@/api/types/perp'
 import { _getContractCategorys, _getContractList } from '@/api/perp'
 import { useDebounceFn } from '@vueuse/core'
+import { usePerpWsPubStore } from '@/stores/perp/wsPub'
+import { WSPerpEventType } from '@/utils/constants'
 
 function normalizeContract(item: any): PerpInfo {
   return {
@@ -91,6 +93,7 @@ function normalizeContract(item: any): PerpInfo {
 
 const emit = defineEmits(['close'])
 const { locale } = useI18n()
+const perpWsPubStore = usePerpWsPubStore()
 
 const query = ref('')
 const sortBy = ref<string>('')
@@ -197,6 +200,25 @@ onMounted(() => {
 watch(() => locale.value, () => {
   fetchCategoryList()
 })
+
+watch(
+  () => perpWsPubStore.wsResult[WSPerpEventType.TICKER_ALL_1S],
+  (val) => {
+    if (!val?.data || !contractList.value.length) return
+    if (val.dataType === 'Snapshot' && WSPerpEventType.TICKER_ALL_1S === val.channel) {
+      contractList.value = contractList.value.map((item) => {
+        const update = val.data.find((y: any) => y?.contractId === item?.contractId)
+        return update ? { ...item, ...update } : item
+      })
+    } else if (val.dataType === 'changed' && WSPerpEventType.TICKER_ALL_1S === val.channel) {
+      contractList.value = contractList.value.map((item) => {
+        const update = val.data.find((y: any) => y?.contractId === item?.contractId)
+        return update ? { ...item, ...update } : item
+      })
+    }
+  },
+  { deep: true }
+)
 </script>
 
 <style lang="scss" scoped>
