@@ -1484,7 +1484,6 @@ function handlerFilterConfirm(
     val.progress_min = undefined
     val.progress_max = undefined
   }
-  console.log('-------handlerFilterConfirm------------')
   getPump({ ...(params as { category: CategoryKey }), ...val }, true)
 }
 
