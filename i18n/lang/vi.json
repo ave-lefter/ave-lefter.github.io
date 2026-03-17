@@ -305,7 +305,6 @@
   "avgBuyPrice": "Giá mua trung bình",
   "avgSellPrice": "Giá bán trung bình",
   "trades": "Giao dịch",
-  "me": "Tôi",
   "orderBook": "Sổ Lệnh",
   "abnormalChips": "Chip bất thường",
   "abnormalChipsTip": "Tỷ lệ chip bất thường đã được xử lý lại",
@@ -875,5 +874,16 @@
   "migratedToMarket": "Đã chuyển sang thị trường",
   "createdAt": "Tạo lúc",
   "openMonitorSuccess": "Đã bật giám sát thành công",
-  "cancelMonitorSuccess": "Đã vô hiệu hóa giám sát thành công"
+  "cancelMonitorSuccess": "Đã vô hiệu hóa giám sát thành công",
+  "trackerTypeRequired": "Vui lòng chọn ít nhất một loại nội dung",
+  "twitterForHMe": "Twitter-Mỏ",
+  "twitterForHot": "Twitter-Hot",
+  "txFilter": "Bộ lọc giao dịch",
+  "filterWallet2": "Lọc ví",
+  "disabledClickKlineFilter": "Tắt thời gian lọc biểu đồ nhấp chuột",
+  "enabledClickKlineFilter": "Bật thời gian lọc biểu đồ nhấp chuột",
+  "onlyFollowed": "Chỉ theo dõi",
+  "OnlyDev": "Chỉ có nhà phát triển",
+  "OnlyYou": "Chỉ có bạn",
+  "you": "Bạn"
 }

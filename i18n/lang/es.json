@@ -192,7 +192,6 @@
   "totalBuy": "Compra Total",
   "totalSell": "Venta Total",
   "trades": "Operaciones",
-  "me": "Yo",
   "orderBook": "Libro de Órdenes",
   "seemsNoProblem": "Parece no haber problema",
   "possibleRisks": "Posibles riesgos",
@@ -657,5 +656,16 @@
   "migratedToMarket": "Migrado al mercado",
   "createdAt": "Creado el",
   "openMonitorSuccess": "Monitoreo habilitado exitosamente",
-  "cancelMonitorSuccess": "Monitoreo deshabilitado exitosamente"
+  "cancelMonitorSuccess": "Monitoreo deshabilitado exitosamente",
+  "trackerTypeRequired": "Seleccione al menos un tipo de contenido",
+  "twitterForHMe": "Twitter-mío",
+  "twitterForHot": "Twitter-caliente",
+  "txFilter": "Filtro de transacciones",
+  "filterWallet2": "Filtrar billetera",
+  "disabledClickKlineFilter": "Deshabilitar el tiempo de filtro del gráfico de clics",
+  "enabledClickKlineFilter": "Habilitar el tiempo de filtrado del gráfico de clics",
+  "onlyFollowed": "Sólo seguido",
+  "OnlyDev": "Sólo desarrollador",
+  "OnlyYou": "Sólo tu",
+  "you": "Tú"
 }

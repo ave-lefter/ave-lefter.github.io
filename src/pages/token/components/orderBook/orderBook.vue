@@ -1,280 +1,410 @@
 <template>
   <div v-if="modelValue"
-    class="bg-[--d-0B0D12-l-F6F9FF] relative rounded-2px text-14px pt-12px flex flex-col overflow-hidden"
-    :style="{ height: `${klineHeight || 200}px` }">
+    class="w-orderBook bg-[--d-0B0D12-l-F6F9FF] relative rounded-2px text-14px pt-12px flex flex-col overflow-hidden"
+    :style="{ height: `${(klineHeight || 200)}px`,'will-change': 'height' }">
+    <!-- 111: {{   !(
+    !modelValue
+    || listStatus.loadingTxs
+    || listStatus.loadingTxs1
+    || isLoading
+    || listStatus.finished
+    || filterTableList.length === 0
+) }}
+    loadingTxs:{{listStatus.loadingTxs}}
+    loadingTxs1:{{listStatus.loadingTxs1}}
+    finished:{{listStatus.finished}}
+    filterTableList.length:{{filterTableList.length}}
+    <div>{{ klineHeight+activeTab+(isMeActive?1:0) }}</div> -->
     <!-- 筛选标签 -->
-    <div class="mx-12px pb-12px flex border-b-1px border-b-solid border-b-[#f2f2f2] dark:border-b-[#222]">
-      <div ref="tabsContainer"
-        class="flex-1 flex items-center gap-x-8px whitespace-nowrap overflow-x-auto scrollbar-hide">
-        <button v-for="(tab, index) in tabs" :key="tab.value"
-          :style="{ backgroundColor: activeTab === tab.value ? 'rgba(63, 128, 247, 0.10)' : 'var(--d-16181D-l-ECF3FF)' }"
-          :class="[
-            'shrink-0 text-12px px-8px py-4px rounded-4px border-none cursor-pointer',
-            activeTab === tab.value
-              ? 'color-[--primary-color]'
-              : 'bg-[--d-16181D-l-ECF3FF] color-[--d-5A5E64-l-A9B0BC]'
-          ]" @click="setActiveTab(tab.value, index)">
-          {{ tab.label }}
-        </button>
-      </div>
-      <div class="flex items-center gap-8px">
-        <button v-if="botStore?.userInfo?.name" class="me-btn shrink-0 flex items-center gap-4px sticky right-0 cursor-pointer"
-          :class="{ 'active': isMeActive }" @click="toggleClickMe">
-          <Icon name="i-tdesign:user-filled" class="text-md" />
-          <span>{{ t('me') }}</span>
-        </button>
-        <span v-tooltip="$t(globalStore.isClickKlineFilter?'clickChartHideFilter':'clickChartFilter')" class="flex items-center justify-center w-12px h-12px rounded-2px color-[--reverse-color] text-10px cursor-pointer" :class="globalStore.isClickKlineFilter?'bg-[--primary-color]':'bg-[--third-text] hover:bg-[--secondary-text]'" @click="globalStore.isClickKlineFilter=!globalStore.isClickKlineFilter"><Icon name="custom:chart" /></span>
-        <Icon name="custom:filter" class="text-12px cursor-pointer" :class="isFilterActive?'color-[--primary-color]':'color-[--third-text] hover:color-[--secondary-text]'" @click.self="filterDialogVisible=true"/>
+    <div class="mx-12px pb-12px flex items-center justify-between lh-none">
+      <div class="text-[--main-text1] font-500 text-13px lh-16px flex gap-4px"><span>{{ t('orderBook') }}</span> <Icon class="text-13px mt-2px origin-center-center transition-transform duration-0.3s ease clickable" :class="isExpand?'rotate-0':'rotate-180'"  name= "material-symbols:keyboard-arrow-up"  @click="isExpand = !isExpand"/></div>
+      <div class="flex gap-8px h-14px text-12px color-[--third-text] items-center">
+        <Icon v-if="isPausedTxs1" name="custom:stop" class="text-14px color-[#FFA622]" />
+        <div class="me-btn shrink-0 flex items-center gap-4px sticky right-0 cursor-pointer"
+          :class="{ 'active': activeTab==='-100' }" @click="toggleClickFollowed" v-tooltip="t('onlyFollowed')">
+          <!-- <Icon name="custom:filter2" class="text-12px"/> -->
+          <span>{{ t('followed') }}</span>
+        </div>
+        <div class="me-btn shrink-0 flex items-center gap-4px sticky right-0 cursor-pointer"
+          :class="{ 'active': activeTab==='25' }" @click="toggleClickDEV"  v-tooltip="t('OnlyDev')">
+          <!-- <Icon name="i-tdesign:user-filled" class="text-md" /> -->
+          <!-- <Icon name="custom:filter2" class="text-12px"/> -->
+          <span>{{ t('dev4') }}</span>
+        </div>
+        <div class="me-btn shrink-0 flex items-center gap-4px sticky right-0 cursor-pointer"
+          :class="{ 'active': isMeActive }" @click="toggleClickMe" v-tooltip="t('OnlyYou')">
+          <!-- <Icon name="custom:user" class="text-12px" /> -->
+          <span>{{ t('you') }}</span>
+        </div>
+        <span v-tooltip="$t(globalStore.isClickKlineFilter?'clickChartHideFilter':'clickChartFilter')" class="flex items-center justify-center cursor-pointer" :class="globalStore.isClickKlineFilter?'color-[--primary-color]':'text-[--third-text] hover:text-[--d-E0E0E0-l-333]'" @click="globalStore.isClickKlineFilter=!globalStore.isClickKlineFilter"><Icon name="custom:chart2" /></span>
+        <Icon name="custom:filter2" class="cursor-pointer" :class="isFilterActive?'color-[--primary-color]':'color-[--third-text] hover:color-[--d-E0E0E0-l-333]'" @click.self="filterDialogVisible=true"/>
       </div>
     </div>
+    <transition name="collapse">
+      <div v-show="isExpand" class="content mx-12px pb-12px flex">
+        <div ref="tabsContainer"
+          class="flex items-center gap-x-8px whitespace-nowrap overflow-x-auto scrollbar-hide border-1px border-solid b-[--main-divider1] rounded-4px">
+          <div v-for="(tab, index) in tabs" :key="tab.value"
+            :class="[
+              'shrink-0 text-12px px-8px py-4px rounded-4px border-none cursor-pointer lh-16px font-500',
+              ((activeTab === tab.value) || ((activeTab === '-100' || activeTab === '25') && tab.value==='all'))
+                ? 'color-[--main-text1] bg-[--main-divider1]'
+                : 'color-[--third-text]'
+            ]" @click="setActiveTab(tab.value, index)">
+            {{ tab.label }}
+          </div>
+        </div>
+      </div>
+    </transition>
 
     <!-- 表格 -->
-    <div class="px-12px">
-      <DateFilterCard v-if="tableFilter.timestamp.length" v-model:timestamp="tableFilter.timestamp" @update:timestamp="filterSubmit"/>
+    <div class="px-0px">
+      <div v-if="tableFilter.timestamp.length&&tableFilter.timestamp[0]&&tableFilter.timestamp[1]" class="flex gap-8px justify-center mb-12px">
+        <DateFilterCard v-model:timestamp="tableFilter.timestamp" @update:timestamp="dialogFilter.timestamp=[];filterSubmit()" class="bg-[transparent]! h-16px! mb-0px! w-244px! justify-end!"/>
+        <el-switch v-model="globalStore.isClickKlineFilter" size="small" class="h-16px!" v-tooltip="!globalStore.isClickKlineFilter?t('enabledClickKlineFilter'):t('disabledClickKlineFilter')"/>
+      </div>
+      <template v-if="tableFilter.markerAddress">
+        <div
+          v-if="tableLoading"
+          class="lh-20px text-12px py-0px bg-[transparent] text-center mb-12px font-400">
+          {{ $t('loading') }}
+        </div>
+        <template v-else>
+          <div class="lh-20px text-12px py-0px bg-[transparent] text-center mb-12px flex justify-center text-[--main-text1] font-400">
+            <div
+              v-html="$t('filterTip', {
+              address: `<span>&nbsp;${tableFilter.markerAddress.slice(0, 4)}...${tableFilter.markerAddress.slice(-4)}&nbsp;</span>`,
+              count: `<span  class='color-#3F80F7'>&nbsp;${filterTableList[0]?.count || 0}&nbsp;</span>`
+            })" />
+            <span class='color-#3F80F7 decoration-underline cursor-pointer ml-2px' @click.stop="resetMakerAddress">
+              {{ $t('reset') }}
+            </span>
+          </div>
+        </template>
+      </template>
       <div v-loading="tableLoading" class="text-12px">
         <!-- 表格头部 -->
         <div
-          class="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] items-center gap-15px mt-8px mb-4px text-12px color-[--d-5A5E64-l-A9B0BC]">
+          class="grid grid-cols-[minmax(0,1.2fr)_minmax(0,1.2fr)] items-center gap-15px mb-12px text-12px color-[--third-text] px-12px">
           <div class="grid grid-cols-[minmax(0,0.8fr)_minmax(0,1fr)] items-center gap-15px">
-            <div class="min-w-0 text-left cursor-pointer flex items-center">
-              <span @click="sortChange({ asc: '', desc: 'asc', '': 'desc' }[defaultSort] || '')">{{ t('time') }}</span>
-              <HeadSort :defaultSort="defaultSort" @sort-change="sortChange" />
-            </div>
-            <div class="text-right text-nowrap min-w-0">
-              <div class="flex items-center justify-end gap-2px">
+            <div class="text-left text-nowrap min-w-0">
+              <div class="flex items-center justify-start gap-2px clickable group" @click="globalStore.isUSDT = !globalStore.isUSDT">
                 <span>{{ t('amountU').slice(0, 3) }}</span>
-                <el-button class="p-0 px-2px border-none hover:bg-[transparent] h-auto"
-                  @click="globalStore.isUSDT = !globalStore.isUSDT">
-                  <svg v-if="globalStore.isUSDT" width="10" height="10" viewBox="0 0 10 10" fill="none"
-                    xmlns="http://www.w3.org/2000/svg" class="color-[--d-5A5E64-l-A9B0BC]">
-                    <path
-                      d="M5 0C2.23884 0 0 2.23884 0 5C0 7.76116 2.23884 10 5 10C7.76116 10 10 7.76116 10 5C10 2.23884 7.76116 0 5 0ZM5.24889 7.42411L5.25112 7.7779C5.25112 7.82701 5.21094 7.8683 5.16183 7.8683H4.84486C4.79576 7.8683 4.75558 7.82812 4.75558 7.77902V7.42857C3.76451 7.35491 3.29799 6.79017 3.24777 6.17634C3.24331 6.12388 3.2846 6.07924 3.33706 6.07924H3.85268C3.89621 6.07924 3.93415 6.11049 3.94085 6.1529C3.99777 6.5067 4.27344 6.7712 4.76785 6.83705V5.24442L4.49219 5.17411C3.90848 5.0346 3.35268 4.67076 3.35268 3.9163C3.35268 3.10268 3.97098 2.66518 4.76116 2.58817V2.21986C4.76116 2.17076 4.80134 2.13058 4.85045 2.13058H5.16406C5.21317 2.13058 5.25334 2.17076 5.25334 2.21986V2.58482C6.01786 2.66183 6.59152 3.10826 6.65848 3.80357C6.66406 3.85603 6.62276 3.90179 6.56919 3.90179H6.06808C6.02343 3.90179 5.98549 3.8683 5.97991 3.82478C5.93527 3.49888 5.67411 3.23326 5.24889 3.17522V4.6741L5.53237 4.73996C6.25558 4.91852 6.74777 5.26451 6.74777 6.03907C6.74777 6.87947 6.12277 7.34822 5.24889 7.42411ZM4.04688 3.86496C4.04688 4.14843 4.2221 4.36831 4.59933 4.50446C4.65179 4.52567 4.70424 4.54241 4.76674 4.56026V3.17634C4.35491 3.2288 4.04688 3.45982 4.04688 3.86496ZM5.34709 5.37388C5.31585 5.36718 5.2846 5.35938 5.24889 5.34933V6.84152C5.72433 6.79911 6.05246 6.53795 6.05246 6.10044C6.05246 5.75782 5.875 5.53459 5.34709 5.37388Z"
-                      fill="currentColor" />
-                  </svg>
-                  <svg v-else width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg"
-                    class="color-[--d-5A5E64-l-A9B0BC]">
-                    <path fill-rule="evenodd" clip-rule="evenodd"
-                      d="M5 0C7.757 0 10 2.243 10 5C10 7.757 7.757 10 5 10C2.243 10 0 7.757 0 5C0 2.243 2.243 0 5 0ZM5.1 3C4.78 3 4.484 3.114 4.256 3.342L3.342 4.256C3.114 4.484 3 4.78 3 5.1C2.9953 5.41628 3.11864 5.72103 3.342 5.945L4.256 6.858C4.484 7.087 4.78 7.2 5.1 7.2C5.41434 7.19485 5.71531 7.07268 5.945 6.858L6.858 5.945C7.087 5.717 7.201 5.42 7.201 5.1C7.201 4.781 7.087 4.484 6.858 4.256L5.945 3.342C5.717 3.114 5.42 3 5.1 3ZM5.1 3.64C5.23799 3.64449 5.369 3.70176 5.466 3.8L6.379 4.712C6.48602 4.80272 6.54509 4.93783 6.539 5.078C6.53426 5.21564 6.477 5.34624 6.379 5.443L5.465 6.356C5.26 6.539 4.918 6.539 4.735 6.356L3.822 5.443C3.708 5.352 3.662 5.215 3.662 5.078C3.66649 4.94001 3.72376 4.80901 3.822 4.712L4.735 3.8C4.82551 3.69326 4.96018 3.63423 5.1 3.64Z"
-                      fill="currentColor" />
-                  </svg>
-                </el-button>
+                <img v-if="!globalStore.isUSDT" :src="`${token_logo_url}chain/${token?.chain}.png`" class="mt-1px border-rd-[50%]" height="12" alt=""></img>
+                <!-- <Icon v-if="globalStore.isUSDT" name="custom:price2" class="color-[--third-text] text-10px"/> -->
+                <Icon v-else name="custom:price2" class="color-[--third-text] text-12px group-hover:color-[--d-E0E0E0-l-333]"/>
               </div>
             </div>
-          </div>
-          <div class="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] items-center gap-15px">
-            <div class="flex items-center justify-end gap-2px text-nowrap min-w-0">
+            <div class="flex items-center justify-start gap-2px text-nowrap min-w-0 clickable group" @click="tableView.isAmount = !tableView.isAmount">
               {{ tableView.isAmount ? t('swapPrice') : t('MC') }}
-              <el-button class="p-0 px-2px border-none hover:bg-[transparent] h-auto"
+              <Icon name="custom:exchange-horizontal" class="color-[--third-text] text-10px group-hover:color-[--d-E0E0E0-l-333]"/>
+              <!-- <div class="p-0 px-2px border-none hover:bg-[transparent] h-auto"
                 @click="tableView.isAmount = !tableView.isAmount">
                 <svg v-if="tableView.isAmount" width="10" height="10" viewBox="0 0 10 10" fill="none"
-                  xmlns="http://www.w3.org/2000/svg" class="color-[--d-5A5E64-l-A9B0BC]">
+                  xmlns="http://www.w3.org/2000/svg" class="color-[--third-text]">
                   <path
                     d="M5 0C2.23884 0 0 2.23884 0 5C0 7.76116 2.23884 10 5 10C7.76116 10 10 7.76116 10 5C10 2.23884 7.76116 0 5 0ZM5.24889 7.42411L5.25112 7.7779C5.25112 7.82701 5.21094 7.8683 5.16183 7.8683H4.84486C4.79576 7.8683 4.75558 7.82812 4.75558 7.77902V7.42857C3.76451 7.35491 3.29799 6.79017 3.24777 6.17634C3.24331 6.12388 3.2846 6.07924 3.33706 6.07924H3.85268C3.89621 6.07924 3.93415 6.11049 3.94085 6.1529C3.99777 6.5067 4.27344 6.7712 4.76785 6.83705V5.24442L4.49219 5.17411C3.90848 5.0346 3.35268 4.67076 3.35268 3.9163C3.35268 3.10268 3.97098 2.66518 4.76116 2.58817V2.21986C4.76116 2.17076 4.80134 2.13058 4.85045 2.13058H5.16406C5.21317 2.13058 5.25334 2.17076 5.25334 2.21986V2.58482C6.01786 2.66183 6.59152 3.10826 6.65848 3.80357C6.66406 3.85603 6.62276 3.90179 6.56919 3.90179H6.06808C6.02343 3.90179 5.98549 3.8683 5.97991 3.82478C5.93527 3.49888 5.67411 3.23326 5.24889 3.17522V4.6741L5.53237 4.73996C6.25558 4.91852 6.74777 5.26451 6.74777 6.03907C6.74777 6.87947 6.12277 7.34822 5.24889 7.42411ZM4.04688 3.86496C4.04688 4.14843 4.2221 4.36831 4.59933 4.50446C4.65179 4.52567 4.70424 4.54241 4.76674 4.56026V3.17634C4.35491 3.2288 4.04688 3.45982 4.04688 3.86496ZM5.34709 5.37388C5.31585 5.36718 5.2846 5.35938 5.24889 5.34933V6.84152C5.72433 6.79911 6.05246 6.53795 6.05246 6.10044C6.05246 5.75782 5.875 5.53459 5.34709 5.37388Z"
                     fill="currentColor" />
                 </svg>
                 <svg v-else width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg"
-                  class="color-[--d-5A5E64-l-A9B0BC]">
+                  class="color-[--third-text]">
                   <path
                     d="M9.02589 2.99465C9.33125 3.60428 9.5 4.2861 9.5 5.00802C9.5 7.48663 7.48304 9.5 5 9.5C2.51696 9.5 0.5 7.48663 0.5 5.00802C0.5 2.52941 2.50893 0.516043 5 0.516043V5.31283L9.02589 2.99465ZM5.64286 0.5V4.14171L8.69643 2.38503C7.99732 1.39037 6.90446 0.684492 5.64286 0.5Z"
                     fill="currentColor" />
                 </svg>
-              </el-button>
+              </div> -->
             </div>
-            <div class="text-right min-w-0">{{ t('makers') }}</div>
+          </div>
+          <div class="grid grid-cols-[minmax(0,1.5fr)_minmax(0,0.8fr)] items-center gap-15px">
+            <div class="text-left min-w-0">{{ t('makers') }}</div>
+            <div class="min-w-0 text-right cursor-pointer flex items-center justify-end">
+              <span @click="sortChange({ asc: '', desc: 'asc', '': 'desc' }[defaultSort] || '')">{{ t('time') }}</span>
+              <HeadSort :defaultSort="defaultSort" @sort-change="sortChange" />
+            </div>
           </div>
         </div>
 
         <!-- 表格内容 -->
-        <UseVirtualList v-if="filterTableList.length > 0" :key="klineHeight" ref="scroller" :list="filterTableList" :options="{itemHeight:24}" style="margin-right: -12px;padding-right: 12px;" class="scrollbar-hide" :height="`${(klineHeight ?? 200) - 75}px`">
-            <template #default="{data:row,index}">
-              <div
-                class="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] items-center gap-15px h-24px hover:bg-[rgba(255,255,255,.02)] relative z-10 overflow-hidden cursor-pointer mt-1px first:mt-0"
-                @mouseenter="isPausedTxs = true"
-                @mouseleave="isPausedTxs = false"
-                @click="onRowClick({ rowData: row } as any)"
-                >
-                <div class="grid grid-cols-[minmax(0,0.8fr)_minmax(0,1fr)] items-center gap-15px relative h-24px px-2px">
-                  <!-- 整行渐变背景 -->
-                  <div class="absolute inset-0 pointer-events-none"
-                    :style="{ backgroundColor: getFullRowGradient(row), transform: `scaleX(${getAmountBarWidthPercent(row)})`, transformOrigin: 'right' }" />
-
-                  <!-- Time -->
-                  <div class="text-left min-w-0">
-                    <div class="color-[--d-5A5E64-l-A9B0BC]">
-                      <TimerCount v-if="row.time && Number(formatTimeFromNow(row.time, true)) < 60"
-                        :key="`${row.time}${index}`" :timestamp="row.time" :end-time="60">
-                        <template #default="{ seconds }">
-                          <span class="color-[--d-5A5E64-l-A9B0BC]">
-                            <template v-if="seconds < 60">
-                              {{ seconds }}s
-                            </template>
-                            <template v-else>
-                              {{ formatTimeFromNow(row.time) }}
-                            </template>
+        <AveEmpty v-if="isEmpty" class="pt-40px">
+          <span class="color-[--third-text] text-12px mb-20px mt-4px">{{ t('emptyNoData') }}</span>
+        </AveEmpty>
+        <!-- :key="klineHeight+activeTab+(isMeActive?1:0)" -->
+        <div v-else ref="scroller" :key="klineHeight+activeTab+updateNum"
+          style="margin-right: -12px;padding-right: 12px;overscroll-behavior-y: contain" class="scrollbar-hide overflow-y-auto"
+          :style="{ height: `${(klineHeight ?? 200) - (isExpand? 104:66)}px`,'will-change': 'height' }"  @mouseenter="isPausedTxs = true"
+          @mouseleave="isPausedTxs = false">
+          <div :style="{
+            height: `${totalSize}px`,
+            width: '100%',
+            position: 'relative'
+          }">
+            <div v-for="virtualRow in virtualItems" :key="String(virtualRow.key)" :style="{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              transform: `translateY(${virtualRow.start}px)`
+            }">
+              <div :ref="(el) => virtualizer.measureElement(el)"  :data-index="virtualRow.index" class="lh-20px w-full">
+                <div
+                  class="px-12px grid grid-cols-[minmax(0,1.2fr)_minmax(0,1.2fr)] items-center gap-15px h-28px hover:bg-[rgba(255,255,255,.02)] relative z-10 overflow-hidden cursor-pointer mt-1px first:mt-0"
+                  :class="{ 'bg-[--tooltip1]': virtualRow.index % 2 === 1 }" @click="onRowClick({ rowData: getItem(virtualRow) } as any)">
+                  <div class="grid grid-cols-[minmax(0,0.8fr)_minmax(0,1fr)] items-center gap-15px relative h-28px px-2px">
+                    <!-- 整行渐变背景 -->
+                    <!-- <div class="absolute inset-0 pointer-events-none w-[calc(100%+12px)] ml--12px"
+                      :style="{ backgroundColor: getFullRowGradient(getItem(virtualRow)), transform: `scaleX(${getAmountBarWidthPercent(getItem(virtualRow))})`, transformOrigin: 'left' }" /> -->
+                    <div class="w-[calc(100%+12px)] ml--12px inset-0 pointer-events-none absolute">
+                      <div :class="`absolute h-full  ${getGradient(getItem(virtualRow))} opacity-15`"
+                      :style="`width:${Math.min(getAmount(getItem(virtualRow), true, true) / (addressAndChain.chain === 'solana' ? 10 : 20), 100)}%`" />
+                    </div>
+                    <!-- Amount -->
+                    <div class="text-left text-nowrap min-w-0">
+                      <div class="font-medium truncate color-[--secondary-text]">
+                        <template v-if="globalStore.isUSDT">
+                          <span>
+                            ${{ formatFixedDecimals(getAmount(getItem(virtualRow), true, true), 2) }}
                           </span>
                         </template>
-                      </TimerCount>
-                      <span v-else class="color-[--d-5A5E64-l-A9B0BC]">
-                        {{ formatTimeFromNow(row.time) }}
-                      </span>
-                    </div>
-                  </div>
-
-                  <!-- Amount -->
-                  <div class="text-right text-nowrap min-w-0">
-                    <div :class="getRowColor(row)" class="font-medium truncate">
-                      <template v-if="globalStore.isUSDT">
-                        <span>
-                          ${{ formatFixedDecimals(getAmount(row, true, true), 2) }}
-                        </span>
-                      </template>
-                      <template v-else>
-                        <span>
-                          ${{ formatFixedDecimals(getAmount(row, true, false), 3) }}
-                          <span class="color-[--d-5A5E64-l-A9B0BC] hidden sm:inline">
-                            {{ getChainInfo(row.chain)?.main_name }}
+                        <template v-else>
+                          <span>
+                            {{ formatFixedDecimals(getAmount(getItem(virtualRow), true, false), 3) }}
+                            <!-- <span class="color-[--third-text] hidden sm:inline">
+                                {{ getChainInfo(getItem(virtualRow).chain)?.main_name }}
+                              </span> -->
                           </span>
-                        </span>
-                      </template>
+                        </template>
+                      </div>
                     </div>
-                  </div>
-                </div>
-
-                <div class="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] items-center gap-15px h-24px">
-                  <!-- Price -->
-                  <div class="text-right text-nowrap min-w-0 overflow-visible">
-                    <div class="color-[--secondary-text]">
-                      <template v-if="tableView.isAmount">
-                        <span>
-                          ${{ formatNumber(getTransactionPrice(row, true), { decimals: 3 }) }}
-                        </span>
-                      </template>
-                      <template v-else>
-                        <span>
-                          ${{ formatNumber(getMcPrice(row), { decimals: 2 }) }}
-                        </span>
-                      </template>
-                    </div>
-                  </div>
-
-                  <!-- Trader -->
-                  <div class="text-right overflow-hidden min-w-0">
-                    <div class="flex items-center justify-end min-w-0">
-                      <template v-if="windowWidth >= 480 && ['solana', 'bsc'].includes(row.chain) && row.senderProfile">
-                        <Icon v-if="hasNewAccount(row) && (!(row.newTags||[]).map((i:any)=>i.type).includes('47'))"
-                          v-tooltip="{ content: `<span style='color: #85E12F'>${$t('newTokenAccount')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
-                          name="custom:new-account" class="w-12px h-12px mr-2px shrink-0 icon-hover hidden sm:block" />
-                        <Icon v-if="hasClearedAccount(row) && (!(row.newTags||[]).map((i:any)=>i.type).includes('46'))"
-                          v-tooltip="{ content: `<span style='color: #EB2B4B'>${$t('sellAl')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
-                          name="custom:cleared-account"
-                          class="w-12px h-12px mr-2px shrink-0 icon-hover hidden sm:block" />
-                        <Icon v-if="bigWallet(row)"
-                          v-tooltip="{ content: `<span style='color: #ccc'>${$t('whales')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
-                          name="custom:big" class="w-12px h-12px mr-2px shrink-0 icon-hover hidden sm:block" />
-                      </template>
-                      <SignalTags v-if="windowWidth >= 480" tagClass="mr-3px"
-                        :tags="(row.newTags || []).map((el: any) => tagStore.matchTag(el.type)||el)"
-                        :walletAddress="row.wallet_address" :chain="row.chain" />
-
-                      <UserRemark :remark="row.remark" :address="row.wallet_address"
-                        :show-address="!(row?.newTags?.length > 1)" :chain="row.chain" :wallet_logo="row.wallet_logo"
-                        :addressClass="`inline-block truncate max-w-full ${
-                          markerTooltipVisible && currentRow.wallet_address===row.wallet_address?'bg-#12B88633':''
-                        }`"
-                        :format-address="(address: string) => windowWidth < 480 ? address?.slice(-3) : '*' + address?.slice(-4)"
-                        class="color-[--secondary-text] truncate min-w-0 !text-12px"
-                        :mouseoverAddress="e => openMarkerTooltip(row, e)" :canEdit="false"
-                        @update-remark="updateRemark" />
-                      <div v-if="row.count && row.count > 1"
-                        class="color-[--secondary-text] !text-12px ml-2px whitespace-nowrap">
-                        ({{ row.count }})
+                    <!-- Price -->
+                    <div class="text-left text-nowrap min-w-0 overflow-visible">
+                      <div :class="getRowColor(getItem(virtualRow))">
+                        <template v-if="tableView.isAmount">
+                          <span>
+                            ${{ formatNumber(getTransactionPrice(getItem(virtualRow), true), { decimals: 3 }) }}
+                          </span>
+                        </template>
+                        <template v-else>
+                          <span>
+                            ${{ formatNumber2(getMcPrice(getItem(virtualRow)), 1) }}
+                          </span>
+                        </template>
                       </div>
                     </div>
                   </div>
+
+                  <div class="grid grid-cols-[minmax(0,1.5fr)_minmax(0,0.5fr)] items-center gap-15px h-28px">
+
+
+                    <!-- Trader -->
+                    <div class="text-left overflow-hidden min-w-0">
+                      <div class="flex items-center justify-start min-w-0">
+
+                        <UserRemark :remark="getItem(virtualRow).remark" :address="getItem(virtualRow).wallet_address"
+                          :show-address="true" :chain="getItem(virtualRow).chain" :wallet_logo="getItem(virtualRow).wallet_logo"
+                          :addressClass="`inline-block truncate max-w-full ${markerTooltipVisible && currentRow.wallet_address === getItem(virtualRow).wallet_address ? 'bg-#12B88633' : ''
+                            }`"
+                          :format-address="(address: string) => windowWidth < 480 ? address?.slice(-3) : '*' + address?.slice(-4)"
+                          class="color-[--secondary-text] truncate min-w-0 !text-12px"
+                          :mouseoverAddress="e => openMarkerTooltip(getItem(virtualRow), e)" :canEdit="false"
+                          @update-remark="updateRemark" />
+                        <div v-if="getItem(virtualRow).count && getItem(virtualRow).count > 1"
+                          class="color-[--secondary-text] !text-12px ml-2px whitespace-nowrap">
+                          ({{ getItem(virtualRow).count }})
+                        </div>
+                        <template v-if="windowWidth >= 480 && ['solana', 'bsc'].includes(getItem(virtualRow).chain) && getItem(virtualRow).senderProfile">
+                          <Icon v-if="hasNewAccount(getItem(virtualRow)) && (!(getItem(virtualRow).newTags || []).map((i: any) => i.type).includes('47'))"
+                            v-tooltip="{ content: `<span style='color: #85E12F'>${$t('newTokenAccount')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
+                            name="custom:new-account" class="w-10px h-10px ml-2px shrink-0 icon-hover hidden sm:block" />
+                          <Icon v-if="hasClearedAccount(getItem(virtualRow)) && (!(getItem(virtualRow).newTags || []).map((i: any) => i.type).includes('46'))"
+                            v-tooltip="{ content: `<span style='color: #EB2B4B'>${$t('sellAl')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
+                            name="custom:cleared-account"
+                            class="w-10px h-10px ml-2px shrink-0 icon-hover hidden sm:block" />
+                          <Icon v-if="bigWallet(getItem(virtualRow))"
+                            v-tooltip="{ content: `<span style='color: #ccc'>${$t('whales')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
+                            name="custom:big" class="w-10px h-10px ml-2px shrink-0 icon-hover hidden sm:block" />
+                        </template>
+                        <SignalTags v-if="windowWidth >= 480" tagClass="mr-2px text-10px" tagHeight="10" class="ml-2px"
+                          :tags="(getItem(virtualRow).newTags || []).map((el: any) => tagStore.matchTag(el.type) || el)"
+                          :walletAddress="getItem(virtualRow).wallet_address" :chain="getItem(virtualRow).chain" />
+                      </div>
+                    </div>
+                    <!-- Time -->
+                    <el-tooltip placement="right" :show-arrow="false" :persistent="false"
+                      :content="formatDate(getItem(virtualRow)?.time, 'YYYY-MM-DD HH:mm:ss')">
+                      <div class="text-right min-w-0 hover:decoration-underline hover:decoration-[--third-text]">
+                        <div class="color-[--third-text]">
+                          <TimerCount v-if="getItem(virtualRow).time && Number(formatTimeFromNow(getItem(virtualRow).time, true)) < 60"
+                            :key="`${getItem(virtualRow).time}${virtualRow.index}`" :timestamp="getItem(virtualRow).time" :end-time="60">
+                            <template #default="{ seconds }">
+                              <span class="color-[--third-text]">
+                                <template v-if="seconds < 60">
+                                  {{ seconds }}s
+                                </template>
+                                <template v-else>
+                                  {{ formatTimeFromNow(getItem(virtualRow).time) }}
+                                </template>
+                              </span>
+                            </template>
+                          </TimerCount>
+                          <span v-else class="color-[--third-text]">
+                            {{ formatTimeFromNow(getItem(virtualRow).time) }}
+                          </span>
+                        </div>
+                      </div>
+                      <!-- <template #default>
+                        </template>
+                        <template #content>
+                          {{}}
+                        </template> -->
+                    </el-tooltip>
+                  </div>
                 </div>
               </div>
-              <div v-if="index === filterTableList.length - 1" ref="sentinel" style="height: 1px;" />
-            </template>
-        </UseVirtualList>
-        <template v-if="filterTableList.length === 0 && !listStatus.loadingTxs">
+            </div>
+          </div>
+        </div>
+        <!-- <template v-if="filterTableList.length === 0 && !listStatus.loadingTxs">
           <div class="h-full flex flex-col items-center justify-center "
             :style="{ height: `${(klineHeight ?? 200) - 105}px` }">
             <img src="@/assets/images/empty-black.svg" alt="">
           </div>
-        </template>
+        </template> -->
       </div>
     </div>
     <!-- status：仅在有暂停状态（hover 或 升序排序）时展示底部条，避免未暂停时仍显示黑条 -->
-    <div
+    <!-- <div
       v-show="isPausedTxs1"
-      class="z-10 absolute bottom-0 h-24px w-100% flex items-center justify-center bg-[--main-input-button-bg] color-[#FFA622]">
+      class="z-10 absolute bottom-0 h-28px w-100% flex items-center justify-center bg-[--main-input-button-bg] color-[#FFA622]">
       <div class="flex items-center gap-x-7px">
         <Icon name="custom:stop" class="text-14px" />
         <span class="text-xs">{{ t('paused') }}</span>
       </div>
-    </div>
+    </div> -->
     <!-- MarkerTooltip -->
     <MarkerTooltip v-model="markerTooltipVisible" :virtual-ref="makerTooltip" :currentRow="currentRow"
       :addressAndChain="addressAndChain">
-      <template v-if="currentRow.senderProfile">
-        <Icon v-if="hasNewAccount(currentRow) && (!(currentRow.newTags||[]).map((i:any)=>i.type).includes('47'))"
-          v-tooltip="{ content: `<span style='color: #85E12F'>${$t('newTokenAccount')}</span>`, props: { 'raw-content': true, 'popper-class': 'orderbook-icon-tooltip' } }"
-          name="custom:new-account" class="icon-hover" />
-        <Icon v-if="hasClearedAccount(currentRow) && (!(currentRow.newTags||[]).map((i:any)=>i.type).includes('46'))"
-          v-tooltip="{ content: `<span style='color: #EB2B4B'>${$t('sellAl')}</span>`, props: { 'raw-content': true, 'popper-class': 'orderbook-icon-tooltip' } }"
-          name="custom:cleared-account" class="icon-hover" />
-        <Icon v-if="bigWallet(currentRow)"
-          v-tooltip="{ content: `<span style='color: #C5842B'>${$t('whales')}</span>`, props: { 'raw-content': true, 'popper-class': 'orderbook-icon-tooltip' } }"
-          name="custom:big" class="icon-hover" />
-      </template>
-      <SignalTags tagClass="mr-3px" :tags="currentRow.newTags" :walletAddress="currentRow.wallet_address"
-        :chain="currentRow.chain" />
+      <div class="flex">
+        <template v-if="currentRow.senderProfile">
+          <Icon v-if="hasNewAccount(currentRow) && (!(currentRow.newTags||[]).map((i:any)=>i.type).includes('47'))"
+            v-tooltip="{ content: `<span style='color: #85E12F'>${$t('newTokenAccount')}</span>`, props: { 'raw-content': true, 'popper-class': 'orderbook-icon-tooltip' } }"
+            name="custom:new-account" class="icon-hover w-15px h-15px text-15px mr-3px" />
+          <Icon v-if="hasClearedAccount(currentRow) && (!(currentRow.newTags||[]).map((i:any)=>i.type).includes('46'))"
+            v-tooltip="{ content: `<span style='color: #EB2B4B'>${$t('sellAl')}</span>`, props: { 'raw-content': true, 'popper-class': 'orderbook-icon-tooltip' } }"
+            name="custom:cleared-account" class="icon-hover w-15px h-15px text-15px mr-3px" />
+          <Icon v-if="bigWallet(currentRow)"
+            v-tooltip="{ content: `<span style='color: #C5842B'>${$t('whales')}</span>`, props: { 'raw-content': true, 'popper-class': 'orderbook-icon-tooltip' } }"
+            name="custom:big" class="icon-hover w-15px h-15px text-15px mr-3px" />
+        </template>
+        <SignalTags tagClass="mr-3px" :tags="(currentRow.newTags || []).map((el: any) => tagStore.matchTag(el.type) || el)" :walletAddress="currentRow.wallet_address"
+          :chain="currentRow.chain" />
+      </div>
     </MarkerTooltip>
-    <el-dialog v-if="filterDialogVisible" v-model="filterDialogVisible" :width="440" :title="$t('markerAddressFilter')" destroy-on-close>
+    <el-dialog v-if="filterDialogVisible" v-model="filterDialogVisible" :width="440" :title="$t('txFilter')" class="w-orderBookDialog" destroy-on-close>
       <div class="mx--16px h-1px bg-[--border] mb-20px"/>
-      <div class="mb-10px">
-        <label for="markerAddress">
-          {{ $t('markerAddress') }}
+      <div class="mb-12px mt-20px">
+        <label>
+          {{ $t('filterTime') }}
         </label>
       </div>
-      <el-input id="markerAddress" v-model="dialogFilter.markerAddress"  class="text-12px" :placeholder="$t('markerAddress')"/>
-      <div class="mb-10px mt-20px">
+      <div class="flex items-center gap-20px">
+        <el-date-picker
+          v-model="dialogFilter.timestamp[0]"
+          :disabled-date="disabledStartDate"
+          class="[--el-font-size-base:12px]"
+          type="datetime"
+          range-separator="To"
+          start-placeholder="yyyy/mm/dd hh:mm:ss"
+          end-placeholder="yyyy/mm/dd hh:mm:ss"
+          format="YYYY-MM-DD HH:mm:ss"
+          value-format="X"
+          prefix-icon="Calendar"
+          :teleported="false"
+          :placeholder="t('startTime')"
+        />
+        <span class="color-[--third-text]">~</span>
+        <el-date-picker
+          v-model="dialogFilter.timestamp[1]"
+          :disabled-date="disabledEndDate"
+          class="[--el-font-size-base:12px]"
+          type="datetime"
+          range-separator="To"
+          start-placeholder="yyyy/mm/dd hh:mm:ss"
+          end-placeholder="yyyy/mm/dd hh:mm:ss"
+          format="YYYY-MM-DD HH:mm:ss"
+          value-format="X"
+          prefix-icon="Calendar"
+          :teleported="false"
+          :placeholder="t('endTime1')"
+        />
+      </div>
+          <div class="mb-12px mt-20px">
         <label>
-          {{ $t('filter') }}
+          {{ $t('volume') }}($)
         </label>
+      </div>
+      <div class="flex items-center mb-12px">
+        <el-button
+          v-for="(item,idx) in volColumns"
+          :key="idx"
+          plain
+          size="default"
+          class="flex-1 h-30px font-400 b-[--border] bg-[--main-input-button-bg] color-[--main-text1]"
+          @click.stop="dialogFilter.minVol=item.key;dialogFilter.maxVol=''"
+        >
+          {{ item.value }}
+        </el-button>
       </div>
       <div class="flex items-center gap-20px">
         <el-input
           v-model.trim.number="dialogFilter.minVol"
-          
           type="text"
           class="text-12px"
-          :placeholder="$t('filterSmallAmount')"
+          :placeholder="$t('minor')"
           style="--el-input-border-color:var(--border);"
+          @blur="onVolBlur(0)"
           @input="(value) => (dialogFilter.minVol = value.replace(/\-|[^\d.]/g, ''))"
         >
           <template #suffix>$</template>
         </el-input>
+        <span class="color-[--third-text]">~</span>
         <el-input
           v-model.trim.number="dialogFilter.maxVol"
           
           type="text"
            class="text-12px"
-           :placeholder="$t('filterLargeAmount')"
+           :placeholder="$t('max1')"
            style="--el-input-border-color:var(--border)"
+          @blur="onVolBlur(1)"
           @input="(value) => (dialogFilter.maxVol = value.replace(/\-|[^\d.]/g, ''))"
         >
           <template #suffix>$</template>
         </el-input>
       </div>
-      <div class="mt-20px flex">
+      <div class="mb-12px mt-20px">
+        <label for="markerAddress">
+          {{ $t('filterWallet2') }}
+        </label>
+      </div>
+      <div class="flex gap-12px">
+        <el-input id="markerAddress" v-model="dialogFilter.markerAddress"  class="text-12px" :placeholder="$t('markerAddress')"></el-input>
         <el-button
-          class="h-30px flex-1 m-l-auto"
+          plain
+          size="default"
+          class="flex-1 h-32px font-400 color-[--main-text1]"
+          @click.stop="toggleClickMe();filterDialogVisible = false"
+        > 
+          {{ $t('filterWallet') }}
+        </el-button>
+      </div>
+    
+      <div class="mt-20px flex gap-8px">
+        <el-button
+          class="h-30px flex-1 color-[--main-text1]"
           @click="resetDialogFilter"
         >
           {{ $t('reset') }}
         </el-button>
-        <el-button type="primary" class="h-30px flex-1 m-l-auto" @click="confirmDialogFilter">
+        <el-button type="primary" class="h-30px flex-1 color-[--main-text1]" @click="confirmDialogFilter">
           {{ $t('confirm') }}
         </el-button>
       </div>
@@ -292,14 +422,17 @@ import { getSimpleTxs,type GetPairLiqResponse, type IGetSimpleTxsResponse, } fro
 import { useRoute } from 'vue-router'
 import { filterLanguage } from '~/pages/token/components/kLine/utils'
 import { WSEventType } from '~/utils/constants'
-import { useThrottleFn,useIntersectionObserver } from '@vueuse/core'
+import { useThrottleFn,useIntersectionObserver, useInfiniteScroll } from '@vueuse/core'
 import { UseVirtualList } from '@vueuse/components'
+import { useVirtualizer } from '@tanstack/vue-virtual'
 import UserRemark from '~/components/userRemark.vue'
 import MarkerTooltip from '../belowChartTable/transactions/markerTooltip.vue'
 import type { RowEventHandlerParams } from 'element-plus'
 import type { SimpleWSTx } from '../kLine/types'
 import BigNumber from 'bignumber.js'
 import DateFilterCard from '../dateFilterCard.vue'
+import dayjs from 'dayjs'
+import { cloneDeep } from 'lodash-es'
 const tokenStore = useTokenStore()
 const themeStore = useThemeStore()
 
@@ -329,18 +462,22 @@ const { t } = useI18n()
 const route = useRoute()
 const { totalHolders, pairAddress, pair, token, } = storeToRefs(useTokenStore())
 
+const walletStore = useWalletStore()
 const globalStore = useGlobalStore()
 const botStore = useBotStore()
 const wsStore = useWSStore()
 const tagStore = useTagStore()
 const tokenDetailSStore = useTokenDetailsStore()
 
+const { mode, token_logo_url, isDark } = storeToRefs(useGlobalStore())
 // 状态管理
 const tabsContainer = ref<HTMLElement | null>(null)
 const activeTab = shallowRef('all')
+
+const isExpand = shallowRef(true)
 const isPausedTxs = shallowRef(false)
 const isPausedTxs1 = computed(() => {
-  return isPausedTxs.value ||(sortConditions.value.sort_dir ==='asc')
+  return isPausedTxs.value ||(sortConditions.value.sort_dir ==='asc')  || tokenDetailSStore.drawerVisible|| markerTooltipVisible.value
 })
 const markerTooltipVisible = shallowRef(false)
 // const isMeActive = ref(false)
@@ -352,34 +489,36 @@ const listStatus = ref({
   page_token:'',
   pageSize:100
 })
-
+const updateNum=shallowRef(0)
 // 虚拟列表相关 refs
 const scroller = ref(null)
 const sentinel = ref(null)
 const tokenTxs = shallowRef<ExtendedTxResponse[]>([])
 const wsPairCache = shallowRef<ExtendedTxResponse[]>([])
 
+
 // 用 IntersectionObserver 监听 sentinel。
 // 特别重要：把 root 指定为虚拟列表的滚动容器 scroller.value
-useIntersectionObserver(
-  sentinel,
-  ([{ isIntersecting }]) => {
-    if (
-      !props.modelValue
-      || !isIntersecting
-      || listStatus.value.loadingTxs
-      || listStatus.value.loadingTxs1
-      || listStatus.value.finished
-      || filterTableList.value.length === 0
-    ) return
-    _getTokenTxs()
-  },
-  {
-    root: scroller, // 注意传 ref（@vueuse/core 会处理）
-    threshold: 0,
-    rootMargin: '0px 0px 120px 0px',
-  }
-)
+// useIntersectionObserver(
+//   sentinel,
+//   ([{ isIntersecting }]) => {
+//     console.log('isIntersecting', isIntersecting,listStatus.value,filterTableList.value.length)
+//     if (
+//       !props.modelValue
+//       || !isIntersecting
+//       || listStatus.value.loadingTxs
+//       || listStatus.value.loadingTxs1
+//       || listStatus.value.finished
+//       || filterTableList.value.length === 0
+//     ) return
+//     _getTokenTxs()
+//   },
+//   {
+//     root: scroller, // 注意传 ref（@vueuse/core 会处理）
+//     threshold: 0,
+//     rootMargin: '0px 0px 120px 0px',
+//   }
+// )
 
 const tableFilter = ref({
   markerAddress: '',
@@ -395,30 +534,44 @@ const currentRow = shallowRef<ExtendedTxResponse>({} as any)
 // 表格视图状态
 const tableView = ref({
   // isVolUSDT: true,
-  isAmount: true,
+  isAmount: false,
 })
 
 // 只在交易历史接口更新之后更新，防止 route 地址更新导致列表数据更新异常
 const realAddress = shallowRef(getAddressAndChainFromId(route.params.id as string).address)
 const filterDialogVisible = shallowRef(false)
 const defaultDialogFilter = {
-  markerAddress: '',
-  minVol:'',
-  maxVol:''
-}
-const dialogFilter = ref({...defaultDialogFilter})
+  markerAddress: '' as string,
+  minVol:'' as string,
+  maxVol:'' as string,
+  timestamp:[] as string[]
+} 
+const dialogFilter = ref(cloneDeep(defaultDialogFilter))
+const ignoreWs = computed(() => {
+  return !['all'].includes(activeTab.value)
+})
+
+const self_address = computed(() => {
+  if (addressAndChain.value.chain !== 'solana') {
+    return botStore.evmAddress || walletStore.address
+  } else {
+    return botStore.getWalletAddress('solana') || walletStore.address
+  }
+})
 
 const tabs = computed(() => {
   const arr: Array<{ label: string, value: string }> = []
   if (Array.isArray(totalHolders.value)) {
     totalHolders.value.forEach(i => {
       const num = i.total_address
-      if (num > 0) {
-        arr.push({
-          ...i,
-          label: i?.[filterLanguage(useLocaleStore().locale)] + (i.type !== '31' ? `(${num})` : ''),
-          value: i.type
-        })
+      if(i.type !== '25') {
+        if (num > 0) {
+          arr.push({
+            ...i,
+            label: i?.[filterLanguage(useLocaleStore().locale)] + (i.type !== '31' ? `(${num})` : ''),
+            value: i.type
+          })
+        }
       }
     })
   }
@@ -442,7 +595,7 @@ const tabs = computed(() => {
 })
 
 const isFilterActive = computed(()=>{
-  return tableFilter.value.markerAddress || tableFilter.value.minVol || tableFilter.value.maxVol
+  return tableFilter.value.markerAddress || tableFilter.value.minVol || tableFilter.value.maxVol || tableFilter.value.timestamp.length
 })
 
 const addressAndChain = computed(() => {
@@ -478,20 +631,71 @@ function sortChange(sort_dir: string) {
   filterSubmit()
 }
 
-function filterSubmit() {
+const {reset ,isLoading} = useInfiniteScroll(scroller, ()=>{
+  console.log('infiniteScroll')
+  // emits('endReached')
+  // if (
+  //   !props.modelValue
+  //   || listStatus.value.loadingTxs
+  //   || listStatus.value.loadingTxs1
+  //   || listStatus.value.finished
+  //   || filterTableList.value.length === 0
+  // ) return
+  _getTokenTxs()
+}, { distance: 20 ,canLoadMore:()=>!(
+    !props.modelValue
+    || listStatus.value.loadingTxs
+    || listStatus.value.loadingTxs1
+    || listStatus.value.finished
+    || isLoading.value
+    || filterTableList.value.length === 0
+  ) })
+
+async function filterSubmit() {
   console.log('filterSubmit')
   listStatus.value.page_token = ''
   listStatus.value.loadingTxs = false
   listStatus.value.finished = false
   wsPairCache.value = []
-  _getTokenTxs()
+  // tokenTxs.value=[]
+  // reCreateChild()
+  getTokenTxs()
+  // reCreateChild()
+  // getTokenTxs()
 }
+
+const volColumns = [
+  {
+    key:'500',
+    value:'>500',
+  },
+  {
+    key:'1000',
+    value:'>1000',
+  },
+  {
+    key:'5000',
+    value:'>5000',
+  },
+]
+
+function onVolBlur(index: number) {
+  const min = Number(dialogFilter.value.minVol)
+  const max = Number(dialogFilter.value.maxVol)
+  const isMaxLessThanMin = max <= min
+  if (index === 0 && isMaxLessThanMin) {
+    dialogFilter.value.minVol = ''
+  } else if (index === 1 && isMaxLessThanMin) {
+    dialogFilter.value.maxVol = ''
+  }
+}
+
 
 const tableLoading = computed(() => listStatus.value.loadingTxs1 )
 
 
 const isMeActive = computed(()=>{
-  return tableFilter.value.markerAddress === botStore.getWalletAddress(addressAndChain.value.chain)!
+  return tableFilter.value.markerAddress&&(tableFilter.value.markerAddress === self_address.value)
 })
 
 const filterTableListMap = {
@@ -535,9 +739,44 @@ const filterTableList = computed(() => {
   return tableList
 })
 
+const shouldRenderChild = shallowRef(true)
+
+const reCreateChild = () => {
+  shouldRenderChild.value = false
+  // 确保 DOM更新
+  nextTick(() => {
+    shouldRenderChild.value = true
+  })
+}
+
+// :key="klineHeight" ref="scroller" :list="filterTableList" :options="{itemHeight:24}" style="margin-right: -12px;padding-right: 12px;overscroll-behavior-y: contain" class="scrollbar-hide" :height="`${(klineHeight ?? 200) - 110}px`"
+const virtualizer = useVirtualizer(
+  computed(() => ({
+    count: filterTableList.value.length,
+    getScrollElement: () => scroller.value,
+    estimateSize: () => 28,
+    overscan: 5,
+    gap: 0
+  }))
+)
+const virtualItems = computed(() => virtualizer.value.getVirtualItems())
+const totalSize = computed(() => virtualizer.value.getTotalSize())
+const isEmpty = computed(() => filterTableList.value.length === 0 && !listStatus.value.loadingTxs && !listStatus.value.loadingTxs1)
+
+const getItem = (virtualRow:any) => {
+  return filterTableList.value[virtualRow.index] || {}
+}
+
+watch(()=> filterTableList.value,()=>{
+  nextTick(() => {
+    reset()
+  })
+})
+
 watch(() => klineDateFilter?.value, (val) => {
   if (val && props.modelValue) {
     tableFilter.value.timestamp = val
+    dialogFilter.value.timestamp = val
     filterSubmit()
   }
 })
@@ -559,7 +798,6 @@ watch(() => pairAddress.value, () => {
     // 重新获取数据
     filterSubmit()
     subscribeToTxs()
-
   }
 })
 
@@ -655,13 +893,17 @@ function transferTxsData(row: IGetSimpleTxsResponse) {
 }
 
 function resetTx() {
-  tokenTxs.value = []
-  listStatus.value.page_token = ''
-  txCount.value = {}
-  wsPairCache.value = []
+  if(!listStatus.value.page_token){
+    tokenTxs.value = []
+    listStatus.value.page_token = ''
+    txCount.value = {}
+    wsPairCache.value = []
+  }
 }
 
-const _getTokenTxs = useThrottleFn(async () => {
+const getTokenTxs = useThrottleFn(_getTokenTxs, 500)
+
+async function _getTokenTxs() {
   console.log('getTokenTxs',tableFilter.value)
   try {
     if (!props.modelValue || !pairAddress.value || listStatus.value.loadingTxs) return
@@ -724,10 +966,11 @@ const _getTokenTxs = useThrottleFn(async () => {
   } finally {
     listStatus.value.loadingTxs1 = false
     listStatus.value.loadingTxs = false
+    updateNum.value++
   }
-}, 500)
+}
 
-// async function _getTokenTxs() {
+// async function getTokenTxs() {
 //   try {
 //     listStatus.value.loadingTxs = true
 //     const { tag_type } = tableFilter.value
@@ -995,6 +1238,9 @@ function getTransactionPrice(row: IGetSimpleTxsResponse | SimpleWSTx, isVolUSDT 
 
 function setActiveTab(val: string, index: number) {
   console.log('🔄 切换订单薄标签:', val)
+  if(activeTab.value===val){
+    return
+  }
   resetData(val)
   // isMeActive.value = false
   // tableFilter.value.markerAddress = ''
@@ -1035,16 +1281,54 @@ function setActiveTab(val: string, index: number) {
 }
 
 function toggleClickMe() {
+  if (!verifyLogin()) {
+    return
+  }
   console.log('🔄 切换"我的交易"筛选')
   if (isMeActive.value) {
     tableFilter.value.markerAddress = ''
     dialogFilter.value.markerAddress = ''
   } else {
-    const walletAddress = botStore.getWalletAddress(addressAndChain.value.chain)!
+    const walletAddress = self_address.value
     tableFilter.value.markerAddress = walletAddress
     dialogFilter.value.markerAddress = walletAddress
   }
   wsPairCache.value.length = 0  // 清空缓存
+  if(activeTab.value==='-100'){
+    resetData('all')
+  }else{
+    resetData(activeTab.value)
+  }
+  filterSubmit()
+}
+function toggleClickFollowed() {
+  if (!verifyLogin()) {
+    return
+  }
+  console.log('🔄 切换"已关注"筛选')
+  if (isMeActive.value) {
+    tableFilter.value.markerAddress = ''
+    dialogFilter.value.markerAddress = ''
+  } 
+  if(activeTab.value==='-100'){
+    resetData('all')
+  }else{
+    resetData('-100')
+  }
+  filterSubmit()
+}
+
+function toggleClickDEV() {
+  console.log('🔄 切换"dev"筛选')
+  // if (isDEVActive.value) {
+  //   tableFilter.value.markerAddress = ''
+  //   dialogFilter.value.markerAddress = ''
+  // } 
+  if(activeTab.value==='25'){
+    resetData('all')
+  }else{
+    resetData('25')
+  }
   filterSubmit()
 }
 
@@ -1094,7 +1378,7 @@ function updateRemark() {
 }
 
 function openMarkerTooltip(row: ExtendedTxResponse, e: MouseEvent) {
-  if (row && MAKER_SUPPORT_CHAINS.includes(row.chain)) {
+  if (row && SupportFullDataChain.includes(row.chain)) {
     makerTooltip.value = e.currentTarget
     console.log(row)
     if (currentRow.value?.wallet_address === row.wallet_address) {
@@ -1149,7 +1433,7 @@ function bigWallet(row: ExtendedTxResponse) {
 }
 
 // WebSocket 相关功能
-onMounted(() => {
+onMounted(async() => {
   // onTxsLiqMessage()
   // 如果组件挂载时 orderBook 已经打开，则获取数据
   if (props.modelValue && pairAddress.value) {
@@ -1178,7 +1462,7 @@ onUnmounted(() => {
 })
 
 watchTxUnwatch = watch(() => wsStore.wsResult[WSEventType.TX], data => {
-  if (!data || listStatus.value.loadingTxs) {
+  if (!data || listStatus.value.loadingTxs || ignoreWs.value) {
     return
   }
   const { wallet_address, from_address, to_address } = data.tx
@@ -1221,7 +1505,7 @@ watchTxUnwatch = watch(() => wsStore.wsResult[WSEventType.TX], data => {
 })
 
 watchSimpleTxUnwatch = watch(() => wsStore.wsResult[WSEventType.SIMPLE_TX], data => {
-  if (!data || listStatus.value.loadingTxs) {
+  if (!data || listStatus.value.loadingTxs || ignoreWs.value) {
     return
   }
   const simpleWSTx = data.msg as SimpleWSTx
@@ -1329,6 +1613,7 @@ const updatetokenTxs = useThrottleFn(() => {
 }, 500)
 
 function confirmDialogFilter() {
+  console.log('confirmDialogFilter')
   Object.keys(dialogFilter.value).forEach((key)=>{
     tableFilter.value[key as keyof typeof dialogFilter.value] =
     dialogFilter.value[key as keyof typeof dialogFilter.value]
@@ -1342,28 +1627,69 @@ function confirmDialogFilter() {
   filterDialogVisible.value = false
 }
 
+function resetMakerAddress() {
+  dialogFilter.value.markerAddress = ''
+  tableFilter.value.markerAddress = ''
+  resetData(activeTab.value)
+  filterSubmit()
+}
+
 function resetDialogFilter() {
   dialogFilter.value = {
-    ...defaultDialogFilter
+    markerAddress: '' as string,
+    minVol:'' as string,
+    maxVol:'' as string,
+    timestamp:[] as string[]
   }
-
+  console.log('resetDialogFilter',dialogFilter.value)
   confirmDialogFilter()
 }
+
+const disabledStartDate = (date:Date)=>{
+  if(dialogFilter.value.timestamp[1]){
+    return dayjs(date).isAfter(dayjs((Number(dialogFilter.value.timestamp[1])*1000)))
+  }
+  return false
+}
+const disabledEndDate = (date:Date)=>{
+  if(dialogFilter.value.timestamp[0]){
+    const filterTime0 = dayjs((Number(dialogFilter.value.timestamp[0])*1000))
+    return dayjs(date).isBefore(filterTime0) && !dayjs(date).isSame(filterTime0, 'day')
+  }
+  return false
+}
+const disabledSave = computed(()=>{
+  if(dialogFilter.value.timestamp[1] && dialogFilter.value.timestamp[0]){
+    return dialogFilter.value.timestamp[1] < dialogFilter.value.timestamp[0]
+  }
+  return false
+})
+
+function getGradient(row: IGetSimpleTxsResponse) {
+  const str = `true-${isBuy(row)}`
+  // const str = `${useThemeStore().isDark}-${isBuy(row)}`
+  const map = {
+    'true-true': 'bg-[linear-gradient(90deg,#111_0%,#12654C_70%,#12B886_100%)]',
+    'true-false': 'bg-[linear-gradient(90deg,#111_0%,#7F2A36_70%,#F6465D_100%)]',
+    'false-false': 'bg-[linear-gradient(90deg,#FFF_0%,#88DBC3_70%,#12B886_100%)]',
+    'false-true': 'bg-[linear-gradient(90deg,#FFF_0%,#FBA2AE_70%,#F6465D_100%)]',
+  } as { [key: string]: string }
+  return map[str]
+}
+
 </script>
 
 <style lang="scss" scoped>
 .me-btn {
   background: transparent;
-  color: var(--secondary-text);
+  // color: var(--d-E0E0E0-l-333);
   display: flex;
   align-items: center;
   border: none;
-  font-size: 12px;
-  padding: 6px 8px;
-  border-radius: 4px;
+  padding: 2px 0px;
 
   &.active {
-    color: #3F80F7;
+    color: var(--main-text1);
   }
 }
 
@@ -1443,6 +1769,44 @@ function resetDialogFilter() {
   .w-12px.h-12px {
     width: 11px;
     height: 11px;
+  }
+}
+.collapse-enter-from {
+  max-height: 0;
+  opacity: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+.collapse-enter-to {
+  max-height: 50px; /* 预估最大高度，需根据内容调整 */
+  opacity: 1;
+  padding-bottom: 13px;
+}
+.collapse-enter-active {
+  transition: max-height 0.3s ease, opacity 0.3s ease, padding 0.3s ease;
+}
+
+/* 离开阶段 */
+.collapse-leave-from {
+  max-height: 50px;
+  opacity: 1;
+  padding-bottom: 13px;
+}
+.collapse-leave-to {
+  max-height: 0;
+  opacity: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+.collapse-leave-active {
+  transition: max-height 0.3s ease, opacity 0.3s ease, padding 0.3s ease;
+}
+:deep() .w-orderBookDialog.el-dialog{
+   .el-dialog__header .el-dialog__title{
+    color:var(--main-text1)
+  }
+  .el-dialog__body{
+    color:var(--main-text1)
   }
 }
 </style>

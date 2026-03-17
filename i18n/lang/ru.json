@@ -305,7 +305,6 @@
   "avgBuyPrice": "Средняя цена покупки",
   "avgSellPrice": "Средняя цена продажи",
   "trades": "Сделки",
-  "me": "Мои",
   "orderBook": "Книга Заказов",
   "abnormalChips": "Аномальные чипы",
   "abnormalChipsTip": "Аномальное соотношение чипов пересчитано",
@@ -880,5 +879,16 @@
   "migratedToMarket": "Перемещено на рынок",
   "createdAt": "Создано",
   "openMonitorSuccess": "Мониторинг успешно включен",
-  "cancelMonitorSuccess": "Мониторинг успешно отключен"
+  "cancelMonitorSuccess": "Мониторинг успешно отключен",
+  "trackerTypeRequired": "Пожалуйста, выберите хотя бы один тип контента",
+  "twitterForHMe": "Твиттер-Мой",
+  "twitterForHot": "Twitter-Горячий",
+  "txFilter": "Фильтр транзакций",
+  "filterWallet2": "Фильтровать кошелек",
+  "disabledClickKlineFilter": "Отключить время фильтра диаграммы кликов",
+  "enabledClickKlineFilter": "Включить время фильтра диаграммы кликов",
+  "onlyFollowed": "Только подписчики",
+  "OnlyDev": "Только Дев",
+  "OnlyYou": "Только ты",
+  "you": "Ты"
 }

@@ -860,8 +860,13 @@ function getEstimatedGas() {
           @playAudio="playAudio('monitor')"
         />
         <AudioSettingsItem
+          v-model="audioSettings.audio.twitterForMe"
+          :title="$t('twitterForHMe')"
+          @playAudio="playAudio('twitterForMe')"
+        />
+        <AudioSettingsItem
           v-model="audioSettings.audio.twitter"
-          :title="$t('twitterTracker')"
+          :title="$t('twitterForHot')"
           @playAudio="playAudio('twitter')"
         />
         <AudioSettingsItem
