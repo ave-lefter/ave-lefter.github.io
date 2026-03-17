@@ -155,6 +155,7 @@ export interface TokenInfoExtra {
   max: number
   limit: number
   insiders_balance_ratio_cur: number
+  t_price_change_24h: number
 }
 
 
