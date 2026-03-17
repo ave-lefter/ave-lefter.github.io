@@ -94,9 +94,9 @@ watch(
   () => contractId.value,
   (val) => {
     if (isCurrent.value) {
-      searchParams.value[selectTab.value].filterContractIdList = 'ALL'
-    } else {
       searchParams.value[selectTab.value].filterContractIdList = val
+    } else {
+      searchParams.value[selectTab.value].filterContractIdList = 'ALL'
     }
   }
 )
