@@ -83,7 +83,7 @@ const { isCanNormalWithdrawableAmount } = usePerp()
 definePageMeta({
   name: 'perp-id',
   key: (route) => {
-    return route.name as string
+    return `perp-${route.params.name || 'BTCUSD'}`
   },
 })
 const tokenStore = useTokenStore()

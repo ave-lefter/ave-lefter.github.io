@@ -140,7 +140,7 @@ import emptyWhite from '@/assets/images/empty-white.svg'
 import emptyDark from '@/assets/images/empty-black.svg'
 import { formatNumber } from '@/utils/formatNumber'
 import BigNumber from 'bignumber.js'
-
+import { usePerpStore } from '@/stores/perp'
 import { getChainDefaultIcon } from '@/utils/index'
 import type { PerpInfo } from '@/api/types/perp'
 
@@ -206,13 +206,13 @@ function onScroll() {
   }
 }
 function tableRowClick(row: PerpInfo) {
-  const perpStore = usePerpStore()
-  perpStore.setContractName(row.contractName)
+  usePerpStore().setContractName(row.contractName)
   $router.push({
     name: 'perp-id',
     params: { name: row.contractName },
+  }).then(() => {
+    emit('close')
   })
-  emit('close')
 }
 
 function getActiveClass(activeSort1: SortValue, sortBy1: string, direction: string) {
