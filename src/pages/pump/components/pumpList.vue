@@ -173,6 +173,25 @@
                       v-copy="row.name"
                       class="name text-12px font-500 mr-5px color-[--third-text1] symbol-ellipsis ellipsis-auto block"
                       >{{ row.name }}</span>
+                      <img
+                        v-if="row.is_cloned"
+                        @mouseover.stop="onEnter($event, row, props.type,getDataColor, true)"
+                        @click.stop
+                        class="rounded-100% mr-5px cursor-pointer"
+                        :src="formatIconTag(row?.deployer_platform)"
+                        alt=""
+                        :width="12"
+                        style="border-radius: 100%"
+                      >
+                      <img
+                        v-if="row.is_pump_agent"
+                        v-tooltip="$t('agentToken')"
+                        class="rounded-100% mr-5px cursor-pointer"
+                        :src="formatIconTag('pumpt_agent')"
+                        alt=""
+                        :width="12"
+                        style="border-radius: 100%"
+                      >
                     <span
                       v-if="row.buy_tax && row.sell_tax"
                     >

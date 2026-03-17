@@ -2100,5 +2100,8 @@
   "perpetualRef": "合約收益",
   "botWalletRef": "Bot錢包收益",
   "withdrawable1": "待領取收益",
-  "withdrawn1": "累計收益"
+  "withdrawn1": "累計收益",
+  "deployerPlatform": "使用{tool}工具尅隆的代幣",
+  "filterDeployerPlatform": "過濾尅隆代幣",
+  "agentToken": "Agent代幣"
 }

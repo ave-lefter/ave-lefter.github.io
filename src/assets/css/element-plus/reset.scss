@@ -152,19 +152,19 @@
   --el-bg-color: var(--dialog-bg);
 }
 .el-dialog__body{
-  --el-text-color-regular:var(--main-text);
+  --el-text-color-regular:var(--main-text1);
 }
 .el-dialog__header {
-  color: var(--main-text);
+  color: var(--main-text1);
   .el-dialog__title{
-    --el-text-color-primary:var(--main-text);
+    --el-text-color-primary:var(--main-text1);
   }
   .el-dialog__headerbtn {
     --el-message-close-size: 24px;
     top: 10px;
     right: 5px;
     .el-dialog__close {
-      --el-color-info: var(--main-text);
+      --el-color-info: var(--main-text1);
     }
   }
 }
