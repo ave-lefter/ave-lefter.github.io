@@ -4,7 +4,7 @@
       <el-input
         ref="inputSearch"
         v-model.trim="query"
-        class="search-input px-20px mr-10px"
+        class="search-input px-20px mr-10px flex-1"
         :placeholder="$t('search')"
         autofocus
         size="large"
@@ -17,7 +17,7 @@
           <Icon
             v-if="query"
             name="pajamas:clear"
-            class="color-[--third-text] text-12px hover:opacity-70% cursor-pointer mr-10px"
+            class="color-[--third-text] text-12px hover:opacity-70% cursor-pointer mr-20px"
             @click="onClearQuery"
           />
         </template>

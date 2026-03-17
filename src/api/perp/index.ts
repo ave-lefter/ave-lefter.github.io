@@ -60,9 +60,9 @@ export function _getContractCategorys(lang:string){
   const { $api } = useNuxtApp()
   return $api('/v2api/token/v1/contract/config', {
     method: 'get',
-    query: {
+    headers: {
       'lang-zone': lang
-    },
+    }
   })
 }
 

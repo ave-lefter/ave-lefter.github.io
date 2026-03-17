@@ -111,7 +111,7 @@
                   :chain="row.chain"
                   :address="row.user_address"
                   iconSize="18px"
-                  iconChainSize="10px"
+                  iconChainSize="8px"
                   class="rounded-full"
                 />
                 <div
