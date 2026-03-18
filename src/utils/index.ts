@@ -22,10 +22,8 @@ import type { SearchHot } from '~/api/types/search'
 import type { ConfigType } from 'dayjs'
 import { useStorage } from '@vueuse/core'
 import type { Size, SizeObj, pumpObjColor } from '~/api/types/pump'
-import FingerprintJs from '@fingerprintjs/fingerprintjs'
 import { UniChainsV4 } from './wallet/utils/abi'
 import type { MessageHandler } from 'element-plus'
-import CryptoJS from 'crypto-js'
 import localforage from 'localforage'
 import AvatarDark from '../assets/images/avatar-dark.svg?url'
 import AvatarLight from '../assets/images/avatar-light.svg?url'
@@ -966,6 +964,7 @@ export async function getDeviceId() {
   if (localStorage.getItem('device_id')) {
     return Promise.resolve(localStorage.getItem('device_id'))
   }
+  const FingerprintJs = await import('@fingerprintjs/fingerprintjs').then(m => m.default)
   const deviceId = await FingerprintJs.load()
     .then((fp: any) => fp.get())
     .then(async (data: { visitorId: string }) => data.visitorId)
@@ -1262,26 +1261,7 @@ class MessageQueue {
 
 export const messageQueue = new MessageQueue()
 
-export function decryptMsg(cipherBase64: string, guid: string): string {
-  // 1. 生成 key (SHA256(guid))
-  const key = CryptoJS.SHA256(guid)
-  // 2. IV = key 前 16 字节
-  const iv = CryptoJS.lib.WordArray.create(key.words.slice(0, 4)) // 4*4字节 = 16字节
-  // 3. Base64 解码密文
-  const cipherParams = CryptoJS.enc.Base64.parse(cipherBase64)
-  // 4. AES-CBC 解密
-  const decrypted = CryptoJS.AES.decrypt({ ciphertext: cipherParams } as any, key, {
-    mode: CryptoJS.mode.CBC,
-    iv,
-    padding: CryptoJS.pad.Pkcs7,
-  })
-
-  // 5. 得到 Base64 编码的明文
-  const base64Str = decrypted.toString(CryptoJS.enc.Utf8)
-
-  // 6. Base64 解码 → 原始明文
-  return CryptoJS.enc.Base64.parse(base64Str).toString(CryptoJS.enc.Utf8)
-}
+// decryptMsg 已迁移到 ~/utils/crypto 以减少主包体积
 
 export function getTwitterSeconds(time: number, unit: string) {
   if (!time || time <= 0) {

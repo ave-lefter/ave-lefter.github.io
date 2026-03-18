@@ -3,7 +3,7 @@
 </template>
 
 <script setup type="ts">
-import * as echarts from 'echarts'
+import * as echarts from '@/utils/echarts'
 import { merge, debounce } from 'lodash-es'
 import { ref, watch, onMounted, onBeforeUnmount } from 'vue'
 

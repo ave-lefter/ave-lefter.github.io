@@ -178,9 +178,8 @@
 
 <script setup>
 import BigNumber from 'bignumber.js'
-import * as echarts from 'echarts'
+import * as echarts from '@/utils/echarts'
 import dayjs from 'dayjs'
-import html2canvas from 'html2canvas'
 import { getProfitCalendar } from '~/api/wallet'
 import PnlCalendarHeader from './pnlCalendarHeader.vue'
 import PnlDialog from './pnlDialog.vue'
@@ -497,6 +496,8 @@ const openShareDialog = () => {
 
 const copySharePoster = async () => {
   if (!shareCardDom.value) return
+  const m = await import('html2canvas')
+  const html2canvas = m.default || m
   const canvas = await html2canvas(shareCardDom.value, {
     backgroundColor: null,
     scale: 2,

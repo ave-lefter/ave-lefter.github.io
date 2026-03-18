@@ -1072,6 +1072,13 @@ onMounted(() => {
   _quoteLimitSolana()
 })
 
+onBeforeUnmount(() => {
+  if (Timer4) { clearTimeout(Timer4); Timer4 = null }
+  if (Timer5) { clearTimeout(Timer5); Timer5 = null }
+  if (Timer6) { clearTimeout(Timer6); Timer6 = null }
+  if (Timer7) { clearTimeout(Timer7); Timer7 = null }
+})
+
 </script>
 
 <style lang="scss" scoped>

@@ -177,11 +177,21 @@ export default defineNuxtConfig({
     },
     $client: {
       optimizeDeps: {
-        include: ['lodash-unified']
+        include: [
+          'lodash-unified',
+          'dayjs',
+          'bignumber.js',
+          'js-cookie',
+        ]
       }
     },
     optimizeDeps: {
-      include: ['lodash-unified']
+      include: [
+        'lodash-unified',
+        'dayjs',
+        'bignumber.js',
+        'js-cookie',
+      ]
     },
     build: {
       minify: 'terser',
@@ -244,6 +254,21 @@ export default defineNuxtConfig({
       skipWaiting: true,
       clientsClaim: true,
       runtimeCaching: [
+        {
+          urlPattern: ({ url }) => url.pathname?.includes('charting_library-'),
+          handler: 'StaleWhileRevalidate',
+          options: {
+            cacheName: 'charting-library-cache',
+            expiration: {
+              maxEntries: 300,
+              maxAgeSeconds: 60 * 60 * 24 * 30 // 本地存 30 天
+            },
+            cacheableResponse: {
+              // 明确允许缓存成功（200）的响应
+              statuses: [0, 200]
+            },
+          },
+        },
         {
           // 匹配 Iconify 的域名
           urlPattern: ({ url }) => url.host === 'api.iconify.design',
