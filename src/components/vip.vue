@@ -13,8 +13,8 @@
           <div class="text-14px font-400 mt-20px">{{ $t('chainWalletRebate') }}</div>
         </div>
         <div class="ml-70px">
-          <div class="text-45px">{{ Math.round(referralInfo?.botRefRatio / 100) || 0 }}<span class="text-30px">%</span></div>
-          <div class="text-14px font-400 mt-20px">{{ $t('botWalletRebate') }}</div>
+          <div class="text-45px">{{ Math.round(referralInfo?.perpRefRatio / 100) || 0 }}<span class="text-30px">%</span></div>
+          <div class="text-14px font-400 mt-20px">{{ $t('perpCommission') }}</div>
         </div>
       </div>
     </div>
