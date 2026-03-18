@@ -119,7 +119,6 @@
 import upImg from '@/assets/images/perp-up.png'
 import downImg from '@/assets/images/perp-down.png'
 import dayjs from 'dayjs'
-import html2canvas from 'html2canvas'
 
 const { t } = useI18n()
 const props = defineProps({
@@ -182,8 +181,10 @@ const getValue = (key) => {
   return checkedOptions.value.find((item) => item.value === key)?.checked
 }
 
-function downloadSharePoster() {
+async function downloadSharePoster() {
   if (shareDom.value) {
+    const m = await import('html2canvas')
+    const html2canvas = m.default || m
     html2canvas(shareDom.value, {
       backgroundColor: null,
       scale: 3,
@@ -199,8 +200,10 @@ function downloadSharePoster() {
   }
 }
 
-function copySharePoster() {
+async function copySharePoster() {
   if (shareDom.value) {
+    const m = await import('html2canvas')
+    const html2canvas = m.default || m
     html2canvas(shareDom.value, {
       backgroundColor: null,
       scale: 3,

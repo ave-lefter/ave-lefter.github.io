@@ -68,4 +68,8 @@ rm -rf $PROJECT;
 rm -rf $PROJECT-dist;
 ENDSSH
 
+
+# 上传 s3
+node deploy.js
+
 # cd -

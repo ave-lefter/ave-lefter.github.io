@@ -41,7 +41,8 @@ export const QuoteAddress: Record<string, string> = {
   plasma: '0xd669b935419ea11f5a691bff056a269170c166e8',
   gatelayer: '0xD669b935419eA11f5a691Bff056a269170C166E8',
   chiliz: '0xD669b935419eA11f5a691Bff056a269170C166E8',
-  monad: '0x679c2E7eE14DfA0B752fF28d93cF22C1E47f70f5'
+  monad: '0x679c2E7eE14DfA0B752fF28d93cF22C1E47f70f5',
+  fusnchain: '0xD669b935419eA11f5a691Bff056a269170C166E8',
 }
 
 
@@ -111,7 +112,8 @@ export const SwapContracts: Record<string, string> = {
   plasma: '0xC2402C8453F39e97113F094E3402fbBdD7E0eDe3',
   gatelayer: '0xC2402C8453F39e97113F094E3402fbBdD7E0eDe3',
   chiliz: '0xC2402C8453F39e97113F094E3402fbBdD7E0eDe3',
-  monad: '0xC2402C8453F39e97113F094E3402fbBdD7E0eDe3'
+  monad: '0xC2402C8453F39e97113F094E3402fbBdD7E0eDe3',
+  fusnchain: '0xC2402C8453F39e97113F094E3402fbBdD7E0eDe3',
 }
 
 export const FeeAddress = '0x69aaaff7419fd2ce58079f05ff06b2ff66d446d2'

@@ -3,7 +3,6 @@
     <div id="tv_chart_container_p" ref="kline" :style="{ width: '100%', height: '100%' }" />
   </div>
   <div
-    v-if="!isRank"
     class="w-full cursor-row-resize bg-[--border] gap-1px hover:bg-[--third-text] flex items-center justify-center h-4px"
     @mousedown.stop.prevent="drag"
   >
@@ -12,11 +11,11 @@
 </template>
 
 <script setup lang='ts'>
-import type { IChartingLibraryWidget, ResolutionString, Timezone, SeriesFormat, VisiblePlotsSet, LanguageCode, ChartingLibraryFeatureset, SubscribeBarsCallback, LibrarySymbolInfo } from '~/types/tradingview/charting_library'
+import type { IChartingLibraryWidget, ResolutionString, Timezone, SeriesFormat, VisiblePlotsSet, LanguageCode, SubscribeBarsCallback, LibrarySymbolInfo } from '~/types/tradingview/charting_library'
 import { getTimezone, formatDecimals, getWSPerpMessage } from '@/utils'
 import { formatNumber } from '@/utils/formatNumber'
 import { switchPerpResolution, formatLang, initTradingViewIntervals, updateChartBackground, waitForTradingView,  setWatermark } from './utils'
-import {useLocalStorage, useElementBounding, useWindowSize, useEventBus, useStorage} from '@vueuse/core'
+import { useElementBounding, useWindowSize, useStorage} from '@vueuse/core'
 import type { KLineBar } from './types'
 import {DefaultHeight, WSPerpEventType} from '~/utils/constants'
 import { TW_STUDY } from './constant'
@@ -26,11 +25,7 @@ import { usePerpStore } from '@/stores/perp'
 import { usePerpWsPubStore } from '@/stores/perp/wsPub'
 const { contractId, contractName, resolution, perp } = storeToRefs(usePerpStore())
 const perpWsPubStore = usePerpWsPubStore()
-const props = defineProps<{
-  isRank?:boolean
-}>()
 const klineDateFilter = inject<Ref<string[]>>(ProvideType.KLINE_DATE_FILTER)
-const tokenStore = props.isRank ? useRankKlineStore() : useTokenStore()
 const globalStore = useGlobalStore()
 const route = useRoute()
 const isReady = ref(false)
@@ -79,7 +74,6 @@ function switchTokenKline() {
   }
 }
 
-const price = 0
 // const wsStore = useWSStore()
 const localeStore = useLocaleStore()
 
@@ -278,7 +272,7 @@ async function initChart() {
       resolveSymbol: (symbolName, onResolve, onError) => {
         try {
           const symbolUp = symbol.value?.toUpperCase?.() || '-'
-          const p = Number(price || tokenStore?.price) || 0
+          const p = Number(perp.value?.lastPrice || perp.value?.oraclePrice || perp.value?.close) || 0
           const symbolInfo: LibrarySymbolInfo = {
             // symbol: symbolUp,
             name: symbolUp,
@@ -340,13 +334,13 @@ async function initChart() {
             const bars1 = result?.map(i => ({
               ...i,
               time: Number(i.klineTime),
-              open: i.open,
-              high: i.high,
-              low: i.low,
-              close: i.close,
+              open: Number(i.open),
+              high: Number(i.high),
+              low: Number(i.low),
+              close: Number(i.close),
               volume: Number(i.value || 0),
-
             })) || []
+            console.log('------res bars--------',bars1)
             const bars = bars1?.map?.(i => ({
               time: Number(i.klineTime),
               open: i.open,
@@ -368,7 +362,7 @@ async function initChart() {
               isReadyLine = true
             }, 100)
 
-          }).catch((err) => {
+          }).catch(() => {
             isCatch.value = true
             // const key = `${WSPerpEventType.KLINE}.${contractId.value}.${interval}`
             // const bars = snapshotCache.value[key] || [];
@@ -378,8 +372,8 @@ async function initChart() {
             //   onResult(bars, { noData: !bars?.length});
             // } else {
               if (firstDataRequest) {
-                const price = perp.value?.lastPrice
-                const volume = perp.value?.value
+                const price = Number(perp.value?.lastPrice || 0)
+                const volume = Number(perp.value?.value || 0)
                 const fakeBar = {
                   time: from * 1000,
                   open: price,
@@ -516,13 +510,13 @@ function onWsKline(resolution: string, onTick: SubscribeBarsCallback, ws = perpW
 
       if (data?.length > 0 && !loading && dataType === 'Snapshot' && isCatch.value) {
 
-        const key = `${WSPerpEventType.KLINE}.${contractId.value}.${interval}`
-        const bars = data.reverse().map(i => ({
+        // const key = `${WSPerpEventType.KLINE}.${contractId.value}.${interval}`
+        const bars: KLineBar[] = data.reverse().map((i: { klineTime: string; open: string; high: string; low: string; close: string; value: string }) => ({
           time: Number(i.klineTime),
-          open: i.open,
-          high: i.high,
-          low: i.low,
-          close: i.close,
+          open: Number(i.open),
+          high: Number(i.high),
+          low: Number(i.low),
+          close: Number(i.close),
           volume: Number(i.value || 0),
         }))
         // snapshotCache.value[key] = bars
@@ -533,20 +527,19 @@ function onWsKline(resolution: string, onTick: SubscribeBarsCallback, ws = perpW
       }
 
       if (data?.length > 0 && !loading && dataType === 'changed') {
-        const wsData = data?.map(i => ({
+        const wsData: KLineBar = data?.map((i: { klineTime: string; open: string; high: string; low: string; close: string; value: string }) => ({
           ...i,
           time: Number(i.klineTime),
-          open: i.open,
-          high: i.high,
-          low: i.low,
-          close: i.close,
+          open: Number(i.open),
+          high: Number(i.high),
+          low: Number(i.low),
+          close: Number(i.close),
           volume: Number(i.value || 0),
           type: i.close > i.open ? 'buy': 'sell'
         }))[0]
-        const bar = wsData as KLineBar
         // const msInterval = switchResolution(resolution)
         // const bar = updatePerpLastBar(wsData, contractId.value, lastBar, msInterval) as KLineBar
-        onTick(bar)
+        onTick(wsData)
       }
     }
   }, 'kline')
