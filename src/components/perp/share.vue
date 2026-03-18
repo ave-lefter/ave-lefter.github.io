@@ -183,7 +183,8 @@ const getValue = (key) => {
 
 async function downloadSharePoster() {
   if (shareDom.value) {
-    const html2canvas = await import('html2canvas').then(m => m.default)
+    const m = await import('html2canvas')
+    const html2canvas = m.default || m
     html2canvas(shareDom.value, {
       backgroundColor: null,
       scale: 3,
@@ -201,7 +202,8 @@ async function downloadSharePoster() {
 
 async function copySharePoster() {
   if (shareDom.value) {
-    const html2canvas = await import('html2canvas').then(m => m.default)
+    const m = await import('html2canvas')
+    const html2canvas = m.default || m
     html2canvas(shareDom.value, {
       backgroundColor: null,
       scale: 3,

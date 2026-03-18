@@ -1081,7 +1081,8 @@ const getShareImg = async () => {
   const postersDom = document.querySelector('.share-card-rebate')
   if (postersDom) {
     try {
-      const html2canvas = await import('html2canvas').then(m => m.default)
+      const m = await import('html2canvas')
+      const html2canvas = m.default || m
       const canvas = await html2canvas(postersDom as HTMLElement, {
         backgroundColor: null,
         scale: 3,
@@ -1103,7 +1104,8 @@ const downloadSharePoster = async () => {
   const postersDom = document.querySelector('.share-card-rebate')
   if (postersDom) {
     try {
-      const html2canvas = await import('html2canvas').then(m => m.default)
+      const m = await import('html2canvas')
+      const html2canvas = m.default || m
       const canvas = await html2canvas(postersDom as HTMLElement, {
         backgroundColor: null,
         scale: 3,

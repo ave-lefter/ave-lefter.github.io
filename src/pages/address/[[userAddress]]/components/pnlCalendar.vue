@@ -496,7 +496,8 @@ const openShareDialog = () => {
 
 const copySharePoster = async () => {
   if (!shareCardDom.value) return
-  const html2canvas = await import('html2canvas').then(m => m.default)
+  const m = await import('html2canvas')
+  const html2canvas = m.default || m
   const canvas = await html2canvas(shareCardDom.value, {
     backgroundColor: null,
     scale: 2,

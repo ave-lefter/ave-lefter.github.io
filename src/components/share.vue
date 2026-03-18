@@ -91,7 +91,8 @@ function getRandomBg(isUp = false) {
 
 async function downloadSharePoster() {
   if (shareDom.value) {
-    const html2canvas = await import('html2canvas').then(m => m.default)
+    const m = await import('html2canvas')
+    const html2canvas = m.default || m
     html2canvas(shareDom.value, {
       backgroundColor: null,
       scale: 3,
