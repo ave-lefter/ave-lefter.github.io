@@ -68,4 +68,8 @@ rm -rf $PROJECT;
 rm -rf $PROJECT-dist;
 ENDSSH
 
+
+# 上传 ave.ai s3
+# node deploy.js
+
 # cd -

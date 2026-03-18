@@ -33,3 +33,5 @@ env.sh
 # scripts files
 scripts/*.json
 
+s3key.js
+
