@@ -9,7 +9,7 @@ import { RESOLUTION_KEY, QUICK_KEY } from './constant'
 import { _getHoldersList } from '~/api/holders'
 import dayjs from 'dayjs'
 
-export const supportSecChains = [ 'bsc', 'base', 'mixmax', 'xlayer', 'solana']
+export const supportSecChains = [ 'bsc', 'base', 'mixmax', 'xlayer']
 
 export const DEFAULT_LIST = ['1S','5S', '1', '5', '15', '30', '60', '120', '240', '1D', '1W']
 export const SUPPORT_LIST = ['1S','5S', '15S', '30S', '1', '5', '15', '30', '60', '120', '240', '1D', '1W']
