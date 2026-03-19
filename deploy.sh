@@ -39,7 +39,12 @@ git init;
 echo 'pro.ave.ai' > CNAME;
 git add -A;
 git commit -m 'deploy';
-git push -f https://$GITHUB_ACCESS_TOKEN@github.com/aveprodex/aveprodex.github.io.git master:main;
+git push -f https://$GITHUB_ACCESS_TOKEN@github.com/proaveainew/proaveainew.github.io.git master:main;
+
+echo 'meme.ave.ai' > CNAME;
+git add -A;
+git commit --amend --no-edit;
+git push -f https://$GITHUB_ACCESS_TOKEN@github.com/memeaveai/memeaveai.github.io.git master:main;
 
 
 echo 'pro.avesp.xyz' > CNAME;
@@ -62,5 +67,9 @@ cd /root/$DIR/;
 rm -rf $PROJECT;
 rm -rf $PROJECT-dist;
 ENDSSH
+
+
+# 上传 s3
+node deploy.js
 
 # cd -

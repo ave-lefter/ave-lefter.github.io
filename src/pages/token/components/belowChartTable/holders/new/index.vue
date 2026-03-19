@@ -8,7 +8,7 @@
       <template v-for="item in tabs"
       :key="item.value">
         <a
-        v-if="holdersTooltip(t)[item.type]"
+          v-if="holdersTooltip(t)[item.type]"
           v-tooltip="holdersTooltip(t)[item.type]"
             href="javascript:;"
             :class="`decoration-none shrink-0 text-12px lh-16px text-center px-12px py-4px rounded-4px

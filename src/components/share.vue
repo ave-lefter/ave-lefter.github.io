@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import QRCode from 'qrcode'
 import Cookies from 'js-cookie'
-import html2canvas from 'html2canvas'
 import type {GetTokenStatisticsResponse} from '~/api/token'
 
 import up1 from '@/assets/images/share/up_1.webp'
@@ -90,8 +89,10 @@ function getRandomBg(isUp = false) {
   bgImg.value = imgs[index] || (isUp ? up1 : down1)
 }
 
-function downloadSharePoster() {
+async function downloadSharePoster() {
   if (shareDom.value) {
+    const m = await import('html2canvas')
+    const html2canvas = m.default || m
     html2canvas(shareDom.value, {
       backgroundColor: null,
       scale: 3,
