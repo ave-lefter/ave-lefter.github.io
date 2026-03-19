@@ -41,6 +41,7 @@
               :address="item.wallet_address"
               :chain="item.chain"
               iconSize="12px"
+              :showChain="false"
             />
             <div class="flex-1.5 min-w-0">
               <div class="flex items-center">

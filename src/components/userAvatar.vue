@@ -20,7 +20,7 @@
       :style="(chainStyle as any)"
     >
     <img
-      v-else-if="props.chain && !wallet_logo?.vip_logo"
+      v-else-if="props.chain && !wallet_logo?.vip_logo && showChain"
       class="icon-chain"
       :src="`${configStore?.token_logo_url}chain/${props.chain}.png`"
       alt=""
@@ -38,15 +38,24 @@ interface WalletLogo {
   url?: string
 }
 
-const props = defineProps<{
+// const props = defineProps<{
+//   address?: string
+//   chain?: string
+//   iconSize?: string
+//   iconChainSize?: string
+//   showChain?: boolean
+//   wallet_logo?: WalletLogo
+// }>()
+const props = withDefaults(defineProps<{
   address?: string
   chain?: string
   iconSize?: string
   iconChainSize?: string
-  // eslint-disable-next-line vue/prop-name-casing
+  showChain?: boolean
   wallet_logo?: WalletLogo
-}>()
-
+}>(), {
+  showChain: true
+})
 const {
   // wallet_logo = {logo: '', name: '', url: ''},
   // address = '',
