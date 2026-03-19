@@ -22,7 +22,7 @@ type Token = {
 export const useTokenStore = defineStore('token', () => {
   const route = useRoute()
   const tokenInfo = ref<null | TokenInfo>(null)
-  const tokenInfoExtra = shallowRef<null | TokenInfoExtra>(null)
+  const tokenInfoExtra = ref<null | TokenInfoExtra>(null)
   const twitterType = ref<0 | 1 | 2 | 3>(0)
   const { $i18n } = useNuxtApp()
   const globalStore = useGlobalStore()
