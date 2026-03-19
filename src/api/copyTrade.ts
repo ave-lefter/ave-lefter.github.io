@@ -166,6 +166,24 @@ export function _getFailFollowTxs(data: {
   })
 }
 
+//查询跟单无效
+export function _getFilteredFollowTxs(data: {
+  walletAddress: string
+  chain: string
+  id: number
+  pageNo: string
+  pageSize: string
+}) {
+  const { $api } = useNuxtApp()
+  return $api('/botapi/swap/getFilteredFollowTxs', {
+    method: 'get',
+    headers: {
+      'ave-platform': 'web',
+    },
+    query: data,
+  })
+}
+
 //切换跟单状态
 export function _toggleFollowOrder(data: { chain: string; followId: number }): Promise<{ status: string}> {
   const { $api } = useNuxtApp()
