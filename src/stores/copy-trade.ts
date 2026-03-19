@@ -25,6 +25,7 @@ export const useCopyTradeStore = defineStore('copyTrade', () => {
     takeProfitRatio: '',
     stopLossRatio: '',
     ignoreHeld: false,
+    buyOnce: false,
     chain: 'bsc',
 
     slippage: 9, //滑点
@@ -36,6 +37,8 @@ export const useCopyTradeStore = defineStore('copyTrade', () => {
     maxBuyValue: '',
     minMarketCap: '',
     maxMarketCap: '',
+    minLiquidity: '',
+    maxLiquidity: '',
     minTokenAge: 0,
     maxTokenAge: 0,
     enableAt: 0,
