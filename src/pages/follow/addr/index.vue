@@ -14,7 +14,7 @@
           <el-radio-button label="30D" :value="'30d'" />
         </el-radio-group>
       </li>
-      <!-- <li :class="`btn btn1 ${(checkedList.length&&'warning')}`" @click="batchDelete">{{ $t('batchDelete') }}{{checkedList.length?`(${checkedList.length})`:''}}</li> -->
+      <li v-if="isMonitor" :class="`btn btn1 ${(checkedList2.length&&'warning')} ${!checkedList2.length&&'cursor-not-allowed!'}`" @click="batchDelete2">{{ $t('batchDelete') }}{{checkedList2.length?`(${checkedList2.length})`:''}}</li>
       <!-- checkedList -->
     </ul>
     <div v-if="currentAddress" class="m-header flex-between px-16px items-start">
@@ -24,7 +24,7 @@
     <div class="m-table w-100% mt-12px flex-1 overflow-hidden bg-[--secondary-bg]">
       <el-table
       ref="tableRef" v-loading="loading" class='' :data="filterDataSource" table-layout="fixed" row-class-name="group" :height="((pageData.total > 50) && shouldRenderChild && currentAddress) ? 'calc(100% - 72px)' : '100%'"
-      :default-sort="defaultSort" @sort-change="handleSortChange" @row-click="tableRowClick"  @selection-change="handleSelectionChange" :row-key="(row:any)=>`${row?.user_address}-${row?.user_chain}`">
+      :default-sort="defaultSort" @sort-change="handleSortChange" @row-click="tableRowClick"  @selection-change="_handleSelectionChange" :row-key="(row:any)=>`${row?.user_address}-${row?.user_chain}`">
         <template #empty>
           <div v-if="!loading && followStore.currentAddress" class="flex flex-col items-center justify-center py-30px">
             <img v-if="mode === 'light'" src="@/assets/images/empty-white.svg">
@@ -49,10 +49,12 @@
           </AveEmpty>
           <span v-else />
         </template>
-        <el-table-column v-if="!isMonitor && (favHover||checkedList.length)" type="selection" width="22" fixed="left" reserve-selection/>
-        <el-table-column :label="$t('wallet2')" width="215" :fixed="!isMonitor?false:'left'">
+        <el-table-column v-if="favHover||checkedList.length" type="selection" width="22" fixed="left" reserve-selection/>
+        <el-table-column v-if="isMonitor" type="selection" width="22" fixed="left" reserve-selection/>
+       <el-table-column :label="$t('wallet2')" width="215" :fixed="false">
           <template #header>
-            <div v-if="favHover||checkedList.length" :class="`batchDel mr-8px ${(checkedList.length&&'warning')}`" @click="batchDelete">{{ $t('batchDelete') }}{{checkedList.length?`(${checkedList.length})`:''}}</div>
+            <div v-if="favHover|| (!isMonitor && checkedList.length)" :class="`batchDel mr-8px ${(checkedList.length&&'warning')}`" @click="batchDelete">{{ $t('batchDelete') }}{{checkedList.length?`(${checkedList.length})`:''}}</div>
+            <!-- <div v-else-if="favHover|| (isMonitor && checkedList2.length)" :class="`batchDel mr-8px ${(checkedList2.length&&'warning')}`" @click="batchDelete2">{{ $t('batchDelete') }}{{checkedList2.length?`(${checkedList2.length})`:''}}</div> -->
             <span class="text-10px" style="opacity: 0">0</span>
             <span>{{ $t('wallet2') }}</span>
               <Icon
@@ -512,7 +514,7 @@
               {{ t('copyTrade') }}
             </a>
             <!-- 监控 -->
-             <div v-if="isMonitor" class="color-[--secondary-text] mr-12px cursor-pointer flex-start" @click.stop.prevent="handleDeleteMonitor(row)">
+             <div v-if="isMonitor" class="color-[--secondary-text] mr-12px cursor-pointer flex-start" @click.stop.prevent="handleDeleteMonitor(row)"  @mouseover="handlerMouseoverFavHover" @mouseout="handlerMouseoutFavHover">
                <Icon  name="bx:bxs-trash-alt" class="text-13px mr-5px mb-1px"/>
                {{ t('delete') }}
              </div>
@@ -562,7 +564,7 @@ import {
   formatIconTag, getTagTooltip
 } from '@/utils/index'
 import { throttle } from 'lodash-es'
-import { getAttentionPageList, changeFavoriteGroupName2, addFavoriteGroup2, removeFavoriteGroup2, moveFavoriteGroup2, deleteAttention ,changeIndexFavoriteGroup2 ,monitorAddresses,addAddressMonitor,favUsersResumeMonitor,favUsersPauseMonitor,deleteMonitor,batchDeleteAddresses} from '~/api/attention'
+import { getAttentionPageList, changeFavoriteGroupName2, addFavoriteGroup2, removeFavoriteGroup2, moveFavoriteGroup2, deleteAttention ,changeIndexFavoriteGroup2 ,monitorAddresses,addAddressMonitor,favUsersResumeMonitor,favUsersPauseMonitor,deleteMonitor,batchDeleteAddresses,batchDeleteMonitor} from '~/api/attention'
 import type { TableInstance } from 'element-plus'
 const { mode, isDark } = storeToRefs(useGlobalStore())
 const followStore = useFollowStore()
@@ -672,6 +674,12 @@ const filterDataSource=computed(() => {
 const favHover=ref(false)
 let timeoutId: any = null;
 const checkedList=ref(<any[]>[])
+const checkedList2=ref(<any[]>[])
+
+const _handleSelectionChange = (val: any[]) => {
+  isMonitor.value?handleSelectionChange2(val):handleSelectionChange(val)
+}
+
 const handleSelectionChange = (val: any[]) => {
   console.log('handleSelectionChange', val)
   checkedList.value=val.map(i => {
@@ -679,6 +687,16 @@ const handleSelectionChange = (val: any[]) => {
       address:currentAddress.value,
       user_chain:i.user_chain,
       user_address:i.user_address,
+    }
+  })
+  // checkedList.value=val.map(i => i?.user_address+'-' + i?.user_chain)
+}
+const handleSelectionChange2 = (val: any[]) => {
+  console.log('handleSelectionChange2', val)
+  checkedList2.value=val.map(i => {
+    return {
+      chain:i.user_chain,
+      address:i.user_address,
     }
   })
   // checkedList.value=val.map(i => i?.user_address+'-' + i?.user_chain)
@@ -714,6 +732,26 @@ const batchDelete=async ()=>{
     checkedList.value = []
   }).catch((e) => {
      ElMessage.error(String(e))
+  })
+}
+const batchDelete2=async ()=>{
+  if(checkedList2.value.length===0) return
+  await ElMessageBox.confirm(t('removeTokenTips2'), t('tips'), {
+    confirmButtonText: t('confirm'),
+    cancelButtonText: t('cancel'),
+    customClass:'w-320px p-16px inputPop',
+    cancelButtonClass:'w-140px h-30px',
+    confirmButtonClass:'w-140px h-30px ml-8px!',
+    dangerouslyUseHTMLString: true,
+  })
+  console.log('batchDelete', checkedList2.value)
+  batchDeleteMonitor(checkedList2.value).then(() => {
+    ElMessage.success(t('success'))
+    init()
+    tableRef.value!.clearSelection()
+    checkedList2.value = []
+  }).catch((e) => {
+    ElMessage.error(String(e))
   })
 }
 onActivated(() => {
@@ -908,6 +946,9 @@ const getTableList = throttle(function() {
     pageData.value.total = res.total || 0
     pageData.value.page = res.pageNO || 1
     pageData.value.pageSize = res.pageSize || 50
+    if(isMonitor.value){
+      monitorNum.value = res.total || 0
+    }
   }).finally(() => {
     loading.value = false
   })

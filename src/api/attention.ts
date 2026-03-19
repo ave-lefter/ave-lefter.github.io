@@ -459,7 +459,7 @@ export function getZeroBalanceAddresses({user_chain, address}: { user_chain: str
 }
 
 /**
- * 批量删除零余额地址
+ * 批量取消关注地址
  * @param {Object} data
  * @param {Array<string>} data.addresses - 要删除的地址数组
  * @param {string} data.user_chain - 地址所在的链
@@ -474,6 +474,13 @@ export function batchDeleteAddresses(body: Array<{ address: string; user_chain: 
 }
 
 
+/**
+ * Resume a paused monitor
+ * @param {Object} body - request body
+ * @param {string} body.uid - the id of the monitor to resume
+ * @param {string} body.address - the address of the monitor to resume
+ * @returns {Promise} - a promise that resolves when the monitor is resumed
+ */
 export function favUsersResumeMonitor({  uid, address }: { uid: string; address: string }) {
   const { $api } = useNuxtApp()
   return $api('/v2api/fav_users/v1/user/resumeMonitor', {
@@ -485,6 +492,13 @@ export function favUsersResumeMonitor({  uid, address }: { uid: string; address:
   })
 }
 
+/**
+ * Pause a monitor
+ * @param {Object} body - request body
+ * @param {string} body.uid - the id of the monitor to pause
+ * @param {string} body.address - the address of the monitor to pause
+ * @returns {Promise} - a promise that resolves when the monitor is paused
+ */
 export function favUsersPauseMonitor({  uid, address }: { uid: string; address: string }) {
   const { $api } = useNuxtApp()
   return $api('/v2api/fav_users/v1/user/pauseMonitor', {
@@ -498,7 +512,7 @@ export function favUsersPauseMonitor({  uid, address }: { uid: string; address: 
 export function monitorAddresses({ group = 0, user_chain, sort = '', sort_dir = '', keyword = '', last_tx_time_max = '', last_tx_time_min = '', time_interval = '', pageSize = 100, pageNO = 1, address = localStorage.bot_evmAddress || localStorage.walletAddress }: any) {
   const { $api } = useNuxtApp()
   return $api('/v2api/fav_users/v1/user/group/monitorAddressv2', {
-   method: 'get',
+    method: 'get',
     params:{
       group,
       sort,
@@ -520,11 +534,24 @@ export function monitorAddresses({ group = 0, user_chain, sort = '', sort_dir = 
  * 批量筛选地址监控推送
  */
 export function batchPauseMonitor(monitor_type: Array<'sell' | 'buy'>): Promise<any> {
-   const { $api } = useNuxtApp()
+  const { $api } = useNuxtApp()
   return $api('/v2api/fav_users/v1/user/monitor/batchPause', {
     method: 'post',
     body:{
       monitor_type
     }
+  })
+}
+
+/**
+ * 批量删除监控
+ * @param {Array<{ address: string; chain: string }>} body - 要删除的监控数组
+ * @returns {Promise} - 一个 Promise 对象,它在删除成功后resolve
+ */
+export function batchDeleteMonitor(body: Array<{ address: string; chain: string }>): Promise<any> {
+  const { $api } = useNuxtApp()
+  return $api('/v2api/fav_users/v1/user/deleteMonitor/batch', {
+    method: 'post',
+    body
   })
 }

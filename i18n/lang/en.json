@@ -2122,5 +2122,8 @@
   "onlyFollowed": "Only Followed",
   "OnlyDev": "Only Dev",
   "OnlyYou": "Only You",
-  "you": "You"
+  "you": "You",
+  "favRemarksTips": "Do you want to follow the selected Wallet?",
+  "batchFav": "Batch Follow",
+  "removeTokenTips2": "Delete the selected monitoring?"
 }

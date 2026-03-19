@@ -885,5 +885,8 @@
   "onlyFollowed": "Chỉ theo dõi",
   "OnlyDev": "Chỉ có nhà phát triển",
   "OnlyYou": "Chỉ có bạn",
-  "you": "Bạn"
+  "you": "Bạn",
+  "favRemarksTips": "Bạn có muốn theo dõi Ví đã chọn không?",
+  "batchFav": "Theo dõi hàng loạt",
+  "removeTokenTips2": "Xóa giám sát đã chọn?"
 }

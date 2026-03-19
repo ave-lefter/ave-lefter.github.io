@@ -645,5 +645,8 @@
   "onlyFollowed": "Apenas seguido",
   "OnlyDev": "Somente desenvolvedor",
   "OnlyYou": "Só você",
-  "you": "Você"
+  "you": "Você",
+  "favRemarksTips": "Você quer seguir a carteira selecionada",
+  "batchFav": "Acompanhamento em lote",
+  "removeTokenTips2": "Excluir o monitoramento selecionado?"
 }
