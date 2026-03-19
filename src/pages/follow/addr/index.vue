@@ -2,7 +2,7 @@
   <div class="w-address flex-1 w-100% h-[calc(100%-76px)] flex flex-col relative" :class="{ 'mt-12px': currentAddress }">
     <ul v-if="currentAddress" class="w-operate">
       <li v-if="evmAddress" class="flex items-center gap-2px">
-          <el-checkbox v-model="isMonitor" :label="t('onlyPush')"  style="color:var(--secondary-text);z-index: 0;--el-checkbox-font-weight:400" class="[--el-checkbox-checked-text-color:var(--d-F5F5F5-l-333)]! [&&]:[--el-checkbox-input-border:1px_solid_var(--icon-color)]" size="large"/>
+          <el-checkbox v-model="isMonitor" @change="handleMonitorChange" :label="t('onlyPush')"  style="color:var(--secondary-text);z-index: 0;--el-checkbox-font-weight:400" class="[--el-checkbox-checked-text-color:var(--d-F5F5F5-l-333)]! [&&]:[--el-checkbox-input-border:1px_solid_var(--icon-color)]" size="large"/>
           <span class="text-[var(--secondary-text)] text-14px" :class="{'text-[var(--d-F5F5F5-l-333)]!':isMonitor}">{{ `${monitorNum}/500` }}</span>
       </li>
       <li class="btn">
@@ -514,7 +514,7 @@
               {{ t('copyTrade') }}
             </a>
             <!-- 监控 -->
-             <div v-if="isMonitor" class="color-[--secondary-text] mr-12px cursor-pointer flex-start" @click.stop.prevent="handleDeleteMonitor(row)"  @mouseover="handlerMouseoverFavHover" @mouseout="handlerMouseoutFavHover">
+             <div v-if="isMonitor" class="color-[--secondary-text] mr-12px cursor-pointer flex-start" @click.stop.prevent="handleDeleteMonitor(row)">
                <Icon  name="bx:bxs-trash-alt" class="text-13px mr-5px mb-1px"/>
                {{ t('delete') }}
              </div>
@@ -675,6 +675,12 @@ const favHover=ref(false)
 let timeoutId: any = null;
 const checkedList=ref(<any[]>[])
 const checkedList2=ref(<any[]>[])
+
+const handleMonitorChange=()=>{
+  if(!isMonitor.value){
+    checkedList2.value=[]
+  }
+}
 
 const _handleSelectionChange = (val: any[]) => {
   isMonitor.value?handleSelectionChange2(val):handleSelectionChange(val)
