@@ -1,52 +1,64 @@
 <template>
   <div class="rounded-4px">
-    <div v-if="!isEmpty" class="p-12px color-[--main-text] flex items-center gap-4px">
-      <template v-if="type === 'new'">
-        {{ t('progress') }}: {{ formatNumber(row.progress, 1) }}%
-      </template>
-      <template v-else-if="type === 'soon'">
-        {{ t('soon') }}
-      </template>
-      <template v-else-if="type === 'graduated'">
-        {{ t('migrated') }}
-        <div v-tooltip="formatDate(row?.created_at || row?.time)" class="time" :style="{
-          color:
-            Number(formatTimeFromNow(row?.created_at || row?.time, true)) <= 600
-              ? '#FFA622'
-              : '#12B886',
-        }">
-          <template v-if="!(row?.created_at || row?.time)"> - </template>
-          <template v-else-if="Number(formatTimeFromNow(row?.created_at || row?.time, true)) >= 60">
-            {{
-              formatCountdown(
-                Number(row?.created_at) * 1000 || Number(row?.time) * 1000,
-                false
-              )
-            }}
-          </template>
-          <TimerCount v-else-if="
-            (row?.created_at || row?.time) &&
-            Number(formatTimeFromNow(row?.created_at || row?.time, true)) < 60
-          " :key="`${row.created_at}`" :timestamp="row.created_at" :end-time="60">
-            <template #default="{ seconds }">
-              <span class="color-#FFA622">
-                <template v-if="seconds < 60"> {{ seconds }}s </template>
-                <template v-else>
-                  {{ formatTimeFromNow(row.created_at) }}
-                </template>
-              </span>
+    <span v-if="hideImage" class="text-14px color-[--down-color] flex-start px-10px pt-10px" :class="similarpic.length ||tokens.length ? '': 'pb-10px'">
+        <img
+          class="rounded-100% mr-5px"
+          :src="formatIconTag(row?.deployer_platform)"
+          alt=""
+          :width="12"
+          style="border-radius: 100%"
+        >
+        {{ $t('deployerPlatform', {tool: row?.deployer_platform}) }}
+    </span>
+    <template v-else>
+      <div v-if="!isEmpty" class="p-12px color-[--main-text] flex items-center gap-4px">
+        <template v-if="type === 'new'">
+          {{ t('progress') }}: {{ formatNumber(row.progress, 1) }}%
+        </template>
+        <template v-else-if="type === 'soon'">
+          {{ t('soon') }}
+        </template>
+        <template v-else-if="type === 'graduated'">
+          {{ t('migrated') }}
+          <div v-tooltip="formatDate(row?.created_at || row?.time)" class="time" :style="{
+            color:
+              Number(formatTimeFromNow(row?.created_at || row?.time, true)) <= 600
+                ? '#FFA622'
+                : '#12B886',
+          }">
+            <template v-if="!(row?.created_at || row?.time)"> - </template>
+            <template v-else-if="Number(formatTimeFromNow(row?.created_at || row?.time, true)) >= 60">
+              {{
+                formatCountdown(
+                  Number(row?.created_at) * 1000 || Number(row?.time) * 1000,
+                  false
+                )
+              }}
             </template>
-          </TimerCount>
-        </div>
-      </template>
-    </div>
-    <el-image class="token-icon w-228px h-228px flex items-center justify-center" style="display: flex" fit="cover"
-      :src="getSymbolDefaultIcon(row, 'rect')" preview-teleported>
-      <template #error>
-        <img class="token-icon w-228px h-228px text-16px color-#fff object-cover"
-          :src="getChainDefaultIcon(row.chain, row.symbol, 'rect')">
-      </template>
-    </el-image>
+            <TimerCount v-else-if="
+              (row?.created_at || row?.time) &&
+              Number(formatTimeFromNow(row?.created_at || row?.time, true)) < 60
+            " :key="`${row.created_at}`" :timestamp="row.created_at" :end-time="60">
+              <template #default="{ seconds }">
+                <span class="color-#FFA622">
+                  <template v-if="seconds < 60"> {{ seconds }}s </template>
+                  <template v-else>
+                    {{ formatTimeFromNow(row.created_at) }}
+                  </template>
+                </span>
+              </template>
+            </TimerCount>
+          </div>
+        </template>
+      </div>
+      <el-image class="token-icon w-228px h-228px flex items-center justify-center" style="display: flex" fit="cover"
+        :src="getSymbolDefaultIcon(row, 'rect')" preview-teleported>
+        <template #error>
+          <img class="token-icon w-228px h-228px text-16px color-#fff object-cover"
+            :src="getChainDefaultIcon(row.chain, row.symbol, 'rect')">
+        </template>
+      </el-image>
+    </template>
     <div v-if="similarpic.length" class="p-12px">
       <div class="flex justify-between">
         <div class="text-12px lh-12px color-[--third-text] mb-12px">{{ t('similarPic') }}({{ similarpic.length }})</div>
@@ -106,13 +118,20 @@ const { t } = useI18n()
 
 const props = defineProps({
   row: {
-    type: Object as PropType<{ chain: string, symbol: string }>,
+    type: Object as PropType<{ chain: string, symbol: string,  is_cloned: number, deployer_platform: string, }>,
     default: () => {
       return {
         chain: '',
-        symbol: ''
+        symbol: '',
+        is_cloned: 0,
+        deployer_platform: ''
       }
     }
+  },
+
+  hideImage: {
+    type: Boolean,
+    default: false,
   },
   type: {
     type: String,

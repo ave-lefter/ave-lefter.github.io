@@ -5,14 +5,15 @@ export function useSimilarTokenPopup() {
 
     const $tooltip = $createTooltip('similar-tooltip')
 
-    function onEnter(e: { target: any },row,type,getDataColor) {
+    function onEnter(e: { target: any },row,type,getDataColor, hideImage = false) {
       $tooltip.show({
         content: {
           is:ImageLarge,
           props: {
             row: row,
             type: type,
-            getDataColor
+            getDataColor,
+            hideImage
           }
         },
         target: e.target,

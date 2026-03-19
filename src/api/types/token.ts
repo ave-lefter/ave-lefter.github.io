@@ -155,6 +155,9 @@ export interface TokenInfoExtra {
   max: number
   limit: number
   insiders_balance_ratio_cur: number
+  is_cloned: number
+  deployer_platform: string
+  is_pump_agent: number
   t_price_change_24h: number
 }
 

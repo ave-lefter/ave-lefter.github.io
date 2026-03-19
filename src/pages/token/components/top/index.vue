@@ -281,7 +281,6 @@
                   </div>
                 </template>
               </el-popover>
-
               <!-- <template v-if="pair && getTags(pair)?.normal_tag?.length > 0">
                 <div
                   v-for="(i, index) in getTags(pair)?.normal_tag"
@@ -698,6 +697,32 @@
               <span>{{ formatNumber(tagsRatio?.smart_wallet_count || 0, 2) }}</span>
             </div>
             </HolderRank>
+            <div
+              v-if="tokenStore.tokenInfoExtra?.is_cloned"
+              class="minor color-text-2 tag-btn signal cursor-pointer mr-4px bg-btn text-10px lh-none"
+              v-tooltip="$t('deployerPlatform', {tool: tokenStore.tokenInfoExtra?.deployer_platform})"
+            >
+              <img
+                class="rounded-100%"
+                :src="formatIconTag(tokenStore.tokenInfoExtra?.deployer_platform)"
+                alt=""
+                :width="12"
+                style="border-radius: 100%"
+              >
+            </div>
+            <div
+              v-if="tokenStore.tokenInfoExtra?.is_pump_agent"
+              class="minor color-text-2 tag-btn signal cursor-pointer mr-4px bg-btn text-10px lh-none"
+              v-tooltip="$t('agentToken')"
+            >
+              <img
+                class="rounded-100%"
+                :src="formatIconTag('pumpt_agent')"
+                alt=""
+                :width="12"
+                style="border-radius: 100%"
+              >
+            </div>
           </div>
         </div>
       </div>
