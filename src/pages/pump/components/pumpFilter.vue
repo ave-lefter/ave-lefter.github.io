@@ -29,15 +29,15 @@
               <span class="text-12px">{{ $t('platform') }}</span>
               <!-- 全选时增加取消全选 -->
               <span v-if="form.platforms === platformsList.map(platform => platform.platform).join(',')" class="text-12px w-60px lh-24px rounded-4px bg-[--pump-filter-bg] text-center cursor-pointer"
-                @click="form.platforms = platformsList[0]?.platform">
+                @click="changePlatformsList('isNull')">
                 {{ $t('cancelAllSelected') }}
               </span>
               <span v-else class="text-12px w-48px lh-24px rounded-4px bg-[--pump-filter-bg] text-center cursor-pointer"
-                @click="form.platforms = platformsList.map(platform => platform.platform).join(',')">
+                @click="changePlatformsList('isAll')">
                 {{ $t('all1') }}
               </span>
             </div>
-            <el-checkbox-group size="default" @change="(val) => form.platforms = val.join(',')"
+            <el-checkbox-group size="default" @change="val=>changePlatformsList('other', val)"
               :model-value="form.platforms? form.platforms.split(',') : []" class="grid grid-cols-2 gap-12px flex-1">
               <el-checkbox v-for="platform in platformsList" :key="platform.platform" :label="platform.platform"
                 class="[&&]:mr-0 [&&]:[--el-checkbox-height:28px]">
@@ -465,11 +465,22 @@ const indicatorArr = computed(() => {
 //     }
 //     form.value = { ...tableFilter, platforms: platforms }
 // }
-watch(() => props.platformsList, (val, oldValue) => {
-  if (isEqual(val, oldValue)) return
-  form.value = {...tableFilter}
-  emit('update:filterData', { ...form.value }, storage.value)
-})
+// watch(() => props.platformsList, (val, oldValue) => {
+//   if (isEqual(val, oldValue)) return
+//   form.value = {...tableFilter}
+//   emit('update:filterData', { ...form.value }, storage.value)
+// })
+function changePlatformsList(type: string, val?: string[]) {
+  if (type == 'isNull') {
+    form.value.platforms = props.platformsList[0]?.platform
+  } else if (type == 'isAll') {
+    form.value.platforms = props.platformsList.map(platform => platform.platform).join(',')
+  } else {
+    form.value.platforms = val?.join(',') || ''
+  }
+  // form.value = {...tableFilter}
+  // emit('update:filterData', { ...form.value }, storage.value)
+}
 watch(() => props.visible, (val) => {
   if (val) {
   tableFilter = pumpStore.pumpV3[props.activeChain][activeTab.value]?.pumpFilter

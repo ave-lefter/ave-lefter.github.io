@@ -56,6 +56,38 @@ export async function getPerpMetadata(): Promise<Metadata1> {
   })
 }
 
+export function _getContractCategorys(lang:string){
+  const { $api } = useNuxtApp()
+  return $api('/v2api/token/v1/contract/config', {
+    method: 'get',
+    headers: {
+      'lang-zone': lang
+    }
+  })
+}
+
+export function _getContractList(
+  category: string,
+  keyword?: string,
+  page_size?: number,
+  page?: number,
+  sort?: string,
+  sort_dir?: string,
+): Promise<Metadata> {
+  const { $api } = useNuxtApp()
+  return $api('/v2api/token/v1/contract/list', {
+    method: 'get',
+    query: {
+      category: category || 'all',
+      keyword: keyword || '',
+      page_size: page_size || 15,
+      page_token: page || '',
+      sort: sort || '',
+      sort_dir: sort_dir || '',
+    },
+  })
+}
+
 export async function onboardSite(): Promise<{
   dataList: Array<AccountInfo>
   nextPageOffsetData: string

@@ -66,22 +66,25 @@ const chartStorageService = {
 
     const allStates = await this.getFullStorage()
 
+    // 过滤掉 Volume（TV 内置，不需要手动 createStudy，避免重复）
+    const filteredStudies = allStudies.filter(s => s !== 'Volume')
+
     // 3. 准入检查：如果没有 LineTool 内容，则执行清理逻辑
     if (!hasValuableContent) {
       if (allStates[subKey]) {
         delete allStates[subKey]
-        allStates.allStudies = Array.from(new Set(['Volume', ...allStudies]))
+        allStates.allStudies = Array.from(new Set(filteredStudies))
         await localforage.setItem(currentStorageKey, allStates)
         return { status: 'cleaned' }
       }
-      allStates.allStudies = Array.from(new Set(['Volume', ...allStudies]))
+      allStates.allStudies = Array.from(new Set(filteredStudies))
       await localforage.setItem(currentStorageKey, allStates)
       return { status: 'ignored' }
     }
 
     // 4. 正常保存逻辑
     allStates[subKey] = { ...chartObj, _lastModified: Date.now() }
-    allStates.allStudies = Array.from(new Set(['Volume', ...allStudies]))
+    allStates.allStudies = Array.from(new Set(filteredStudies))
 
     // LRU 清理：超过最大数量时删除最早修改的项目（排除 allStudies 字段）
     const keys = Object.keys(allStates).filter(k => k !== 'allStudies')

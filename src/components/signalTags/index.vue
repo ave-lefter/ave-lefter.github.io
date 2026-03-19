@@ -9,7 +9,7 @@
         v-if="i.type?.includes('TOP') && i.type?.slice(3) <25 || Number(i.type)"
         style="pointer-events: none;"
         :class="getTagClass(index) + ' signal-tag-hover'" :src="formatNewTags(i.icon)" alt=""
-        height="15">
+        :height="tagHeight">
     </template>
   </div>
 </template>
@@ -26,6 +26,10 @@ const props = defineProps({
   tagClass: {
     type: String,
     default: 'ml-3px'
+  },
+  tagHeight: {
+    type: String,
+    default: '15'
   },
   walletAddress: {
     type: String,

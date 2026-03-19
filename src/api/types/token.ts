@@ -158,6 +158,7 @@ export interface TokenInfoExtra {
   is_cloned: number
   deployer_platform: string
   is_pump_agent: number
+  t_price_change_24h: number
 }
 
 

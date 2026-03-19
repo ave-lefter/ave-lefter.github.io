@@ -43,11 +43,10 @@ function setTimeStamp(type:number){
 </script>
 
 <template>
-    <div
-        class="h-24px flex items-center justify-center bg-[--main-input-button-bg] color-[--secondary-text] mb-12px text-12px gap-8px">
+    <div class="h-24px flex items-center justify-center bg-[--main-input-button-bg] color-[--d-E0E0E0-l-333] mb-12px text-12px gap-4px">
         <span>{{timeString}}</span>
-        <span class="color-[--main-text] cursor-pointer" @click="reset">{{ $t('reset') }}</span>
-        <Icon name="tabler:arrow-left" class="cursor-pointer hover:color-[--main-text]" @click="setTimeStamp(-1)"/>
-        <Icon name="tabler:arrow-right" class="cursor-pointer hover:color-[--main-text]"  @click="setTimeStamp(1)"/>
+        <Icon name="custom:arrow-left" class="cursor-pointer hover:color-[--main-text] text-9px mr-4px" @click="setTimeStamp(-1)"/>
+        <Icon name="custom:arrow-right" class="cursor-pointer hover:color-[--main-text] text-9px"  @click="setTimeStamp(1)"/>
+        <span class="color-[--primary-color] cursor-pointer" @click="reset">{{ $t('reset') }}</span>
     </div>
 </template>

@@ -38,8 +38,8 @@ export function useKlineLineSave(getKey: () => string, rootKey: string = 'tv_cha
 
   function addStudy(allStudies: Array<string>, chart: any) {
     const currentStudies = chart.getAllStudies()
-    // 过滤掉已经在图表上的指标，避免重复创建
-    const newStudies = allStudies?.filter(s => !currentStudies.some((cs: any) => cs.name === s))
+    // 过滤掉已经在图表上的指标，避免重复创建；同时排除 Volume（TV 内置，不需要手动创建）
+    const newStudies = allStudies?.filter(s => s !== 'Volume' && !currentStudies.some((cs: any) => cs.name === s))
     const removeStudies: Array<{name: string; id: string}> = currentStudies?.filter((cs: any) => !allStudies.includes(cs.name) && cs.name !== 'Volume')
     // 先移除不需要的指标
     removeStudies.forEach(study => {

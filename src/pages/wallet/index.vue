@@ -111,7 +111,7 @@ import {
   type Records,
 } from '@/api/botManage'
 import { ElMessage } from 'element-plus'
-import { decryptMsg } from '@/utils/index'
+import { decryptMsg } from '@/utils/crypto'
 import { useStorage, useThrottleFn, useDebounceFn } from '@vueuse/core'
 import { Warning } from '@element-plus/icons-vue'
 import { markRaw } from 'vue'

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import * as echarts from 'echarts'
+import * as echarts from '@/utils/echarts'
 import type {  KlineDatum } from '~/api/market'
 
 const retryCount = ref(0)
@@ -44,9 +44,7 @@ onBeforeUnmount(()=>{
         chartInstance.dispose()
         chartInstance = null
     }
-    if (chartDom.value) {
-      observer.unobserve(chartDom.value)
-    }
+    observer.disconnect()
     if (timer) {
       clearTimeout(timer)
       timer = null

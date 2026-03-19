@@ -510,7 +510,6 @@
   "avgBuyPrice": "買入成本價",
   "avgSellPrice": "賣出成本價",
   "trades": "交易",
-  "me": "我的",
   "orderBook": "訂單簿",
   "abnormalChips": "异常籌碼",
   "abnormalChipsTip": "异常籌碼比例已去重處理",
@@ -2103,5 +2102,17 @@
   "withdrawn1": "累計收益",
   "deployerPlatform": "使用{tool}工具尅隆的代幣",
   "filterDeployerPlatform": "過濾尅隆代幣",
-  "agentToken": "Agent代幣"
+  "agentToken": "Agent代幣",
+  "trackerTypeRequired": "請至少選擇一種內容類型",
+  "twitterForHMe": "推特-我的",
+  "twitterForHot": "推特-熱門",
+  "txFilter": "交易篩選",
+  "filterWallet2": "篩選錢包",
+  "disabledClickKlineFilter": "禁用點擊圖表篩選時間",
+  "enabledClickKlineFilter": "啟用點擊圖表篩選時間",
+  "dev4": "開發者",
+  "onlyFollowed": "只看已關注",
+  "OnlyDev": "只看開發者",
+  "OnlyYou": "只看您",
+  "you": "您"
 }

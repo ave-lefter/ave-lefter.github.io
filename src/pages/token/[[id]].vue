@@ -38,9 +38,10 @@
           </div>
           <el-scrollbar :height="scrollbarHeight" @scroll="centerScroll" wrap-class="bg-[--secondary-bg]">
             <div
+              ref="centerContainer" 
               :class="orderBookVisible ? 'grid gap-1px' : 'grid grid-cols-1 gap-1px'"
               :style="
-                orderBookVisible ? { gridTemplateColumns: `1fr 4px ${orderBookWidth}px` } : {}
+                orderBookVisible ? { gridTemplateColumns: `1fr 4px ${orderBookWidth}px`,'will-change': 'gridTemplateColumns' } : {}
               "
             >
               <div>
@@ -56,6 +57,12 @@
               </div>
               <OrderBook v-model="orderBookVisible" :kline-height="klineHeight + 3" />
             </div>
+            <div
+              class="w-full cursor-row-resize bg-[--border] gap-1px hover:bg-[--third-text] flex items-center justify-center h-4px"
+              @mousedown.stop.prevent="drag"
+            >
+              <span v-for="i in 4" :key="i" class="bg-[--icon-color] w-2px h-2px rounded-full" />
+            </div>
             <BelowChartTable class="min-h-300px rounded-4px bg-[--d-000-l-F6F6F6]" />
           </el-scrollbar>
         </div>
@@ -66,7 +73,7 @@
 </template>
 
 <script setup lang="ts">
-import { useStorage } from '@vueuse/core'
+import { useStorage,useWindowSize,useElementBounding, useElementSize } from '@vueuse/core'
 import { getTokenInfo, getTokenInfoExtra } from '~/api/token'
 import { useTokenStore } from '~/stores/token'
 import Top from './components/top/index.vue'
@@ -373,6 +380,69 @@ const klineContainerRef = useTemplateRef('klineContainer')
 const centerScroll = ({ scrollTop }: { scrollTop: number }) => {
   klineContainerRef.value?.setScrollTop?.(scrollTop)
 }
+
+// 拖动缩放
+let isMask = false
+const kHeight = useStorage('kHeight', DefaultHeight.KLINE)
+const wHeight = useWindowSize().height
+const dom =  useTemplateRef('centerContainer')
+let rafId: number | null = null;
+function drag(e: MouseEvent) {
+  console.log('drag',dom.value)
+  let dy = e.clientY
+  isMask = true
+  // const dom = document.querySelector('#k-line-chart-container')
+  if (!dom.value) {
+    return
+  }
+  const { height } = useElementBounding(dom.value)
+  kHeight.value = height.value
+  document.onmousemove = (e) => {
+    if (rafId !== null) return
+    if (!isMask) {
+      return
+    }
+    if (e.clientY > wHeight.value) {
+      isMask = false
+      return
+    }
+    rafId = window.requestAnimationFrame(() => {
+      document.getElementById('tv_chart_container')!.style.pointerEvents = 'none'
+      const _kHeight =
+        e.clientY < dy ? kHeight.value - (dy - e.clientY) : kHeight.value + e.clientY - dy
+  
+      if (_kHeight <= wHeight.value - 164) {
+        kHeight.value = _kHeight
+      }
+      dy = e.clientY
+      rafId = null
+    })
+  }
+  document.onmouseup = () => {
+    document.getElementById('tv_chart_container')!.style.pointerEvents = 'auto'
+    isMask = false
+    document.onmousemove = null
+    document.onmouseup = null
+    if (tokenStore?.centerTopHeight) {
+      tokenStore.centerTopHeight = kHeight.value
+    }
+    if (rafId !== null) {
+      window.cancelAnimationFrame(rafId);
+      rafId = null
+    }
+  }
+  // e.stopPropagation()
+  // e.preventDefault()
+  return false
+}
+onBeforeUnmount(() => {
+  document.onmousemove = null
+  document.onmouseup = null
+  if (rafId !== null) {
+    window.cancelAnimationFrame(rafId)
+  }
+})
+
 </script>
 
 <style scoped>

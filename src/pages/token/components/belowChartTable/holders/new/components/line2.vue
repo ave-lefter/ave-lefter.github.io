@@ -5,7 +5,7 @@
 </template>
 
 <script setup>
-import * as echarts from 'echarts'
+import * as echarts from '@/utils/echarts'
 import { v4 as uuidv4 } from 'uuid'
 const { t } = useI18n()
 // Props

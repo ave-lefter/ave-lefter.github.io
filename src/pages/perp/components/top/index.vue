@@ -33,7 +33,7 @@
         </div>
       </template>
       <template #default>
-        <Search :list="contractList" :loading="loadingPerpMetadata" @close="visible = false"/>
+        <Search :loading="loadingPerpMetadata" @close="visible = false"/>
       </template>
     </el-popover>
 

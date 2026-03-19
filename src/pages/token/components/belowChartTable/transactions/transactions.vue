@@ -852,7 +852,8 @@ function bigWallet(row: (GetPairLiqResponse | IGetSimpleTxsResponse | SimpleWSTx
 }
 
 function getGradient(row: IGetSimpleTxsResponse) {
-  const str = `${useThemeStore().isDark}-${isBuy(row)}`
+  const str = `true-${isBuy(row)}`
+  // const str = `${useThemeStore().isDark}-${isBuy(row)}`
   const map = {
     'true-true': 'bg-[linear-gradient(270deg,#111_0%,#12654C_70%,#12B886_100%)]',
     'true-false': 'bg-[linear-gradient(270deg,#111_0%,#7F2A36_70%,#F6465D_100%)]',
@@ -1324,8 +1325,8 @@ onUnmounted(() => {
               v-tooltip:tx="{ content: `<span style='color: #ccc'>${$t('whales')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
               name="custom:big" class="mr-3px shrink-0"/>
           </template>
-          <SignalTags tagClass="mr-3px" :tags="(row.newTags||[]).map((el: any)=>tagStore.matchTag(el.type)||el)"
-                      :walletAddress="row.wallet_address" :chain="row.chain"/>
+          <SignalTags tagClass="mr-3px text-12px"  tagHeight="12" :tags="(row.newTags||[]).map((el: any)=>tagStore.matchTag(el.type)||el)"
+                      :walletAddress="row.wallet_address" :chain="row.chain" class="mr-3px"/>
           <div :key="row.wallet_address" class="flex items-center gap-4px">
             <UserRemark
               :remark="row.remark"
@@ -1375,22 +1376,24 @@ onUnmounted(() => {
         v-model="markerTooltipVisible" :virtual-ref="makerTooltip" :currentRow="currentRow"
         :addressAndChain="addressAndChain"
       >
-        <template v-if="['solana', 'bsc'].includes(currentRow.chain) && (currentRow.senderProfile || currentRow.maker_bal)">
-          <Icon
-            v-if="hasNewAccount(currentRow) && (!(currentRow.newTags||[]).map((i:any)=>i.type).includes('47'))"
-            v-tooltip.raw="`<span style='color: #85E12F'>${$t('newTokenAccount')}</span>`" name="custom:new-account"
-            class="mr-3px" />
-          <Icon
-            v-if="hasClearedAccount(currentRow) && (!(currentRow.newTags||[]).map((i:any)=>i.type).includes('46'))"
-            v-tooltip.raw="`<span style='color: #EB2B4B'>${$t('sellAl')}</span>`" name="custom:cleared-account"
-            class="mr-3px" />
-          <Icon
-            v-if="bigWallet(currentRow)" v-tooltip.raw="`<span style='color: #C5842B'>${$t('whales')}</span>`"
-            name="custom:big" />
-        </template>
-        <SignalTags
-          tagClass="mr-3px" :tags="currentRow.newTags" :walletAddress="currentRow.wallet_address"
-          :chain="currentRow.chain" />
+        <div class="flex">
+          <template v-if="['solana', 'bsc'].includes(currentRow.chain) && (currentRow.senderProfile || currentRow.maker_bal)">
+            <Icon
+              v-if="hasNewAccount(currentRow) && (!(currentRow.newTags||[]).map((i:any)=>i.type).includes('47'))"
+              v-tooltip.raw="`<span style='color: #85E12F'>${$t('newTokenAccount')}</span>`" name="custom:new-account"
+              class="mr-3px text-15px w-15px h-15px" />
+            <Icon
+              v-if="hasClearedAccount(currentRow) && (!(currentRow.newTags||[]).map((i:any)=>i.type).includes('46'))"
+              v-tooltip.raw="`<span style='color: #EB2B4B'>${$t('sellAl')}</span>`" name="custom:cleared-account"
+              class="mr-3px text-15px w-15px h-15px" />
+            <Icon
+              v-if="bigWallet(currentRow)" v-tooltip.raw="`<span style='color: #C5842B'>${$t('whales')}</span>`"
+              name="custom:big" class="mr-3px text-15px w-15px h-15px" />
+          </template>
+          <SignalTags
+            tagClass="mr-3px" :tags="currentRow.newTags" :walletAddress="currentRow.wallet_address"
+            :chain="currentRow.chain" />
+        </div>
       </MarkerTooltip>
     </div>
   </div>

@@ -53,9 +53,9 @@
   </div>
 </template>
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import dayjs from 'dayjs'
-import * as echarts from 'echarts'
+import * as echarts from '@/utils/echarts'
 import AveCharts from '@/components/charts/aveCharts.vue'
 import AveEmpty from '@/components/aveEmpty.vue'
 // import Loading from '@/components/loading/js/Component.vue'
@@ -338,6 +338,13 @@ if(val && activity.value.dataset.source.length > 0){
     bindEchartsEvent()
   }, 20)
 }
+})
+
+onBeforeUnmount(() => {
+  if (instance.value) {
+    instance.value.dispose()
+    instance.value = null
+  }
 })
 </script>
 
