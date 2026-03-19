@@ -31,6 +31,7 @@ const sortOptions = ref(props.list)
 watch(() => props.list, (val) => {
   sortOptions.value = val
 })
+const {updateNum4,updateNum5} = storeToRefs(useFollowStore())
 const favDialogEvent = useEventBus(BusEventType.FAV_DIALOG)
 const {t} = useI18n()
 const botStore = useBotStore()
@@ -327,6 +328,7 @@ async function batchDelete() {
     favDialogEvent.emit({
       type: 'delete',
     })
+    updateNum5.value++
   }).catch((e) => {
      ElMessage.error(String(e))
   })
@@ -344,7 +346,7 @@ function removeTokenFavorite(row:any) {
         type: 'delete',
       })
       resetAndGet()
-      // TODO:
+      updateNum5.value++
       ElMessage.success(t('cancelled1'))
       props.getData()
     })

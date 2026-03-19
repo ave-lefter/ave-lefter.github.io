@@ -21,7 +21,7 @@ const topAddGroupEvent = useEventBus(BusEventType.TOP_ADD_GROUP)
 topAddGroupEvent.on(_getUserFavoriteGroups)
 
 const otherListArea = ref<ScrollbarInstance>()
-
+const {updateNum4,updateNum5} = storeToRefs(useFollowStore())
 
 onUnmounted(() => {
   topEventBus.off(refresh)
@@ -223,6 +223,14 @@ watch(
   }
 )
 
+watch(
+  () => updateNum4.value,
+  () => {
+    resetListStatus()
+    loadMoreFavorites()
+  }
+)
+
 const arrowVisible = ref(false)
 async function _getUserFavoriteGroups() {
   try {
@@ -393,7 +401,7 @@ function toggleMode(mode: string) {
         :infinite-scroll-delay="10"
         :infinite-scroll-immediate="false"
       >
-        <div class="pb-20px">
+        <div class="pb-0px">
           <NuxtLink
             v-for="(row, $index) in sortedFavList"
             :key="`${row.token}-${row.chain}`"

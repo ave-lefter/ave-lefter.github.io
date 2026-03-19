@@ -5,9 +5,10 @@ export const useDragStore = defineStore('drag', () => {
   const pumpStore = usePumpStore()
   const twitterTrackerStore = useTwitterTrackerStore()
   const positionStore = usePositionStore()
+  const favTokenStore = useFavTokenStore()
 
-  const leftArr = useStorage<Array<'monitor' | 'pump' | 'signal' | 'twitter' |'position'>>('dragLeft', [])
-  const rightArr = useStorage<Array<'monitor' | 'pump' | 'signal' | 'twitter' |'position'>>('dragRight', [])
+  const leftArr = useStorage<Array<'monitor' | 'pump' | 'signal' | 'twitter' |'position'|'favToken'>>('dragLeft', [])
+  const rightArr = useStorage<Array<'monitor' | 'pump' | 'signal' | 'twitter' |'position'|'favToken'>>('dragRight', [])
 
   watch(() => monitorStore.placement,(val) => {
      console.log('monitorStore.placement', val)
@@ -66,7 +67,17 @@ export const useDragStore = defineStore('drag', () => {
       leftArr.value = leftArr.value.filter(el => el !== 'position')
       rightArr.value = rightArr.value.filter(el => el !== 'position')
     }
-   })
+  })
+  watch(()=> favTokenStore.placement,val=>{
+    if(val==='left'){
+      leftArr.value.push('favToken')
+    }else if (val==='right'){
+      rightArr.value.push('favToken')
+    } else{
+      leftArr.value = leftArr.value.filter(el => el !== 'favToken')
+      rightArr.value = rightArr.value.filter(el => el !== 'favToken')
+    }
+  })
 
   const fixedWidth = computed(() => {
     return {
@@ -75,6 +86,7 @@ export const useDragStore = defineStore('drag', () => {
       signal: signalStore.fixedWidth,
       twitter:twitterTrackerStore.fixedWidth,
       position:positionStore.fixedWidth,
+      favToken:favTokenStore.fixedWidth,
     }
   })
   const isRightFixed = computed(() => {
@@ -84,6 +96,7 @@ export const useDragStore = defineStore('drag', () => {
       signal: signalStore.isRightFixed,
       twitter:twitterTrackerStore.isRightFixed,
       position:positionStore.isRightFixed,
+      favToken:favTokenStore.isRightFixed,
     }
   })
   const isLeftFixed = computed(() => {
@@ -93,6 +106,7 @@ export const useDragStore = defineStore('drag', () => {
       signal: signalStore.isLeftFixed,
       twitter:twitterTrackerStore.isLeftFixed,
       position:positionStore.isLeftFixed,
+      favToken:favTokenStore.isLeftFixed,
     }
   })
   const visible = computed(() => {
@@ -101,6 +115,7 @@ export const useDragStore = defineStore('drag', () => {
       pump: pumpStore.visible,
       signal: signalStore.signalVisible,
       position: positionStore.visible,
+      favToken: favTokenStore.visible,
       twitter:twitterTrackerStore.visible
     }
   })
@@ -112,6 +127,7 @@ export const useDragStore = defineStore('drag', () => {
       signal: signalStore.shouldHide,
       twitter:false,
       position:false,
+      favToken:false,
     }
   })
   const leftWidth = computed(() => {
@@ -120,11 +136,13 @@ export const useDragStore = defineStore('drag', () => {
     const index3 =leftArr.value.findIndex(el => el === 'pump')
     const index4 =leftArr.value.findIndex(el => el === 'twitter')
     const index5 =leftArr.value.findIndex(el => el === 'position')
+    const index6 =leftArr.value.findIndex(el => el === 'favToken')
     let monitor=0
     let pump=0
     let signal=0
     let twitter=0
     let position=0
+    let favToken=0
     leftArr.value.forEach((el, index) => {
       if(index<index1){
         signal += (visible.value[el]&&isLeftFixed.value[el]&&!shouldHide.value[el]) ? fixedWidth.value[el]+1 : 0
@@ -141,6 +159,9 @@ export const useDragStore = defineStore('drag', () => {
       if(index<index5){
         position+=(visible.value[el]&&isLeftFixed.value[el]&&!shouldHide.value[el]) ? fixedWidth.value[el]+1 :0
       }
+      if(index<index6){
+        favToken+=(visible.value[el]&&isLeftFixed.value[el]&&!shouldHide.value[el]) ? fixedWidth.value[el]+1 :0
+      }
     })
     console.log('leftWidth', monitor, pump, signal, twitter)
     return {
@@ -148,7 +169,8 @@ export const useDragStore = defineStore('drag', () => {
       pump,
       signal,
       twitter,
-      position
+      position,
+      favToken
     }
   })
   const rightWidth = computed(() => {
@@ -157,11 +179,13 @@ export const useDragStore = defineStore('drag', () => {
     const index3 =rightArr.value.findIndex(el => el === 'pump')
     const index4 =rightArr.value.findIndex(el => el === 'twitter')
     const index5 =rightArr.value.findIndex(el => el === 'position')
+    const index6 =rightArr.value.findIndex(el => el === 'favToken')
     let monitor=0
     let pump=0
     let signal=0
     let twitter = 0
     let position = 0
+    let favToken = 0
     rightArr.value.forEach((el, index) => {
       if(index<index1){
         signal += (visible.value[el]&&isRightFixed.value[el]&&!shouldHide.value[el]) ? fixedWidth.value[el]+1 : 0
@@ -178,6 +202,9 @@ export const useDragStore = defineStore('drag', () => {
       if(index<index5){
         position += (visible.value[el]&&isRightFixed.value[el]&&!shouldHide.value[el]) ? fixedWidth.value[el]+1 : 0
       }
+      if(index<index6){
+        favToken += (visible.value[el]&&isRightFixed.value[el]&&!shouldHide.value[el]) ? fixedWidth.value[el]+1 : 0
+      }
     })
     console.log('rightWidth', monitor, pump, signal)
     return {
@@ -186,6 +213,7 @@ export const useDragStore = defineStore('drag', () => {
       signal:monitorStore.winWidth-fixedWidth.value['signal']-(Number(signal)||0),
       twitter:monitorStore.winWidth-fixedWidth.value['twitter']-(Number(twitter)||0),
       position:monitorStore.winWidth-fixedWidth.value['position']-(Number(position)||0),
+      favToken:monitorStore.winWidth-fixedWidth.value['favToken']-(Number(favToken)||0),
     }
   })
 
@@ -196,6 +224,7 @@ export const useDragStore = defineStore('drag', () => {
     if(pumpStore.visible&&(pumpStore.isLeftFixed || pumpStore.isRightFixed)) count++
     if(twitterTrackerStore.visible&&(twitterTrackerStore.isLeftFixed || twitterTrackerStore.isRightFixed)) count++
     if(positionStore.visible&&(positionStore.isLeftFixed || positionStore.isRightFixed)) count++
+    if(favTokenStore.visible&&(favTokenStore.isLeftFixed || favTokenStore.isRightFixed)) count++
     return count
   })
 

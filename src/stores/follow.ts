@@ -59,6 +59,10 @@ export const useFollowStore = defineStore('follow', () => {
   const updateNum2=ref(0)
   // 关注地址弹框
   const updateNum3=ref(0)
+  // 自选地址
+  const updateNum4=ref(0)
+  // 自选地址弹框
+  const updateNum5=ref(0)
   const {t} = useI18n()
   watch(currentAddress, (val) => {
     if(!val)addressGroups.value = []
@@ -160,6 +164,8 @@ export const useFollowStore = defineStore('follow', () => {
     updateNum1,
     updateNum2,
     updateNum3,
+    updateNum4,
+    updateNum5,
     loading,
     addressConditions,
     addressConditions2,

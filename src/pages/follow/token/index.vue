@@ -13,6 +13,7 @@ let sortParam:any={}
 
 let timeoutId: any = null;
 const tableRef = ref<TableInstance | null>(null)
+const {updateNum4,updateNum5} = storeToRefs(useFollowStore())
 const {isDark,zone} = storeToRefs(useGlobalStore())
 const botStore = useBotStore()
 const walletStore = useWalletStore()
@@ -326,6 +327,7 @@ const collect = (row: any) => {
       // const newList = checkedList.value.filter((item) => item !== `${row.token}-${row.chain}`)
       // checkedList.value = newList
       tableRef.value?.toggleRowSelection(row,false)
+      updateNum4.value++
     })
     .catch((err) => {
       console.log(err)
@@ -381,6 +383,10 @@ watch(()=>zone.value,(val)=>{
     sortParam.prop=(val==='24h'? 'price_change_24h' :'price_change')
     handleSortChange(sortParam)
   }
+})
+
+watch(()=>updateNum5.value,()=>{
+  setActiveTab(activeTab.value)
 })
 
 

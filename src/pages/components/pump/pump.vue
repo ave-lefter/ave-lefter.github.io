@@ -49,6 +49,7 @@ import { addFavorite, removeFavorite } from '~/api/fav'
 import type { RowEventHandlerParams } from 'element-plus'
 
 const { t } = useI18n()
+const {updateNum5} = storeToRefs(useFollowStore())
 const globalStore = useGlobalStore()
 const walletStore = useWalletStore()
 const botStore = useBotStore()
@@ -100,6 +101,14 @@ const pageInfo = ref({
 watch(
   () => pageInfo.value.pageNO,
   (val) => { useSessionStorage('pump-pageNO', 1).value = val }
+)
+
+watch(
+  () => updateNum5.value,
+  () => {  
+    pageInfo.value.pageNO = 1
+    _getTreasureList()
+  }
 )
 const tableRef = shallowRef()
 const loading = shallowRef(false)

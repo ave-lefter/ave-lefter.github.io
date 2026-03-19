@@ -48,7 +48,7 @@ const localeStore = useLocaleStore()
 const globalStore = useGlobalStore()
 const rankKlineStore = useRankKlineStore()
 const klineChartsData = ref<any[]>([])
-
+const {updateNum5} = storeToRefs(useFollowStore())
 const props = defineProps<{
   listMapFunction(i: Record<string, any>): Record<string, any>
   activeChain: string
@@ -106,6 +106,15 @@ watch(
   () => pageInfo.value.pageNO,
   (val) => { useSessionStorage('hot-pageNO', 1).value = val }
 )
+
+watch(
+  () => updateNum5.value,
+  () => {  
+    pageInfo.value.pageNO = 1
+    _getTreasureList()
+  }
+)
+
 const loading = shallowRef(false)
 const columns = useStorage(CategoryTabsCacheKey.hot, getHotDefaultColumns(t))
 
