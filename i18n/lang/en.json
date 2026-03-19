@@ -2122,5 +2122,7 @@
   "onlyFollowed": "Only Followed",
   "OnlyDev": "Only Dev",
   "OnlyYou": "Only You",
-  "you": "You"
+  "you": "You",
+  "buyOnce": "Buy Same Token Once",
+  "liquidityLimit": "Pool Size"
 }
