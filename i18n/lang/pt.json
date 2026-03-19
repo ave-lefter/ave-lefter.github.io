@@ -648,5 +648,6 @@
   "you": "Você",
   "favRemarksTips": "Você quer seguir a carteira selecionada",
   "batchFav": "Acompanhamento em lote",
-  "removeTokenTips2": "Excluir o monitoramento selecionado?"
+  "removeTokenTips2": "Excluir o monitoramento selecionado?",
+  "monitor": "monitor"
 }

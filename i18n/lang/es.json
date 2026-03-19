@@ -670,5 +670,6 @@
   "you": "Tú",
   "favRemarksTips": "¿Quieres seguir el Wallet seleccionado?",
   "batchFav": "Seguimiento por lotes",
-  "removeTokenTips2": "¿Eliminar el seguimiento seleccionado?"
+  "removeTokenTips2": "¿Eliminar el seguimiento seleccionado?",
+  "monitor": "Monitor"
 }

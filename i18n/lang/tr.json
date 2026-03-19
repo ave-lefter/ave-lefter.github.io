@@ -644,5 +644,6 @@
   "you": "Sen",
   "favRemarksTips": "Seçilen Cüzdan'ı takip etmek istiyor musunuz?",
   "batchFav": "Toplu Takip",
-  "removeTokenTips2": "Seçilen izleme silinsin mi?"
+  "removeTokenTips2": "Seçilen izleme silinsin mi?",
+  "monitor": "monitör"
 }
