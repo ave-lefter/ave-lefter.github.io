@@ -99,10 +99,10 @@
         <template #default="{ row, $index }">
           <div class="flex items-baseline ">
             <div class="flex-start">
-              <span class="color-[--third-text] w-24px inline-block">{{ $index +1 < 10? "0" : '' }}{{ $index + 1 }}</span>
+              <span class="color-[--third-text] inline-block mr-8px">{{ $index +1 < 10? "0" : '' }}{{ $index + 1 }}</span>
               <Icon
                 :ref="(el: any) => $refs.buttonRefs[$index] = el" name="custom:attention"
-                :class="row.is_wallet_address_fav === 1 ? 'color-#F45469' : 'color-[--icon-color]'" class="h-16px w-16px clickable shrink-0 mt-4px" @click.stop.prevent="collect(row,$index)" />
+                :class="row.is_wallet_address_fav === 1 ? 'color-#F45469' : 'color-[--icon-color]'" class="h-16px w-16px clickable shrink-0 mt-4px mr-8px" @click.stop.prevent="collect(row,$index)" />
             </div>
             <div class="relative ml-2px">
               <div class="flex-start">
@@ -112,6 +112,7 @@
                   :address="row.user_address"
                   iconSize="18px"
                   iconChainSize="8px"
+                  :showChain="false"
                   class="rounded-full"
                 />
                 <div
