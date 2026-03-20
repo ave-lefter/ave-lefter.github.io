@@ -12,6 +12,10 @@ const props = defineProps({
     type: String,
     default: ''
   },
+  baseInfo: {
+    type: Object,
+    default: () => {},
+  },
   type: {
     type: String,
     default: ''
@@ -28,10 +32,10 @@ const { onEnter, contentProps } = useDevPop()
 
 function onEnter1(e: { target: any }) {
   if (curTokenId === props.tokenId + props.type) {
-    onEnter(props.tokenId, e, {type: props.type, ratio: props.ratio}, false)
+    onEnter(props.tokenId, e, {type: props.type, ratio: props.ratio, ...props.baseInfo}, false)
     return
   }
-  onEnter(props.tokenId, e, {type: props.type, ratio: props.ratio}, true)
+  onEnter(props.tokenId, e, {type: props.type, ratio: props.ratio, ...props.baseInfo}, true)
   curTokenId = props.tokenId + props.type
 }
 

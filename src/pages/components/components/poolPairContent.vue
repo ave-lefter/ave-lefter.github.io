@@ -214,7 +214,6 @@ function addTokenFavorite(row, newGroupId: number) {
             :src="formatIconTag(row?.deployer_platform)"
             alt=""
             :width="12"
-            style="border-radius: 100%"
           >
           <img
             v-if="row.is_pump_agent"
@@ -223,7 +222,6 @@ function addTokenFavorite(row, newGroupId: number) {
             :src="formatIconTag('pumpt_agent')"
             alt=""
             :width="12"
-            style="border-radius: 100%"
           >
           <img
             v-if="row.issue_platform"

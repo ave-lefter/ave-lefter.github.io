@@ -707,7 +707,6 @@
                 :src="formatIconTag(tokenStore.tokenInfoExtra?.deployer_platform)"
                 alt=""
                 :width="12"
-                style="border-radius: 100%"
               >
             </div>
             <div
@@ -720,7 +719,6 @@
                 :src="formatIconTag('pumpt_agent')"
                 alt=""
                 :width="12"
-                style="border-radius: 100%"
               >
             </div>
           </div>

@@ -2069,6 +2069,7 @@
   "totalTax": "總稅率",
   "taxTip": "總稅率：代幣稅率",
   "smarterAddress": "聪明钱包数",
+  "kolSummary": "共有{people}比特{type}，目前有{holders}人持倉，{type}持倉{vol}，占比{ratio}",
   "perp1": "合約",
   "chainCommission": "交出返傭",
   "chainPerp": "合約",

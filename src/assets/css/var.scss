@@ -53,7 +53,7 @@
   --table-title-bg: var(--d-12161D-l-ECF3FF);
   // 主页面悬浮弹窗色
   --tooltip: var(--d-1F242C-l-FFF);
- 
+
   // 通知背景色
   --notification-bg: var(--d-222222-l-f2f2f2);
 
@@ -78,7 +78,7 @@
   --main-divider1: var(--d-1E1F23-l-E0ECFF);
   // 主页面悬浮弹窗色v2
   --tooltip1: var(--d-1F242C4D-l-FFF);
-  
+
   &.dark {
     // 规范：颜色相同省略为 3 位，所有都用大写
     --d-000-l-404753: #000;
@@ -244,6 +244,7 @@
     --d-E0E0E0-l-333: #E0E0E0;
     --d-1E1F23-l-E0ECFF: #1E1F23;
     --d-1F242C4D-l-FFF: #1F242C4D;
+    --d-0E0F10-l-FFF: #0E0F10;
   }
 
   &.light {
@@ -409,5 +410,6 @@
     --d-E0E0E0-l-333: #333;
     --d-1E1F23-l-E0ECFF: #E0ECFF;
     --d-1F242C4D-l-FFF: #FFF;
+    --d-0E0F10-l-FFF: #FFF;
   }
 }

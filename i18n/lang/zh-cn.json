@@ -2094,6 +2094,7 @@
   "totalTax": "总税率",
   "taxTip": "总税率：代币税率",
   "smarterAddress": "聪明钱包数",
+  "kolSummary": "共有{people}位{type}, 目前有{holders}人持仓, {type}持仓{vol},占比{ratio}",
   "perp1": "合约",
   "chainCommission": "链上返佣",
   "totalChainSwapValue": "链上交易额",

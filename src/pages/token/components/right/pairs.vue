@@ -61,13 +61,13 @@
             </el-progress>
             <span
               v-if="Number(item.buy_tax) > 0 || Number(item.sell_tax) > 0"
-              v-tooltip="$t('pairTax')+':'+formatNumber(item?.buy_tax || 0, 2)+'%'"
+              v-tooltip="$t('pairTax')+':'+formatNumber(item?.buy_tax || item?.sell_tax || 0, 2)+'%'"
               class="bg-[--d-1E2025-l-E8F1FF] py-1px px-4px rounded-4px text-10px ml-3px cursor-pointer"
               :style="{
-                color: Number(item?.buy_tax) > 3 ? '#F6465D' : 'var(--secondary-text))',
+                color: Number(item?.buy_tax || item?.sell_tax) > 3 ? '#F6465D' : 'var(--secondary-text))',
               }"
             >
-              {{ formatNumber(item?.buy_tax || 0, 2) }}%
+              {{ formatNumber(item?.buy_tax || item?.sell_tax || 0, 2) }}%
             </span>
           </div>
           <NuxtLink

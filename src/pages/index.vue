@@ -1,6 +1,6 @@
 <template>
-  <div v-if="route.name=='index'" class="pump w-full bg-[--main-bg]">
-    <div class="flex-start p-x-17px py-12px bg-[--main-bg] mb-1px mt-1px">
+  <div v-if="route.name=='index'" class="pump w-full bg-[--d-0E0F10-l-FFF]">
+    <div class="flex-start p-x-17px py-12px bg-[--d-0E0F10-l-FFF] mb-1px mt-1px">
       <div class="tabs mr-8px">
         <div
           v-for="item in pumpConfig"
@@ -98,7 +98,7 @@
     </div>
     <el-row type="flex" :gutter="pumpSetting.isGutter ? 10 : 2" class="w-full pl-16px" :class="pumpSetting.isGutter? 'pr-6px': 'pr-14px'">
       <el-col v-show="single('new') && pumpSetting.grid['new']?.show" :span="getSpan()" :style="{order: orderNew}">
-        <div class="pump-item  rounded-4px" style="padding-top: 15px;">
+        <div class="pump-item  rounded-4px pt-10px">
           <div class="pump-item_header flex-start px-12px rounded-4px">
             <template v-if="width > 1024">
               <!-- <img
@@ -150,7 +150,7 @@
               v-if="pumpSetting?.show_search"
               ref="inputSearch"
               v-model.trim="pumpStore.pumpV3[activeChain].new.pumpFilter.q"
-              class="search-input1 px-20px mr-4px"
+              class="search-input1 px-20px mr-8px"
               size="small"
               :placeholder="$t('keywordsPlaceholder')"
               @input="(val) => {
@@ -205,7 +205,7 @@
         </div>
       </el-col>
       <el-col v-show="single('soon') && pumpSetting.grid['soon'].show" :span="getSpan()" :style="{order: orderSoon}">
-        <div class="pump-item" style="padding-top: 15px;">
+        <div class="pump-item pt-10px">
           <div class="pump-item_header flex-start px-12px rounded-4px">
             <template v-if="width > 1024">
               <!-- <img
@@ -257,7 +257,7 @@
               v-if="pumpSetting?.show_search"
               ref="inputSearch"
               v-model.trim="pumpStore.pumpV3[activeChain].soon.pumpFilter.q"
-              class="search-input1 px-20px mr-4px"
+              class="search-input1 px-20px mr-8px"
               size="small"
               :placeholder="$t('keywordsPlaceholder')"
               @input="(val) => {
@@ -312,7 +312,7 @@
         </div>
       </el-col>
       <el-col v-show="single('graduated') && pumpSetting.grid['graduated'].show" :span="getSpan()" :style="{order: orderGraduated}">
-        <div class="pump-item" style="padding-top: 15px;">
+        <div class="pump-item pt-10px">
           <div class="pump-item_header flex-start px-12px rounded-4px">
             <template v-if="width > 1024">
               <!-- <img
@@ -365,7 +365,7 @@
               v-if="pumpSetting?.show_search"
               ref="inputSearch"
               v-model.trim="pumpStore.pumpV3[activeChain].graduated.pumpFilter.q"
-              class="search-input1 px-20px mr-4px"
+              class="search-input1 px-20px mr-8px"
               size="small"
               :placeholder="$t('keywordsPlaceholder')"
               @input="(val) => {
@@ -2356,7 +2356,7 @@ function hitBlacklist(item:PumpObj, black: pumpBlack) {
   color: var(--main-text);
 }
 .pump-item{
-  background: var(--main-bg);
+  background: var(--d-0E0F10-l-FFF);
   border: 1px solid var(--main-input-button-bg);
   border-radius: 4px;
 }
