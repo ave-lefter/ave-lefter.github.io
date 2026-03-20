@@ -33,12 +33,12 @@ const tabData=computed(()=>[
     path:'/follow/addr'
   },
   {
-    label:t('remarkLib'),
-    path:'/follow/remark'
-  },
-  {
     label:t('monitor'),
     path:'/follow/monitor'
+  },
+  {
+    label:t('remarkLib'),
+    path:'/follow/remark'
   }
 ])
 watch(
