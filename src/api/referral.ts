@@ -168,18 +168,24 @@ export async function getLevelsReferralInfo(): Promise<{
     refFee: string
     invited: number
     swapValue: string
+    perpRefFee: string
+    perpSwapValue: string
   }
   l2: {
     rate: number
     refFee: string
     invited: number
     swapValue: string
+    perpRefFee: string
+    perpSwapValue: string
   }
   other: {
     rate: number
     refFee: string
     invited: number
     swapValue: string
+    perpRefFee: string
+    perpSwapValue: string
   }
 }> {
   const { $api } = useNuxtApp()

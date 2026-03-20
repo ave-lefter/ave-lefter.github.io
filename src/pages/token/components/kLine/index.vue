@@ -1,16 +1,16 @@
 <template>
-  <div class="relative" :style="{ height: `${isRank ? 390 : kHeight}px` }">
+  <div class="relative" :style="{ height: `${isRank ? 390 : kHeight}px`,'will-change': 'height' }">
     <div id="tv_chart_container" ref="kline" :style="{ width: '100%', height: '100%' }" />
     <UnknownRisk v-show="isReady" :isRank="isRank" @refresh="refresh" />
     <DialogRemind v-model="dialogVisible_remind" />
   </div>
-  <div
+  <!-- <div
     v-if="!isRank"
     class="w-full cursor-row-resize bg-[--border] gap-1px hover:bg-[--third-text] flex items-center justify-center h-4px"
     @mousedown.stop.prevent="drag"
   >
     <span v-for="i in 4" :key="i" class="bg-[--icon-color] w-2px h-2px rounded-full" />
-  </div>
+  </div> -->
   <div
     v-show="globalStore.klineSettingPop.visible"
     :style="{

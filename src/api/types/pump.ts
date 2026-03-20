@@ -8,14 +8,23 @@ interface BaseToken {
   logo_url: string
   name: string
 }
+interface deployerPlatforms {
+  logo_url: string
+  name: string
+  platform: string
+}
+
 export interface PumpConfig {
   chain: ChainKey
   chain_show: string
   platforms: Platform[]
   base_tokens: BaseToken[]
+  deployer_platforms: deployerPlatforms[]
 }
 
 export interface PumpObj {
+  deployer_platform: string
+  is_cloned: any
   colluded_cluster_ratio: any
   summary_score: number | undefined
   following: number
@@ -119,6 +128,7 @@ export interface PumpObj {
     logo_url: string
     token: string
   }
+  is_pump_agent: number
 }
 
 interface Pair {

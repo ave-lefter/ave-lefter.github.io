@@ -41,6 +41,7 @@ export const usePerpStore = defineStore('perp', () => {
   const lastPrice = shallowRef(0)
   const resolution = useLocalStorage('tv_resolution_perp', '15')
   const unit = ref<CoinInfo | null>(null)
+  const perpAcc = useLocalStorage('perp_accessToken', '')
 
   const normalWithdrawableAmount = ref('0')
   const depthData = reactive<{
@@ -76,9 +77,13 @@ export const usePerpStore = defineStore('perp', () => {
     return walletStore.address && isLogin.value
   })
 
+  const _contractName = ref<string>('')
   const contractName = computed(() => {
-    return (route.params.name as string) || 'BTCUSD'
+    return _contractName.value || (route.params.name as string) || 'BTCUSD'
   })
+  function setContractName(name: string) {
+    _contractName.value = name
+  }
   const perp = computed(() => {
     return contractList?.value?.find((item) => item.contractName === contractName.value) || null
   })
@@ -232,7 +237,11 @@ export const usePerpStore = defineStore('perp', () => {
     }
     const metaConfig = metadata.value?.global
     const clientAccountId = 'main'
-    const message = `name: ${metaConfig?.appName}\nenvId: ${metaConfig?.appEnv}\naction: L2 Key\nonlySignOn: ${metaConfig?.appOnlySignOn}\nclientAccountId: ${clientAccountId}`
+    const message = `name: ${metaConfig?.appName}
+envId: ${metaConfig?.appEnv}
+action: L2 Key
+onlySignOn: ${metaConfig?.appOnlySignOn}
+clientAccountId: ${clientAccountId}`
     starkSignatureLoading.value = true
     return walletStore.signMessage(message)?.then(async signature => {
       // 生成 API 密钥
@@ -329,6 +338,7 @@ export const usePerpStore = defineStore('perp', () => {
     tickers,
     perp,
     contractName,
+    setContractName,
     totalAssets,
     contractId,
     resolution,
@@ -343,6 +353,7 @@ export const usePerpStore = defineStore('perp', () => {
     normalWithdrawableAmount,
     buyList,
     sellList,
-    depthData
+    depthData,
+    perpAcc
   }
 })

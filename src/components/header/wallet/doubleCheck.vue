@@ -397,6 +397,9 @@ onMounted(() => {
     sendVerificationCode()
   // Initialization code if needed
 })
+onBeforeUnmount(() => {
+  resetCountdown()
+})
 </script>
 
 <style scoped lang='scss'>

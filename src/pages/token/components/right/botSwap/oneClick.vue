@@ -8,7 +8,7 @@
       <template v-if="botStore.isSupportChains?.includes(chain) && visible">
         <Icon name="ph:dots-six" class="absolute top-3px text-20px left-50% translate-x--50% cursor-move color-[--third-text] hover:color-[--main-text]" />
         <div class="flex-between">
-          <div class="flex-start">
+          <div class="flex-start mr-auto">
             <!-- <span>{{ $t('oneClick') }}</span> -->
             <Icon :key="isEnableHotkey" v-tooltip="isEnableHotkey ? $t('hotkeyTips') : $t('hotkeyTips1')" class="text-14px color-[--secondary-text] clickable" :class="{ 'color-[--primary-color]!': isEnableHotkey }" name="ri:keyboard-box-fill" @click.stop="isEnableHotkey = !isEnableHotkey" @mousedown.stop />
             <Icon :key="isEnablePnL" v-tooltip="isEnablePnL ? $t('enablePnLTips2') : $t('enablePnLTips1')" name="bx:bxs-bar-chart-alt-2" class="text-14px color-[--secondary-text] clickable ml-5px" :class="{ 'color-[--primary-color]!': isEnablePnL }" @mousedown.stop @click.stop="isEnablePnL = !isEnablePnL" />
@@ -16,7 +16,22 @@
             <Icon v-if="!isEdit" name="fe:edit" class="text-14px color-[--secondary-text] clickable ml-5px" @click.stop="isEdit=true" @mousedown.stop />
             <Icon v-else name="ic:baseline-check" class="text-14px color-[--secondary-text] clickable ml-5px" @click.stop="isEdit=false" @mousedown.stop />
           </div>
-          <SlippageSetMarket class="mr-10px ml-auto" :chain="chain" @mousedown.stop />
+          <el-dropdown :persistent="false" placement="bottom" trigger="click" @visible-change="visible => show = visible" @mousedown.stop @mouseup.stop>
+            <div class="inline-flex items-center clickable" @mousedown.stop @mouseup.stop>
+              <img :src="`${configStore.token_logo_url}${tokenStore.swap.payToken?.logo_url}`" class="rd-50%" height="16"  alt="" srcset="" >
+              <span class="text-12px font-400 ml-4px">{{ tokenStore.swap.payToken?.symbol || getChainInfo(chain || '')?.main_name }}</span>
+              <Icon v-if="swapBaseTokens?.length > 1" class="arrow-up" :class="{ active: show === true }" name="solar:alt-arrow-down-bold" />
+            </div>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item v-for="item in (botSwapStore?.botSwapBaseTokens?.[chain || ''] || [])?.filter(item => item?.address !== tokenStore.swap.payToken?.address)" :key="item.address" @click.stop="tokenStore.swap.payToken = item;getTokenBalance()">
+                  <img :src="`${configStore.token_logo_url}${item.logo_url}`" class="rd-50% mr-4px" height="16"  alt="" srcset="" >
+                  <span class="text-12px font-400">{{ item?.symbol }}</span>
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
+          <SlippageSetMarket class="mx-10px" :chain="chain" @mousedown.stop />
           <Icon
             class="text-14px clickable color-[--main-text] clickable" name="ri:close-large-fill"
             @click.stop="visible = false" @mousedown.stop />
@@ -32,8 +47,8 @@
                 @click.stop="botSettings[chain]!.buy!.selected = item.value">{{ item.label }}</button>
             </div>
             <span v-if="isEnableShowsReflected && Number(estimateBuyAmount) > 0" class="mr-5px">≈{{ formatNumber(estimateBuyAmount, 3) }} {{ tokenStore.swap.token?.symbol || tokenStore.token?.symbol || '' }}</span>
-            <span class="color-[--secondary-text]">{{ $t('balance1') }}: {{ formatNumber(tokenStore.swap.native?.balance || 0)
-              }}&nbsp;{{ getChainInfo(chain)?.main_name }}</span>
+            <span class="color-[--secondary-text]">{{ $t('balance1') }}: {{ formatNumber(tokenStore.swap.payToken?.balance || 0)
+              }}&nbsp;{{ tokenStore.swap.payToken?.symbol || getChainInfo(chain || '')?.main_name }}</span>
             <RefreshBalance class="color-[--secondary-text]" :type="0" @mousedown.stop />
           </div>
           <div v-if="!isEdit" class="mt-10px tabs flex-1 flex-wrap" @mousedown.stop>
@@ -65,7 +80,7 @@
                 :class="{ 'active': item.value === botSettings?.[chain]?.sell?.selected }" type="button" @mousedown.stop
                 @click.stop="botSettings[chain]!.sell!.selected = item.value">{{ item.label }}</button>
             </div>
-            <span v-if="isEnableShowsReflected && Number(estimateSellAmount) > 0" class="mr-5px">≈{{ formatNumber(estimateSellAmount, 3) }} {{ getChainInfo(chain)?.main_name || '' }}</span>
+            <span v-if="isEnableShowsReflected && Number(estimateSellAmount) > 0" class="mr-5px">≈{{ formatNumber(estimateSellAmount, 3) }} {{ tokenStore.swap.payToken?.symbol || getChainInfo(chain || '')?.main_name || '' }}</span>
             <span class="color-[--secondary-text]">{{ $t('balance1') }}: {{ formatNumber(tokenStore.swap.token?.balance || 0)
               }}&nbsp;{{ tokenStore.token?.symbol || '' }}</span>
             <RefreshBalance class="color-[--secondary-text]" :type="1" @mousedown.stop />
@@ -161,7 +176,15 @@ const isEnableHotkey = useLocalStorage('isEnableHotkey', false)
 const isEnablePnL = useLocalStorage('isEnablePnL', true)
 const isEnableShowsReflected = useLocalStorage('isEnableShowsReflected', false)
 
-const { retryGetTokenBalance, updateBalanceFromWs } = useBotSwap()
+const swapBaseTokens = computed(() => {
+  return (botSwapStore?.botSwapBaseTokens?.[chain.value || ''] || [])?.filter(item => item?.address !== tokenStore.swap.payToken?.address)
+})
+
+const show = ref(false)
+
+const configStore = useConfigStore()
+
+const { retryGetTokenBalance, updateBalanceFromWs, getTokenBalance } = useBotSwap()
 
 const chain = computed(() => {
   return (getAddressAndChainFromId(route.params?.id as string)?.chain || tokenStore.token?.chain) as BotChain
@@ -174,6 +197,9 @@ function getChain() {
 
 const nativePrice = computed(() => {
   const chain = getChain()
+  if(![NATIVE_TOKEN, 'sol', 'TON']?.includes(tokenStore.swap.payToken?.address || '')) {
+    return '1'
+  }
   return botSwapStore.mainTokensPrice?.find(item => item.chain === chain && item.token === getChainInfo(chain)?.wmain_wrapper)?.current_price_usd || tokenStore.swap.native.price || 0
 })
 
@@ -307,8 +333,8 @@ async function submitBotSwap(amount1: string | number, type: 'buy' | 'sell', ind
     ElNotification({ title: 'Error', type: 'error', message: t('amountMustG0') })
     return
   }
-  const fromToken = isBuy ? tokenStore.swap.native : tokenStore.swap.token
-  const toToken = isBuy ? tokenStore.swap.token : tokenStore.swap.native
+  const fromToken = isBuy ? tokenStore.swap.payToken : tokenStore.swap.token
+  const toToken = isBuy ? tokenStore.swap.token : tokenStore.swap.payToken
   const amount = (new BigNumber(amount1 || 0)).toFixed().match(new RegExp(`[0-9]*(\\.[0-9]{0,${fromToken?.decimals || 18}})?`))?.[0] || ''
   if ((Number(amount) || 0) <= 0) {
     ElNotification({ title: 'Error', type: 'error', message: t('amountTooSmall') })
@@ -386,7 +412,7 @@ async function submitBotSwap(amount1: string | number, type: 'buy' | 'sell', ind
     solana: 'sol',
     ton: 'TON',
   }
-  const native = chainMainToken?.[chain] || NATIVE_TOKEN
+  const native = tokenStore.swap.payToken?.address || chainMainToken?.[chain] || NATIVE_TOKEN
   const walletAddress = botStore.userInfo?.addresses?.find?.(i => i?.chain === chain)?.address
   if (chain === 'solana' || chain === 'ton') {
     const botSettings = botSettingStore.botSettings?.[chain]?.[type]
@@ -1388,6 +1414,15 @@ onBeforeUnmount(() => {
     text-align: center;
     color: var(--main-text);
     height: 100%;
+  }
+}
+
+.arrow-up {
+  font-size: 16px;
+  transition: all 0.2s linear;
+  color: var(--secondary-text);
+  &.active {
+    transform: rotate(180deg);
   }
 }
 

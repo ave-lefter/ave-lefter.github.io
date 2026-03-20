@@ -55,6 +55,10 @@ function getApi() {
       if (walletStore.address) {
         options.headers.set('l1address', walletStore.address)
       }
+      let ac = localStorage.getItem('perp_accessToken')
+      if (ac) {
+        options.headers.set('Authorization', 'Bearer ' + ac)
+      }
       if (authorizationList.some(item=>url.includes(item))) {
         options.headers.set('Authorization', 'Bearer 0')
         url=url.replace('https://award.edgex.exchange/api','')

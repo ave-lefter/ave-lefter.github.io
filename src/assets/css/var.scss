@@ -53,6 +53,7 @@
   --table-title-bg: var(--d-12161D-l-ECF3FF);
   // 主页面悬浮弹窗色
   --tooltip: var(--d-1F242C-l-FFF);
+
   // 通知背景色
   --notification-bg: var(--d-222222-l-f2f2f2);
 
@@ -67,12 +68,17 @@
   // 扫链筛选框背景色
   --pump-filter-bg: var(--d-16181D-l-F6F9FF);
 
-  // 一级文字1
-  --main-text1: var(--d-F2F2F2-l-111);
-  // 二级文字1
+  // 一级文字V2
+  --main-text1: var(--d-E0E0E0-l-111);
+  // 二级文字V2
   --secondary-text1: var(--d-707275-l-404753);
-  // 三级文字
+  // 三级文字V2
   --third-text1: var(--d-707275-l-A9B0BC);
+  // 扫链分割线v1
+  --main-divider1: var(--d-1E1F23-l-E0ECFF);
+  // 主页面悬浮弹窗色v2
+  --tooltip1: var(--d-1F242C4D-l-FFF);
+
   &.dark {
     // 规范：颜色相同省略为 3 位，所有都用大写
     --d-000-l-404753: #000;
@@ -231,11 +237,14 @@
     --d-16181D-l-F6F9FF: #16181D;
     --d-222222-l-f2f2f2: #222222;
     --d-F5F5F5-l-A9B0BC: #f5f5f5;
-    --d-F2F2F2-l-111: #E0E0E0;
+    --d-E0E0E0-l-111: #E0E0E0;
     --d-707275-l-404753: #707275;
     --d-F2F2F2-l-000:#E0E0E0;
     --d-707275-l-A9B0BC: #707275;
     --d-E0E0E0-l-333: #E0E0E0;
+    --d-1E1F23-l-E0ECFF: #1E1F23;
+    --d-1F242C4D-l-FFF: #1F242C4D;
+    --d-0E0F10-l-FFF: #0E0F10;
   }
 
   &.light {
@@ -394,10 +403,13 @@
     --d-16181D-l-F6F9FF: #F6F9FF;
     --d-222222-l-f2f2f2: #f2f2f2;
     --d-F5F5F5-l-A9B0BC: #a9b0bc;
-    --d-F2F2F2-l-111: #111;
+    --d-E0E0E0-l-111: #111;
     --d-707275-l-404753: #404753;
     --d-F2F2F2-l-000:#000;
     --d-707275-l-A9B0BC: #a9b0bc;
     --d-E0E0E0-l-333: #333;
+    --d-1E1F23-l-E0ECFF: #E0ECFF;
+    --d-1F242C4D-l-FFF: #FFF;
+    --d-0E0F10-l-FFF: #FFF;
   }
 }

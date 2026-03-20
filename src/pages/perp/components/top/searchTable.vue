@@ -1,38 +1,38 @@
 <template>
   <div class="histrory">
-    <div class="top h-39px">
+    <div class="top h-32px">
       <span>{{ $t('markets1') }}</span>
-      <div class="flex-end cursor-pointer select-none" @click.stop="switchSort('lastPrice')">
+      <div class="flex-end cursor-pointer select-none" @click.stop="switchSort('last_price')">
         {{ $t('price') }}
         <div class="flex flex-col items-center justify-center ml-5px">
           <i
             :class="`w-0 h-0 border-solid border-4px border-transparent cursor-pointer
-            ${getActiveClass(-1, 'lastPrice', 'b')}
+            ${getActiveClass(-1, 'last_price', 'b')}
             `"
-            @click.stop="switchSort('lastPrice', -1)"
+            @click.stop="switchSort('last_price', -1)"
           />
           <i
             :class="`w-0 h-0 border-solid border-4px border-transparent mt-3px cursor-pointer
-            ${getActiveClass(1, 'lastPrice', 't')}
+            ${getActiveClass(1, 'last_price', 't')}
             `"
-            @click.stop="switchSort('lastPrice', 1)"
+            @click.stop="switchSort('last_price', 1)"
           />
         </div>
       </div>
-      <div class="flex-end cursor-pointer select-none" @click.stop="switchSort('priceChangePercent')">
+      <div class="flex-end cursor-pointer select-none" @click.stop="switchSort('price_change_percent')">
         {{ $t('24HChange') }}
         <div class="flex flex-col items-center justify-center ml-5px">
           <i
             :class="`w-0 h-0 border-solid border-4px border-transparent cursor-pointer
-            ${getActiveClass(-1, 'priceChangePercent', 'b')}
+            ${getActiveClass(-1, 'price_change_percent', 'b')}
             `"
-            @click.stop="switchSort('priceChangePercent', -1)"
+            @click.stop="switchSort('price_change_percent', -1)"
           />
           <i
             :class="`w-0 h-0 border-solid border-4px border-transparent mt-3px cursor-pointer
-            ${getActiveClass(1, 'priceChangePercent', 't')}
+            ${getActiveClass(1, 'price_change_percent', 't')}
             `"
-            @click.stop="switchSort('priceChangePercent', 1)"
+            @click.stop="switchSort('price_change_percent', 1)"
           />
         </div>
       </div>
@@ -56,47 +56,21 @@
           />
         </div>
       </div>
-      <div class="flex-end cursor-pointer select-none" @click.stop="switchSort('openInterests')">
+      <div class="flex-end cursor-pointer select-none">
         {{ $t('openInterest') }}
-        <div class="flex flex-col items-center justify-center ml-5px">
-          <i
-            :class="`w-0 h-0 border-solid border-4px border-transparent cursor-pointer
-            ${getActiveClass(-1, 'openInterests', 'b')}
-            `"
-            @click.stop="switchSort('openInterests', -1)"
-          />
-          <i
-            :class="`w-0 h-0 border-solid border-4px border-transparent mt-3px cursor-pointer
-            ${getActiveClass(1, 'openInterests', 't')}
-            `"
-            @click.stop="switchSort('openInterests', 1)"
-          />
-        </div>
       </div>
-      <div class="flex-end cursor-pointer select-none" @click.stop="switchSort('fundingRate')">
+      <div class="flex-end cursor-pointer select-none">
         {{ $t('fundingRate') }}
-        <div class="flex flex-col items-center justify-center ml-5px">
-          <i
-            :class="`w-0 h-0 border-solid border-4px border-transparent cursor-pointer
-            ${getActiveClass(-1, 'fundingRate', 'b')}
-            `"
-            @click.stop="switchSort('fundingRate', -1)"
-          />
-          <i
-            :class="`w-0 h-0 border-solid border-4px border-transparent mt-3px cursor-pointer
-            ${getActiveClass(1, 'fundingRate', 't')}
-            `"
-            @click.stop="switchSort('fundingRate', 1)"
-          />
-        </div>
       </div>
     </div>
     <el-scrollbar
       v-if="tokens1?.length > 0 || isLoading"
+      ref="scrollbarRef"
       v-loading="isLoading"
       class="hidden-scrollbar"
       height="500px"
       max-height="calc(100vh - 200px)"
+      @scroll="onScroll"
     >
       <ul class="content">
         <li v-for="(row, $index) in tokens1" :key="$index">
@@ -166,7 +140,7 @@ import emptyWhite from '@/assets/images/empty-white.svg'
 import emptyDark from '@/assets/images/empty-black.svg'
 import { formatNumber } from '@/utils/formatNumber'
 import BigNumber from 'bignumber.js'
-
+import { usePerpStore } from '@/stores/perp'
 import { getChainDefaultIcon } from '@/utils/index'
 import type { PerpInfo } from '@/api/types/perp'
 
@@ -186,7 +160,9 @@ const props = defineProps({
     default: false,
   },
 })
-const emit = defineEmits(['close', 'filter', 'sortChange', 'done'])
+const emit = defineEmits(['close', 'filter', 'sortChange', 'done', 'loadMore'])
+const scrollbarRef = ref()
+const isLoadMoreLoading = ref(false)
 const $router = useRouter()
 
 
@@ -213,12 +189,30 @@ const tokens1 = computed(() => {
 const isLoading = computed(() => {
   return props.loading
 })
+
+function onScroll() {
+  const scrollbar = scrollbarRef.value?.$el?.querySelector('.el-scrollbar__wrap')
+  if (!scrollbar || isLoadMoreLoading.value || props.loading) return
+
+  const { scrollTop, scrollHeight, clientHeight } = scrollbar
+  const threshold = 50
+
+  if (scrollHeight - scrollTop - clientHeight < threshold) {
+    isLoadMoreLoading.value = true
+    emit('loadMore')
+    setTimeout(() => {
+      isLoadMoreLoading.value = false
+    }, 500)
+  }
+}
 function tableRowClick(row: PerpInfo) {
+  usePerpStore().setContractName(row.contractName)
   $router.push({
     name: 'perp-id',
     params: { name: row.contractName },
+  }).then(() => {
+    emit('close')
   })
-  emit('close')
 }
 
 function getActiveClass(activeSort1: SortValue, sortBy1: string, direction: string) {

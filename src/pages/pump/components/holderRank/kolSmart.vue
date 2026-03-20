@@ -1,6 +1,6 @@
 <template>
   <div class="p-12px text-12px">
-    <div class="color-[--main-text] mb-4px text-12px">
+    <div class="color-[--main-text1] mb-4px text-12px">
       <!-- {{ type == 'smart' ? $t('smarter2') : 'KOL' }} {{ $t('insidersOwned') }}
       <span class="ml-2px" :style="{ color: Number(ratio) > 5 ? '#F6465D' : '#12B886' }">
         {{
@@ -9,7 +9,7 @@
       </span> -->
       {{ $t('kolSummary', {people:tableList.length, type: type == 'smart' ? $t('smarter2') : 'KOL', holders: formatNumber(holders,0), vol: '$'+formatNumber(vol,0),  ratio: formatNumber(Number(ratio) >= 0.1 ? ratio || 0 : Number(ratio) == 0 ? '0' : '<0.1', 2)+ '%'}) }}
     </div>
-    <div class="w-full text-12px color-[--main-text]">
+    <div class="w-full text-12px color-[--main-text1]">
       <!-- list -->
       <el-scrollbar :max-height="300">
         <el-skeleton v-if="loading" :rows="5" animated style="--el-skeleton-circle-size: 32px;padding: 12px">
@@ -42,11 +42,11 @@
               }"
               :address="item.wallet_address"
               :chain="item.chain"
-              iconSize="12px"
+              iconSize="24px"
             />
             <div class="flex-1.5 min-w-0">
               <div class="flex items-center">
-                <span class="leading-18px ellipsis text-12px color-[--main-text]">
+                <span class="leading-18px ellipsis text-12px color-[--main-text1]">
                   {{
                     item.remark ||
                     item.wallet_address?.slice(0, 6) + '...' + item.wallet_address?.slice(-4)
@@ -55,8 +55,8 @@
               </div>
             </div>
             <div class="flex-1 text-right">
-              <div class="text-14px color-[--main-text]"
-                :style="{color:Number(formatNumber(item?.balance_radio || 0, 1))==0? 'var(--third-text)': 'var(--main-text)'}"
+              <div class="text-14px color-[--main-text1]"
+                :style="{color:Number(formatNumber(item?.balance_radio || 0, 1))==0? 'var(--third-text)': 'var(--main-text1)'}"
               >
                   {{ formatNumber(Number(item.balance_radio) >= 0.1 ? item.balance_radio || 0 : Number(item.balance_radio) == 0 ? '0' : '<0.1', 2) }}%
               </div>

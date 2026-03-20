@@ -70,6 +70,15 @@ export const useBotStore = defineStore('bot', () => {
     addresses: Array<AddressItem>
   }>
 
+  watch(
+    () => accessToken.value,
+    (val) => {
+      if (val) {
+        localStorage.setItem('perp_accessToken', val)
+      }
+    }
+  )
+
   function refreshAccessToken(type: 'acc' | 'ref') {
     if (!refreshToken.value) {
       return Promise.reject('no refreshToken')

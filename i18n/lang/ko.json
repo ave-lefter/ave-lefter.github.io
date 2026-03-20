@@ -503,7 +503,6 @@
   "avgBuyPrice": "매수 평균 가격",
   "avgSellPrice": "매도 평균 가격",
   "trades": "거래",
-  "me": "내 페이지",
   "orderBook": "주문 목록",
   "abnormalChips": "이상 코인",
   "abnormalChipsTip": "이상 코인 비율 중복 제거 처리",
@@ -1484,5 +1483,16 @@
   "migratedToMarket": "시장으로 이전",
   "createdAt": "생성일",
   "openMonitorSuccess": "모니터링이 활성화되었습니다.",
-  "cancelMonitorSuccess": "모니터링이 비활성화되었습니다"
+  "cancelMonitorSuccess": "모니터링이 비활성화되었습니다",
+  "trackerTypeRequired": "콘텐츠 유형을 하나 이상 선택하세요.",
+  "twitterForHMe": "트위터-마인",
+  "twitterForHot": "트위터-핫",
+  "txFilter": "거래 필터",
+  "filterWallet2": "필터 지갑",
+  "disabledClickKlineFilter": "클릭 차트 필터 시간 비활성화",
+  "enabledClickKlineFilter": "클릭 차트 필터 시간 활성화",
+  "onlyFollowed": "팔로우한 사람만",
+  "OnlyDev": "개발자 전용",
+  "OnlyYou": "당신만",
+  "you": "너"
 }

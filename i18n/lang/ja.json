@@ -503,7 +503,6 @@
   "avgBuyPrice": "買いコスト価格",
   "avgSellPrice": "売りコスト価格",
   "trades": "取引",
-  "me": "私の",
   "orderBook": "注文簿",
   "abnormalChips": "異常チップ",
   "abnormalChipsTip": "異常チップ比率は重複処理されています",
@@ -1484,5 +1483,16 @@
   "migratedToMarket": "市場に移行",
   "createdAt": "作成日",
   "openMonitorSuccess": "モニタリングが正常に有効になりました",
-  "cancelMonitorSuccess": "監視が正常に無効になりました"
+  "cancelMonitorSuccess": "監視が正常に無効になりました",
+  "trackerTypeRequired": "少なくとも 1 つのコンテンツ タイプを選択してください",
+  "twitterForHMe": "ツイッター-マイン",
+  "twitterForHot": "ツイッターで話題",
+  "txFilter": "トランザクションフィルター",
+  "filterWallet2": "フィルターウォレット",
+  "disabledClickKlineFilter": "クリック チャートのフィルター時間を無効にする",
+  "enabledClickKlineFilter": "クリック チャート フィルター時間を有効にする",
+  "onlyFollowed": "フォローのみ",
+  "OnlyDev": "開発者のみ",
+  "OnlyYou": "あなただけ",
+  "you": "あなた"
 }

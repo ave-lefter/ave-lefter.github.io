@@ -1,26 +1,9 @@
 <script setup lang="ts">
-import * as echarts from 'echarts/core'
-import { LineChart } from 'echarts/charts'
-import {
-  GridComponent,
-  TooltipComponent,
-  LegendComponent,
-  MarkPointComponent,
-} from 'echarts/components'
-import { CanvasRenderer } from 'echarts/renderers'
+import * as echarts from '@/utils/echarts'
 
 import buy from 'assets/images/mark/buy.png'
 import buyDark from 'assets/images/mark/buy-dark.png'
 import buyLight from 'assets/images/mark/buy-light.png'
-// 注册使用组件
-echarts.use([
-  LineChart,
-  GridComponent,
-  TooltipComponent,
-  LegendComponent,
-  MarkPointComponent,
-  CanvasRenderer,
-])
 
 const props = defineProps({
   dataList: {

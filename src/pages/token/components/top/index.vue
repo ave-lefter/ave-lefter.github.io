@@ -281,7 +281,6 @@
                   </div>
                 </template>
               </el-popover>
-
               <!-- <template v-if="pair && getTags(pair)?.normal_tag?.length > 0">
                 <div
                   v-for="(i, index) in getTags(pair)?.normal_tag"
@@ -698,6 +697,30 @@
               <span>{{ formatNumber(tagsRatio?.smart_wallet_count || 0, 2) }}</span>
             </div>
             </HolderRank>
+            <div
+              v-if="tokenStore.tokenInfoExtra?.is_cloned"
+              class="minor color-text-2 tag-btn signal cursor-pointer mr-4px bg-btn text-10px lh-none"
+              v-tooltip="$t('deployerPlatform', {tool: tokenStore.tokenInfoExtra?.deployer_platform})"
+            >
+              <img
+                class="rounded-100%"
+                :src="formatIconTag(tokenStore.tokenInfoExtra?.deployer_platform)"
+                alt=""
+                :width="12"
+              >
+            </div>
+            <div
+              v-if="tokenStore.tokenInfoExtra?.is_pump_agent"
+              class="minor color-text-2 tag-btn signal cursor-pointer mr-4px bg-btn text-10px lh-none"
+              v-tooltip="$t('agentToken')"
+            >
+              <img
+                class="rounded-100%"
+                :src="formatIconTag('pumpt_agent')"
+                alt=""
+                :width="12"
+              >
+            </div>
           </div>
         </div>
       </div>
@@ -1047,7 +1070,7 @@ const themeStore = useThemeStore()
 const { t } = useI18n()
 const route = useRoute()
 const { mode, dialogVisible_search, dialogSearchText, showMarket, clickHolderCount, popVisible, tagsRatio, pumpBlackList } = storeToRefs(useGlobalStore())
-
+const wsStore = useWSStore()
 const editableGroup = shallowRef(false)
 const groupId = shallowRef(0)
 const selectedGroup = shallowRef(0)
@@ -1244,12 +1267,18 @@ const pairTooltipContent = computed(() => {
   }
   return `${t('createdAt')}: ${formatDate(publish_at)}`
 })
-
 const price = computed(() => {
   return tokenStore.price
 })
+const tokenAllPair = computed(() => {
+  return tokenStore.tokenAllPair
+})
 const priceChange = computed(() => {
-  return tokenStore.priceChangeV2 || 0
+  if (tokenStore.selectedToken && tokenAllPair.value) {
+    return tokenStore.tokenInfoExtra?.t_price_change_24h || 0
+  } else {
+    return tokenStore.priceChangeV2 || 0
+  }
 })
 const marketCap = computed(() => {
   return tokenStore.marketCap || 0
@@ -1335,6 +1364,22 @@ watch(
     }
   }
 )
+watch(() => wsStore.wsResult[WSEventType.PRICEV2], (val) => {
+  if (WSEventType.PRICEV2 == val.event) {
+    if (Array.isArray(val.prices) && val.prices?.length > 0 && tokenStore.tokenInfoExtra) {
+      const find = val.prices?.find(i => i.target_token == address.value)
+      if (find) {
+        tokenStore.tokenInfoExtra.t_price_change_24h = find.tprice_change_24h
+        if (!tokenStore.tokenInfoExtra) return
+        tokenStore.tokenInfoExtra = {
+          ...tokenStore.tokenInfoExtra,
+          t_price_change_24h: find.tprice_change_24h
+        }
+      }
+    }
+  }
+})
+
 // const collected = shallowRef(false)
 const loading = shallowRef(false)
 

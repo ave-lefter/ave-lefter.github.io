@@ -130,7 +130,6 @@ const loading = ref(false)
 const loading2 = ref(false)
 
 const currentHeight=computed(()=>{
-  console.log('currentHeight',props.height)
   return props.height-47-((dataList.value.length > 0||loading.value)?465:182)
 })
 

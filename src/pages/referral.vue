@@ -109,16 +109,15 @@
         <ul class="data-list">
           <li class="data-card">
             <div>
-              <div class="data-card_label">{{ $t('withdrawable') }}</div>
+              <div class="data-card_label">{{ $t('withdrawable1') }}</div>
               <div class="text-20px lh-26px">
                 ${{ formatNumber(referralInfo?.totalWithdrawableIncome || referralInfo?.totalWithdrawableAmount || 0) }}
               </div>
-              <div class="data-card_label mt-24px">{{ $t('withdrawn') }}</div>
+              <div class="data-card_label mt-24px">{{ $t('withdrawn1') }}</div>
               <div class="text-20px lh-26px">
                 ${{
                   formatNumber(
-                    (referralInfo?.totalIncomeAmount || 0) -
-                      (referralInfo?.totalWithdrawableIncome || referralInfo?.totalWithdrawableAmount || 0)
+                    (referralInfo?.totalIncomeAmount || 0)
                   )
                 }}
               </div>
@@ -135,16 +134,36 @@
           </li>
           <li class="data-card">
             <div>
-              <div class="data-card_label">{{ $t('totalRebateAmount') }}</div>
-              <div class="text-20px lh-26px">
-                $ {{ formatNumber(referralInfo?.totalIncomeAmount || 0) }}
+              <div class="flex">
+                <div>
+                  <div class="data-card_label">{{ $t('botWalletRef') }}</div>
+                  <div class="text-20px lh-26px">
+                    $ {{ formatNumber(referralInfo?.botSwapTotalIncome || 0) }}
+                  </div>
+                </div>
+
+                <!-- <div v-show="(referralInfo?.botChannelRefRatio || referralInfo?.channelRefRatio || 0) > 0" class="data-card_label mt-24px">
+                  {{ $t('totalChannelRebate') }}
+                </div>
+                <div v-show="(referralInfo?.botChannelRefRatio || referralInfo?.channelRefRatio || 0) > 0" class="text-20px lh-26px">
+                  $ {{ formatNumber(referralInfo?.botSwapChannelIncome || referralInfo?.channelReferralIncomeAmount || 0) }}
+                </div> -->
               </div>
-              <div v-show="(referralInfo?.botChannelRefRatio || referralInfo?.channelRefRatio || 0) > 0" class="data-card_label mt-24px">
-                {{ $t('totalChannelRebate') }}
+              <div class="flex mt-24px justify-between">
+                <div>
+                  <div class="data-card_label">{{ $t('chainWalletRef') }}</div>
+                  <div class="text-20px lh-26px">
+                    $ {{ formatNumber(referralInfo?.chainSwapTotalIncome || 0) }}
+                  </div>
+                </div>
+                <div>
+                  <div class="data-card_label">{{ $t('perpetualRef') }}</div>
+                  <div class="text-20px lh-26px">
+                    $ {{ formatNumber(referralInfo?.perpTotalIncome || 0) }}
+                  </div>
+                </div>
               </div>
-              <div v-show="(referralInfo?.botChannelRefRatio || referralInfo?.channelRefRatio || 0) > 0" class="text-20px lh-26px">
-                $ {{ formatNumber(referralInfo?.botSwapChannelIncome || referralInfo?.channelReferralIncomeAmount || 0) }}
-              </div>
+
             </div>
           </li>
           <li class="data-card">
@@ -174,11 +193,15 @@
                 <div class="text-14px color-#fff">{{ levelsReferralInfo?.l1?.invited || 0 }}</div>
               </div>
               <div>
-                <div class="color-#697F95 text-14px mb-8px">{{ $t('commissionValue') }}</div>
+                <div class="color-#697F95 text-14px mb-8px">{{ $t('chainCommission') }}</div>
                 <div class="text-14px color-#fff">${{ formatNumber2(levelsReferralInfo?.l1?.refFee || 0, 2) }}</div>
               </div>
               <div>
-                <div class="color-#697F95 text-14px mb-8px">{{ $t('totalSwapValue') }}</div>
+                <div class="color-#697F95 text-14px mb-8px">{{ $t('perpCommission') }}</div>
+                <div class="text-14px color-#fff">${{ formatNumber2(levelsReferralInfo?.l1?.perpRefFee || 0, 2) }}</div>
+              </div>
+              <div>
+                <div class="color-#697F95 text-14px mb-8px">{{ $t('totalChainSwapValue') }}</div>
                 <div class="text-14px color-#fff">${{ formatNumber2(levelsReferralInfo?.l1?.swapValue || 0, 2) }}</div>
               </div>
             </div>
@@ -191,11 +214,15 @@
                 <div class="text-14px color-#fff">{{ levelsReferralInfo?.l2?.invited || 0 }}</div>
               </div>
               <div>
-                <div class="color-#697F95 text-14px mb-8px">{{ $t('commissionValue') }}</div>
+                <div class="color-#697F95 text-14px mb-8px">{{ $t('chainCommission') }}</div>
                 <div class="text-14px color-#fff">${{ formatNumber2(levelsReferralInfo?.l2?.refFee || 0, 2) }}</div>
               </div>
               <div>
-                <div class="color-#697F95 text-14px mb-8px">{{ $t('totalSwapValue') }}</div>
+                <div class="color-#697F95 text-14px mb-8px">{{ $t('perpCommission') }}</div>
+                <div class="text-14px color-#fff">${{ formatNumber2(levelsReferralInfo?.l2?.perpRefFee || 0, 2) }}</div>
+              </div>
+              <div>
+                <div class="color-#697F95 text-14px mb-8px">{{ $t('totalChainSwapValue') }}</div>
                 <div class="text-14px color-#fff">${{ formatNumber2(levelsReferralInfo?.l2?.swapValue || 0, 2) }}</div>
               </div>
             </div>
@@ -330,7 +357,7 @@
               </el-table-column>
               <el-table-column prop="name" :label="$t('commission')">
                 <template #default="{ row }">
-                  ${{ formatNumber(row?.refFee || '0', 2) }}
+                  ${{ formatNumber(new BigNumber(row?.refFee || '0').plus(new BigNumber(row?.perpRefFee || '0')).toFixed(), 2) }}
                 </template>
               </el-table-column>
               <el-table-column prop="level" :label="$t('vipLevel')" align="right">
@@ -371,47 +398,132 @@
               </el-table-column>
               <el-table-column prop="name" :label="$t('token')">
                 <template #default="{ row }">
-                  <div
-                    v-for="(j, k) in row.list || []"
-                    :key="k"
-                    style="line-height: 24px; height: 24px; width: 24px"
-                    class="token-box position-relative t-l"
-                  >
-                    <img
-                      class="icon-logo"
-                      style="height: 24px; width: 24px"
-                      :src="`${globalConfig.token_logo_url}${j.tokenLogoUrl}`"
-                      alt=""
-                      :onerror="`this.src='${getSymbolDefaultIcon(j.chain, j.tokenSymbol)}'`"
-                    >
-                    <img
-                      class="icon-chain"
-                      :src="`${globalConfig.token_logo_url}chain/${j.chain}.png`"
-                      alt=""
-                      srcset=""
-                    >
-                    <span class="ml-5px"> {{ j.tokenSymbol }}</span>
-                  </div>
+                  <template v-for="(j, k) in row.list || []" :key="k">
+                    <div v-if="j.rewardType !== 'chain_swap,perp_swap'"
+                      style="line-height: 24px; height: 24px; width: 24px"
+                      class="token-box position-relative t-l">
+                      <img
+                        class="icon-logo"
+                        style="height: 24px; width: 24px"
+                        :src="`${globalConfig.token_logo_url}${j.tokenLogoUrl}`"
+                        alt=""
+                        :onerror="`this.src='${getSymbolDefaultIcon(j.chain, j.tokenSymbol)}'`"
+                      >
+                      <img
+                        class="icon-chain"
+                        :src="`${globalConfig.token_logo_url}chain/${j.chain}.png`"
+                        alt=""
+                        srcset=""
+                      >
+                      <span class="ml-5px"> {{ j.tokenSymbol }}</span>
+                    </div>
+                    <template v-else>
+                      <div v-if="Number(j.withdrawAveswapValue || 0)" style="line-height: 24px; height: 24px; width: 24px"
+                      class="token-box position-relative t-l">
+                        <img
+                          class="icon-logo"
+                          style="height: 24px; width: 24px"
+                          :src="`${globalConfig.token_logo_url}${j.tokenLogoUrl}`"
+                          alt=""
+                          :onerror="`this.src='${getSymbolDefaultIcon(j.chain, j.tokenSymbol)}'`"
+                        >
+                        <img
+                          class="icon-chain"
+                          :src="`${globalConfig.token_logo_url}chain/${j.chain}.png`"
+                          alt=""
+                          srcset=""
+                        >
+                        <span class="ml-5px"> {{ j.tokenSymbol }}</span>
+                      </div>
+                      <div v-if="Number(j.withdrawPerpValue || 0)" style="line-height: 24px; height: 24px; width: 24px"
+                      class="token-box position-relative t-l">
+                        <img
+                          class="icon-logo"
+                          style="height: 24px; width: 24px"
+                          :src="`${globalConfig.token_logo_url}${j.tokenLogoUrl}`"
+                          alt=""
+                          :onerror="`this.src='${getSymbolDefaultIcon(j.chain, j.tokenSymbol)}'`"
+                        >
+                        <img
+                          class="icon-chain"
+                          :src="`${globalConfig.token_logo_url}chain/${j.chain}.png`"
+                          alt=""
+                          srcset=""
+                        >
+                        <span class="ml-5px"> {{ j.tokenSymbol }}</span>
+                      </div>
+                    </template>
+                  </template>
                 </template>
               </el-table-column>
               <el-table-column prop="name" :label="$t('amount')">
                 <template #default="{ row }">
-                  <div v-for="(j, k) in row.list || []" :key="k" style="line-height: 24px" class="t-l">
+                  <!-- <div v-for="(j, k) in row.list || []" :key="k" style="line-height: 24px" class="t-l">
                     {{ formatNumber(formatAmount(j.withdrawValue || 0, j.tokenDecimals || 0)) }}
-                  </div>
+                  </div> -->
+                  <template v-for="(j, k) in row.list || []" :key="k">
+                    <div v-if="j.rewardType !== 'chain_swap,perp_swap'" style="line-height: 24px" class="t-l">
+                      {{ formatNumber(formatAmount(j.withdrawValue || 0, j.tokenDecimals || 0)) }}
+                    </div>
+                    <template v-else>
+                      <div v-if="Number(j.withdrawAveswapValue || 0)" class="t-l lh-24px">
+                        {{ formatNumber(formatAmount(j.withdrawAveswapValue || 0, j.tokenDecimals || 0)) }}
+                      </div>
+                      <div v-if="Number(j.withdrawPerpValue || 0)" class="t-l lh-24px">
+                        {{ formatNumber(formatAmount(j.withdrawPerpValue || 0, j.tokenDecimals || 0)) }}
+                      </div>
+                    </template>
+
+                  </template>
+                </template>
+              </el-table-column>
+              <el-table-column prop="rewardType" :label="$t('source')">
+                <template #default="{ row }">
+                  <template v-for="(j, k) in row.list || []" :key="k">
+                    <div v-if="j.rewardType !== 'chain_swap,perp_swap'" style="line-height: 24px" class="t-l">
+                      {{ formatRewardType(j.rewardType) }}
+                    </div>
+                    <template v-else>
+                      <div v-if="Number(j.withdrawAveswapValue || 0)" class="t-l lh-24px">
+                        {{ formatRewardType('chain_swap') }}
+                      </div>
+                      <div v-if="Number(j.withdrawPerpValue || 0)" class="t-l lh-24px">
+                        {{ formatRewardType('perp_swap') }}
+                      </div>
+                    </template>
+                  </template>
                 </template>
               </el-table-column>
               <el-table-column prop="level" :label="$t('withdrawalStatus')" align="left">
                 <template #default="{ row }">
-                  <div v-for="(j, k) in row.list || []" :key="k" style="line-height: 24px" class="t-l">
-                    <span
-                      class="clickable"
-                      :style="{ color: formatStatusColor(j.status) }"
-                      @click.stop="goLink(j)"
-                      >{{ formatStatus(j.status) }}</span
-                    >
-                    <!-- <van-icon v-if="j.errorLog" class="ml-5 clickable" style="color: #aaa;" name="warning-o" @click.stop="$messageBox.alert(j.errorLog)" /> -->
-                  </div>
+                  <template v-for="(j, k) in row.list || []" :key="k" >
+                    <div v-if="j.rewardType !== 'chain_swap,perp_swap'" style="line-height: 24px" class="t-l">
+                      <span
+                        class="clickable"
+                        :style="{ color: formatStatusColor(j.status) }"
+                        @click.stop="goLink(j)"
+                        >{{ formatStatus(j.status) }}</span
+                      >
+                    </div>
+                    <template v-else>
+                      <div  v-if="Number(j.withdrawAveswapValue || 0)" style="line-height: 24px" class="t-l">
+                        <span
+                          class="clickable"
+                          :style="{ color: formatStatusColor(j.status) }"
+                          @click.stop="goLink(j)"
+                          >{{ formatStatus(j.status) }}</span
+                        >
+                      </div>
+                      <div v-if="Number(j.withdrawPerpValue || 0)"  style="line-height: 24px" class="t-l">
+                        <span
+                          class="clickable"
+                          :style="{ color: formatStatusColor(j.status) }"
+                          @click.stop="goLink(j)"
+                          >{{ formatStatus(j.status) }}</span
+                        >
+                      </div>
+                    </template>
+                  </template>
                 </template>
               </el-table-column>
               <el-table-column
@@ -586,33 +698,32 @@ import {
 import { formatExplorerUrl } from '~/utils'
 import BigNumber from 'bignumber.js'
 import QRCode from 'qrcode'
-import html2canvas from 'html2canvas'
 import VIP from '../components/vip.vue'
 
 // 类型定义
 interface ReferralInfo {
-  refCode?: string
-  vip?: 'vip1' | 'vip2' | 'vip3' | 'svip' | ''
-  refRatio?: number
-  channelRefRatio?: number
-  totalWithdrawableAmount?: number
-  totalIncomeAmount?: number
-  channelReferralIncomeAmount?: number
-  invitees1?: number
-  invitees2?: number
-  invitees3?: number
-  swapInvitees24H?: number
-  canWithdraw?: boolean
+  username: string
+  canWithdraw: boolean
+  vip: '' | 'vip1' | 'vip2' | 'vip3' | 'svip'
+  minWithdraw: string
+  refCode: string
+  startTime: string
+  endTime: string
+  totalIncomeAmount: string
+  swapInvitees24H: number
+  totalInvitees: number
+  totalWithdrawableIncome: string
+  botChannelRefRatio: number
+  botRefRatio: number
+  chainRefRatio: number
+  botSwapReferralIncome: string
+  botSwapChannelIncome: string
+  botSwapTotalIncome: string
+  chainSwapTotalIncome: string
+  nextLevelInvitees: number
+  perpRefRatio: number
+  perpTotalIncome: string
   withdrawableList?: WithdrawableItem[]
-  startTime?: string
-  endTime?: string
-  botRefRatio?: number
-  botChannelRefRatio?: number
-  botSwapChannelIncome?: number
-  totalInvitees?: number
-  totalWithdrawableIncome?: number
-  username?: string
-  nextLevelInvitees?: number
 }
 
 interface InviteeItem {
@@ -625,12 +736,17 @@ interface InviteeItem {
 
 interface WithdrawableItem {
   chain: string
+  walletAddress: string
+  address: string
   symbol: string
-  logoUrl?: string
-  value: string
+  name: string
   decimals: number
-  price?: number
+  logoUrl: string
+  amount: string
+  amountUSD: string
+  price: string
   canWithdraw: boolean
+  rewardType: 'bot_swap' | 'chain_swap' | 'chain_perp'
 }
 
 interface WithdrawRecordItem {
@@ -646,8 +762,11 @@ interface WithdrawRecordItem {
   tokenDecimals: number
   tokenLogoUrl: string
   withdrawValue: string
+  withdrawAveswapValue: string
+  withdrawPerpValue: string
   txHash?: string
   errorLog?: string
+  rewardType: 'bot_swap' | 'chain_swap' | 'chain_perp'
 }
 
 interface WithdrawRecord {
@@ -887,10 +1006,13 @@ function getNextVip(vip: string) {
   return vipObj?.[vip] || ''
 }
 
-function formatRewardType(type: 'bot_swap' | 'chain_swap') : string {
+function formatRewardType(type: 'bot_swap' | 'chain_swap' | 'chain_perp' | 'perp_swap') : string {
   const typeObj = {
     bot_swap: t('botWallet'),
-    chain_swap: t('chainWallet3')
+    chain_swap: t('chainWallet3'),
+    chain_perp: t('chainPerp'),
+    perp_swap: t('chainPerp'),
+    'chain_swap,perp_swap': t('chainWallet3') + '/' + t('chainPerp'),
   } as const
   return typeObj?.[type] || type || ''
 }
@@ -959,6 +1081,8 @@ const getShareImg = async () => {
   const postersDom = document.querySelector('.share-card-rebate')
   if (postersDom) {
     try {
+      const m = await import('html2canvas')
+      const html2canvas = m.default || m
       const canvas = await html2canvas(postersDom as HTMLElement, {
         backgroundColor: null,
         scale: 3,
@@ -980,6 +1104,8 @@ const downloadSharePoster = async () => {
   const postersDom = document.querySelector('.share-card-rebate')
   if (postersDom) {
     try {
+      const m = await import('html2canvas')
+      const html2canvas = m.default || m
       const canvas = await html2canvas(postersDom as HTMLElement, {
         backgroundColor: null,
         scale: 3,
@@ -1211,15 +1337,15 @@ onMounted(() => {
     background-size: auto 100%;
     background-repeat: no-repeat;
     background-position: bottom right;
-    &:nth-child(1) {
-      background-image: url(@/assets/images/referral/data-bg-1.svg);
-    }
-    &:nth-child(2) {
-      background-image: url(@/assets/images/referral/data-bg-2.svg);
-    }
-    &:nth-child(3) {
-      background-image: url(@/assets/images/referral/data-bg-3.svg);
-    }
+    // &:nth-child(1) {
+    //   background-image: url(@/assets/images/referral/data-bg-1.svg);
+    // }
+    // &:nth-child(2) {
+    //   background-image: url(@/assets/images/referral/data-bg-2.svg);
+    // }
+    // &:nth-child(3) {
+    //   background-image: url(@/assets/images/referral/data-bg-3.svg);
+    // }
 
     & + .data-card {
       margin-left: 30px;

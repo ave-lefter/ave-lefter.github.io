@@ -190,7 +190,6 @@
   "totalBuy": "Toplam Alış",
   "totalSell": "Toplam Satış",
   "trades": "İşlemler",
-  "me": "Ben",
   "orderBook": "Emir Defteri",
   "download": "İndir",
   "seemsNoProblem": "Sorun görünmüyor",
@@ -631,5 +630,16 @@
   "migratedToMarket": "Pazara taşındı",
   "createdAt": "Oluşturuldu",
   "openMonitorSuccess": "İzleme başarıyla etkinleştirildi",
-  "cancelMonitorSuccess": "İzleme başarıyla devre dışı bırakıldı"
+  "cancelMonitorSuccess": "İzleme başarıyla devre dışı bırakıldı",
+  "trackerTypeRequired": "Lütfen en az bir içerik türü seçin",
+  "twitterForHMe": "Twitter-Mine",
+  "twitterForHot": "Twitter-Sıcak",
+  "txFilter": "İşlem Filtresi",
+  "filterWallet2": "Cüzdanı Filtrele",
+  "disabledClickKlineFilter": "Tıklama grafiği filtre süresini devre dışı bırak",
+  "enabledClickKlineFilter": "Tıklama grafiği filtre süresini etkinleştir",
+  "onlyFollowed": "Yalnızca Takip Edilenler",
+  "OnlyDev": "Yalnızca Geliştirici",
+  "OnlyYou": "Sadece sen",
+  "you": "Sen"
 }

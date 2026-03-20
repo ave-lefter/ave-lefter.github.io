@@ -7,20 +7,13 @@
   <script setup lang="ts">
   import { formatNumber } from '@/utils/formatNumber'
   import { getAddressAndChainFromId } from '@/utils/index'
-  // import * as echarts from 'echarts'
-  //   import { v4 as uuidv4 } from 'uuid'
   import { filterChartColor } from '@/utils/holders'
   import { filterLanguage } from '~/pages/token/components/kLine/utils'
-
-  import * as echarts from 'echarts/core'
-  // 导入必要的组件和图表类型
-  import { TitleComponent, TooltipComponent, GridComponent, LegendComponent } from 'echarts/components'
-  import { LineChart } from 'echarts/charts'
-  import { CanvasRenderer } from 'echarts/renderers'
+  import * as echarts from '@/utils/echarts'
   import type { BotChain } from '~/utils/types'
 
-  // 注册所需的组件和渲染器
-  echarts.use([TitleComponent, TooltipComponent, GridComponent, LegendComponent, LineChart, CanvasRenderer])
+  // 提取为常量，避免每次 computed 重算时创建新数组
+  const RATIO_KEYS = new Set(['insider_balance_ratio', 'sniper_balance_ratio', 'dev_balance_ratio', 'smartmoney_balance_ratio', 'kol_balance_ratio'])
 
 
   interface DataItem {
@@ -46,7 +39,8 @@
     chartHeight?: string
   }>()
 
-  const chartId = 'chart_holder'
+  // 固定 id 在多实例时会冲突，用随机 id
+  const chartId = `chart_holder_${Math.random().toString(36).slice(2)}`
   let myChart: echarts.ECharts | null = null
 
   const route = useRoute()
@@ -111,10 +105,8 @@
         valueFormatter: (value: number) => `${formatNumber(value || 0, 2)}%`,
         textStyle: { fontSize: 10, color: '#333' }
       },
-      data: props.dataList.map(j => {
-        if (
-          ['insider_balance_ratio', 'sniper_balance_ratio', 'dev_balance_ratio', 'smartmoney_balance_ratio', 'kol_balance_ratio'].includes(opt.value)
-        ) {
+        data: props.dataList.map(j => {
+          if (RATIO_KEYS.has(opt.value)) {
           return opt.value ? (j?.[opt.value] * 100 || 0) : 0
         } else {
           return j.total_amount ? j[opt.value] * 100 / j.total_amount : 0
@@ -205,15 +197,6 @@
       myChart = null
     }
   })
-  watch(() => globalStore.showLeft, async () => {
-    await nextTick()
-    myChart?.resize()
-  })
-  watch(() => globalStore.showRight, async () => {
-    await nextTick()
-    myChart?.resize()
-  })
-  // Watchers
   watch(() => props.dataList, () => initChart())
   watch(() => props.loading, (val) => {
     if (!myChart) return
@@ -223,12 +206,17 @@
       myChart.hideLoading()
     }
   })
-  props.showSeries.forEach((val, idx) => {
-    watch(() => props.showSeries[idx], (v) => {
-      updateLegendSelection(v, idx)
-    })
+  // 合并 showLeft/showRight 为一个 watch
+  watch([() => globalStore.showLeft, () => globalStore.showRight], async () => {
+    await nextTick()
+    myChart?.resize()
   })
-  watch(() => mode, () => initChart())
+  // 监听 mode.value，修复原来监听 ref 对象本身导致不触发的问题
+  watch(() => mode.value, () => initChart())
+  // 合并 showSeries 为一个 deep watch
+  watch(() => props.showSeries, (newVal) => {
+    newVal.forEach((v, idx) => updateLegendSelection(v, idx))
+  }, { deep: true })
   </script>
 
   <style scoped lang="scss">

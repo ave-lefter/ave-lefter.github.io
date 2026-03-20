@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
-import * as echarts from 'echarts'
+import * as echarts from '@/utils/echarts'
 import { assetDetail } from '~/api/perp'
 
 const { t } = useI18n()

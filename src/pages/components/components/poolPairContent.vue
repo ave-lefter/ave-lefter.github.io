@@ -208,6 +208,22 @@ function addTokenFavorite(row, newGroupId: number) {
             <Icon name="custom:search" class="text-12px" />
           </a>
           <img
+            v-if="row?.is_cloned"
+            v-tooltip="$t('deployerPlatform', {tool: row?.deployer_platform})"
+            class="rounded-100% ml-4px cursor-pointer"
+            :src="formatIconTag(row?.deployer_platform)"
+            alt=""
+            :width="12"
+          >
+          <img
+            v-if="row.is_pump_agent"
+            v-tooltip="$t('agentToken')"
+            class="rounded-100% ml-4px cursor-pointer"
+            :src="formatIconTag('pumpt_agent')"
+            alt=""
+            :width="12"
+          >
+          <img
             v-if="row.issue_platform"
             v-tooltip="row.issue_platform"
             :src="formatIconTag(row.issue_platform)"
