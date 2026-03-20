@@ -336,6 +336,31 @@ const amm = computed(() => {
 
 let loading = false
 
+// rAF 批量合并同帧内的 onTick 调用，避免高频 WS 消息导致图表反复重绘
+let _pendingBar: KLineBar | null = null
+let _rafTickId: number | null = null
+function scheduleOnTick(bar: KLineBar, onTick: (bar: KLineBar) => void) {
+  _pendingBar = bar
+  if (_rafTickId !== null) return
+  _rafTickId = requestAnimationFrame(() => {
+    _rafTickId = null
+    if (_pendingBar) {
+      onTick(_pendingBar)
+      _pendingBar = null
+    }
+  })
+}
+
+// rAF 批量合并同帧内的 refreshMarks 调用
+let _rafMarksId: number | null = null
+function scheduleRefreshMarks() {
+  if (_rafMarksId !== null) return
+  _rafMarksId = requestAnimationFrame(() => {
+    _rafMarksId = null
+    _widget?.activeChart?.()?.refreshMarks?.()
+  })
+}
+
 watch(
   () => token.value,
   (val) => {
@@ -1247,7 +1272,7 @@ function onWsKline(
             .toNumber()
         }
         if (newBar && newBar?.time) {
-          onTick(newBar)
+          scheduleOnTick(newBar, onTick)
         }
       }
       wsTxUpdateMarks(
@@ -1258,6 +1283,7 @@ function onWsKline(
         },
         _widget
       )
+      scheduleRefreshMarks()
     } else if (event === WSEventType.PUBLIC_PORTRAIT) {
       const marksTabsIds = marksTabs.value.map((v) => v.id)
       const msgArr = (data?.msg || [])?.filter?.(el=>{
@@ -1267,10 +1293,11 @@ function onWsKline(
         return
       }
        const interval = switchResolution(resolution)
-      wsPublicPortraitUpdateMarks(msgArr,_widget,{
+      wsPublicPortraitUpdateMarks(msgArr, _widget, {
         interval: Number(interval),
         user: user.value
       })
+      scheduleRefreshMarks()
     }
   }, 'kline')
 }
@@ -1363,14 +1390,16 @@ const { resetKOLLine } = useKOLAvgPriceLine(
 )
 
 function setIframeCssVar() {
-  const iframe = document.querySelector('#tv_chart_container iframe') as HTMLIFrameElement
-  const iframeRoot = iframe?.contentWindow?.document.documentElement
-  if (!iframeRoot) {
-    console.error('无法获取 iframe 内部的根元素')
-    return
-  }
-  // 给 iframe 内部设置 CSS 变量
-  iframeRoot.style.setProperty('--secondary-bg', getCssVariable('--secondary-bg'))
+  requestAnimationFrame(() => {
+    const iframe = document.querySelector('#tv_chart_container iframe') as HTMLIFrameElement
+    const iframeRoot = iframe?.contentWindow?.document.documentElement
+    if (!iframeRoot) {
+      console.error('无法获取 iframe 内部的根元素')
+      return
+    }
+    // 给 iframe 内部设置 CSS 变量
+    iframeRoot.style.setProperty('--secondary-bg', getCssVariable('--secondary-bg'))
+  })
 }
 
 onBeforeUnmount(() => {
@@ -1398,6 +1427,16 @@ onUnmounted(() => {
     })
   })
   listenerGuidMap?.clear()
+  // 先取消挂起的 rAF，再销毁 widget，防止回调访问已销毁实例
+  if (_rafTickId !== null) {
+    cancelAnimationFrame(_rafTickId)
+    _rafTickId = null
+  }
+  if (_rafMarksId !== null) {
+    cancelAnimationFrame(_rafMarksId)
+    _rafMarksId = null
+  }
+  _pendingBar = null
   _widget?.remove?.()
   _widget = null
 })
@@ -1411,10 +1450,7 @@ const onMarkChanged = (val: boolean) => {
   if (!val) {
     _widget?.activeChart?.()?.clearMarks?.()
   }
-
-  setTimeout(() => {
-    _widget?.activeChart?.()?.refreshMarks?.()
-  }, 20)
+  scheduleRefreshMarks()
 }
 
 watch(

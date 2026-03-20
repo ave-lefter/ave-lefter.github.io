@@ -195,6 +195,8 @@ function getFollowSwapOrder() {
       maxBuyValue: res.maxBuyValue == '0'? '': res.maxBuyValue,
       minMarketCap: res.minMarketCap == '0'? '': res.minMarketCap,
       maxMarketCap: res.maxMarketCap == '0' ? '' : res.maxMarketCap,
+      minLiquidity: res.minLiquidity == '0' ? '' : res.minLiquidity,
+      maxLiquidity: res.maxLiquidity == '0' ? '' : res.maxLiquidity,
       minTokenAge: res.minTokenAge,
       maxTokenAge: res.maxTokenAge,
       enableAt: res.enableAt,

@@ -55,6 +55,7 @@
                 :address="item.account_address"
                 :chain="chain"
                 iconSize="32px"
+                :showChain="false"
               />
 
               <div class="min-w-0">
