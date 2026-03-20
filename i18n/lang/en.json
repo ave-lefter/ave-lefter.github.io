@@ -2126,5 +2126,7 @@
   "OnlyDev": "Only Dev",
   "OnlyYou": "Only You",
   "you": "You",
-  "pairTax": "Pair Tax"
+  "pairTax": "Pair Tax",
+  "buyOnce": "Buy Same Token Once",
+  "liquidityLimit": "Pool Size"
 }
