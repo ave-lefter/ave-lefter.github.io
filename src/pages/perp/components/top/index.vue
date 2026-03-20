@@ -116,10 +116,7 @@
           >{{ $t('openInterest') }}({{ perp?.quoteCoin }})</span
         >
         <span class="text-12px block text-left color-[--main-text] mt-6px">{{
-          formatNumber(BigNumber(perp?.openInterest || 0).times(perp?.indexPrice || 0)?.toFixed?.(), {
-            limit: 11,
-            decimals: 2
-          })
+          openInterestValue
         }}</span>
       </div>
 
@@ -150,60 +147,60 @@
 </template>
 
 <script lang="ts" setup>
-import Search from './search.vue'
+import { defineAsyncComponent, computed } from 'vue'
 import Swipe from './swipe.vue'
 import { usePerpWsPubStore } from '@/stores/perp/wsPub'
-import type { PerpInfo } from '@/api/types/perp'
+// import type { PerpInfo } from '@/api/types/perp'
 import { usePerpStore } from '@/stores/perp'
 import { WSPerpEventType } from '@/utils/constants'
 import type { TickerEntry } from '~/utils/perp/types'
 import BigNumber from 'bignumber.js'
+
+const Search = defineAsyncComponent(() => import('./search.vue'))
 const { metadata, loadingPerpMetadata, contractList, perp, tickers } = storeToRefs(usePerpStore())
 const perpWsPubStore = usePerpWsPubStore()
 const visible = shallowRef(false)
+
+const openInterestValue = computed(() => {
+  if (!perp.value?.openInterest || !perp.value?.indexPrice) {
+    return 0
+  }
+  const value = BigNumber(perp.value.openInterest).times(perp.value.indexPrice)
+  return formatNumber(value.toFixed(), {
+    limit: 11,
+    decimals: 2
+  })
+})
+
 watch(
   () => perpWsPubStore.wsResult[WSPerpEventType.TICKER_ALL_1S],
   (val) => {
+    if (!val.data) return
     if (val.dataType === 'Snapshot' && WSPerpEventType.TICKER_ALL_1S == val.channel) {
+      tickers.value = val.data
       if (metadata.value && metadata.value?.contractList?.length > 0) {
+        const tickerMap = new Map(val.data.map((y: any) => [y.contractId, y]))
         contractList.value =
           metadata.value?.contractList?.map((i) => {
-            const item = val.data?.find((y: any) => y?.contractId === i?.contractId)
-            // console.log('----------item------', item)
-            if (item) {
-              i = {
-                ...i,
-                ...item,
-              }
-            }
-            return i
-          }) || []
+            const item = tickerMap.get(i.contractId)
+            return item ? { ...i, ...item } : i
+          })
       } else {
         contractList.value = val.data
       }
-      tickers.value = val.data
     } else if (val.dataType === 'changed' && WSPerpEventType.TICKER_ALL_1S == val.channel) {
-      contractList.value =
-        contractList.value?.map((i) => {
-          const item = val.data?.find((y: any) => y?.contractId === i?.contractId)
-          // console.log('----------item------', item)
-          if (item) {
-            i = {
-              ...i,
-              ...item,
-            }
-          }
-          return i
-        }) || []
-      tickers.value = tickers.value?.map((i) => {
-        const item = (val.data as TickerEntry[])?.find((y) => y?.contractId === i?.contractId)
-        if (item) {
-          i = {
-            ...i,
-            ...item,
-          }
+      const updates = new Map(val.data.map((item: TickerEntry) => [item.contractId, item]))
+
+      contractList.value.forEach(item => {
+        if (updates.has(item.contractId)) {
+          Object.assign(item, updates.get(item.contractId))
         }
-        return i
+      })
+
+      tickers.value.forEach(item => {
+        if (updates.has(item.contractId)) {
+          Object.assign(item, updates.get(item.contractId))
+        }
       })
     }
   }

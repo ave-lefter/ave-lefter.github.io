@@ -25,7 +25,7 @@
       <ul class="flex gap-8px">
         <li
           v-for="item in categoryList"
-          :key="item.key"
+          :key="item.category"
           class="ml-8px cursor-pointer text-14px transition-all"
           :class="activeCategory === item.category ? 'text-[--main-text] underline' : 'text-[--third-text] hover:opacity-80'"
           @click="onCategoryClick(item.category)"
