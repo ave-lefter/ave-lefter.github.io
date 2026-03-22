@@ -13,7 +13,8 @@ let sortParam:any={}
 
 let timeoutId: any = null;
 const tableRef = ref<TableInstance | null>(null)
-const {updateNum4,updateNum5} = storeToRefs(useFollowStore())
+const {userFavoriteGroups} = storeToRefs(useGlobalStore())
+const {updateNum4,updateNum5,delTokenGroup} = storeToRefs(useFollowStore())
 const {isDark,zone} = storeToRefs(useGlobalStore())
 const botStore = useBotStore()
 const walletStore = useWalletStore()
@@ -24,12 +25,21 @@ const router = useRouter()
 const { t } = useI18n()
 const activeTab = ref(0)
 const tabsGroup = ref<any[]>([])
-const allTabsGroup = computed(() => {
-  return [
-    { label: t('defaultGroup'), value: 0 },
-    ...tabsGroup.value
-  ]
+const allTabsGroup=computed(()=>{
+  return  [
+      {
+        value: 0,
+        label: t('defaultGroup'),
+      },
+      ...(userFavoriteGroups.value.map(i => ({...i,label:i.name,value:i.group_id}))||[])
+    ]
 })
+// const allTabsGroup = computed(() => {
+//   return [
+//     { label: t('defaultGroup'), value: 0 },
+//     ...tabsGroup.value
+//   ]
+// })
 const moveList = ref<any[]>([])
 const moveValue = ref('')
 
@@ -76,6 +86,17 @@ const addressValue = computed(() => {
 
 
 // 12-16 批量取消
+watch(() => userFavoriteGroups.value, (val) => {
+  tabsGroup.value = val.map((item) => ({
+    ...item,
+    label: item.name,
+    value: item.group_id
+  }))
+},{immediate: true})
+
+const walletAddress = computed(() => {
+  return botStore.evmAddress || walletStore.address
+})
 const favHover=ref(false)
 
 const checkedList=ref(<any[]>[])
@@ -133,14 +154,14 @@ onActivated(() => {
 watch(() => walletStore.walletSignature[walletStore.address], (newValue) => {
   if (newValue) {
     getList()
-    getGroupList()
+    // getGroupList()
   }
 })
 
 watch(() => botStore.evmAddress, (newVal) => {
   if (newVal) {
     getList()
-    getGroupList()
+    // getGroupList()
   } else {
     tableList.value = []
     tabsGroup.value = []
@@ -150,7 +171,7 @@ watch(() => botStore.evmAddress, (newVal) => {
 watch(() => walletStore.address, (newVal) => {
   if (newVal) {
     getList()
-    getGroupList()
+    // getGroupList()
   } else {
     tableList.value = []
     tabsGroup.value = []
@@ -200,10 +221,8 @@ const handleDeleteGroup = async (groupId: number) => {
   })
   await removeFavoriteGroup(groupId, addressValue.value)
   ElMessage.success(t('success'))
-  getGroupList()
-  if (activeTab.value === groupId || activeTab.value === 0) {
-    setActiveTab(0)
-  }
+  useGlobalStore().getUserFavoriteGroups(walletAddress.value)
+  delTokenGroup.value = groupId
 }
 
 // 添加分组
@@ -214,7 +233,7 @@ const handleAddGroup = async () => {
   await addFavoriteGroup(groupValue.value, addressValue.value)
   ElMessage.success(t('success'))
   addGroupPopoverRef.value?.hide()
-  getGroupList()
+  useGlobalStore().getUserFavoriteGroups(walletAddress.value)
 }
 
 // 重命名分组
@@ -236,7 +255,7 @@ const handleUpdateGroupConfirm = async (item: any, index: number) => {
     await changeFavoriteGroupName(groupValue.value, item.value, addressValue.value)
     ElMessage.success(t('success'))
     editGroupPopoverRef.value[index]?.hide()
-    getGroupList()
+    useGlobalStore().getUserFavoriteGroups(walletAddress.value)
   } catch (err) {
     console.log(err)
     // ElMessage.error(err)
@@ -260,6 +279,7 @@ const handleMoveGroupConfirm = async () => {
     })
     loading.close()
     tabsGroup.value = cloneDeep(moveList.value)
+    useGlobalStore().getUserFavoriteGroups(walletAddress.value)
     ElMessage.success(t('success'))
   } catch (err) {
     loading.close()
@@ -386,9 +406,18 @@ watch(()=>zone.value,(val)=>{
 })
 
 watch(()=>updateNum5.value,()=>{
+  console.log('updateNum5.value',updateNum5.value)
   setActiveTab(activeTab.value)
 })
 
+watch(
+  () => delTokenGroup.value,
+  (val) => {
+    if(val==activeTab.value){
+      setActiveTab(0)
+    }
+  }
+)
 
 // 获取分组列表
 const getGroupList = async () => {
@@ -403,7 +432,7 @@ const getGroupList = async () => {
 onMounted(() => {
   if (!botStore.evmAddress && !walletStore.address) return
   getList()
-  getGroupList()
+  // getGroupList()
 })
 
 // 组件销毁时清理订阅

@@ -34,9 +34,10 @@ const props = defineProps({
 
 const sortOptions = ref(props.list)
 watch(() => props.list, (val) => {
+  console.log('=>(dialogFavoriteManage.vue) props.list', val) 
   sortOptions.value = val
 })
-const {updateNum4,updateNum5} = storeToRefs(useFollowStore())
+const {updateNum4,updateNum5,delTokenGroup} = storeToRefs(useFollowStore())
 const favDialogEvent = useEventBus(BusEventType.FAV_DIALOG)
 const {t} = useI18n()
 const botStore = useBotStore()
@@ -301,9 +302,8 @@ async function _removeFavoriteGroup(item: GetUserFavoriteGroupsResponse) {
   try {
     await removeFavoriteGroup(item.group_id, walletAddress.value)
     ElMessage.success(t('success'))
-    setActiveTab(0)
     props.getData()
-    props.setActiveTab(0)
+    delTokenGroup.value=item.group_id
     favDialogEvent.emit({
       type: 'removeFavoriteGroup',
       groupId:item.group_id

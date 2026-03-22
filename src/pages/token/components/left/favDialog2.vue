@@ -15,11 +15,6 @@ const props = defineProps({
     default: () => {
     }
   },
-  setActiveTab: {
-    type: Function,
-    default: () => {
-    }
-  }
 })
 const {t} = useI18n()
 const emit = defineEmits(['update:visible'])
@@ -84,7 +79,7 @@ const Component = computed(() => {
         </a>
       </div>
     </div> -->
-    <DialogFavoriteManage :visible="show" :list="list" :get-data="getData" :loading="loading" :setActiveTab="setActiveTab"></DialogFavoriteManage>
+    <DialogFavoriteManage :visible="show" :list="list" :get-data="getData" :loading="loading"></DialogFavoriteManage>
     <!-- <component :is="Component" :visible="show" :list="list" :get-data="getData" :loading="loading"/> -->
   </el-dialog>
 </template>
