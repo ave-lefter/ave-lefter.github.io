@@ -822,6 +822,7 @@ function handleDeleteMonitor(row:any){
     address: row.user_address
   }).then(() => {
     ElMessage.success(t('success'))
+    tableRef.value?.toggleRowSelection(row,false)
     updateNum1.value++
     init()
     getMonitorNum()

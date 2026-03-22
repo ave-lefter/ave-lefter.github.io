@@ -489,7 +489,7 @@ onBeforeUnmount(() => {
           </div>
         </div>
       </el-popover>
-      <el-popover trigger="click" @hide="moveValue = ''" ref="moveGroupPopoverRef" :width="250">
+      <el-popover v-if="tabsGroup.length" trigger="click" @hide="moveValue = ''" ref="moveGroupPopoverRef" :width="250">
         <template #reference>
           <div @click="handleMoveGroup"
             class="cursor-pointer text-12px bg-[--main-input-button-bg] color-[--secondary-text] px-8px h-28px rounded-4px shrink-0 flex items-center">

@@ -476,6 +476,7 @@ function toggleMode(mode: string) {
       v-model:visible="editVisible"
       :loading="loading"
       :get-data="_getUserFavoriteGroups"
+      :setActiveTab="setActiveTab"
       :list="userFavoriteGroups"
     />
   </div>

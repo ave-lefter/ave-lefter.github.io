@@ -24,6 +24,11 @@ const props = defineProps({
     default: () => {
     }
   },
+  setActiveTab: {
+    type: Function,
+    default: () => {
+    }
+  },
   visible: Boolean
 })
 
@@ -296,7 +301,9 @@ async function _removeFavoriteGroup(item: GetUserFavoriteGroupsResponse) {
   try {
     await removeFavoriteGroup(item.group_id, walletAddress.value)
     ElMessage.success(t('success'))
+    setActiveTab(0)
     props.getData()
+    props.setActiveTab(0)
     favDialogEvent.emit({
       type: 'removeFavoriteGroup',
       groupId:item.group_id
