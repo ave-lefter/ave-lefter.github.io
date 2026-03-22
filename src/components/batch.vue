@@ -102,9 +102,12 @@
         />
         <div v-if="!isValid" class="error-message mt-2"><span v-html="errorMessage"></span></div>
         <div class="flex mt-10px mb-4px justify-between">
-          <div class="text-14px">{{ $t('addToGroup') }}
-          </div>
+          <div class="text-14px">{{ $t('addToGroup') }}</div>
           <el-switch v-model="showGroup" size="small" />
+        </div>
+        <div class="flex mt-10px mb-4px justify-between">
+          <div class="text-14px">{{ $t('isMonitored') }}</div>
+          <el-switch v-model="isMonitored" size="small" />
         </div>
         <div v-if="showGroup" class="mb-40px">
           <el-select
@@ -300,6 +303,7 @@ const loadingDelete = ref(false)
 const zeroBalanceAddresses = ref('')
 const zeroBalanceList = ref([])
 const showGroup = ref(false)
+const isMonitored = ref(true)
 const proPopoverRef = ref()
 const addGroupName = ref('')
 const addButtonRef = ref()
@@ -493,7 +497,7 @@ const handleBulkImportAttention = () => {
     return
   }
   loading.value = true
-  bulkImportAttention(arr, undefined ,selectedGroupId.value)
+  bulkImportAttention(arr, undefined ,selectedGroupId.value, isMonitored.value)
     .then((res) => {
       console.log(res)
       ElMessage.success(t('success'))

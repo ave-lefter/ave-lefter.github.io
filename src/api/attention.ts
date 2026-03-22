@@ -411,19 +411,22 @@ export async function bulkImportAttention(
   addressArr: BulkImportAttentionItem[],
   address: string = localStorage.bot_evmAddress || localStorage.walletAddress,
   group: number | undefined,
+  is_monitored : boolean
 ): Promise<any> {
   const arr: Array<{
     address: string
     remark?: string
     user_address: string
     user_chain: string
+    is_monitored: 1 | 0
   }> = addressArr.map((i) => {
     return {
       address: address,
       remark: i.remark,
       user_address: i.user_address,
       user_chain: i.user_chain,
-      group_id: group
+      group_id: group,
+      is_monitored: is_monitored ? 1 : 0
     }
   })
   const { $api } = useNuxtApp()
