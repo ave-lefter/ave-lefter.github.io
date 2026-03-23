@@ -104,7 +104,10 @@ const pageInfo = ref({
 })
 watch(
   () => pageInfo.value.pageNO,
-  (val) => { useSessionStorage('hot-pageNO', 1).value = val }
+  (val) => { 
+    useSessionStorage('hot-pageNO', 1).value = val 
+    nextTick(() => aveTableRef.value?.scrollToTop(0))
+  }
 )
 
 watch(
@@ -198,17 +201,6 @@ watch(
   () => {
     pageInfo.value.pageNO = 1
     _getTreasureList()
-  }
-)
-
-watch(
-  () => pageInfo.value.pageNO,
-  () => {
-    if (aveTableRef.value) {
-      setTimeout(() => {
-        aveTableRef.value.scrollToTop(0)
-      }, 20)
-    }
   }
 )
 

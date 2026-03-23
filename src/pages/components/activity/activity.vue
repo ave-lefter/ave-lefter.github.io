@@ -83,7 +83,10 @@ const pageInfo = ref({
 })
 watch(
   () => pageInfo.value.pageNO,
-  (val) => { useSessionStorage('activity-pageNO', 1).value = val }
+  (val) => {
+    useSessionStorage('activity-pageNO', 1).value = val
+    nextTick(() => tableRef.value?.scrollToTop(0))
+  }
 )
 watch(
   () => updateNum5.value,
@@ -173,7 +176,6 @@ async function _getTreasureList(shouldLoading = true) {
     })
     pageInfo.value.total = res.total
     listData.value = (res.data || []).map(props.listMapFunction)
-    nextTick(() => tableRef.value?.scrollToTop(0))
     if (shouldLoading) {
       initWs()
     }

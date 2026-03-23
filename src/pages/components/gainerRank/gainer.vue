@@ -102,7 +102,10 @@ const pageInfo = ref({
 
 watch(
   () => pageInfo.value.pageNO,
-  (val) => { useSessionStorage('gainer-pageNO', 1).value = val }
+  (val) => { 
+    useSessionStorage('gainer-pageNO', 1).value = val
+    nextTick(() => tableRef.value?.scrollToTop(0))
+  }
 )
 
 watch(
@@ -257,7 +260,6 @@ async function _getTreasureList(shouldLoading = true) {
 
     const processedData = (res.data || []).map(props.listMapFunction)
     listData.value = processedData
-    nextTick(() => tableRef.value?.scrollToTop(0))
 
     // 更新缓存
     tableDataCache[cacheKey] = {
