@@ -36,9 +36,9 @@ export interface PumpObj {
   co_holders_count: string
   buy_tax: any
   sell_tax: any
-  dev_migrated_count?: number
-  dev_migrated_ratio?: number
-  dev_total_count?: number
+  dev_migrated_count: number
+  dev_migrated_ratio: number
+  dev_total_count: number
   dev_age_seconds?: any
   dev_first_transfer_in_from?: string
   dev_first_transfer_in_from_label?: any

@@ -1995,9 +1995,9 @@
   "latestToken": "最新代币",
   "ago": "以前",
   "similarTokens": "同名代币",
-  "devMigrated": "Dev已迁移",
+  "devMigrated": "Dev发币迁移数",
   "devLaunched": "Dev发币总数",
-  "migratedRatio": "迁移比例",
+  "migratedRatio": "Dev迁移比例",
   "KOLRatio": "KOL占比",
   "smarterRatio": "聪明钱占比",
   "devWallet": "DEV钱包",
@@ -2091,8 +2091,8 @@
   "averageMarketBuySell": "平均市值买卖",
   "openMonitorSuccess": "开启监控成功",
   "cancelMonitorSuccess": "取消监控成功",
-  "totalTax": "总税率",
-  "taxTip": "总税率：代币税率",
+  "totalTax": "代币税",
+  "taxTip": "代币税：代币税率",
   "smarterAddress": "聪明钱包数",
   "kolSummary": "共有{people}位{type}, 目前有{holders}人持仓, {type}持仓{vol},占比{ratio}",
   "perp1": "合约",
@@ -2133,5 +2133,6 @@
   "removeTokenTips2": "是否删除所选监控?",
   "pairTax": "池子税收",
   "buyOnce": "相同代币只买一次",
-  "liquidityLimit": "池子大小限制"
+  "liquidityLimit": "池子大小限制",
+  "twitterFollowers": "推特粉丝数"
 }
