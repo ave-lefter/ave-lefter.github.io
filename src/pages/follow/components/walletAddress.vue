@@ -14,7 +14,7 @@
           <el-radio-button label="30D" :value="'30d'" />
         </el-radio-group>
       </li>
-      <li v-if="isMonitor" :class="`btn btn1 ${(checkedList2.length&&'warning')} ${!checkedList2.length&&'cursor-not-allowed!'}`" @click="batchDelete2">{{ $t('batchDelete') }}{{checkedList2.length?`(${checkedList2.length})`:''}}</li>
+      <!-- <li v-if="isMonitor" :class="`btn btn1 ${(checkedList2.length&&'warning')} ${!checkedList2.length&&'cursor-not-allowed!'}`" @click="batchDelete2">{{ $t('batchDelete') }}{{checkedList2.length?`(${checkedList2.length})`:''}}</li> -->
       <!-- checkedList -->
     </ul>
     <div v-if="currentAddress" class="m-header flex-between px-16px items-start">
@@ -54,7 +54,7 @@
        <el-table-column :label="$t('wallet2')" width="215" :fixed="false">
           <template #header>
             <div v-if="favHover|| (!isMonitor && checkedList.length)" :class="`batchDel mr-8px ${(checkedList.length&&'warning')}`" @click="batchDelete">{{ $t('batchDelete') }}{{checkedList.length?`(${checkedList.length})`:''}}</div>
-            <!-- <div v-else-if="favHover|| (isMonitor && checkedList2.length)" :class="`batchDel mr-8px ${(checkedList2.length&&'warning')}`" @click="batchDelete2">{{ $t('batchDelete') }}{{checkedList2.length?`(${checkedList2.length})`:''}}</div> -->
+            <div v-else-if="isMonitor&&checkedList2.length" :class="`batchDel mr-8px warning`" @click="batchDelete2">{{ $t('batchDelete') }}{{checkedList2.length?`(${checkedList2.length})`:''}}</div>
             <span class="text-10px" style="opacity: 0">0</span>
             <span>{{ $t('wallet2') }}</span>
               <Icon

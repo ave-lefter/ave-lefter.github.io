@@ -591,7 +591,7 @@ class="flex-1 text-center cursor-pointer text-14px color-[#F5F5F5] bg-[#3F80F7] 
   font-size: 12px;
   &.warning{
     cursor: pointer;
-    background-color: #F6465D1A;
+    background-color: #3F80F71A;
     color: var(--primary-color);
   }
 }
