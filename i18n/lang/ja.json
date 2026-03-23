@@ -1494,5 +1494,8 @@
   "onlyFollowed": "フォローのみ",
   "OnlyDev": "開発者のみ",
   "OnlyYou": "あなただけ",
-  "you": "あなた"
+  "you": "あなた",
+  "favRemarksTips": "選択したウォレットをフォローしますか?",
+  "batchFav": "バッチフォロー",
+  "removeTokenTips2": "選択したモニタリングを削除しますか?"
 }

@@ -21,7 +21,7 @@ const topAddGroupEvent = useEventBus(BusEventType.TOP_ADD_GROUP)
 topAddGroupEvent.on(_getUserFavoriteGroups)
 
 const otherListArea = ref<ScrollbarInstance>()
-
+const {updateNum4,updateNum5,delTokenGroup} = storeToRefs(useFollowStore())
 
 onUnmounted(() => {
   topEventBus.off(refresh)
@@ -68,6 +68,8 @@ watch(
           current_price_usd: item.uprice,
           price_change: item.price_change,
           price_change_v2: item.price_change_v2,
+          pool_circulating_supply:
+            (i.total - i.lock_amount - i.burn_amount - i.other_amount) * item.uprice
         }
       }
       return i
@@ -97,7 +99,7 @@ const walletAddress = computed(() => {
 })
 const editVisible = shallowRef(false)
 const loading = shallowRef(false)
-const userFavoriteGroups = shallowRef<GetUserFavoriteGroupsResponse[]>([])
+const {userFavoriteGroups} = storeToRefs(useGlobalStore())
 const activeTab = shallowRef(0)
 const favoriteCondition = useStorage('favoriteCondition', { currentMode: 'mcap' })
 const sort = shallowRef<{
@@ -127,6 +129,17 @@ const favoritesList = shallowRef<
     pool_circulating_supply: number
   })[]
 >([])
+
+const userFavoriteGroups2=computed(()=>{
+  return  [
+      {
+        group_id: 0,
+        name: t('defaultGroup'),
+      },
+      ...(userFavoriteGroups.value||[])
+    ]
+})
+
 const columns = computed(() => {
   return [
     {
@@ -176,14 +189,20 @@ const sortedFavList = computed(() => {
 
 onMounted(() => {
   if (walletAddress.value) {
-    _getUserFavoriteGroups()
+    useGlobalStore().getUserFavoriteGroups(walletAddress.value)
+  }else{
+    userFavoriteGroups.value=[]
   }
 })
 watch(
   () => walletAddress.value,
-  () => {
-    _getUserFavoriteGroups()
-    setActiveTab(0, 0)
+  (val) => {
+    if(val){
+      useGlobalStore().getUserFavoriteGroups(walletAddress.value)
+      setActiveTab(0, 0)
+    }else{
+      userFavoriteGroups.value=[]
+    }
   }
 )
 
@@ -223,17 +242,33 @@ watch(
   }
 )
 
+watch(
+  () => updateNum4.value,
+  () => {
+    resetListStatus()
+    loadMoreFavorites()
+  }
+)
+watch(
+  () => delTokenGroup.value,
+  (val) => {
+    if(val==activeTab.value){
+      setActiveTab(0, 0)
+    }
+  }
+)
+
 const arrowVisible = ref(false)
 async function _getUserFavoriteGroups() {
   try {
     loading.value = true
-    const res = await getUserFavoriteGroups(walletAddress.value)
-    userFavoriteGroups.value = [
-      {
-        group_id: 0,
-        name: t('defaultGroup'),
-      },
-    ].concat((res || []).filter((el) => !!el.name))
+    useGlobalStore().getUserFavoriteGroups(walletAddress.value)
+    // userFavoriteGroups.value = [
+    //   {
+    //     group_id: 0,
+    //     name: t('defaultGroup'),
+    //   },
+    // ].concat((res || []).filter((el) => !!el.name))
     setTimeout(() => {
       arrowVisible.value = Number(tabsContainer.value?.offsetWidth) > 212
     })
@@ -362,7 +397,7 @@ function toggleMode(mode: string) {
             {{ $t('defaultGroup') }}
           </span>
           <span
-            v-for="(item, index) in userFavoriteGroups.slice(1)"
+            v-for="(item, index) in userFavoriteGroups"
             :key="index"
             :class="`decoration-none shrink-0 text-12px lh-16px text-center px-4px py-2px rounded-4px cursor-pointer ${activeTab === item.group_id ? 'bg-[--border] color-[--main-text]' : 'color-[--third-text]'}`"
             @click="setActiveTab(item.group_id, index + 1)"
@@ -393,7 +428,7 @@ function toggleMode(mode: string) {
         :infinite-scroll-delay="10"
         :infinite-scroll-immediate="false"
       >
-        <div class="pb-20px">
+        <div class="pb-0px">
           <NuxtLink
             v-for="(row, $index) in sortedFavList"
             :key="`${row.token}-${row.chain}`"
@@ -463,12 +498,11 @@ function toggleMode(mode: string) {
         </div>
       </div>
     </el-scrollbar>
-
     <FavDialog
       v-model:visible="editVisible"
       :loading="loading"
       :get-data="_getUserFavoriteGroups"
-      :list="userFavoriteGroups"
+      :list="userFavoriteGroups2"
     />
   </div>
 </template>

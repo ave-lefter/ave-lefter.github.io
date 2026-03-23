@@ -43,7 +43,7 @@
           {{ t('socialMediaTracker') }}
         </div>
       </el-badge>
-      <el-badge :is-dot="false">
+      <el-badge :is-dot="false" class="mr-12px">
         <div
           class="flex items-center gap-4px cursor-pointer hover:color-[--main-text]"
           :class="positionStore.visible ? 'color-[--main-text]' : 'color-[--secondary-text]'"
@@ -52,7 +52,19 @@
           <div class="flex items-center justify-center text-14px">
             <Icon name="custom:holding" />
           </div>
-           {{t('holding')}}
+          {{t('holding')}}
+        </div>
+      </el-badge>
+      <el-badge :is-dot="false">
+        <div
+          class="flex items-center gap-4px cursor-pointer hover:color-[--main-text]"
+          :class="favTokenStore.visible ? 'color-[--main-text]' : 'color-[--secondary-text]'"
+          @click="handleClickDrag('favToken')"
+        >
+          <div class="flex items-center justify-center text-16px">
+            <Icon name="material-symbols:kid-star" />
+          </div>
+          {{t('favorites')}}
         </div>
       </el-badge>
       <el-popover popper-style="padding: 0;border-radius: 8px;" width="auto" placement="top" :teleported="false" trigger="hover">
@@ -213,6 +225,7 @@ const monitorStore = useMonitorStore()
 const signalStore = useSignalStore()
 const trackerStore = useTwitterTrackerStore()
 const positionStore = usePositionStore()
+const favTokenStore = useFavTokenStore()
 const themeStore = useThemeStore()
 const globalStore = useGlobalStore()
 const botStore = useBotStore()
@@ -724,7 +737,7 @@ const audioUrl = computed(() => {
   )
 })
 
-function handleClickDrag(type:'monitor'|'signal'|'tracker'|'position') {
+function handleClickDrag(type:'monitor'|'signal'|'tracker'|'position'|'favToken') {
   switch (type) {
     case 'monitor':
       if((monitorStore.isLeftFixed||monitorStore.isRightFixed) && (dragStore.fixedCount >= 3) &&!monitorStore.visible){
@@ -753,6 +766,13 @@ function handleClickDrag(type:'monitor'|'signal'|'tracker'|'position') {
         positionStore.isRightFixed = false
       }
       positionStore.visible = !positionStore.visible
+      break
+    case 'favToken':
+      if((favTokenStore.isLeftFixed||favTokenStore.isRightFixed) && (dragStore.fixedCount >= 3) &&!favTokenStore.visible){
+        favTokenStore.isLeftFixed = false
+        favTokenStore.isRightFixed = false
+      }
+      favTokenStore.visible = !favTokenStore.visible
       break
     default:
       break

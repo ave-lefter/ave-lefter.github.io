@@ -45,7 +45,7 @@ import dayjs from 'dayjs'
 
 const { t } = useI18n()
 const globalStore = useGlobalStore()
-
+const {updateNum5} = storeToRefs(useFollowStore())
 const props = defineProps<{
   listMapFunction(i: Record<string, any>): Record<string, any>
   activeChain: string
@@ -93,7 +93,18 @@ const pageInfo = ref({
 })
 watch(
   () => pageInfo.value.pageNO,
-  (val) => { useSessionStorage('new-pageNO', 1).value = val }
+  (val) => { 
+    useSessionStorage('new-pageNO', 1).value = val
+    nextTick(() => tableRef.value?.scrollToTop(0))
+  }
+)
+
+watch(
+  () => updateNum5.value,
+  () => {  
+    pageInfo.value.pageNO = 1
+    _getTreasureList()
+  }
 )
 const tableRef = shallowRef()
 const loading = shallowRef(false)
@@ -157,7 +168,6 @@ async function _getTreasureList(shouldLoading = true) {
     })
     pageInfo.value.total = res.total
     listData.value = (res.data || []).map(props.listMapFunction)
-    nextTick(() => tableRef.value?.scrollToTop(0))
     if (shouldLoading) {
       initWs()
     }

@@ -247,6 +247,13 @@ function batchDeleteFavorite(data: any): Promise<any> {
     body: data
   })
 }
+function batchFavRemarks(data: any): Promise<any> {
+  const { $api } = useNuxtApp()
+  return $api('/v2api/fav_users/v1/user/remark/changeTo', {
+      method: 'post',
+    body: data
+  })
+}
 export {
   getUserFavoriteGroups,
   getFavoriteList,
@@ -266,6 +273,7 @@ export {
   getNewFavoriteList,
   getRemarksDetail,
   getGroupChangeIndex,
-  batchDeleteFavorite
+  batchDeleteFavorite,
+  batchFavRemarks,
 }
 export type { GetUserFavoriteGroupsResponse, GetFavListResponse }

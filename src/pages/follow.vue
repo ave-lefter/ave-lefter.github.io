@@ -33,6 +33,10 @@ const tabData=computed(()=>[
     path:'/follow/addr'
   },
   {
+    label:t('monitor'),
+    path:'/follow/monitor'
+  },
+  {
     label:t('remarkLib'),
     path:'/follow/remark'
   }
@@ -41,14 +45,14 @@ watch(
   () => route.path,
   (newPath, oldPath) => {
     console.log('===================', newPath)
-    if (newPath === '/follow/addr' || newPath === '/follow/remark') {
+    if (newPath === '/follow/addr' || newPath === '/follow/monitor' ||newPath === '/follow/remark') {
         getFollowingInfo()
         getFollowingAddress()
       }
   }
 )
 onMounted(() => {
-  if (route.path === '/follow/addr' || route.path === '/follow/remark') {
+  if (route.path === '/follow/addr' || route.path === '/follow/monitor' ||route.path === '/follow/remark') {
     getFollowingInfo()
     getFollowingAddress()
   }

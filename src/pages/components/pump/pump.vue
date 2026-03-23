@@ -49,6 +49,7 @@ import { addFavorite, removeFavorite } from '~/api/fav'
 import type { RowEventHandlerParams } from 'element-plus'
 
 const { t } = useI18n()
+const {updateNum5} = storeToRefs(useFollowStore())
 const globalStore = useGlobalStore()
 const walletStore = useWalletStore()
 const botStore = useBotStore()
@@ -99,7 +100,18 @@ const pageInfo = ref({
 })
 watch(
   () => pageInfo.value.pageNO,
-  (val) => { useSessionStorage('pump-pageNO', 1).value = val }
+  (val) => { 
+    useSessionStorage('pump-pageNO', 1).value = val 
+    nextTick(() => tableRef.value?.scrollToTop(0))
+  }
+)
+
+watch(
+  () => updateNum5.value,
+  () => {  
+    pageInfo.value.pageNO = 1
+    _getTreasureList()
+  }
 )
 const tableRef = shallowRef()
 const loading = shallowRef(false)
@@ -163,7 +175,6 @@ async function _getTreasureList(shouldLoading = true) {
     })
     pageInfo.value.total = res.total
     listData.value = (res.data || []).map(props.listMapFunction)
-    nextTick(() => tableRef.value?.scrollToTop(0))
     if (shouldLoading) {
       initWs()
     }

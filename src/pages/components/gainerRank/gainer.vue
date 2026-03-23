@@ -55,6 +55,7 @@ const props = defineProps<{
 }>()
 
 const { rankConditions } = storeToRefs(globalStore)
+const {updateNum5} = storeToRefs(useFollowStore())
 
 function setSortConditions(params: { sort: string; sort_dir: string }) {
   rankConditions.value.gainer.sort = params
@@ -101,7 +102,18 @@ const pageInfo = ref({
 
 watch(
   () => pageInfo.value.pageNO,
-  (val) => { useSessionStorage('gainer-pageNO', 1).value = val }
+  (val) => { 
+    useSessionStorage('gainer-pageNO', 1).value = val
+    nextTick(() => tableRef.value?.scrollToTop(0))
+  }
+)
+
+watch(
+  () => updateNum5.value,
+  () => {  
+    pageInfo.value.pageNO = 1
+    _getTreasureList()
+  }
 )
 
 const tableRef = shallowRef()
@@ -248,7 +260,6 @@ async function _getTreasureList(shouldLoading = true) {
 
     const processedData = (res.data || []).map(props.listMapFunction)
     listData.value = processedData
-    nextTick(() => tableRef.value?.scrollToTop(0))
 
     // 更新缓存
     tableDataCache[cacheKey] = {
@@ -430,7 +441,6 @@ const headerRenderer = computed(() => {
     sniper_tx_count: SnipersHeader,
   }
 })
-
 const cellRenderer = computed(() => {
   return {
     poolPair: PoolPairContent,

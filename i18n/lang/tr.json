@@ -641,5 +641,9 @@
   "onlyFollowed": "Yalnızca Takip Edilenler",
   "OnlyDev": "Yalnızca Geliştirici",
   "OnlyYou": "Sadece sen",
-  "you": "Sen"
+  "you": "Sen",
+  "favRemarksTips": "Seçilen Cüzdan'ı takip etmek istiyor musunuz?",
+  "batchFav": "Toplu Takip",
+  "removeTokenTips2": "Seçilen izleme silinsin mi?",
+  "monitor": "monitör"
 }

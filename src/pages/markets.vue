@@ -76,7 +76,7 @@ onActivated(() => {
 onMounted(() => {
   _getTreasureConfig()
   if (walletAddress.value) {
-    useGlobalStore().getUserFavoriteGroups(walletAddress.value)
+    // useGlobalStore().getUserFavoriteGroups(walletAddress.value)
   }
   trackRef({ category: 'view', extra: 'home(pro.ave.ai)' })
 })
@@ -84,7 +84,7 @@ watch(
   () => walletAddress.value,
   (val) => {
     if (val) {
-      useGlobalStore().getUserFavoriteGroups(walletAddress.value)
+      // useGlobalStore().getUserFavoriteGroups(walletAddress.value)
     }
   }
 )

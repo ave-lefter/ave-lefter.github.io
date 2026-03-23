@@ -29,6 +29,7 @@
     <SignalDraggable v-if="!signalStore.shouldHide" />
     <MonitorDragger v-show="monitorStore.visible" />
     <PositionDragger v-show="positionStore.visible" />
+    <FavTokenDragger v-show="favTokenStore.visible" />
     <!-- <DragPump v-show="dragPumpStore.visible && !dragPumpStore.shouldHide" /> -->
     <TrackerDragger/>
     <FavAddressPop
@@ -66,6 +67,7 @@ const globalStore = useGlobalStore()
 const dragPumpStore = usePumpStore()
 const trackerStore = useTwitterTrackerStore()
 const positionStore = usePositionStore()
+const favTokenStore = useFavTokenStore()
 const route = useRoute()
 
 const _style = computed(() => {
@@ -78,7 +80,7 @@ const _style = computed(() => {
       paddingRight += signalStore.fixedWidth + 1
     }
   }
-  ;[monitorStore, dragPumpStore, trackerStore,positionStore].forEach((storeItem) => {
+  ;[monitorStore, dragPumpStore, trackerStore,positionStore,favTokenStore].forEach((storeItem) => {
     // 不存在 shouldHide 属性或者 shouldHide 为 false
     if (storeItem.visible && (!('shouldHide' in storeItem) || !storeItem.shouldHide)) {
       if (storeItem.isLeftFixed) {
