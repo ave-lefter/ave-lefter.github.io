@@ -641,5 +641,6 @@
   "onlyFollowed": "Yalnızca Takip Edilenler",
   "OnlyDev": "Yalnızca Geliştirici",
   "OnlyYou": "Sadece sen",
-  "you": "Sen"
+  "you": "Sen",
+  "reasonInvalid": "Geçersiz Neden"
 }

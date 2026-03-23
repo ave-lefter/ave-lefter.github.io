@@ -1655,6 +1655,7 @@
   "watchingCopyTrade": "Watching",
   "showPositions": "Show Positions",
   "reasonFailure": "Reason Failure",
+    "reasonInvalid": "Reason Invalid",
   "historyCopyTrade": "History Copy Trade",
   "createCopyTrade": "Create Copy Trade",
   "copyTradeMethod": "Copy Trade Method",

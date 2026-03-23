@@ -864,6 +864,7 @@
   "addrGroup": "주소 그룹",
   "push": "푸시",
   "copyTrade": "트레이딩 복사",
+    "reasonInvalid": "무효 이유",
   "pauseMonitor": "모니터링 일시 정지",
   "enableMonitor": "모니터링 활성화",
   "cabal": "밋업 주소",

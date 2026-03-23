@@ -1637,6 +1637,7 @@
   "watchingCopyTrade": "重新跟單",
   "showPositions": "僅顯示當前持有幣種",
   "reasonFailure": "失敗原因",
+    "reasonInvalid": "未生效原因",
   "historyCopyTrade": "歷史跟單地址",
   "createCopyTrade": "新建錢包跟單",
   "copyTradeMethod": "跟單管道",

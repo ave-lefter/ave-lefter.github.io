@@ -511,6 +511,7 @@
   "addrGroup": "Nhóm địa chỉ",
   "push": "Xô",
   "copyTrade": "Copy giao dịch",
+    "reasonInvalid": "Lý do không hiệu lực",
   "pauseMonitor": "Tạm dừng giám sát",
   "enableMonitor": "Bật giám sát",
   "sniper": "Người săn",

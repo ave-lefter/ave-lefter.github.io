@@ -157,7 +157,7 @@ export function _getFailFollowTxs(data: {
   pageSize: string
 }) {
   const { $api } = useNuxtApp()
-  return $api('/botapi/swap/getFailFollowTxs', {
+  return $api('/botapi/swap/getFailFollowTxsV2', {
     method: 'get',
     headers: {
       'ave-platform': 'web',

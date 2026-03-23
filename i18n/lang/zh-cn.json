@@ -1666,6 +1666,7 @@
   "watchingCopyTrade": "重新跟单",
   "showPositions": "仅显示当前持有币种",
   "reasonFailure": "失败原因",
+    "reasonInvalid": "未生效原因",
   "historyCopyTrade": "历史跟单地址",
   "createCopyTrade": "新建钱包跟单",
   "copyTradeMethod": "跟单方式",

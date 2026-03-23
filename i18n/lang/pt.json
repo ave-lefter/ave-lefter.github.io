@@ -645,5 +645,6 @@
   "onlyFollowed": "Apenas seguido",
   "OnlyDev": "Somente desenvolvedor",
   "OnlyYou": "Só você",
-  "you": "Você"
+  "you": "Você",
+  "reasonInvalid": "Razão inválida"
 }
