@@ -61,8 +61,8 @@
           :class="favTokenStore.visible ? 'color-[--main-text]' : 'color-[--secondary-text]'"
           @click="handleClickDrag('favToken')"
         >
-          <div class="flex items-center justify-center text-14px">
-            <Icon name="custom:holding" />
+          <div class="flex items-center justify-center text-16px">
+            <Icon name="material-symbols:kid-star" />
           </div>
           {{t('favorites')}}
         </div>
