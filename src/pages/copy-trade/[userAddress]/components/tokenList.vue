@@ -13,7 +13,7 @@
         <AveEmpty v-if="!loading && tableData.length === 0" class="pt-[40px]" />
         <span v-else />
       </template>
-      <el-table-column :label="$t('type')" fixed="left" v-if="type === 'success' || type === 'failed'">
+      <el-table-column :label="$t('type')" fixed="left" v-if="type === 'success' || type === 'failed'|| type === 'invalid' ">
         <template #header>
           <span>{{ $t('type') }}</span>
           <el-popover
@@ -147,7 +147,7 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('amount')" align="right">
+      <el-table-column v-if="type === 'success'" :label="$t('amount')" align="right">
         <template #default="{ row }">
           <div :class="!row?.amount ? 'color-text-3' : ''">
             {{ row?.amount > 0 ? formatNumber(row?.amount || 0, 2) : 0 }}
