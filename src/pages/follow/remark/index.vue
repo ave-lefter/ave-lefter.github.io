@@ -275,7 +275,7 @@ const collect = async (row: any) => {
 }
 
 // 获取列表
-const getList = async () => {
+const getList = useThrottleFn(async () => {
   loading.value = true
   const res: any = await getRemarksDetail({
     address: addressValue.value,
@@ -295,7 +295,7 @@ const getList = async () => {
   pageData.value.total = res.total
   tableList.value = tableData
   loading.value = false
-}
+}, 1000)
 
 function safeBigNumber(value: any) {
   try {
