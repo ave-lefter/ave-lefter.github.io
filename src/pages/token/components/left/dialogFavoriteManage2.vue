@@ -37,7 +37,7 @@ watch(() => props.list, (val) => {
   console.log('=>(dialogFavoriteManage.vue) props.list', val) 
   sortOptions.value = val
 })
-const {updateNum4,updateNum5,delTokenGroup} = storeToRefs(useFollowStore())
+const {updateNum11,updateNum4,delTokenGroup} = storeToRefs(useFollowStore())
 const favDialogEvent = useEventBus(BusEventType.FAV_DIALOG)
 const {t} = useI18n()
 const botStore = useBotStore()
@@ -335,7 +335,7 @@ async function batchDelete() {
     favDialogEvent.emit({
       type: 'delete',
     })
-    updateNum5.value++
+    updateNum4.value++
   }).catch((e) => {
      ElMessage.error(String(e))
   })
@@ -353,7 +353,7 @@ function removeTokenFavorite(row:any) {
         type: 'delete',
       })
       resetAndGet()
-      updateNum5.value++
+      updateNum4.value++
       ElMessage.success(t('cancelled1'))
       props.getData()
     })

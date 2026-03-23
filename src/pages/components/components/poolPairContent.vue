@@ -5,7 +5,7 @@ import XIcon from '~/components/xPopup/xIcon.vue'
 import Collect from '~/components/collect.vue'
 
 const emit = defineEmits(['toggleKline'])
-const {updateNum4,updateNum5} = storeToRefs(useFollowStore())
+const {updateNum11,updateNum4} = storeToRefs(useFollowStore())
 const rankKlineStore = useRankKlineStore()
 const walletStore = useWalletStore()
 const botStore = useBotStore()
@@ -119,7 +119,8 @@ function removeTokenFavorite(row) {
     .then(() => {
       ElMessage.success(t('cancelled1'))
       row.is_fav = false
-      updateNum4.value++
+      updateNum11.value++
+      console.log('removeTokenFavorite')
     })
     .catch((err) => {
       console.log(err)
@@ -132,7 +133,8 @@ function addTokenFavorite(row, newGroupId: number) {
     .then(() => {
       ElMessage.success(t('collected'))
       row.is_fav = true
-      updateNum4.value++
+      updateNum11.value++
+      console.log('addTokenFavorite')
     })
     .catch((err) => {
       console.log(err)

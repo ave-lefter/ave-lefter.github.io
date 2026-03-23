@@ -48,7 +48,7 @@ const localeStore = useLocaleStore()
 const globalStore = useGlobalStore()
 const rankKlineStore = useRankKlineStore()
 const klineChartsData = ref<any[]>([])
-const {updateNum5} = storeToRefs(useFollowStore())
+const {updateNum4} = storeToRefs(useFollowStore())
 const props = defineProps<{
   listMapFunction(i: Record<string, any>): Record<string, any>
   activeChain: string
@@ -111,7 +111,7 @@ watch(
 )
 
 watch(
-  () => updateNum5.value,
+  () => updateNum4.value,
   () => {  
     pageInfo.value.pageNO = 1
     _getTreasureList()

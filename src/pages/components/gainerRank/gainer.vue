@@ -55,7 +55,7 @@ const props = defineProps<{
 }>()
 
 const { rankConditions } = storeToRefs(globalStore)
-const {updateNum5} = storeToRefs(useFollowStore())
+const {updateNum4} = storeToRefs(useFollowStore())
 
 function setSortConditions(params: { sort: string; sort_dir: string }) {
   rankConditions.value.gainer.sort = params
@@ -109,7 +109,7 @@ watch(
 )
 
 watch(
-  () => updateNum5.value,
+  () => updateNum4.value,
   () => {  
     pageInfo.value.pageNO = 1
     _getTreasureList()

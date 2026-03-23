@@ -14,7 +14,7 @@ let sortParam:any={}
 let timeoutId: any = null;
 const tableRef = ref<TableInstance | null>(null)
 const {userFavoriteGroups} = storeToRefs(useGlobalStore())
-const {updateNum4,updateNum5,delTokenGroup} = storeToRefs(useFollowStore())
+const {updateNum11,updateNum4,delTokenGroup} = storeToRefs(useFollowStore())
 const {isDark,zone} = storeToRefs(useGlobalStore())
 const botStore = useBotStore()
 const walletStore = useWalletStore()
@@ -149,7 +149,8 @@ onActivated(() => {
   checkedList.value = []
   tableRef.value!.clearSelection()
   clearTimeout(timeoutId);
-  // reCreateChild()
+  setActiveTab(activeTab.value)
+  // reCreateChild()-
 })
 watch(() => walletStore.walletSignature[walletStore.address], (newValue) => {
   if (newValue) {
@@ -347,7 +348,7 @@ const collect = (row: any) => {
       // const newList = checkedList.value.filter((item) => item !== `${row.token}-${row.chain}`)
       // checkedList.value = newList
       tableRef.value?.toggleRowSelection(row,false)
-      updateNum4.value++
+      updateNum11.value++
     })
     .catch((err) => {
       console.log(err)
@@ -405,8 +406,8 @@ watch(()=>zone.value,(val)=>{
   }
 })
 
-watch(()=>updateNum5.value,()=>{
-  console.log('updateNum5.value',updateNum5.value)
+watch(()=>updateNum4.value,()=>{
+  console.log('updateNum4.value',updateNum4.value)
   setActiveTab(activeTab.value)
 })
 
