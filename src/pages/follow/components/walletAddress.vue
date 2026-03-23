@@ -1,6 +1,6 @@
 <template>
-  <div class="w-address flex-1 w-100% h-[calc(100%-76px)] flex flex-col relative" :class="{ 'mt-12px': currentAddress }">
-    <ul v-if="currentAddress" class="w-operate">
+  <div class="w-address flex-1 w-100% h-[calc(100%-76px)] flex flex-col relative" :class="{ 'mt-12px': currentAddress&&!isMonitor }">
+    <ul v-if="currentAddress" class="w-operate" :class="{ 'top--41px!': currentAddress&&!isMonitor }">
       <!-- <li v-if="evmAddress" class="flex items-center gap-2px">
           <el-checkbox v-model="isMonitor" @change="handleMonitorChange" :label="t('onlyPush')"  style="color:var(--secondary-text);z-index: 0;--el-checkbox-font-weight:400" class="[--el-checkbox-checked-text-color:var(--d-F5F5F5-l-333)]! [&&]:[--el-checkbox-input-border:1px_solid_var(--icon-color)]" size="large"/>
           <span class="text-[var(--secondary-text)] text-14px" :class="{'text-[var(--d-F5F5F5-l-333)]!':isMonitor}">{{ `${monitorNum}/500` }}</span>
@@ -1157,7 +1157,7 @@ function copyTrade(row:  {user_chain: string, user_address: string}) {
 }
 .w-operate{
   position: absolute;
-  top: -42px;
+  top: -29px;
   right: 0;
   width: 50%;
   display: flex;
