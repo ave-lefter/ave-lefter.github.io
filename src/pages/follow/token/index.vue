@@ -149,6 +149,7 @@ onActivated(() => {
   checkedList.value = []
   tableRef.value!.clearSelection()
   clearTimeout(timeoutId);
+  if (!botStore.evmAddress && !walletStore.address) return
   setActiveTab(activeTab.value)
   // reCreateChild()-
 })
