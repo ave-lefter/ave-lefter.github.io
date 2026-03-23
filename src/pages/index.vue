@@ -1,6 +1,6 @@
 <template>
-  <div v-if="route.name=='index'" class="pump w-full bg-[--main-bg]">
-    <div class="flex-start p-x-17px py-12px bg-[--main-bg] mb-1px mt-1px">
+  <div v-if="route.name=='index'" class="pump w-full bg-[--d-0E0F10-l-FFF]">
+    <div class="flex-start p-x-17px py-12px bg-[--d-0E0F10-l-FFF] mb-1px mt-1px">
       <div class="tabs mr-8px">
         <div
           v-for="item in pumpConfig"
@@ -98,7 +98,7 @@
     </div>
     <el-row type="flex" :gutter="pumpSetting.isGutter ? 10 : 2" class="w-full pl-16px" :class="pumpSetting.isGutter? 'pr-6px': 'pr-14px'">
       <el-col v-show="single('new') && pumpSetting.grid['new']?.show" :span="getSpan()" :style="{order: orderNew}">
-        <div class="pump-item  rounded-4px" style="padding-top: 15px;">
+        <div class="pump-item  rounded-4px pt-10px">
           <div class="pump-item_header flex-start px-12px rounded-4px">
             <template v-if="width > 1024">
               <!-- <img
@@ -150,7 +150,7 @@
               v-if="pumpSetting?.show_search"
               ref="inputSearch"
               v-model.trim="pumpStore.pumpV3[activeChain].new.pumpFilter.q"
-              class="search-input1 px-20px mr-4px"
+              class="search-input1 px-20px mr-8px"
               size="small"
               :placeholder="$t('keywordsPlaceholder')"
               @input="(val) => {
@@ -205,7 +205,7 @@
         </div>
       </el-col>
       <el-col v-show="single('soon') && pumpSetting.grid['soon'].show" :span="getSpan()" :style="{order: orderSoon}">
-        <div class="pump-item" style="padding-top: 15px;">
+        <div class="pump-item pt-10px">
           <div class="pump-item_header flex-start px-12px rounded-4px">
             <template v-if="width > 1024">
               <!-- <img
@@ -257,7 +257,7 @@
               v-if="pumpSetting?.show_search"
               ref="inputSearch"
               v-model.trim="pumpStore.pumpV3[activeChain].soon.pumpFilter.q"
-              class="search-input1 px-20px mr-4px"
+              class="search-input1 px-20px mr-8px"
               size="small"
               :placeholder="$t('keywordsPlaceholder')"
               @input="(val) => {
@@ -312,7 +312,7 @@
         </div>
       </el-col>
       <el-col v-show="single('graduated') && pumpSetting.grid['graduated'].show" :span="getSpan()" :style="{order: orderGraduated}">
-        <div class="pump-item" style="padding-top: 15px;">
+        <div class="pump-item pt-10px">
           <div class="pump-item_header flex-start px-12px rounded-4px">
             <template v-if="width > 1024">
               <!-- <img
@@ -365,7 +365,7 @@
               v-if="pumpSetting?.show_search"
               ref="inputSearch"
               v-model.trim="pumpStore.pumpV3[activeChain].graduated.pumpFilter.q"
-              class="search-input1 px-20px mr-4px"
+              class="search-input1 px-20px mr-8px"
               size="small"
               :placeholder="$t('keywordsPlaceholder')"
               @input="(val) => {
@@ -427,6 +427,7 @@
       :activeChain="activeChain"
       :activeFilterType="activeFilterType"
       :platformsList="platformsList"
+      :deployerPlatforms="deployerPlatforms"
       :baseTokens="baseTokenMap.values().toArray()"
       @update:filterData="handlerFilterConfirm"
     />
@@ -590,7 +591,20 @@ const activeFilterType = ref<'new' | 'soon' | 'graduated'>('new')
 // let wsTableListCache: PumpObj[] = []
 let wsTableListCache: Record<string, PumpObj[]> = {}
 const wsTableList = shallowRef<PumpObj[]>([])
-const logoList = shallowRef<{ logo_url: string, name: string, token: string, symbol: string, rTime: number, appendix: string, twitter_type: number, buy_tax: number, sell_tax: number }[]>([])
+const logoList = shallowRef<{
+  is_pump_agent: number
+  logo_url: string,
+  name: string,
+  token: string,
+  symbol: string,
+  rTime: number,
+  appendix: string,
+  twitter_type: number,
+  buy_tax: number,
+  sell_tax: number,
+  deployer_platform: string
+  is_cloned: number,
+}[]>([])
 type StatisticsItem = {
   first_transfer_in_from_label: any
   volume_u_24h: number
@@ -642,6 +656,9 @@ const mapStatistics = shallowRef(new Map<string, StatisticsItem>())
 // })
 const platformsList = computed(() => {
   return pumpConfig.value?.filter(i=> i.chain == activeChain.value)?.[0]?.platforms || []
+})
+const deployerPlatforms = computed(() => {
+  return pumpConfig.value?.filter(i=> i.chain == activeChain.value)?.[0]?.deployer_platforms || []
 })
 const platforms = computed(() => {
     return pumpV3.value?.[activeChain.value]?.platforms?.filter?.(Boolean).join(',')
@@ -736,7 +753,25 @@ const list1 = computed(() => {
               twitter_type: obj.twitter_type
             }
           : {}
-        )
+        ),
+        ...(obj.is_cloned
+          ? {
+              is_cloned: obj.is_cloned
+            }
+          : {}
+        ),
+        ...(obj.deployer_platform
+          ? {
+              deployer_platform: obj.deployer_platform
+            }
+          : {}
+        ),
+        ...(obj.is_pump_agent
+          ? {
+              is_pump_agent: obj.is_pump_agent
+            }
+          : {}
+        ),
       }
     })
   }
@@ -790,15 +825,43 @@ const list2 = computed(() => {
             }
           : {}
         ),
-        name: obj.name,
-        symbol: obj.symbol,
+        ...(obj.name
+          ? {
+              name: obj.name
+            }
+          : {}
+        ),
+        ...(obj.symbol
+          ? {
+              symbol: obj.symbol
+            }
+          : {}
+        ),
         ...(obj.appendix
           ? {
               medias: getMedias(obj.appendix),
               twitter_type: obj.twitter_type
             }
           : {}
-        )
+        ),
+        ...(obj.is_cloned
+          ? {
+              is_cloned: obj.is_cloned
+            }
+          : {}
+        ),
+        ...(obj.deployer_platform
+          ? {
+              deployer_platform: obj.deployer_platform
+            }
+          : {}
+        ),
+        ...(obj.is_pump_agent
+          ? {
+              is_pump_agent: obj.is_pump_agent
+            }
+          : {}
+        ),
       }
     })
   }
@@ -884,7 +947,25 @@ let list = fourmemeListObj?.[activeChain.value]?.graduated || []
               twitter_type: obj.twitter_type
             }
           : {}
-        )
+        ),
+        ...(obj.is_cloned
+          ? {
+              is_cloned: obj.is_cloned
+            }
+          : {}
+        ),
+        ...(obj.deployer_platform
+          ? {
+              deployer_platform: obj.deployer_platform
+            }
+          : {}
+        ),
+        ...(obj.is_pump_agent
+          ? {
+              is_pump_agent: obj.is_pump_agent
+            }
+          : {}
+        ),
       }
     })
   }
@@ -1066,10 +1147,23 @@ const bufferLogoMap = new Map<string, any>()
 const logoThrottled = useThrottleFn(() => {
   if (!bufferLogoMap.size) return
   const mergedList = Array.from(bufferLogoMap.values())
-  logoList.value = [
-    ...mergedList,
-    ...logoList.value,
-  ].slice(0, 300)
+  const map = new Map()
+  // 新数据优先
+  mergedList.forEach(item => {
+    map.set(item.token, item)
+  })
+  // 旧数据补充
+  logoList.value.forEach(item => {
+    if (!map.has(item.token)) {
+      map.set(item.token, item)
+    }
+  })
+  logoList.value = Array.from(map.values()).slice(0, 300)
+  // logoList.value = [
+  //   ...mergedList,
+  //   ...logoList.value,
+  // ].slice(0, 300)
+
   bufferLogoMap.clear()
 }, 100)
 
@@ -1082,7 +1176,7 @@ watchTokenUpdatedUnwatch = watch(
       bufferLogoMap,
       val.token,
       prev ? mergeLogo(prev, val) : val,
-      100
+      300
     )
     logoThrottled()
   }
@@ -1358,16 +1452,7 @@ function getPumpConfig() {
     pumpConfig.value = Array.isArray(res) ? res : []
     pumpConfig.value?.forEach(i => {
       if (!pumpV3.value[i.chain]?.platforms?.length) {
-        const platforms = i.platforms?.map(y => {
-          if (i.chain == 'solana') {
-            if (y.platform !== 'believe') {
-              return y.platform || ''
-            }
-            return ''
-          } else {
-            return y.platform || ''
-          }
-        }) || []
+        const platforms = i.platforms?.map(y => y.platform) || []
         const platformsString = platforms.filter(Boolean).join(',')
 
         pumpV3.value[i.chain] = {
@@ -1752,6 +1837,9 @@ function getFilterData(list: PumpObj[], conditions: any) {
     if (conditions?.rbtx) {
       pass = pass && i.buys_tx_24h_count <= Number(conditions.rbtx)
     }
+    if (conditions?.deployer_platform_exclude) {
+      pass = pass && !i.deployer_platform || !(conditions?.deployer_platform_exclude?.includes?.(i.deployer_platform))
+    }
     if (conditions?.platforms) {
       pass = pass && (
         conditions?.platforms?.includes?.(i.platform_id)
@@ -2089,13 +2177,29 @@ function mergeStatistics(prev: any, next: any) {
   }
   return result
 }
+// function mergeLogo(prev: any, next: any) {
+//   return {
+//     ...prev,
+//     ...next,
+//     logo_url: next.logo_url || prev.logo_url,
+//     appendix: next.appendix || prev.appendix,
+//     buy_tax: next.buy_tax || prev.buy_tax,
+//     sell_tax: next.sell_tax || prev.sell_tax,
+//     is_cloned: next.is_cloned || prev.is_cloned,
+//     deployer_platform: next.deployer_platform || prev.deployer_platform
+//   }
+// }
 function mergeLogo(prev: any, next: any) {
-  return {
-    ...prev,
-    ...next,
-    logo_url: next.logo_url || prev.logo_url,
-    appendix: next.appendix || prev.appendix,
-  }
+  const result = { ...prev }
+
+  Object.keys(next).forEach((key) => {
+    const val = next[key]
+    if (val !== undefined) {
+      result[key] = val
+    }
+  })
+
+  return result
 }
 function handleClearFilter(type: 'new' | 'soon' | 'graduated') {
   const platformsString = pumpConfig.value?.find(i => i.chain === activeChain.value)?.platforms?.map(i => i.platform)?.filter(i=>i!=='believe').join?.(',') || ''
@@ -2252,7 +2356,7 @@ function hitBlacklist(item:PumpObj, black: pumpBlack) {
   color: var(--main-text);
 }
 .pump-item{
-  background: var(--main-bg);
+  background: var(--d-0E0F10-l-FFF);
   border: 1px solid var(--main-input-button-bg);
   border-radius: 4px;
 }

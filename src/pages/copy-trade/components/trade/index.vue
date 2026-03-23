@@ -114,7 +114,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column align="right" :min-width="250" fixed="right">
+      <el-table-column align="right" :min-width="260" fixed="right">
         <template #header>
           <span class="mr-7px">{{ $t('operation') }}</span>
         </template>
@@ -129,15 +129,15 @@
 </template>
 
 <script setup lang="ts">
-import { useWindowSize } from '@vueuse/core'
-import { type CopyObj } from '@/api/copyTrade'
-import TradeDialog from '../tradeDialog.vue'
+// import { useWindowSize } from '@vueuse/core'
+import type { CopyObj } from '@/api/copyTrade'
+// import TradeDialog from '../tradeDialog.vue'
 import Operate from '../operate.vue'
-const { copyTradeVisible, copyObj, copyOrderLoading, copyOrder  } = storeToRefs(useCopyTradeStore())
+const { copyObj, copyOrderLoading, copyOrder  } = storeToRefs(useCopyTradeStore())
 
-const { t } = useI18n()
+// const { t } = useI18n()
 const router = useRouter()
-const { height } = useWindowSize()
+// const { height } = useWindowSize()
 const tableData = computed(() => {
   return copyOrder.value?.copyList  || []
 })

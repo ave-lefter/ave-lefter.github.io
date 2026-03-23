@@ -17,7 +17,7 @@ export function useXPopup() {
   })
 
   function onEnter(tokenId: string, e: { target: any }, type?: 1 | 2 | 3, isGetData = true) {
-    if (isGetData) {
+    if (isGetData || !contentProps?.info) {
       getXData(tokenId, type)
     }
     $tooltip.show({
@@ -59,7 +59,7 @@ export function useXPopup() {
     }
     if ([1, 2, 3].includes(contentProps.type)) {
       getXContent(tokenId, contentProps.type).then(res => {
-        contentProps.info = res
+        contentProps.info = res || null
       }).catch(() => {
         contentProps.info = null
       }).finally(() => {

@@ -1,6 +1,6 @@
 <template>
   <el-dialog align-center v-model="localVisible" header-class="hidden"
-    class="[--el-bg-color:--pump-bg] border-1px border-solid border-[--main-divider] dialog" title="" :width="488"
+    class="[--el-bg-color:--pump-bg] border-1px border-solid border-[--main-divider] dialog color-[--main-text1]" title="" :width="488"
     style="padding: 0" append-to-body :persistent="false" :show-close="false">
     <template #default>
       <div
@@ -11,7 +11,7 @@
       <div class="flex items-center px-16px gap-16px border-b-1px border-b-solid border-b-[--main-divider] mb-16px">
         <div v-for="(item) in topTabs" :key="item.value" class="flex items-center gap-4px">
           <span
-            :class="`flex items-center decoration-none text-12px lh-39px text-center b-b-solid b-b-2px cursor-pointer ${activeTab === item.value ? 'color-[--main-text] b-b-[--main-text] font-500' : 'b-b-transparent color-[--secondary-text]'}`"
+            :class="`flex items-center decoration-none text-12px lh-39px text-center b-b-solid b-b-2px cursor-pointer ${activeTab === item.value ? 'color-[--main-text1] b-b-[--main-text] font-500' : 'b-b-transparent color-[--secondary-text]'}`"
             @click="activeTab = item.value">
             {{ item.name }}
           </span>
@@ -42,7 +42,10 @@
               <el-checkbox v-for="platform in platformsList" :key="platform.platform" :label="platform.platform"
                 class="[&&]:mr-0 [&&]:[--el-checkbox-height:28px]">
                 <span
-                  class="flex items-center gap-8px rounded-30px py-6px px-12px border-1px border-solid color-[--main-text]"
+                  class="flex items-center gap-8px rounded-30px py-6px px-12px border-1px border-solid color-[--main-text1]"
+                  :class="{
+                    'opacity-70': !form.platforms?.split(',').includes(platform.platform)
+                  }"
                   :style="{ borderColor: PlatformColors[platform.platform] }">
                   <el-image class="rounded w-14px" :src="`${configStore.token_logo_url}${platform.platform_icon?.replace(
                     '/signals/',
@@ -68,7 +71,10 @@
               <el-checkbox v-for="platform in baseTokens" :key="platform.token" :label="platform.token"
                 class="[&&]:mr-0 [&&]:[--el-checkbox-height:28px]">
                 <span
-                  class="flex items-center gap-8px rounded-30px py-6px px-12px border-1px border-solid color-[--main-text]"
+                  class="flex items-center gap-8px rounded-30px py-6px px-12px border-1px border-solid color-[--main-text1]"
+                  :class="{
+                    'opacity-70': !form.base_tokens?.split(',').includes(platform.token)
+                  }"
                   :style="{ borderColor: PlatformColors[platform.symbol] }">
                   <el-image class="rounded w-14px" :src="platform.logo_url ? `${configStore.token_logo_url}${platform.logo_url?.replace(
                     '/signals/',
@@ -99,7 +105,7 @@
           </div>
           <div class="mx-16px p-2px border-1px border-solid border-[--main-divider] flex items-center rounded-6px">
             <div class="flex-1 rounded-6px text-center lh-28px cursor-pointer" v-for="item in tabs2"
-              :class="tabs2Active === item.id ? 'bg-[--pump-filter-bg] color-[--main-text]' : 'color-[--secondary-text]'"
+              :class="tabs2Active === item.id ? 'bg-[--pump-filter-bg] color-[--main-text1]' : 'color-[--secondary-text]'"
               :key="item.id" @click="tabs2Active = item.id">
               {{ item.name }}
             </div>
@@ -124,6 +130,25 @@
               </span>
             </el-checkbox>
           </div>
+          <div v-show="tabs2Active === Tabs2Enum.indicator && deployerPlatforms?.length >0" class="px-16px  py-12px">
+            <span class="text-12px">{{ $t('filterDeployerPlatform') }}</span>
+            <div class="py-12px border">
+              <el-checkbox-group size="default" @change="(val) => form.deployer_platform_exclude = val.join(',')"
+                :model-value="form.deployer_platform_exclude? form.deployer_platform_exclude.split(',') : []" class="grid grid-cols-2 gap-12px flex-1">
+                <el-checkbox v-for="item in deployerPlatforms" :key="item.platform" :label="item.platform"
+                  class="[&&]:mr-0 [&&]:[--el-checkbox-height:28px]">
+                  <span class="flex items-center gap-8px color-[--main-text1]">
+                    <el-image class="rounded w-14px" :src="`${configStore.token_logo_url}${item.logo_url?.replace(
+                      '/signals/',
+                      'signals/'
+                    )}`" />
+                    {{ item.name }}
+                  </span>
+                </el-checkbox>
+              </el-checkbox-group>
+            </div>
+          </div>
+
           <el-form-item v-if="!storage.value?.includes('_graduated') && tabs2Active===Tabs2Enum.indicator" :label="`${t('progress')}(%)`"
             class="mt-12px px-16px columns-form-item">
 
@@ -198,12 +223,12 @@
         <el-form-item>
           <div style="display: flex; width: 100%" class="mt-18px px-16px">
             <el-button class="flex-1 rounded-8px"
-              style="height: 36px; min-width: 60px; --el-button-font-weight: 400; background: var(--border); border: none;color: var(--main-text)"
+              style="height: 36px; min-width: 60px; --el-button-font-weight: 400; background: var(--border); border: none;color: var(--main-text1)"
               @click="reset">
               {{ $t('reset') }}
             </el-button>
             <el-button
-              style="height: 36px; min-width: 60px; --el-button-font-weight: 400; background:#3F80F7; color: #f5f5f5"
+              style="height: 36px; min-width: 60px; --el-button-font-weight: 400; background:#3F80F7; color: #e0e0e0"
               type="primary" class="flex-1 rounded-8px" @click="handleConfirm">
               {{ $t('confirm') }}
             </el-button>
@@ -238,6 +263,10 @@ const props = defineProps({
     type: Array<any>,
     default: () => []
   },
+  deployerPlatforms: {
+    type: Array<any>,
+    default: () => []
+  },
   baseTokens:{
     type:Array<any>,
     default:() => []
@@ -264,6 +293,7 @@ const limitData = {
   q: '',
   dev_sale_out: 0,
   platforms: 'pump,moonshot',
+  deployer_platform_exclude: '',
   // platforms_pump: true,
   // platforms_moonshot: true,
   progress_min: 0, //进度
@@ -308,6 +338,7 @@ const initForm = {
   q: '',
   dev_sale_out: 0,
   platforms: 'pump,moonshot',
+  deployer_platform_exclude: '',
   // platforms_pump: true,
   // platforms_moonshot: true,
   progress_min: '', //进度
@@ -801,7 +832,7 @@ const getItemFilterNumber = value => {
   position: relative;
 
   &.hight {
-    color: var(--main-text)
+    color: var(--main-text1)
   }
 
   img {
@@ -816,17 +847,17 @@ const getItemFilterNumber = value => {
     height: 14px;
     text-align: center;
     background-color: var(--third-text);
-    color: var(--main-text);
+    color: var(--main-text1);
     margin-left: 4px;
     font-size: 10px;
   }
 
   &:hover {
     cursor: pointer;
-    color: var(--main-text);
+    color: var(--main-text1);
 
     .iconify {
-      color: var(--main-text);
+      color: var(--main-text1);
     }
   }
 
@@ -865,7 +896,7 @@ const getItemFilterNumber = value => {
     justify-content: center;
 
     &.active {
-      color: var(--main-text);
+      color: var(--main-text1);
       background: var(--dialog-tab-active-bg);
     }
   }
@@ -877,7 +908,7 @@ const getItemFilterNumber = value => {
 }
 
 :deep().el-form-item__label {
-  color: var(--main-text);
+  color: var(--main-text1);
   height: 36px;
   line-height: 36px;
 }
@@ -903,7 +934,7 @@ const getItemFilterNumber = value => {
   --el-input-bg-color: var(--pump-filter-bg);
   --el-input-border-color: var(--pump-filter-bg);
   --el-input-border-radius: 4px;
-  color: var(--main-text);
+  color: var(--main-text1);
 
   .el-checkbox__inner {
     border-color: var(--border);
@@ -928,7 +959,7 @@ const getItemFilterNumber = value => {
     }
 
     .el-input__inner {
-      color: var(--main-text);
+      color: var(--main-text1);
 
       &::placeholder {
         color: var(--third-text);

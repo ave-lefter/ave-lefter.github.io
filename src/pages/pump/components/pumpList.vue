@@ -1,5 +1,5 @@
 <template>
-  <div class="mt-20px mb-30px relative">
+  <div class="mt-10px mb-30px relative">
     <ul  v-bind="containerProps" class="pump-item_list scroller-container"  :style="{height: scrollHeight}" @scroll="handleScroll">
       <div v-bind="wrapperProps">
           <li
@@ -11,14 +11,19 @@
             :style="{ background:  pumpSetting.bgList?.includes(row.platform)? pumpSetting?.bg?.[row.platform]?.bg : '' }"
             @click.stop="tableRowClick(row)"
             @contextmenu="handleContextMenu($event, row)"
+            @mouseenter="() => currentRow = row "
+            @mouseleave="currentRow = null"
           >
             <div class="w-full relative" :class="getAnimClass(row)">
               <div class="flex-start items-start relative">
                 <div class="mr-12px relative">
+                  <!-- <div class="flex items-center px-4px py-2px bg-[--secondary-bg] absolute z-2 right--2px top--7px !rounded-4px border border-1 border-solid border-[--border] color-[--secondary-text] text-9px">
+                      <Icon class="text-9px mr-2px" name="ix:image" />44
+                  </div> -->
                   <div class="black-container">
                     <span
                       v-tooltip="pumpBlackList?.findIndex(i => (i.address == row.token && i.type == 'ca') || (i.address == row.symbol && i.type == 'keyword')) !== -1 ? $t('cancel') + $t('BlackListToken') : $t('BlackListToken')"
-                      class="bg-[--d-000-l-FFF] cursor-pointer px-2px py-2px color-[--third-text1] block rounded-2px hover:color-[--secondary-text] w-16px h-16px flex items-center justify-center"
+                      class="bg-[--d-000-l-FFF] cursor-pointer px-2px py-2px color-[--third-text1] block rounded-2px hover:color-[--primary-color] w-16px h-16px flex items-center justify-center"
                     >
                       <Icon
                         v-if="
@@ -42,7 +47,7 @@
                     </span>
                     <span
                       v-tooltip="pumpBlackList?.findIndex(i => i.address == row.token && i.type == 'dev') !== -1 ? $t('cancel') + $t('BlackListDev') : $t('BlackListDev')"
-                      class="bg-[--d-000-l-FFF] cursor-pointer px-2px py-2px color-[--third-text1] block rounded-2px mt-4px hover:color-[--secondary-text] w-16px h-16px flex items-center justify-center"
+                      class="bg-[--d-000-l-FFF] cursor-pointer px-2px py-2px color-[--third-text1] block rounded-2px mt-4px hover:color-[--primary-color] w-16px h-16px flex items-center justify-center"
                     >
                       <Icon
                         v-if="
@@ -64,7 +69,7 @@
                     <span
                       v-if="row?.medias?.filter?.(i => i.icon === 'twitter')?.length > 0 && row?.medias?.filter?.(i => i.icon === 'twitter')?.[0] && formatXUser(row?.medias?.filter?.(i => i.icon === 'twitter')?.[0]?.url)"
                       v-tooltip="pumpBlackList?.findIndex(i => i.address == row.token && i.type == 'twitter') !== -1 ? $t('cancel') + $t('BlackListTwitter') : $t('BlackListTwitter')"
-                      class="bg-[--d-000-l-FFF] cursor-pointer px-2px py-2px color-[--third-text1] block rounded-2px mt-4px hover:color-[--secondary-text] w-16px h-16px flex items-center justify-center"
+                      class="bg-[--d-000-l-FFF] cursor-pointer px-2px py-2px color-[--third-text1] block rounded-2px mt-4px hover:color-[--primary-color] w-16px h-16px flex items-center justify-center"
                     >
                       <Icon
                         v-if="
@@ -162,7 +167,7 @@
                     {{row.token?.slice(0, 4) + '...' + row.token?.slice(-4)}}
                   </div>
                 </div>
-                <div class="flex flex-col self-stretch relative">
+                <div class="flex flex-col self-stretch relative overflow-hidden">
                   <div class="flex-start">
                     <span v-tooltip="row.symbol" v-copy="row.token" class="text-16px font-500 mr-5px symbol-ellipsis ellipsis-auto block color-[--d-F2F2F2-l-000]">{{
                       row.symbol
@@ -173,22 +178,40 @@
                       v-copy="row.name"
                       class="name text-12px font-500 mr-5px color-[--third-text1] symbol-ellipsis ellipsis-auto block"
                       >{{ row.name }}</span>
+                      <img
+                        v-if="row.is_cloned"
+                        @mouseover.stop="onEnter($event, row, props.type,getDataColor, true)"
+                        @click.stop
+                        class="rounded-100% mr-5px cursor-pointer"
+                        :src="formatIconTag(row?.deployer_platform)"
+                        alt=""
+                        :width="12"
+                      >
+                      <img
+                        v-if="row.is_pump_agent"
+                        v-tooltip="$t('agentToken')"
+                        class="rounded-100% mr-5px cursor-pointer"
+                        :src="formatIconTag('pumpt_agent')"
+                        alt=""
+                        :width="12"
+                      >
                     <span
                       v-if="row.buy_tax && row.sell_tax"
                     >
                       <span
                         v-if="row.buy_tax == row.sell_tax"
-                        class=""
+                        class="bg-[--d-1E2025-l-E8F1FF] rounded-4px px-2px text-10px"
                         :style="{
-                              color:(Number(row?.sell_tax) > 5 ? '#F6465D' : 'var(--secondary-text)'),
+                              color:(Number(row?.sell_tax) > 5 ? '#F6465D' : 'var(--secondary-text1)'),
                           }"
                       >
                         Tax {{ formatNumber(row?.sell_tax || 0, 2) }}%
                       </span>
                       <span
                         v-else
+                        class="bg-[--d-1E2025-l-E8F1FF] rounded-4px px-2px text-10px"
                           :style="{
-                              color: (Number(row?.sell_tax) > 5 || Number(row?.buy_tax) > 5  ? '#F6465D' :'var(--secondary-text)'),
+                              color: (Number(row?.sell_tax) > 5 || Number(row?.buy_tax) > 5  ? '#F6465D' :'var(--secondary-text1)'),
                           }"
                       >
                       B {{ formatNumber(row?.buy_tax || 0, 2) }}%&nbsp;&nbsp;S {{ formatNumber(row?.sell_tax || 0, 2) }}%
@@ -196,16 +219,18 @@
                     </span>
                     <span
                       v-else-if="row.buy_tax"
+                      class="bg-[--d-1E2025-l-E8F1FF] rounded-4px px-2px text-10px"
                       :style="{
-                            color:(Number(row?.buy_tax) > 5 ? '#F6465D' : 'var(--secondary-text)'),
+                            color:(Number(row?.buy_tax) > 5 ? '#F6465D' : 'var(--secondary-text1)'),
                         }"
                     >
                       B {{ formatNumber(row?.buy_tax || 0, 2) }}%
                     </span>
                     <span
                       v-else-if="row.sell_tax"
+                      class="bg-[--d-1E2025-l-E8F1FF] rounded-4px text-10px"
                         :style="{
-                            color:(Number(row?.sell_tax) > 5 ? '#F6465D' : 'var(--secondary-text)'),
+                            color:(Number(row?.sell_tax) > 5 ? '#F6465D' : 'var(--secondary-text1)'),
                         }"
                     >
                       S {{ formatNumber(row?.sell_tax || 0, 2) }}%
@@ -214,7 +239,7 @@
                   <div class="flex-start text-12px mt-5px">
                       <div
                         v-tooltip="formatDate(row?.created_at || row?.time)"
-                        class="time"
+                        class="time mr-8px"
                         :style="{
                           color:
                             Number(formatTimeFromNow(row?.created_at || row?.time, true)) <= 600
@@ -251,7 +276,7 @@
                           content:getLiqTooltip(row),
                           props: { 'raw-content': true, 'popper-class': 'pump-tooltip' }
                         }"
-                        class="rounded-100% cursor-pointer ml-8px mr-8px"
+                        class="rounded-100% cursor-pointer mr-8px"
                         :src="getSymbolDefaultIcon({ ...(row.baseToken || {}), chain: row.chain})"
                         alt=""
                         :width="12"
@@ -391,6 +416,20 @@
                         {{ formatNumber(row?.holders || 0, 2) }}
                       </span>
                     </div>
+                    <!-- <div
+                      v-tooltip.raw="{
+                        content: `$t('followed')`,
+                        props: {
+                          placement: 'top-start',
+                        },
+                      }"
+                      class="flex mr-8px items-center"
+                    >
+                      <Icon
+                        class="iconfont icon-rug text-10px vertical-middle color-[--yellow]"
+                        name="custom:fav"
+                      />
+                    </div> -->
                     <div
                       v-show="pumpSetting?.define?.some((i) => i === 'markers')"
                       v-tooltip.raw="{
@@ -414,6 +453,10 @@
                     v-if="route.name === 'index' && pumpSetting?.define?.some((i) => i === 'kol')"
                     class="flex mr-8px"
                     :tokenId="(row?.token || row?.target_token) + '-' + row?.chain"
+                    :baseInfo="{
+                      symbol: row.symbol,
+                      logo_url: row.logo_url || ''
+                    }"
                     type="kol"
                     :ratio="Number(row?.kol_ratio || 0)"
                     >
@@ -432,6 +475,10 @@
                       v-if="route.name === 'index' && pumpSetting?.define?.some((i) => i === 'smart')"
                       class="flex mr-8px"
                       :tokenId="(row?.token || row?.target_token) + '-' + row?.chain"
+                      :baseInfo="{
+                        symbol: row.symbol,
+                        logo_url: row.logo_url || ''
+                      }"
                       type="smart"
                       :ratio="Number(row?.smart_wallet_ratio || 0)"
                       >
@@ -569,7 +616,7 @@ class="flex-start mr-8px bg-btn"
                         :src="formatIconPumpDev(row.dev_first_transfer_in_from_label)"
                         alt=""
                       >
-                      <span v-if="row?.dev_age_seconds" class="ml-4px color-[--secondary-text]">{{ formatSeconds(Number(row?.dev_age_seconds || 0)) }}</span>
+                      <span v-if="row?.dev_age_seconds" class="ml-4px color-[--secondary-text1]">{{ formatSeconds(Number(row?.dev_age_seconds || 0)) }}</span>
                      </DevPop>
                     <!-- </div> -->
                     <div
@@ -669,7 +716,11 @@ class="flex-start mr-8px bg-btn"
                   </div>
                 </div>
               </div>
-              <div class="pump-right bg-transparent" :style="{ background:  pumpSetting.bgList?.includes(row.platform)? pumpSetting?.bg?.[row.platform]?.bg : '', 'border-color': pumpSetting.border &&  pumpSetting.size_swap ==='16px'? (pumpSetting.border =='border_hight' ? '#12B886': 'var(--border)') : 'transparent' ,'box-shadow': pumpSetting.border &&  pumpSetting.size_swap ==='16px'? (pumpSetting.border =='border_hight' ? '0px 2px 10px 0px #12B886': '0px 2px 10px 0px var(--border)') : ''}">
+              <div class="pump-right">
+                <div
+                 v-show="(pumpSetting.border && pumpSetting.size_swap === '16px') || pumpSetting.bgList?.includes(row.platform)"
+                 class="h-102px w-160px absolute z-2 top--12px right--8px border border-solid rounded-8px" :style="{ background:  pumpSetting.bgList?.includes(row.platform)? pumpSetting?.bg?.[row.platform]?.bg : ( pumpSetting.border &&  pumpSetting.size_swap ==='16px'? '#12B88614': ''), 'border-color': pumpSetting.border &&  pumpSetting.size_swap ==='16px'? (pumpSetting.border =='border_hight' ? '#12B886': 'var(--border)') : 'transparent' ,'box-shadow': pumpSetting.border &&  pumpSetting.size_swap ==='16px'? (pumpSetting.border =='border_hight' ? '0px 0px 10px 0px #12B88699': '0px 2px 10px 0px var(--border)') : ''}">
+                </div>
                 <div
                   v-if="
                     (isSoon && row.progress > 99) || pumpSetting?.define?.some((i) => i === 'mcap')
@@ -718,14 +769,14 @@ class="flex-start mr-8px bg-btn"
                 </div>
                 <div
                   v-show="pumpSetting?.define?.some((i) => i === 'txs')"
-                  class="flex-end text-12px pr-12px"
+                  class="flex-end text-12px pr-12px bg-1"
                 >
                   <div v-tooltip.raw="{
                         content: `<div class='max-w-[400px] color-[--secondary-text]'>${$t('netInflow')}: <span class=${ 'color-'+(Number(row?.net_flow_vol) === 0 || row?.net_flow_vol == null? '' : ((row?.net_flow_vol||0)>0?'[--up-color]':'[--down-color]'))}>${Number(row?.net_flow_vol) === 0 || row?.net_flow_vol == null? 0 : ( (row?.net_flow_vol > 0 ? '+$' : '-$')+ formatNumber(Math.abs(row?.net_flow_vol ?? 0), { decimals: 2, l: 4, limit: 3, locale: 'en' }))}</span> </div>`,
                         props: {
                           placement: 'top-start',
                         },
-                      }" class="flex-end">
+                      }" class="flex-end bg-1">
                     <div class="mr-5px color-[--third-text1] ml-5px">N</div>
                     <span v-if="Number(row?.net_flow_vol) === 0 || row?.net_flow_vol == null" class="color-[--third-text1]" >0</span>
                     <div v-else class="color-[--main-text1]">
@@ -744,7 +795,7 @@ class="flex-start mr-8px bg-btn"
                         `,
                       props: { 'raw-content': true, 'popper-class': 'pump-tooltip' }
                     }"
-                    class="relative flex-end">
+                    class="relative flex-end bg-1">
                     <div class="mr-5px color-[--third-text1] ml-5px">Txs</div>
                     <span v-if="Number(row?.tx_24h_count) === 0 || row?.tx_24h_count == null" class="color-[--third-text1]" >0</span>
                     <div v-else class="color-[--main-text1]">
@@ -790,7 +841,7 @@ class="flex-start mr-8px bg-btn"
                     :quickBuyValue="quickBuyValue"
                     :swapSetSelected="props.swapSetSelected"
                     :row="row"
-                    classNames="bg-[--up-color] color-#fff"
+                    :classNames="pumpSetting.border &&  pumpSetting.size_swap ==='16px' ? '' :'bg-[--up-color] color-#fff'"
                     :size="pumpSetting.size_swap"
                     @jump="jump(row)"
                   />
@@ -913,7 +964,7 @@ const handleClearFilter = () => {
 }
 const { quickBuyValue, loading, isOut, isSoon , type} = toRefs(props)
 const tableList = shallowRef<PumpObj[]>(props.tableList || [])
-
+const hover = ref(false)
 // 只监听数组引用变化，不深度监听对象
 watch(() => props.tableList, (newList) => {
   tableList.value = newList
@@ -1259,14 +1310,20 @@ defineExpose({
     cursor: pointer;
     display: flex;
     align-items: center;
-    padding: 15px 0 11px 12px;
+    padding: 15px 10px 11px 12px;
     border-top: 1px solid var(--main-input-button-bg);
     border-radius: 4px;
+    .bg-1{
+      background-color: var(--main-bg);
+    }
     &:hover {
       background-color: var(--main-list-hover);
       .black-container {
         color: #959a9f;
         visibility: visible;
+      }
+      .bg-1{
+        background-color: var(--main-list-hover);
       }
       .pump-right {
         box-shadow: none;
@@ -1284,19 +1341,18 @@ defineExpose({
     .pump-right {
       // box-shadow: -2px 0px 4px 0px #00000099;
       // background: var(--secondary-bg);
-      min-width: 200px;
+      width: 0;
       position: absolute;
       right: 0;
       top: 0;
-      padding-left: 12px;
-      padding-bottom: 5px;
-      border: 1px solid;
+      z-index: 10;
+      // border: 1px solid;
 
       .btns-swap{
         // background-color: var(--secondary-bg);
         position: relative;
-        z-index:1;
-        bottom: -24px;
+        z-index:20;
+        bottom: -15px;
       }
     }
     .black-container {
@@ -1417,7 +1473,7 @@ defineExpose({
 }
 @media (max-width: 1680px) and (min-width: 1025px) {
   .btns-swap{
-    visibility: hidden;
+    // visibility: hidden;
   }
 }
 @media (max-width: 1920px) {
