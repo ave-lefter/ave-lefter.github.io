@@ -849,7 +849,11 @@ const handleMonitor = throttle((row:any,index:number=0) => {
       // dataSource.value[index].is_pause = row.is_pause===0?1:0
       getTableList()
       updateNum1.value++
-      ElMessage.success(t('cancelMonitorSuccess'))
+      if(req===favUsersResumeMonitor){
+        ElMessage.success(t('openMonitorSuccess'))
+      }else{
+        ElMessage.success(t('cancelMonitorSuccess'))
+      }
     }).catch((e) => { ElMessage.error(String(e)) })
     return
   }else{
