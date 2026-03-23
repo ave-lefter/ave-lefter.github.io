@@ -68,6 +68,8 @@ watch(
           current_price_usd: item.uprice,
           price_change: item.price_change,
           price_change_v2: item.price_change_v2,
+          pool_circulating_supply:
+            (i.total - i.lock_amount - i.burn_amount - i.other_amount) * item.uprice
         }
       }
       return i
