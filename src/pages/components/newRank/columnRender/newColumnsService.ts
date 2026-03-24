@@ -9,7 +9,8 @@ export function getNewOptions(t: ReturnType<typeof useI18n>['t']) {
           'liquidityContent',
           'holdersContent',
           'top10PositionsContent',
-          'devContent'
+          'devContent',
+          'securityContent'
         ],
       },
       {
@@ -32,14 +33,13 @@ export function getNewOptions(t: ReturnType<typeof useI18n>['t']) {
           // 'runTime2',
           'snipersContent',
           'snipers1mContent',
-          'securityContent',
           'insidersContent',
           'dexContent'
         ],
       },
     ]
 }
-  
+
 export function getNewDefaultColumns(t: ReturnType<typeof useI18n>['t']) {
   console.log(getTextWidth(t('snipers_1m'), 50) + 70,'minw')
   return [
@@ -204,7 +204,6 @@ export function getNewDefaultColumns(t: ReturnType<typeof useI18n>['t']) {
       minWidth:110,
       align:'right'
     },
-  
     // {
     //   title: t('lastTxsTime1'),
     //   key: 'last_trade_at',
@@ -214,12 +213,12 @@ export function getNewDefaultColumns(t: ReturnType<typeof useI18n>['t']) {
     //   align:'right'
     // },
     {
-      title: t('security'),
+      title: t('tokenInfoSecurity'),
       key: 'security',
       isVisible: true,
       render: 'securityContent',
       children:[
-        {title:t('security'),isVisible:true,render:'securityContent'},
+        {title:t('tokenInfoSecurity'),isVisible:true,render:'securityContent'},
         {title:t('runPull'),isVisible:true,render:'runPullContent'},
       ],
       minWidth:getTextWidth(t('security'), 50) + 55,

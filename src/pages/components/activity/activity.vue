@@ -272,7 +272,7 @@ const headerRenderer = computed(() => {
     holders: HoldersHeader,
     smart_money_buy_volume_24h: SmarterHeader,
     dex: DexHeader,
-    security: () => t('security'),
+    security: () => t('tokenInfoSecurity'),
     holders_top10_ratio: Top10Header,
     quick: () => t('quick'),
     sniper_tx_count: SnipersHeader,

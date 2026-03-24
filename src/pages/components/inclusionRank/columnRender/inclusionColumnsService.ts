@@ -10,6 +10,7 @@ export function getInclusionOptions(t: ReturnType<typeof useI18n>['t']) {
           'holdersContent',
           'top10PositionsContent',
           // 'devContent'
+          'securityContent',
         ],
       },
       {
@@ -39,7 +40,7 @@ export function getInclusionOptions(t: ReturnType<typeof useI18n>['t']) {
       },
     ]
 }
-  
+
 export function getInclusionDefaultColumns(t: ReturnType<typeof useI18n>['t']) {
   console.log(getTextWidth(t('snipers_1m'), 50) + 70,'minw')
   return [
@@ -204,7 +205,7 @@ export function getInclusionDefaultColumns(t: ReturnType<typeof useI18n>['t']) {
     //   minWidth:getTextWidth(t('snipers_1m'), 50) + 60,
     //   align:'right'
     // },
-   
+
     // {
     //   title:'DEV%',
     //   key:'dev_balance_ratio_cur',
@@ -221,8 +222,8 @@ export function getInclusionDefaultColumns(t: ReturnType<typeof useI18n>['t']) {
     //   minWidth:110,
     //   align:'right'
     // },
-  
-   
+
+
     // {
     //   title: t('security'),
     //   key: 'security',

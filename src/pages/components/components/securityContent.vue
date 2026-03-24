@@ -94,7 +94,7 @@ function getRugColor(val) {
 
 <template>
   <div>
-    <div v-if="childrenData[0]?.isVisible" class="flex items-center justify-end gap-4px h-18px">
+    <div v-if="childrenData[0]?.isVisible ?? true" class="flex items-center justify-end gap-4px h-18px">
       <img
         v-if="row.risk_level == -1 || row.risk_score >= 60"
         class="w-16px h-16px"

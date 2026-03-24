@@ -4,11 +4,13 @@ export function getHotOptions(t: ReturnType<typeof useI18n>['t']) {
       title: t('basicInfo'),
       list: [
         // 'headline',
+        'trendChart',
         'priceContent',
         'mCapContent',
         'liquidityContent',
         'holdersContent',
         'top10PositionsContent',
+        'securityContent',
       ],
     },
     {
@@ -28,8 +30,7 @@ export function getHotOptions(t: ReturnType<typeof useI18n>['t']) {
       title: t('securityInfo'),
       list: [
         'snipersContent',
-        'securityContent',
-        // 'runPullContent',
+        'runPullContent',
         'dexContent',
         'insidersContent',
       ],
@@ -145,13 +146,12 @@ export function getHotDefaultColumns(t: ReturnType<typeof useI18n>['t']) {
       align:'center'
     },
     {
-      title: t('security'),
+      title: t('tokenInfoSecurity'),
       key: 'security',
       isVisible: true,
       render: 'securityContent',
       children:[
-        {title:t('security'),isVisible:true,render:'securityContent'},
-        {title:t('runPull'),isVisible:true,render:'runPullContent'},
+        {title:t('tokenInfoSecurity'),isVisible:true,render:'securityContent'},
       ],
       minWidth:getTextWidth(t('security'), 50) + 55,
       align:'right'
