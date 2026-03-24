@@ -211,7 +211,7 @@ export function getPumpOptions(t: ReturnType<typeof useI18n>['t']) {
           {title:t('tokenInfoSecurity'),isVisible:true,render:'securityContent'},
           {title:t('runPull'),isVisible:true,render:'runPullContent'},
         ],
-        minWidth:250,
+        minWidth:280,
         align:'right'
       },
       {

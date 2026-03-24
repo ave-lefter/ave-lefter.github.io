@@ -108,6 +108,8 @@ const storageKey = computed(() => {
   return props.activeTab + 'Ranks'
 })
 let columns = useStorage(storageKey.value, getPumpDefault(t))
+const secColPump = columns.value.find((c: any) => c.render === 'securityContent')
+if (secColPump) secColPump.minWidth = 280
 const isFirstMount = shallowRef(true)
 watch(
   () => [props.activeTab, props.activeSubTab],

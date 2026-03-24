@@ -109,6 +109,8 @@ watch(
 )
 const loading = shallowRef(false)
 const columns = useStorage(CategoryTabsCacheKey.hot, getHotDefaultColumns(t))
+const secCol = columns.value.find((c: any) => c.render === 'securityContent')
+if (secCol) secCol.minWidth = 280
 
 function tableRowClick({ rowData }: RowEventHandlerParams) {
   const {

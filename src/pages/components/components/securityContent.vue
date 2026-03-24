@@ -39,14 +39,14 @@ function formatRate(val) {
 // Top10 颜色
 function top10Color(val) {
   if (val == null || val === 0) return 'color-[--third-text]'
-  if (val >= 30) return 'color-[--yellow]'
+  if (val >= 30) return 'color-[--up-color]'
   return ''
 }
 
 // Dev 颜色
 function devColor(val) {
   if (val == null || Number(val) < 0.1) return 'color-[--secondary-text]'
-  if (val > 10) return 'color-[--yellow]'
+  if (val > 10) return 'color-[--up-color]'
   return ''
 }
 
@@ -59,7 +59,7 @@ function formatDev(val) {
 // 狙击人数颜色
 function sniperColor(val) {
   if (val > 30) return 'color-[--down-color]'
-  return 'color-[--secondary-text]'
+  return 'color-[--up-color]'
 }
 
 // 占比通用颜色（>30%红色）

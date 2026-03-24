@@ -109,6 +109,8 @@ const tableRef = shallowRef()
 
 const loading = shallowRef(false)
 const columns = useStorage(CategoryTabsCacheKey.gainer, getGainDefaultColumns(t))
+const secCol = columns.value.find((c: any) => c.render === 'securityContent')
+if (secCol) secCol.minWidth = 280
 
 function tableRowClick({ rowData }: RowEventHandlerParams) {
   navigateTo(`/token/${rowData.target_token}-${rowData.chain}`)

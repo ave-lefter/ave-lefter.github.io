@@ -102,6 +102,8 @@ const storageKey = computed(() => {
   return CategoryTabsCacheKey.new
 })
 let columns = useStorage(storageKey.value, getNewDefaultColumns(t))
+const secColNew = columns.value.find((c: any) => c.render === 'securityContent')
+if (secColNew) secColNew.minWidth = 280
 const isFirstMount = shallowRef(true)
 watch(
   () => props.activeTab,

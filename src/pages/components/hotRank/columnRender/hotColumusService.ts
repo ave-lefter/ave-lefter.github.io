@@ -152,7 +152,7 @@ export function getHotDefaultColumns(t: ReturnType<typeof useI18n>['t']) {
       children:[
         {title:t('tokenInfoSecurity'),isVisible:true,render:'securityContent'},
       ],
-      minWidth:250,
+      minWidth:280,
       align:'right'
     },
     {
