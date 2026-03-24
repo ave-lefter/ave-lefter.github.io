@@ -136,6 +136,11 @@ watch(() => wsStore.wsResult[WSEventType.ASSET], (val: IAssetResponse) => {
         const newBalanceUsd = newBalance.multipliedBy(price)
         indexObj.balance = newBalance.toString()
         indexObj.balance_usd = newBalanceUsd.toNumber()
+        if(!isBuy){
+          if(!Number(indexObj.balance)){
+            listData.value.splice(index, 1);
+          }
+        }
         triggerRef(listData)
       } else {
         setTimeout(()=>{
@@ -205,7 +210,8 @@ const userIds = computed(() => {
   }
 })
 
-watch(() => userIds.value, () => {
+watch(() => userIds.value, (old,val) => {
+  if(JSON.stringify(old) === JSON.stringify(val)) return
   tableFilter.value.user_ids = userIds.value
 })
 
