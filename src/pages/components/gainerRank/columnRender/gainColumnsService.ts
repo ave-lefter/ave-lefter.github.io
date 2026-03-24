@@ -152,7 +152,7 @@ export function getGainDefaultColumns(t: ReturnType<typeof useI18n>['t']) {
         { title: t('tokenInfoSecurity'), isVisible: true, render: 'securityContent' },
         { title: t('runPull'), isVisible: true, render: 'runPullContent' },
       ],
-      minWidth: getTextWidth(t('security'), 50) + 55,
+      minWidth: 250,
       align: 'right'
     },
     {

@@ -8,6 +8,7 @@ import cabalWhite from '@/assets/images/rugPull/cabal-white.svg'
 import cabalBlack from '@/assets/images/rugPull/cabal-black.svg'
 import bundleWhite from '@/assets/images/rugPull/bundle-white.svg'
 import bundleBlack from '@/assets/images/rugPull/bundle-black.svg'
+import DevPop from '@/pages/pump/components/devPop/index.vue'
 
 const props = defineProps<{
   activeChain: string
@@ -15,6 +16,8 @@ const props = defineProps<{
   row: any
 }>()
 const themeStore = useThemeStore()
+const { t } = useI18n()
+
 function formateMin(data) {
   if (typeof data === 'string' || typeof data === 'number') {
     const value = new BigNumber(data)
@@ -28,153 +31,169 @@ function formateMin(data) {
   }
 }
 
-const { t } = useI18n()
-function getProgressData(row) {
-  return [
-    {
-      icon: themeStore.isDark ? insidersWhite : insidersBlack,
-      label: t('insiders'),
-      rate: row.rat_rate,
-    },
-    {
-      icon: themeStore.isDark ? phishingWhite : phishingBlack,
-      label: t('phishing1'),
-      rate: row.phishing_rate,
-    },
-    {
-      icon: themeStore.isDark ? cabalWhite : cabalBlack,
-      label: t('cabal'),
-      rate: row.cluster_rate,
-    },
-    {
-      icon: themeStore.isDark ? bundleWhite : bundleBlack,
-      label: t('bundle1'),
-      rate: row.boulder_rate,
-    },
-  ]
+function formatRate(val) {
+  if (val == null || val === '') return '--'
+  return (formateMin(val) || formatNumber(val, 1)) + '%'
 }
 
+// Top10 颜色
+function top10Color(val) {
+  if (val == null || val === 0) return 'color-[--third-text]'
+  if (val >= 30) return 'color-[--yellow]'
+  return ''
+}
+
+// Dev 颜色
+function devColor(val) {
+  if (val == null || Number(val) < 0.1) return 'color-[--secondary-text]'
+  if (val > 10) return 'color-[--yellow]'
+  return ''
+}
+
+function formatDev(val) {
+  if (val > 0 && val < 0.1) return '<0.1'
+  return formatNumber(val || 0, 1)
+}
+
+
+// 狙击人数颜色
+function sniperColor(val) {
+  if (val > 30) return 'color-[--down-color]'
+  return 'color-[--secondary-text]'
+}
+
+// 占比通用颜色（>30%红色）
+function rateColor(val) {
+  if (val == null) return 'color-[--third-text]'
+  if (val > 30) return 'color-[--down-color]'
+  if (val === 0) return 'color-[--third-text]'
+  return ''
+}
+
+// 跑路颜色
+function getRugColor(val) {
+  if (val === 0) return 'color-[--third-text]'
+  if (val > 60) return 'color-[--down-color]'
+  return 'color-[--main-text]'
+}
+
+// 跑路历史颜色
 function ruggedColor(row) {
   const data = row.rugged
   if (typeof data === 'string' || typeof data === 'number') {
     const value = new BigNumber(data)
-    if (value.lte(2) && value.gt(0)) {
-      // 0< x <=2
-      return ''
-    } else if (value.lte(10) && value.gt(2)) {
-      // 2< x <=10
-      return 'color-[--yellow]'
-    } else if (value.gt(10)) {
-      return 'color-[--down-color]'
-    } else {
-      return ''
-    }
-  } else {
+    if (value.lte(2) && value.gt(0)) return ''
+    if (value.lte(10) && value.gt(2)) return 'color-[--yellow]'
+    if (value.gt(10)) return 'color-[--down-color]'
     return ''
   }
+  return ''
 }
 
-const runPullVisible = computed(() => {
-  const { activeChain } = props
-  return (
-    ['AllChains', 'solana'].includes(activeChain)  &&
-    props.childrenData[1]?.isVisible
-  )
-})
+const isSolana = computed(() => ['AllChains', 'solana'].includes(props.activeChain))
 
-function getRugColor(val) {
-  if(val === 0){
-    return 'color-[--third-text]'
-  } else if(val > 60){
-    return 'color-[--down-color]'
-  }
-  return 'color-[--main-text]'
+// 跑路是否显示（solana 链）
+const runPullVisible = computed(() => isSolana.value)
+
+// 安全图标
+function getRiskIcon(row) {
+  if (row.risk_level == -1 || row.risk_score >= 60) return new URL('@/assets/images/risk-gaoliang.svg', import.meta.url).href
+  if (row.risk_score > 55 && row.risk_score < 60) return new URL('@/assets/images/yichang1-gaoliang.svg', import.meta.url).href
+  if (row.risk_score > 0 && row.risk_score <= 55) return new URL('@/assets/images/安全.svg', import.meta.url).href
+  if (row.risk_score == 0) return new URL('@/assets/images/zhuyi1.svg', import.meta.url).href
+  return null
 }
 </script>
 
 <template>
-  <div>
-    <div v-if="childrenData[0]?.isVisible ?? true" class="flex items-center justify-end gap-4px h-18px">
-      <img
-        v-if="row.risk_level == -1 || row.risk_score >= 60"
-        class="w-16px h-16px"
-        src="@/assets/images/risk-gaoliang.svg"
-        alt=""
-      >
-      <img
-        v-else-if="row.risk_score > 55 && row.risk_score < 60"
-        class="w-16px h-16px"
-        src="@/assets/images/yichang1-gaoliang.svg"
-        alt=""
-      >
-      <img
-        v-else-if="row.risk_score > 0 && row.risk_score <= 55"
-        class="w-16px h-16px"
-        src="@/assets/images/安全.svg"
-        alt=""
-      >
-      <img
-        v-else-if="row.risk_score == 0"
-        class="w-16px h-16px"
-        src="@/assets/images/zhuyi1.svg"
-        alt=""
-      >
-      {{ $t('safe') }}
-    </div>
-    <el-popover v-if="runPullVisible" :width="247" :persistent="false">
-      <template #reference>
-        <div
-          class="flex items-center justify-end h-20px gap-4px mt-10px"
-          :class="getRugColor(row.rug_rate)"
+  <div class="flex flex-col items-end gap-4px">
+    <!-- 第一行： Top10 + Dev -->
+    <div class="flex gap-4px">
+      <!-- Top10 持仓 -->
+      <div class="sec-card" :class="top10Color(row.holders_top10_ratio)">
+        <Icon name="custom:top3" class="text-12px shrink-0" />
+        <span>{{
+          row.holders_top10_ratio > 0 && row.holders_top10_ratio < 0.1
+            ? '<0.1'
+            : formatNumber(row.holders_top10_ratio || 0, 1)
+        }}%</span>
+      </div>
+      <!-- Dev 持仓（hover 展示主币来源） -->
+      <DevPop :tokenId="(row.token || row.target_token) + '-' + row.chain">
+        <div class="sec-card cursor-pointer" :class="devColor(row.dev_balance_ratio_cur)">
+          <Icon name="custom:dev-ds" class="text-12px shrink-0" />
+          <span>{{ formatDev(row.dev_balance_ratio_cur) }}%</span>
+        </div>
+      </DevPop>
+      <!-- 狙击 sniper_tx_count -->
+      <div class="sec-card" :class="sniperColor(row.sniper_tx_count)">
+        <Icon name="custom:gun" class="text-10px shrink-0" />
+        <span>{{ formatNumber(row.sniper_balance_ratio_cur) }}%</span>
+      </div>
+      <!-- 老鼠仓 rat_rate -->
+      <div class="sec-card" :class="rateColor(row.rat_rate)">
+        <img
+          :src="themeStore.isDark ? insidersWhite : insidersBlack"
+          width="12" height="12" alt=""
+          class="opacity-70"
         >
-          <Icon name="custom:rug" class="text-12px" />
-          {{ row.rug_rate == -1 ? $t('unKnown1') : formatNumber(row.rug_rate || 0, 2) + '%' }}
-        </div>
-      </template>
-      <template #default>
-        <el-row align="middle" class="mb-16px">
-          <el-col :span="24">
-            <div class="lh-20px color-[--secondary-text]">
-              <span>{{ $t('abnormalChips') }}&nbsp;:&nbsp;</span>
-              <span />
-              <span
-                >{{ formateMin(row.all_tag_rate) || formatNumber(row.all_tag_rate || 0, 1) }}%</span
-              >
-            </div>
-          </el-col>
-        </el-row>
-        <template v-for="(item, index) in getProgressData(row)" :key="item.label + index">
-          <el-row align="middle" class="lh-16px mb-16px">
-            <el-col :span="12">
-              <div class="flex items-center">
-                <img :src="item.icon" alt="" width="14" height="14" style="margin-right: 2px" >
-                <span class="color-[--main-text] text-12px">{{ item.label }}:</span>
-              </div>
-            </el-col>
-            <el-col :span="12">
-              <div class="flex items-center">
-                <el-progress
-                  :percentage="item.rate || 0"
-                  :stroke-width="4"
-                  color="[--down-color]"
-                  :show-text="false"
-                  style="width: 70px"
-                />
-                <span class="text-12px ml-10px">
-                  {{ formateMin(item.rate) || formatNumber(item.rate || 0, 1) }}%
-                </span>
-              </div>
-            </el-col>
-          </el-row>
-        </template>
-        <div v-if="row.total" class="flex items-center color-[--secondary-text]">
-          {{ $t('runPullHistory') }}&nbsp;:&nbsp;<span>
-            <span :class="ruggedColor(row)">{{ formatNumber(row.rugged || 0, 0) }}</span
-            >/{{ formatNumber(row.total || 0, 0) }}
-          </span>
-          <!-- <Icon name="ri:error-warning-line" class="ml-4px"/> -->
-        </div>
-      </template>
-    </el-popover>
+        <span>{{ formatRate(row.rat_rate) }}</span>
+      </div>
+    </div>
+
+    <div class="flex gap-4px">
+      <!-- 钓鱼 phishing_rate -->
+      <div class="sec-card" :class="rateColor(row.phishing_rate)">
+        <img
+          :src="themeStore.isDark ? phishingWhite : phishingBlack"
+          width="12" height="12" alt=""
+          class="opacity-70"
+        >
+        <span>{{ formatRate(row.phishing_rate) }}</span>
+      </div>
+      <!-- 捆绑 boulder_rate -->
+      <div class="sec-card" :class="rateColor(row.boulder_rate)">
+        <img
+          :src="themeStore.isDark ? bundleWhite : bundleBlack"
+          width="12" height="12" alt=""
+          class="opacity-70"
+        >
+        <span>{{ formatRate(row.boulder_rate) }}</span>
+      </div>
+      <!-- 阴谋集团 cluster_rate -->
+      <div class="sec-card" :class="rateColor(row.cluster_rate)">
+        <img
+          :src="themeStore.isDark ? cabalWhite : cabalBlack"
+          width="12" height="12" alt=""
+          class="opacity-70"
+        >
+        <span>{{ formatRate(row.cluster_rate) }}</span>
+      </div>
+      <!-- 安全 risk_score -->
+      <div class="sec-card">
+        <img v-if="getRiskIcon(row)" :src="getRiskIcon(row)" class="w-12px h-12px" alt="" />
+        <span>{{ $t('safe') }}</span>
+      </div>
+      <!-- 跑路（仅 solana） -->
+      <div v-if="runPullVisible" class="sec-card">
+        <Icon name="custom:rug" class="text-12px shrink-0" />
+        <span :class="getRugColor(row.rug_rate)">{{ row.rug_rate == -1 ? $t('unKnown1') : formatRate(row.rug_rate) }}</span>
+      </div>
+    </div>
   </div>
 </template>
+
+<style scoped>
+.sec-card {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--main-divider);
+  font-size: 11px;
+  line-height: 16px;
+  cursor: default;
+  white-space: nowrap;
+}
+</style>

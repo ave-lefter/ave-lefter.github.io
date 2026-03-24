@@ -41,6 +41,7 @@ import {
   LastTradeContent,
   Headline,
   DexHeader,
+  SecurityHeader,
 } from '../components/index'
 import { set } from 'lodash-es'
 import { addFavorite, removeFavorite } from '~/api/fav'
@@ -284,7 +285,7 @@ const headerRenderer = computed(() => {
     holders: HoldersHeader,
     smart_money_buy_volume_24h: SmarterHeader,
     dex: DexHeader,
-    security: () => t('tokenInfoSecurity'),
+    security: SecurityHeader,
     holders_top10_ratio: Top10Header,
     quick: () => t('quick'),
     insider_balance_ratio_cur: InsidersHeader,

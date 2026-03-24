@@ -30,7 +30,6 @@ export function getHotOptions(t: ReturnType<typeof useI18n>['t']) {
       title: t('securityInfo'),
       list: [
         'snipersContent',
-        'runPullContent',
         'dexContent',
         'insidersContent',
       ],
@@ -153,7 +152,7 @@ export function getHotDefaultColumns(t: ReturnType<typeof useI18n>['t']) {
       children:[
         {title:t('tokenInfoSecurity'),isVisible:true,render:'securityContent'},
       ],
-      minWidth:getTextWidth(t('security'), 50) + 55,
+      minWidth:250,
       align:'right'
     },
     {

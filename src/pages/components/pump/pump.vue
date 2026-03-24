@@ -42,6 +42,7 @@ import {
   LastTradeHeader,
   LastTradeContent,
   Headline,
+  SecurityHeader,
 } from '../components/index'
 import { set } from 'lodash-es'
 import dayjs from 'dayjs'
@@ -280,7 +281,7 @@ const headerRenderer = computed(() => {
     holders: HoldersHeader,
     smart_money_buy_volume_24h: SmarterHeader,
     dex: () => 'DEX',
-    security: () => t('tokenInfoSecurity'),
+    security: SecurityHeader,
     holders_top10_ratio: Top10Header,
     quick: () => t('quick'),
     insider_balance_ratio_cur: InsidersHeader,
