@@ -140,7 +140,7 @@ interface TokenObj {
 const tokenObj = ref<TokenObj>({})
 const tableList = ref<any[]>([])
 const pageNO = ref(1)
-const pageSize = ref(20)
+const pageSize = ref(50)
 const loadingRun = ref(false)
 const finished = ref(false)
 const showFinished = ref(false)
@@ -192,6 +192,8 @@ async function getRugPullList() {
             token_id: id.value,
             pageNO: pageNO.value,
             pageSize: pageSize.value,
+            sort: conditions.value.sort,
+            sort_dir: conditions.value.sort_dir
         }
         const res = await _getDevList(data)
         const { dev_address, total_migrated, total_non_migrated, total_tokens } = res

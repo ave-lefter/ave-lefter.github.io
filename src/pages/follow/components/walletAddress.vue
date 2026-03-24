@@ -581,7 +581,7 @@ const $router = useRouter()
 const { t } = useI18n()
 const botStore = useBotStore()
 const {evmAddress} = storeToRefs(useBotStore())
-const { addressGroups ,currentAddress,updateNum12,updateNum13,updateNum2,updateNum3,addressConditions,addressConditions2} = storeToRefs(useFollowStore())
+const { addressGroups ,currentAddress,updateNum12,updateNum13,updateNum14,updateNum2,updateNum3,addressConditions,addressConditions2} = storeToRefs(useFollowStore())
 // const addressGroups = ref([{ "group_id": 3763, "name": "base", "show_index": -1 }, { "group_id": 37632, "name": "base1", "show_index": 0 }, { "group_id": 37631, "name": "base2", "show_index": 1 }])
 const visible = ref(false)
 const visible2 = ref(false)
@@ -816,7 +816,7 @@ watch(() => currentAddress.value, (val) => {
     init()
   }
 })
-watch([() => conditions.value, ()=>updateNum2.value+updateNum3.value+(!props.isMonitor?updateNum13.value:updateNum12.value),()=>props.isMonitor], (value, oldValue) => {
+watch([() => conditions.value, ()=>updateNum2.value+updateNum3.value+(!props.isMonitor?updateNum13.value:updateNum12.value)+updateNum14.value,()=>props.isMonitor], (value, oldValue) => {
   init()
   if(value[2]!==oldValue[2]){
     nextTick(()=>{
