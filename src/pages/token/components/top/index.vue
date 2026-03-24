@@ -47,7 +47,7 @@
         <div class="black-container">
           <span
             v-tooltip="pumpBlackList?.findIndex(i => (i.address == token?.token && i.type == 'ca') || (i.address == token?.symbol && i.type == 'keyword')) !== -1 ? $t('cancel') + $t('BlackListToken') : $t('BlackListToken')"
-            class="bg-[--d-000-l-FFF] cursor-pointer px-2px py-2px color-[--third-text1] block rounded-2px hover:color-[--secondary-text] w-14px h-14px flex items-center justify-center"
+            class="bg-[--d-000-l-FFF] cursor-pointer px-2px py-2px color-[--third-text1] block rounded-2px hover:color-[--primary-color] w-14px h-14px flex items-center justify-center"
           >
             <Icon
               v-if="
@@ -57,8 +57,8 @@
                     (i.address == token?.symbol && i.type == 'keyword')
                 ) !== -1
               "
-              name="custom:key-visible"
-              class="text-12px"
+              name="custom:key-invisible"
+              class="text-12px color-[#F6465D]"
               @click.stop="addOrRemoveBlaclList('ca')"
             />
             <Icon
@@ -70,7 +70,7 @@
           </span>
           <span
             v-tooltip="pumpBlackList?.findIndex(i => i.address == token?.token && i.type == 'dev') !== -1 ? $t('cancel') + $t('BlackListDev') : $t('BlackListDev')"
-            class="bg-[--d-000-l-FFF] cursor-pointer px-2px py-2px color-[--third-text1] block rounded-2px mt-2px hover:color-[--secondary-text] w-14px h-14px flex items-center justify-center"
+            class="bg-[--d-000-l-FFF] cursor-pointer px-2px py-2px color-[--third-text1] block rounded-2px mt-2px hover:color-[--primary-color] w-14px h-14px flex items-center justify-center"
           >
             <Icon
               v-if="
@@ -78,8 +78,8 @@
                   (i) => i.address == token?.token && i.type == 'dev'
                 ) !== -1
               "
-              name="custom:dev"
-              class="text-12px"
+              name="custom:invisible"
+              class="text-12px color-[#F6465D]"
               @click.stop="addOrRemoveBlaclList('dev')"
             />
             <Icon
@@ -92,7 +92,7 @@
           <span
             v-if="medias?.filter?.(i => i.icon === 'twitter')?.length > 0 && medias?.filter?.(i => i.icon === 'twitter')?.[0] && formatXUser(medias?.filter?.(i => i.icon === 'twitter')?.[0]?.url)"
             v-tooltip="pumpBlackList?.findIndex(i => i.address == formatXUser(medias?.filter?.(m => m.icon === 'twitter')?.[0]?.url) && i.type == 'twitter') !== -1 ? $t('cancel') + $t('BlackListTwitter') : $t('BlackListTwitter')"
-            class="bg-[--d-000-l-FFF] cursor-pointer px-2px py-2px color-[--third-text1] block rounded-2px mt-2px hover:color-[--secondary-text] w-14px h-14px flex items-center justify-center"
+            class="bg-[--d-000-l-FFF] cursor-pointer px-2px py-2px color-[--third-text1] block rounded-2px mt-2px hover:color-[--primary-color] w-14px h-14px flex items-center justify-center"
           >
             <Icon
               v-if="
@@ -100,8 +100,8 @@
                   (i) => i.address == formatXUser(medias?.filter?.(m => m.icon === 'twitter')?.[0]?.url) && i.type == 'twitter'
                 ) !== -1
               "
-              name="custom:twitter-visible"
-              class="text-12px text-[--third-text]"
+              name="custom:twitter-unvisible"
+              class="text-12px color-[#F6465D]"
               @click.stop="addOrRemoveBlaclList('twitter')"
             />
             <Icon
@@ -876,7 +876,7 @@
         }}</span>
       </div>
       <div v-if="(tokenInfoExtra?.buy_tax??0) > 0 || (tokenInfoExtra?.sell_tax??0) > 0" class="item ml-24px">
-        <span v-tooltip="$t('taxTip')" class="border-b border-b-dashed cursor-pointer">{{ $t('totalTax') }}</span>
+        <span>{{ $t('totalTax') }}</span>
         <div class="block mt-8px color-[--third-text]">
           <span
             v-if="(tokenInfoExtra?.buy_tax??0) > 0"
@@ -884,7 +884,7 @@
           >
             {{ formatNumber(tokenInfoExtra?.buy_tax ||0, 1) }}%
           </span>
-          <span >/</span>
+          <span v-if="(tokenInfoExtra?.buy_tax??0) > 0 && (tokenInfoExtra?.sell_tax??0) > 0">/</span>
           <span
             v-if="(tokenInfoExtra?.sell_tax??0) > 0"
             :style="{ color: downColor[0] }"

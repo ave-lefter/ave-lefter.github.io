@@ -238,10 +238,10 @@ v-model:visible="visible"
             {{ filterType(row.event_type)?.name }}
           </span>
       </div>
-      <div class="flex items-center flex-[2] justify-end">
+      <div class="flex items-center flex-[2] justify-end color-[--main-text1]">
         ${{ formatNumber(row.volume || 0, 2) }}
       </div>
-      <div class="flex items-center flex-[2] justify-end text-right">
+      <div class="flex items-center flex-[2] justify-end text-right color-[--main-text1]">
         <div v-if="['ADD_LIQUIDITY','REMOVE_LIQUIDITY'].includes(row.event_type)">
           <div>
             {{ formatNumber(row.amount || 0, 2) }}
@@ -256,7 +256,7 @@ v-model:visible="visible"
           {{ formatNumber(row.amount, 2) }}
         </div>
       </div>
-      <div class="flex items-center flex-[2] justify-end">
+      <div class="flex items-center flex-[2] justify-end color-[--main-text1]">
         <div v-if="['ADD_LIQUIDITY','REMOVE_LIQUIDITY'].includes(row.event_type)">
           --
         </div>
@@ -269,7 +269,7 @@ v-model:visible="visible"
           </template>
         </div>
       </div>
-      <div class="flex items-center flex-[2] justify-end">
+      <div class="flex items-center flex-[2] justify-end color-[--main-text1]">
         ${{ formatNumber(row.gas || 0, 2) }}
       </div>
       <!--<div class="flex items-center w-50px text-right"/>-->

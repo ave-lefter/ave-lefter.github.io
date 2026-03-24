@@ -26,11 +26,11 @@
 
       <div class="item cursor-pointer" @mouseover.stop="(e) => showBubbleTooltip(e)">
         <div
-          class="text-12px color-[--secondary-text1] flex items-center justify-center"
+          class="text-12px color-[--secondary-text] flex items-center justify-center"
           :style="{
             color:
               Number(formatNumber(tagsRatio?.top10_ratio || 0, 1)) == 0
-                ? 'var(--third-text1)'
+                ? ''
                 : Number(tagsRatio?.top10_ratio) > 30
                   ? '#F6465D'
                   : '#12B886',
@@ -52,7 +52,7 @@
         :style="{
           color:
             Number(formatNumber(tagsRatio?.dev_ratio || 0, 1)) == 0
-              ? 'var(--third-text1)'
+              ? 'var(--secondary-text)'
               : Number(tagsRatio?.dev_ratio) > 5
                 ? '#F6465D'
                 : '#12B886',
@@ -96,7 +96,7 @@
               :src="formatIconPumpDev(tagsRatio?.dev_first_transfer_in_from_label)"
               alt=""
             />
-            <span v-if="tagsRatio?.dev_age_seconds" class="ml-4px color-[--secondary-text]">{{
+            <span v-if="tagsRatio?.dev_age_seconds" class="ml-4px color-[--main-text1]">{{
               formatSeconds(Number(tagsRatio?.dev_age_seconds || 0))
             }}</span>
           </div>
@@ -111,11 +111,11 @@
       >
         <div class="item cursor-pointer">
           <div
-            class="text-12px color-[--secondary-text1] flex items-center justify-center"
+            class="text-12px color-[--secondary-text] flex items-center justify-center"
             :style="{
               color:
                 Number(formatNumber(tagsRatio?.sniper_balance_ratio_cur || 0, 1)) == 0
-                  ? 'var(--third-text1)'
+                  ? ''
                   : Number(tagsRatio?.sniper_balance_ratio_cur) > 5
                     ? '#F6465D'
                     : '#12B886',
@@ -143,11 +143,11 @@
       >
         <div class="item cursor-pointer">
           <div
-            class="text-12px color-[--secondary-text1] flex items-center justify-center"
+            class="text-12px color-[--secondary-text] flex items-center justify-center"
             :style="{
               color:
                 Number(formatNumber(tagsRatio?.rat_ratio || 0, 1)) == 0
-                  ? 'var(--third-text1)'
+                  ? ''
                   : Number(tagsRatio?.rat_ratio) > 5
                     ? '#F6465D'
                     : '#12B886',
@@ -170,11 +170,11 @@
       >
         <div class="item cursor-pointer">
           <div
-            class="text-12px color-[--secondary-text1] flex items-center justify-center"
+            class="text-12px color-[--secondary-text] flex items-center justify-center"
             :style="{
               color:
                 Number(formatNumber(tagsRatio?.address_binding_ratio || 0, 1)) == 0
-                  ? 'var(--third-text1)'
+                  ? ''
                   : Number(tagsRatio?.address_binding_ratio) > 5
                     ? '#F6465D'
                     : '#12B886',
@@ -202,11 +202,11 @@
       >
         <div class="item cursor-pointer">
           <div
-            class="text-12px color-[--secondary-text1] flex items-center justify-center"
+            class="text-12px color-[--secondary-text] flex items-center justify-center"
             :style="{
               color:
                 Number(formatNumber(tagsRatio?.colluded_cluster_ratio || 0, 1)) == 0
-                  ? 'var(--third-text1)'
+                  ? ''
                   : Number(tagsRatio?.colluded_cluster_ratio) > 5
                     ? '#F6465D'
                     : '#12B886',

@@ -1,5 +1,5 @@
 <template>
-  <div class="mt-10px mb-30px relative">
+  <div class="mt-10px mb-10px relative">
     <ul  v-bind="containerProps" class="pump-item_list scroller-container"  :style="{height: scrollHeight}" @scroll="handleScroll">
       <div v-bind="wrapperProps">
           <li
@@ -33,14 +33,13 @@
                               (i.address == row.symbol && i.type == 'keyword')
                           ) !== -1
                         "
-                        name="custom:key-visible"
-                        class="text-12px"
+                        name="custom:key-invisible"
+                        class="text-12px color-[#F6465D]"
                         @click.stop="addOrRemoveBlaclList(row, 'ca')"
                       />
                       <Icon
                         v-else
                         name="custom:key-invisible"
-
                         class="text-12px"
                         @click.stop="addOrRemoveBlaclList(row, 'ca')"
                       />
@@ -55,8 +54,8 @@
                             (i) => i.address == row.token && i.type == 'dev'
                           ) !== -1
                         "
-                        name="custom:dev"
-                        class="text-12px"
+                        name="custom:invisible"
+                        class="text-12px color-[#F6465D]"
                         @click.stop="addOrRemoveBlaclList(row, 'dev')"
                       />
                       <Icon
@@ -77,8 +76,8 @@
                             (i) => i.address == row.token && i.type == 'twitter'
                           ) !== -1
                         "
-                        name="custom:twitter-visible"
-                        class="text-12px"
+                        name="custom:twitter-unvisible"
+                        class="text-12px color-[#F6465D]"
                         @click.stop="addOrRemoveBlaclList(row, 'twitter')"
                       />
                       <Icon
@@ -135,6 +134,9 @@
                       )}`"
                       target="_blank"
                       class="token-mark clickable"
+                      :style="{
+                        'border-radius': pumpSetting.avatar_isCircle == 'circle' ? '100%' : '4px',
+                      }"
                     @mouseover.stop="onEnter($event, row, props.type, getDataColor)"
                       @click.stop
                     >
@@ -497,7 +499,7 @@
                         content:
                           `<div style='color:var(--secondary-text)'>${$t('devMigrated')} <span style='color:var(--main-text)'>${formatNumber(row?.dev_migrated_count || 0, 0)}</span></div>
                           <div style='color:var(--secondary-text)'>${$t('devLaunched')} <span style='color:var(--up-color)'>${formatNumber(row?.dev_total_count || 0, 0)}</span></div>
-                          <div style='color:var(--secondary-text)'>${$t('migratedRatio')} <span style='color:var(--down-color)'>${formatNumber(row?.dev_migrated_ratio || 0, 0)}%</span></div>
+                          <div style='color:var(--secondary-text)'>${$t('migratedRatio')} <span style='color:var(--down-color)'>${formatNumber(row?.dev_migrated_ratio || 0, 2)}%</span></div>
                           `,
                         props: { 'raw-content': true, 'popper-class': 'pump-tooltip' }
                       }"
@@ -616,7 +618,7 @@ class="flex-start mr-8px bg-btn"
                         :src="formatIconPumpDev(row.dev_first_transfer_in_from_label)"
                         alt=""
                       >
-                      <span v-if="row?.dev_age_seconds" class="ml-4px color-[--secondary-text1]">{{ formatSeconds(Number(row?.dev_age_seconds || 0)) }}</span>
+                      <span v-if="row?.dev_age_seconds" class="ml-4px color-[--main-text1]">{{ formatSeconds(Number(row?.dev_age_seconds || 0)) }}</span>
                      </DevPop>
                     <!-- </div> -->
                     <div
@@ -725,10 +727,10 @@ class="flex-start mr-8px bg-btn"
                   v-if="
                     (isSoon && row.progress > 99) || pumpSetting?.define?.some((i) => i === 'mcap')
                   "
-                  class="flex-end text-12px pr-12px mb-10px"
-                  :class="pumpSetting.fontSize_mc =='12px'? 'mb-11px' : 'mb-11px'"
+                  class="flex-end text-12px pr-12px mb-10px bg-1"
+                  :class="pumpSetting.fontSize_mc =='12px'? 'mb-4px' : 'mb-4px'"
                 >
-                  <template v-if="isSoon && row.progress >= 99.99">
+                  <div class="bg-1 flex-end py-2px" v-if="isSoon && row.progress >= 99.99">
                     <el-image
                       v-if="row.issue_platform"
                       v-tooltip="row.issue_platform"
@@ -742,8 +744,8 @@ class="flex-start mr-8px bg-btn"
                       class="w-20px ml-9px rounded-100% bg-[--d-1A1A1A-l-FFF] chain"
                       :src="`${token_logo_url}swap/${row.amm}.jpeg`"
                     />
-                  </template>
-                  <template v-else>
+                  </div>
+                  <div class="bg-1 flex-end py-2px" v-else>
                     <template v-if="pumpSetting?.define?.some((i) => i === 'vol')">
                       <div class="mr-5px color-[--third-text1]" :style="{ 'font-size': pumpSetting.fontSize_mc }">V</div>
                       <span v-if="Number(row?.volume_u_24h) === 0 || row?.volume_u_24h == null" class="color-[--third-text1]" >0</span>
@@ -765,11 +767,11 @@ class="flex-start mr-8px bg-btn"
                         >${{ pumpSetting.isInt ? formatNumber(row.market_cap || 0, { decimals: 0, l: 4, limit: 3,  locale: 'en' }) : formatNumber(row.market_cap || 0, { decimals: 1, l: 4, limit: 3, locale: 'en' }) }}</span
                       >
                     </template>
-                  </template>
+                  </div>
                 </div>
                 <div
                   v-show="pumpSetting?.define?.some((i) => i === 'txs')"
-                  class="flex-end text-12px pr-12px bg-1"
+                  class="flex-end text-12px pr-12px bg-1 py-2px"
                 >
                   <div v-tooltip.raw="{
                         content: `<div class='max-w-[400px] color-[--secondary-text]'>${$t('netInflow')}: <span class=${ 'color-'+(Number(row?.net_flow_vol) === 0 || row?.net_flow_vol == null? '' : ((row?.net_flow_vol||0)>0?'[--up-color]':'[--down-color]'))}>${Number(row?.net_flow_vol) === 0 || row?.net_flow_vol == null? 0 : ( (row?.net_flow_vol > 0 ? '+$' : '-$')+ formatNumber(Math.abs(row?.net_flow_vol ?? 0), { decimals: 2, l: 4, limit: 3, locale: 'en' }))}</span> </div>`,
@@ -1314,7 +1316,7 @@ defineExpose({
     border-top: 1px solid var(--main-input-button-bg);
     border-radius: 4px;
     .bg-1{
-      background-color: var(--main-bg);
+      background-color: var(--d-0E0F10-l-FFF);
     }
     &:hover {
       background-color: var(--main-list-hover);
@@ -1352,7 +1354,7 @@ defineExpose({
         // background-color: var(--secondary-bg);
         position: relative;
         z-index:20;
-        bottom: -15px;
+        bottom: -18px;
       }
     }
     .black-container {
@@ -1557,6 +1559,7 @@ defineExpose({
   scrollbar-width: thin;
   /* Firefox 颜色：第一个是滑块颜色，第二个是轨道颜色 */
   scrollbar-color: rgba(144, 147, 153, 0.3) transparent;
+  overflow-x: hidden;
 }
 
 /* 1. 整体宽度保持 6px 比较精致 */

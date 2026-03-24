@@ -987,7 +987,7 @@ const mergedBaseList = computed(() => {
 })
 const scrollHeight = computed(()=>{
   // return 'calc(100vh - 215px)'
-  return globalStore.tokenHistoryVisible ? 'calc(100vh - 248px)':'calc(100vh - 215px)'
+  return globalStore.tokenHistoryVisible ? 'calc(100vh - 160px)':'calc(100vh - 195px)'
 })
 
 
@@ -1903,6 +1903,53 @@ function getFilterData(list: PumpObj[], conditions: any) {
     }
     if(conditions?.rmks) {
       pass = pass && i.makers_24h <= Number(conditions.rmks)
+    }
+    if(conditions?.ldtc) {
+      pass = pass && i.dev_total_count >= Number(conditions.ldtc)
+    }
+    if(conditions?.rdtc) {
+      pass = pass && i.dev_total_count < Number(conditions.rdtc)
+    }
+
+    if(conditions?.ldmc) {
+      pass = pass && i.dev_migrated_count >= Number(conditions.ldmc)
+    }
+    if(conditions?.rdmc) {
+      pass = pass && i.dev_migrated_count < Number(conditions.rdmc)
+    }
+
+    if(conditions?.ldmr) {
+      pass = pass && i.dev_migrated_ratio >= Number(conditions.ldmr)
+    }
+    if(conditions?.rdmr) {
+      pass = pass && i.dev_migrated_ratio < Number(conditions.rdmr)
+    }
+
+    if(conditions?.lbdr) {
+      pass = pass && Number(i.address_binding_ratio || 0) >= Number(conditions.lbdr)
+    }
+    if(conditions?.rbdr) {
+      pass = pass && Number(i.address_binding_ratio|| 0) < Number(conditions.rbdr)
+    }
+
+    if(conditions?.lfsr) {
+      pass = pass && Number(i.phishing_ratio || 0) >= Number(conditions.lfsr)
+    }
+    if(conditions?.rfsr) {
+      pass = pass && Number(i.phishing_ratio|| 0) < Number(conditions.rfsr)
+    }
+
+    if(conditions?.lccr) {
+      pass = pass && Number(i.colluded_cluster_ratio || 0) >= Number(conditions.lccr)
+    }
+    if(conditions?.rccr) {
+      pass = pass && Number(i.colluded_cluster_ratio|| 0) < Number(conditions.rccr)
+    }
+    if(conditions?.lfans) {
+      pass = pass && Number(i.followers || 0) >= Number(conditions.lfans)
+    }
+    if(conditions?.rfans) {
+      pass = pass && Number(i.followers|| 0) < Number(conditions.rfans)
     }
     return pass
   })

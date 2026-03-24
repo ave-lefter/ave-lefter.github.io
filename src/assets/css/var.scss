@@ -8,17 +8,18 @@
   --signal-red: #E50000;
   --signal-green: #37B270;
   // 一级文字
-  --main-text: var(--d-F5F5F5-l-111);
+  --main-text: var(--d-E0E0E0-l-111);
   // 二级文字
   --secondary-text: var(--d-9CA1A8-l-404753);
   // 三级文字
-  --third-text: var(--d-5A5E64-l-A9B0BC);
+  --third-text: var(--d-707275-l-696969);
+
   // 图标插画颜色
   --icon-color: var(--d-3B3E44-l-CAD6EC);
   // 主要背景
   --main-bg: var(--d-000-l-FFF);
   // 次要背景
-  --secondary-bg: var(--d-101114-l-F6F9FF);
+  --secondary-bg: var(--d-0E0F10-l-F6F9FF);
   // 主页列表标题栏背景
   --main-list-header-bg: var(--d-1B1D21-l-ECF3FF);
   // 主页面列表悬浮色
@@ -58,7 +59,7 @@
   --notification-bg: var(--d-222222-l-f2f2f2);
 
   // 扫链背景色
-  --pump-bg: var(--d-000-l-FFF);
+  --pump-bg: var(--d-0E0F10-l-F6F9FF);
 
   --pump-tooltip-text: var(--d-000-l-404753);
 
@@ -245,6 +246,9 @@
     --d-1E1F23-l-E0ECFF: #1E1F23;
     --d-1F242C4D-l-FFF: #1F242C4D;
     --d-0E0F10-l-FFF: #0E0F10;
+    --d-707275-l-696969: #707275;
+    --d-707275-l-696969: #707275;
+    --d-0E0F10-l-F6F9FF: #0E0F10;
   }
 
   &.light {
@@ -411,5 +415,7 @@
     --d-1E1F23-l-E0ECFF: #E0ECFF;
     --d-1F242C4D-l-FFF: #FFF;
     --d-0E0F10-l-FFF: #FFF;
+    --d-707275-l-696969: #707275;
+    --d-0E0F10-l-F6F9FF: #F6F9FF;
   }
 }

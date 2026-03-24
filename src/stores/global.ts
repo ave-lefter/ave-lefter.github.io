@@ -81,7 +81,7 @@ export const useGlobalStore = defineStore('global', () => {
     >
     jump: 'close' | 'open' | 'open_jump'
     border: string
-  }>('pumpSetting9', {
+  }>('pumpSetting10', {
     fontSize_mc: '12px',
     size_swap: '12px',
     Progress_isCircle: 'circle',
@@ -112,22 +112,22 @@ export const useGlobalStore = defineStore('global', () => {
         minSize: 30000,
         minColor: getCssVariable('--main-text1'),
         middleSize: 100000,
-        middleColor: '#FFA622',
-        maxColor: '#12B886',
+        middleColor: '#12B886',
+        maxColor: '#FFA622',
       },
       vol: {
         minSize: 1000,
         minColor: getCssVariable('--main-text1'),
         middleSize: 50000,
-        middleColor: '#FFA622',
-        maxColor: '#12B886',
+        middleColor: '#12B886',
+        maxColor: '#FFA622',
       },
       holders: {
         minSize: 100,
         minColor: getCssVariable('--main-text1'),
         middleSize: 500,
-        middleColor: '#FFA622',
-        maxColor: '#12B886',
+        middleColor: '#12B886',
+        maxColor: '#FFA622',
       },
       twitter: {
         minSize: 10,

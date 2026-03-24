@@ -149,7 +149,7 @@
             </div>
           </div>
 
-          <el-form-item v-if="!storage.value?.includes('_graduated') && tabs2Active===Tabs2Enum.indicator" :label="`${t('progress')}(%)`"
+          <el-form-item v-if="!storage.value?.includes('_graduated') && tabs2Active===Tabs2Enum.indicator && activeTab !=='graduated'" :label="`${t('progress')}(%)`"
             class="mt-12px px-16px columns-form-item">
 
             <div class="formItem inputRange">
@@ -332,7 +332,26 @@ const limitData = {
   sm_list: [],
   has_sm: 0,
   ltvl: '', //池子大小
-  rtvl: ''
+  rtvl: '',
+
+  ldtc: '', //Dev发币总数
+  rdtc: '',
+
+  ldmc: '', //Dev发币迁移数
+  rdmc: '',
+  ldmr: '', //Dev发币迁移比例
+  rdmr: '',
+
+  lbdr: '',  //捆绑
+  rbdr: '',
+
+  lfsr: '',  //钓鱼地址
+  rfsr: '',
+  lccr: '',  //阴谋集团
+  rccr: '',
+  lfans: '',  //推特粉丝数
+  rfans: '',
+
 }
 const initForm = {
   q: '',
@@ -379,6 +398,24 @@ const initForm = {
   ltvl: '', //池子大小
   rtvl: '',
 
+  ldtc: '', //Dev发币总数
+  rdtc:'',
+
+  ldmc: '', //Dev发币迁移数
+  rdmc: '',
+
+  ldmr: '', //Dev发币迁移比例
+  rdmr: '',
+
+  lbdr: '',  //捆绑
+  rbdr: '',
+  lfsr: '',  //钓鱼地址
+  rfsr: '',
+  lccr: '',  //阴谋集团
+  rccr: '',
+
+  lfans: '',  //推特粉丝数
+  rfans: '',
   // tx_24h_count_min: '',
   // tx_24h_count_max: '',
 
@@ -547,9 +584,41 @@ const columns = computed(() => {
       suffix: '',
       tab: Tabs2Enum.indicator
     },
-
     {
-      label: t('insiders'),
+      label: t('devLaunched'),
+      prop: [
+        'ldtc',
+        'rdtc'
+      ],
+      placeholder: [t('minor'), t('max1')],
+      type: 'inputRange',
+      suffix: '',
+      tab: Tabs2Enum.indicator
+    },
+    {
+      label: t('devMigrated'),
+      prop: [
+        'ldmc',
+        'rdmc'
+      ],
+      placeholder: [t('minor'), t('max1')],
+      type: 'inputRange',
+      suffix: '',
+      tab: Tabs2Enum.indicator
+    },
+    {
+      label: `${t('migratedRatio')}(%)`,
+      prop: [
+        'ldmr',
+        'rdmr'
+      ],
+      placeholder: [t('minor'), t('max1')],
+      type: 'inputRange',
+      suffix: '%',
+      tab: Tabs2Enum.indicator
+    },
+    {
+      label: `${t('insiders')}`,
       prop: [
         'lins',
         'rins'
@@ -557,6 +626,50 @@ const columns = computed(() => {
       placeholder: [t('minor'), t('max1')],
       type: 'inputRange',
       suffix: '%',
+      tab: Tabs2Enum.indicator
+    },
+    {
+      label: `${t('phishing1')}`,
+      prop: [
+        'lfsr',
+        'rfsr'
+      ],
+      placeholder: [t('minor'), t('max1')],
+      type: 'inputRange',
+      suffix: '%',
+      tab: Tabs2Enum.indicator
+    },
+    {
+      label: `${t('Bundle')}`,
+      prop: [
+        'lbdr',
+        'rbdr'
+      ],
+      placeholder: [t('minor'), t('max1')],
+      type: 'inputRange',
+      suffix: '%',
+      tab: Tabs2Enum.indicator
+    },
+    {
+      label: `${t('Cabal')}`,
+      prop: [
+        'lccr',
+        'rccr'
+      ],
+      placeholder: [t('minor'), t('max1')],
+      type: 'inputRange',
+      suffix: '%',
+      tab: Tabs2Enum.indicator
+    },
+    {
+      label: t('twitterFollowers'),
+      prop: [
+        'lfans',
+        'rfans'
+      ],
+      placeholder: [t('minor'), t('max1')],
+      type: 'inputRange',
+      suffix: '',
       tab: Tabs2Enum.indicator
     },
     {

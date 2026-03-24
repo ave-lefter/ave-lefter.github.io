@@ -1966,9 +1966,9 @@
   "subCount": "訂閱人數",
   "subCountTips": "正在追蹤該賬號的錢包用戶數",
   "home": "主頁",
-  "devMigrated": "Dev已遷移",
+  "devMigrated": "Dev發幣遷移數",
   "devLaunched": "Dev發幣總數",
-  "migratedRatio": "迁移比例",
+  "migratedRatio": "Dev迁移比例",
   "KOLRatio": "KOL占比",
   "smarterRatio": "聰明錢占比",
   "devWallet": "DEV錢包",
@@ -2066,8 +2066,8 @@
   "averageMarketBuySell": "平均市值買賣",
   "openMonitorSuccess": "開啟監控成功",
   "cancelMonitorSuccess": "取消監控成功",
-  "totalTax": "總稅率",
-  "taxTip": "總稅率：代幣稅率",
+  "totalTax": "代幣稅",
+  "taxTip": "代幣稅：代幣稅率",
   "smarterAddress": "聪明钱包数",
   "kolSummary": "共有{people}比特{type}，目前有{holders}人持倉，{type}持倉{vol}，占比{ratio}",
   "perp1": "合約",
@@ -2119,5 +2119,6 @@
   "pairTax": "池子税收",
   "buyOnce": "相同代幣只買一次",
   "liquidityLimit": "池子大小限制",
-  "favRemarksTips": "是否關注所選備註地址?"
+  "favRemarksTips": "是否關注所選備註地址?",
+  "twitterFollowers": "推特粉丝数"
 }

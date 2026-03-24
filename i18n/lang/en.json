@@ -1982,7 +1982,7 @@
   "liqTip": "Number of pools and size of the bottom pool",
   "devMigrated": "Dev Migrated",
   "devLaunched": "Dev Launched",
-  "migratedRatio": "Migrated",
+  "migratedRatio": "Dev Migrated",
   "KOLRatio": "KOL Ratio",
   "smarterRatio": "Smarter Ratio",
   "devWallet": "DEV Wallet",
@@ -2087,8 +2087,8 @@
   "totalSwapValue": "Total Volume",
   "positionTime": "Position Time",
   "averageMarketBuySell": "Average market Buy/Sell",
-  "totalTax": "Total tax",
-  "taxTip": "Total tax rate: Token tax rate",
+  "totalTax": "Token Tax",
+  "taxTip": "Token tax: Token tax rate",
   "smarterAddress": "Smarter Address",
   "openMonitorSuccess": "Monitoring successfully enabled",
   "cancelMonitorSuccess": "Monitoring successfully disabled",
@@ -2132,5 +2132,6 @@
   "liquidityLimit": "Pool Size",
   "favRemarksTips": "Do you want to follow the selected Wallet?",
   "batchFav": "Batch Follow",
-  "removeTokenTips2": "Delete the selected monitoring?"
+  "removeTokenTips2": "Delete the selected monitoring?",
+  "twitterFollowers": "Twitter Followers"
 }
