@@ -21,7 +21,7 @@ const topAddGroupEvent = useEventBus(BusEventType.TOP_ADD_GROUP)
 topAddGroupEvent.on(_getUserFavoriteGroups)
 
 const otherListArea = ref<ScrollbarInstance>()
-const {updateNum4,updateNum5,delTokenGroup} = storeToRefs(useFollowStore())
+const {updateNum11,delTokenGroup} = storeToRefs(useFollowStore())
 
 onUnmounted(() => {
   topEventBus.off(refresh)
@@ -243,8 +243,9 @@ watch(
 )
 
 watch(
-  () => updateNum4.value,
+  () => updateNum11.value,
   () => {
+    console.log('updateNum11.value', updateNum11.value)
     resetListStatus()
     loadMoreFavorites()
   }

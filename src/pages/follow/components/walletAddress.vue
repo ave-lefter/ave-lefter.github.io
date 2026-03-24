@@ -538,7 +538,7 @@
       <el-pagination
         v-if="(pageData.total > 50) && shouldRenderChild && currentAddress"
         v-model:current-page="pageData.page" v-model:page-size="pageData.pageSize" class="h-72px flex justify-end items-center"
-        layout="prev, pager, next, ->" :total="pageData.total" :page-sizes="[10, 20, 30, 40, 50, 60]" @change="getTableList"/>
+        layout="prev, pager, next, ->" :total="pageData.total" :page-sizes="[10, 20, 30, 40, 50, 60]" @change="handleChangePage"/>
     </div>
      <el-tooltip
       ref="tooltipRef1"
@@ -581,7 +581,7 @@ const $router = useRouter()
 const { t } = useI18n()
 const botStore = useBotStore()
 const {evmAddress} = storeToRefs(useBotStore())
-const { addressGroups ,currentAddress,updateNum1,updateNum2,updateNum3,addressConditions,addressConditions2} = storeToRefs(useFollowStore())
+const { addressGroups ,currentAddress,updateNum12,updateNum13,updateNum14,updateNum2,updateNum3,addressConditions,addressConditions2} = storeToRefs(useFollowStore())
 // const addressGroups = ref([{ "group_id": 3763, "name": "base", "show_index": -1 }, { "group_id": 37632, "name": "base1", "show_index": 0 }, { "group_id": 37631, "name": "base2", "show_index": 1 }])
 const visible = ref(false)
 const visible2 = ref(false)
@@ -743,10 +743,11 @@ const batchDelete=async ()=>{
   batchDeleteAddresses(checkedList.value).then(() => {
     ElMessage.success(t('success'))
     init()
+    props.isMonitor?updateNum13.value++:updateNum12.value++
     tableRef.value!.clearSelection()
     checkedList.value = []
   }).catch((e) => {
-     ElMessage.error(String(e))
+    ElMessage.error(String(e))
   })
 }
 const batchDelete2=async ()=>{
@@ -763,6 +764,7 @@ const batchDelete2=async ()=>{
   batchDeleteMonitor(checkedList2.value).then(() => {
     ElMessage.success(t('success'))
     init()
+    props.isMonitor?updateNum13.value++:updateNum12.value++
     tableRef.value!.clearSelection()
     checkedList2.value = []
   }).catch((e) => {
@@ -780,6 +782,7 @@ onActivated(() => {
 watch(() => conditions.value.group, (val) => {
   checkedList.value = []
   tableRef.value!.clearSelection()
+  tableRef.value!.setScrollTop(0)
 })
 watch(() => props.isMonitor, (val) => {
   checkedList.value = []
@@ -798,6 +801,13 @@ function init() {
   getTableList()
 }
 
+function handleChangePage() {
+  getTableList()
+  nextTick(() => {
+    tableRef.value?.setScrollTop(0)
+  })
+}
+
 watch(() => currentAddress.value, (val) => {
   if(!val) {
     dataSource.value=[]
@@ -806,7 +816,7 @@ watch(() => currentAddress.value, (val) => {
     init()
   }
 })
-watch([() => conditions.value, ()=>updateNum2.value+updateNum3.value,()=>props.isMonitor], (value, oldValue) => {
+watch([() => conditions.value, ()=>updateNum2.value+updateNum3.value+(!props.isMonitor?updateNum13.value:updateNum12.value)+updateNum14.value,()=>props.isMonitor], (value, oldValue) => {
   init()
   if(value[2]!==oldValue[2]){
     nextTick(()=>{
@@ -823,7 +833,7 @@ function handleDeleteMonitor(row:any){
   }).then(() => {
     ElMessage.success(t('success'))
     tableRef.value?.toggleRowSelection(row,false)
-    updateNum1.value++
+    props.isMonitor?updateNum13.value++:updateNum12.value++
     init()
     getMonitorNum()
   })
@@ -848,7 +858,7 @@ const handleMonitor = throttle((row:any,index:number=0) => {
       }
       // dataSource.value[index].is_pause = row.is_pause===0?1:0
       getTableList()
-      updateNum1.value++
+      props.isMonitor?updateNum13.value++:updateNum12.value++
       if(req===favUsersResumeMonitor){
         ElMessage.success(t('openMonitorSuccess'))
       }else{
@@ -866,7 +876,7 @@ const handleMonitor = throttle((row:any,index:number=0) => {
       dataSource.value[index].is_monitored = row.is_monitored===0?1:0
       getTableList()
       ElMessage.success(t('openMonitorSuccess'))
-      updateNum1.value++
+      props.isMonitor?updateNum13.value++:updateNum12.value++
       getMonitorNum()
     }).catch((e) => {
         ElMessage.error(String(e))
@@ -1013,7 +1023,7 @@ function handleDeleteAttention(item:any) {
   deleteAttention({address: currentAddress.value, user_chain: item.user_chain,user_address: item.user_address}).then(() => {
     ElMessage.success(t('success'))
     getTableList()
-    updateNum1.value++
+    props.isMonitor?updateNum13.value++:updateNum12.value++
     // const newList = checkedList.value.filter((i) => !(i.user_address === item.user_address && i.user_chain === item.user_chain))
     // checkedList.value = newList
     tableRef.value?.toggleRowSelection(item,false)
@@ -1024,7 +1034,7 @@ function handleDeleteAttention(item:any) {
 }
 const getRowGroupChange = async (val: number, row: any) => {
   await moveFavoriteGroup2({user_chain:row.user_chain, user_address:row.user_address, group:val})
-  updateNum1.value++
+  props.isMonitor?updateNum13.value++:updateNum12.value++
   getTableList()
 }
 
