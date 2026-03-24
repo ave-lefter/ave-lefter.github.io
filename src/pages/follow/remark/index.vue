@@ -10,7 +10,7 @@ import { deleteAttention, updateWhaleRemark, addAttentionNew, addAddressMonitor,
 import type { TableInstance } from 'element-plus'
 import { useThrottleFn } from '@vueuse/core'
 const globalStore = useGlobalStore()
-const { updateNum1, updateNum2, updateNum3 } = storeToRefs(useFollowStore())
+const { updateNum12,updateNum13,updateNum14, updateNum2, updateNum3 } = storeToRefs(useFollowStore())
 const botStore = useBotStore()
 const walletStore = useWalletStore()
 const router = useRouter()
@@ -97,6 +97,7 @@ const batchDelete=async ()=>{
     ElMessage.success(t('success'))
     pageData.value.page = 1
     getList()
+    updateNum14.value++
     tableRef.value!.clearSelection()
     checkedList.value = []
   }).catch((e) => {
@@ -137,7 +138,7 @@ watch(() => walletStore.walletSignature[walletStore.address], (newValue) => {
   }
 })
 
-watch(() => updateNum2.value+updateNum3.value, () => {
+watch(() => updateNum13.value+updateNum12.value+updateNum2.value+updateNum3.value, () => {
   getList()
 })
 
@@ -173,7 +174,7 @@ const handleMonitor = async (row: any) => {
     }).then(() => {
       ElMessage.success(t('openMonitorSuccess'))
       getList()
-      updateNum1.value++
+      updateNum14.value++
     }).catch((e) => {
       ElMessage.error(String(e))
     })
@@ -184,7 +185,7 @@ const handleMonitor = async (row: any) => {
     }).then(() => {
       ElMessage.success(t('cancelMonitorSuccess'))
       getList()
-      updateNum1.value++
+      updateNum14.value++
     })
   }
 }
@@ -264,6 +265,7 @@ const collect = async (row: any) => {
     // tableList.value.filter((i:any) => i.is_wallet_address_fav === 1).forEach((j:any) => {
     //   console.log('j', j)
     // })
+    updateNum14.value++
     nextTick(() => {
       tableRef.value?.toggleRowSelection(row, row.is_wallet_address_fav !== 1)
     })
@@ -275,7 +277,7 @@ const collect = async (row: any) => {
 }
 
 // 获取列表
-const getList = async () => {
+const getList = useThrottleFn(async () => {
   loading.value = true
   const res: any = await getRemarksDetail({
     address: addressValue.value,
@@ -295,7 +297,7 @@ const getList = async () => {
   pageData.value.total = res.total
   tableList.value = tableData
   loading.value = false
-}
+}, 1000)
 
 function safeBigNumber(value: any) {
   try {

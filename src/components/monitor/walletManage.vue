@@ -167,7 +167,7 @@ const addButtonRef = ref()
 const addFavAddressPopRef = ref()
 // const selectGroupId=ref(0)
 const {selectGroupId,paginationParams,user_chain,monitorList1} = storeToRefs(useMonitorStore())
-const {currentAddress ,showBatchAddressDetails, updateNum1,updateNum2,updateNum3,addressGroups} = storeToRefs(useFollowStore())
+const {currentAddress ,showBatchAddressDetails, updateNum12,updateNum13,updateNum14,updateNum2,updateNum3,addressGroups} = storeToRefs(useFollowStore())
 const conditions = reactive({
   group: selectGroupId.value,
   activeTab: '7d',
@@ -225,7 +225,7 @@ onMounted(() => {
    if(monitorList1.value.length>0) return
   init()
 })
-watch(() => updateNum1.value+updateNum3.value, () => {
+watch(() => updateNum12.value+updateNum13.value+updateNum14.value+updateNum3.value, () => {
   paginationParams.value={...defaultPaginationParams,pageSize: 50}
   getTableList()
 })

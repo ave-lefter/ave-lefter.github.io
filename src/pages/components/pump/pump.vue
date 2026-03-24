@@ -49,7 +49,7 @@ import { addFavorite, removeFavorite } from '~/api/fav'
 import type { RowEventHandlerParams } from 'element-plus'
 
 const { t } = useI18n()
-const {updateNum5} = storeToRefs(useFollowStore())
+const {updateNum4} = storeToRefs(useFollowStore())
 const globalStore = useGlobalStore()
 const walletStore = useWalletStore()
 const botStore = useBotStore()
@@ -107,7 +107,7 @@ watch(
 )
 
 watch(
-  () => updateNum5.value,
+  () => updateNum4.value,
   () => {  
     pageInfo.value.pageNO = 1
     _getTreasureList()

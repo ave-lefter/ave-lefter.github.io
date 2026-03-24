@@ -39,7 +39,10 @@
         :class="collected ? 'color-#ffbb19' : 'color-[--icon-color]'"
         @click="collect"
       /> -->
-      <Collect iconClass="text-16px cursor-pointer" :isCollected="collected" :userFavoriteGroups="userFavoriteGroups" @confirmSwitchGroup="confirmSwitchGroup" @collect="collect" @newGroupAndCollect="newGroupAndCollect"/>
+      <div class="flex">
+        <Collect iconClass="text-16px cursor-pointer" :isCollected="collected" :userFavoriteGroups="userFavoriteGroups" @confirmSwitchGroup="confirmSwitchGroup" @collect="collect" @newGroupAndCollect="newGroupAndCollect"/>
+      </div>
+      
       <div class="pump-item_item token-info ml-16px flex items-center color-[--third-text] ">
         <div class="black-container">
           <span
