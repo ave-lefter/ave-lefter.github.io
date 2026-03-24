@@ -105,7 +105,7 @@
           <div class="text-14px">{{ $t('addToGroup') }}</div>
           <el-switch v-model="showGroup" size="small" />
         </div>
-        <div class="flex mt-10px mb-4px justify-between">
+        <div v-if="botStore.userInfo && botStore.userInfo.name" class="flex mt-10px mb-4px justify-between">
           <div class="text-14px">{{ $t('isMonitored') }}</div>
           <el-switch v-model="isMonitored" size="small" />
         </div>
@@ -303,7 +303,7 @@ const loadingDelete = ref(false)
 const zeroBalanceAddresses = ref('')
 const zeroBalanceList = ref([])
 const showGroup = ref(false)
-const isMonitored = ref(true)
+const isMonitored = ref(false)
 const proPopoverRef = ref()
 const addGroupName = ref('')
 const addButtonRef = ref()

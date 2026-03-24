@@ -411,7 +411,7 @@ export async function bulkImportAttention(
   addressArr: BulkImportAttentionItem[],
   address: string = localStorage.bot_evmAddress || localStorage.walletAddress,
   group: number | undefined,
-  is_monitored : boolean
+  is_monitored : boolean = false
 ): Promise<any> {
   const arr: Array<{
     address: string
