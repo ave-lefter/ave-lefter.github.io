@@ -337,16 +337,22 @@ const amm = computed(() => {
 let loading = false
 
 // rAF 批量合并同帧内的 onTick 调用，避免高频 WS 消息导致图表反复重绘
-let _pendingBar: KLineBar | null = null
+let _pendingBars: KLineBar[] = []
 let _rafTickId: number | null = null
-function scheduleOnTick(bar: KLineBar, onTick: (bar: KLineBar) => void) {
-  _pendingBar = bar
+function scheduleOnTick(bar: KLineBar | KLineBar[], onTick: (bar: KLineBar) => void) {
+  if (Array.isArray(bar)) {
+    _pendingBars.push(...bar)
+  } else {
+    _pendingBars.push(bar)
+  }
   if (_rafTickId !== null) return
   _rafTickId = requestAnimationFrame(() => {
     _rafTickId = null
-    if (_pendingBar) {
-      onTick(_pendingBar)
-      _pendingBar = null
+    if (_pendingBars.length) {
+      for (const pendingBar of _pendingBars) {
+        onTick(pendingBar)
+      }
+      _pendingBars = []
     }
   })
 }
@@ -420,6 +426,15 @@ function switchTokenKline() {
   isReadyLine = false
   const val = pair.value
   if (isReady.value && route.name === 'token-id') {
+    lastBar = null
+    lastPairPrice = 0
+    // 清空待处理的 bars 和取消 rAF
+    if (_rafTickId !== null) {
+      cancelAnimationFrame(_rafTickId)
+      _rafTickId = null
+    }
+    _pendingBars = []
+    
     resetLimitPriceLineId()
     // resetAvgPriceLineId()
     resetTop100AvgPriceLineId()
@@ -1090,6 +1105,14 @@ async function initChart() {
         if (resolution.value !== interval) {
           resolution.value = interval
           localStorage.setItem('tv_resolution', interval)
+          lastBar = null
+          lastPairPrice = 0
+          // 清空待处理的 bars 和取消 rAF
+          if (_rafTickId !== null) {
+            cancelAnimationFrame(_rafTickId)
+            _rafTickId = null
+          }
+          _pendingBars = []
           _widget?.resetCache?.()
         }
       })
@@ -1257,22 +1280,24 @@ function onWsKline(
         const newBar1 = buildOrUpdateLastBarFromTx(tx, t, lastBar, interval)
         if (newBar1) {
           lastBar = { ...newBar1 }
-        }
-        const newBar = { ...newBar1 } as KLineBar
-        if (showMarket.value && newBar) {
-          newBar.open = new BigNumber(newBar.open || 0)
-            .times(tokenStore?.circulation || 0)
-            .toNumber()
-          newBar.high = new BigNumber(newBar.high || 0)
-            .times(tokenStore?.circulation || 0)
-            .toNumber()
-          newBar.low = new BigNumber(newBar.low || 0).times(tokenStore?.circulation || 0).toNumber()
-          newBar.close = new BigNumber(newBar.close || 0)
-            .times(tokenStore?.circulation || 0)
-            .toNumber()
-        }
-        if (newBar && newBar?.time) {
-          scheduleOnTick(newBar, onTick)
+          let newBar = { ...newBar1 } as KLineBar
+
+          if (showMarket.value && newBar) {
+            newBar.open = new BigNumber(newBar.open || 0)
+              .times(tokenStore?.circulation || 0)
+              .toNumber()
+            newBar.high = new BigNumber(newBar.high || 0)
+              .times(tokenStore?.circulation || 0)
+              .toNumber()
+            newBar.low = new BigNumber(newBar.low || 0).times(tokenStore?.circulation || 0).toNumber()
+            newBar.close = new BigNumber(newBar.close || 0)
+              .times(tokenStore?.circulation || 0)
+              .toNumber()
+          }
+
+          if (newBar && newBar?.time) {
+            scheduleOnTick(newBar, onTick)
+          }
         }
       }
       wsTxUpdateMarks(
@@ -1436,7 +1461,7 @@ onUnmounted(() => {
     cancelAnimationFrame(_rafMarksId)
     _rafMarksId = null
   }
-  _pendingBar = null
+  _pendingBars = []
   _widget?.remove?.()
   _widget = null
 })
