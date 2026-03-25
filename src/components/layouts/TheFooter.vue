@@ -105,6 +105,9 @@
       </div>
     </div>
     <ul class="right">
+      <li>
+        <Net />
+      </li>
       <li class="color-[--secondary-text] hover:color-[--main-text]">
         <a target="_blank" href="https://cloud.tencent.com/" class="flex-center">
           <Icon name="custom:tencent-cloud" class="text-14px mr-2px hover:color-[#0052D9]" />
@@ -216,6 +219,7 @@ import navHoverIcon from '@/assets/icons/footer/nav-hover.svg?url'
 import navWhiteIcon from '@/assets/icons/footer/nav-white.svg?url'
 import navWhiteHoverIcon from '@/assets/icons/footer/nav-white-hover.svg?url'
 import { TokenImg, QuickSwap } from '#components'
+import Net from '@/components/net.vue'
 // import QuickSwap from '../quickSwapTsx.vue'
 
 const { t } = useI18n()

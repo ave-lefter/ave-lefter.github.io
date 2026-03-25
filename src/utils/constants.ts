@@ -307,5 +307,6 @@ export const WSEventV2Type = {
   PORTRAIT_STATISTICS:'portrait_statistics',
   TWITTER_MONITOR:'twitter_monitor',
   PUBLIC_TWITTER: 'public_twitter',
-  SUB_TOKEN_KLINE_EXTRA: 'sub_token_kline_extra'
+  SUB_TOKEN_KLINE_EXTRA: 'sub_token_kline_extra',
+  HEARTBEAT: 'heartbeat'
 }
