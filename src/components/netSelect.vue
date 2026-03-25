@@ -17,34 +17,50 @@ const options = computed(() => {
 })
 const selectedChains = shallowRef<string[]>([])
 
-const displayChains = computed(() => {
-  return selectedChains.value.slice(0, 2)
-})
-
+const selectedChainDisplay=shallowRef<string[]>([])
+const displayChains = ref<string[]>([])
+const displayLen=ref(0)
 onMounted(() => {
   nextTick(() => {
-    selectedChains.value = botStore.evmAddress ? (botStore.isSupportChains as unknown as string[]) : ['bsc', 'base', 'eth', 'xlayer']
+    selectedChains.value = botStore.evmAddress ? ['bsc', 'solana'] : ['bsc', 'base', 'eth']
+    displayChains.value=selectedChains.value.slice(0, 2)
+    selectedChainDisplay.value=displayChains.value
+    displayLen.value=selectedChains.value.length
   })
 })
 function getDisabled(val: string) {
-  return selectedChains.value.length >= 6 && !selectedChains.value.includes(val)
+  return selectedChainDisplay.value.length >= 6 && !selectedChainDisplay.value.includes(val)
 }
 
 function onConfirm() {
+  let arr: string[] = []
+  displayChains.value=[]
   if (botStore.userInfo && Array.isArray(botStore.userInfo.addresses)) {
-    const arr: string[] = []
-    botStore.userInfo.addresses.map(el => {
-      if (selectedChains.value.includes(el.chain)) {
+    botStore.userInfo.addresses.map((el,index) => {
+      if (selectedChainDisplay.value.includes(el.chain)) {
         arr.push(el.address + '-' + el.chain)
+        if(displayChains.value.length<2) displayChains.value.push(el.chain)
       }
     })
     emit('update:userIds', arr)
   }else{
-    const arr =selectedChains.value.map(i => walletStore.address + '-' + i)
+    arr =selectedChainDisplay.value.map(i => walletStore.address + '-' + i)
+    displayChains.value=selectedChainDisplay.value.slice(0, 2)
     emit('update:userIds', arr)
   }
+  selectedChains.value=selectedChainDisplay.value
+  displayLen.value=arr.length||0
   visible.value = false
 }
+
+watch(
+  () => visible.value,
+  () => {
+    if (visible.value) {
+      selectedChainDisplay.value = selectedChains.value
+    }
+  }
+)
 
 /**
  * Cancel the net select popover.
@@ -79,7 +95,7 @@ function onCancel() {
               :class="['rounded-50% mr--4px relative','z-'+(index+1), (index === displayChains.length - 1) && 'mr-0']"
               :src="formatImgUrl('chain',item)"
               alt="">
-            <span class="inline-block bg-[#333] text-[#fff] min-w-14px h-14px lh-14px text-12px ml-4px border-rd-4px">{{ selectedChains.length }}</span>
+            <span class="inline-block bg-[#333] text-[#fff] min-w-14px h-14px lh-14px text-12px ml-4px border-rd-4px">{{ displayLen }}</span>
           </el-button>
         </div>
       </template>
@@ -88,7 +104,7 @@ function onCancel() {
       >
         <el-scrollbar height="130px">
           <el-checkbox-group
-            v-model="selectedChains"
+            v-model="selectedChainDisplay"
           >
             <el-checkbox
               v-for="item in options" :key="item"
@@ -113,7 +129,7 @@ function onCancel() {
           <el-button
             size="small" type="primary"
             class="h-30px min-w-60px"
-            :disabled="selectedChains.length === 0"
+            :disabled="selectedChainDisplay.length === 0"
             @click="onConfirm"
           >
             {{ $t('confirm') }}
