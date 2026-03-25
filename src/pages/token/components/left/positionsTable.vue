@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import THead from './tHead.vue'
-import {getUserBalance, type GetUserBalanceResponse} from '~/api/swap'
+import {getUserBalance, type GetUserBalanceResponse } from '~/api/swap'
 import type {IAssetResponse, IPriceV2Response} from '~/api/types/ws'
-import {bot_createSolTx, bot_createSwapEvmTx, bot_createSwapTonTx, bot_getTokenBalance} from '~/api/bot'
+import {bot_createSolTx, bot_createSwapEvmTx, bot_createSwapTonTx, bot_getTokenBalance,getBalances} from '~/api/bot'
 import {ElNotification} from 'element-plus'
 import {formatBotGasTips, hasCreateTxError, getCreateTxErrorMsg, handleBotError} from '~/utils/bot'
 import BigNumber from 'bignumber.js'
-import {useDebounceFn, useThrottleFn} from '@vueuse/core'
+import {useDebounceFn, useLocalStorage, useThrottleFn} from '@vueuse/core'
 import {useWalletStore} from '~/stores/wallet'
 import type { BotChain, BotSettingKey } from '~/utils/types'
 import { recordTxV2, updateTxV2 } from '~/api/tracking'
@@ -21,7 +21,8 @@ const priceV2Store = usePriceV2Store()
 const walletStore = useWalletStore()
 const tokenStore = useTokenStore()
 const {hide_risk, hide_small} = storeToRefs(useGlobalStore())
-
+const {currentAddress} = storeToRefs(useFollowStore())
+const selectedChains = useLocalStorage<string[]>('positionsSelectedChains', [])
 watch(() => wsStore.wsResult[WSEventType.PRICEV2], (val: IPriceV2Response) => {
   const idToPriceMap: { [key: string]: IPriceV2Response['prices'][0] } = {}
   val.prices.forEach((item) => {
@@ -107,7 +108,85 @@ watch(()=>updateHolderNum.value, () => {
 // }
 //   },20000)
 // })
+
+const getTokenBalance = useThrottleFn(function (token: string, chain: string) {
+  const creatorAddress = botStore.getWalletAddress(chain)
+  if (creatorAddress) {
+    getBalances({
+      chain,
+      creatorAddress,
+      tokens: [token],
+      showZero: false
+    }).then(res => {
+      const index = listData.value.findIndex(i => i.token === token && i.chain === chain)
+      if(!res?.tokens||!res?.tokens?.length){
+        if(index>-1){
+          console.log('index',index,token,chain)
+          listData.value.splice(index, 1);
+        }
+      }else if(res.chain === chain && res.creatorAddress === creatorAddress){
+        const tokens = res.tokens.filter(i => i.token === token)
+        const newToken=tokens?.[0]||{}
+        if (tokens.length > 0) {
+          if(index>-1){
+            listData.value[index].balance = new BigNumber(newToken?.balance || 0).toNumber()
+            listData.value[index].balance_usd = new BigNumber(newToken?.balance || 0)
+              .times(newToken?.price || 0).toNumber()
+            listData.value[index].current_price_usd = Number(newToken?.price||0)
+            listData.value[index].total_profit = Number(newToken?.pnl?.totalProfit||0)?.toFixed(6)||'--'
+            listData.value[index].total_profit_ratio =Number(newToken?.pnl?.totalProfitRatio||0)?.toFixed(6)||'--'
+            nextTick(() => {
+              triggerRef(listData)
+            })
+          }else{
+            const data={
+              index: newToken?.token === NATIVE_TOKEN
+            ? getChainInfo(res.chain)?.wmain_wrapper + '-' + res.chain
+            : `${newToken?.token}-${res.chain}`,
+              address: creatorAddress,
+              chain: res?.chain,
+              token: newToken?.token,
+              symbol: newToken?.symbol,
+              logo_url: newToken?.logoUrl,
+              balance: new BigNumber(newToken?.balance || 0).toNumber(),
+              balance_usd: new BigNumber(newToken?.balance || 0)
+                .times(newToken?.price || 0).toNumber(),
+              total_profit:  Number(newToken?.pnl?.totalProfit||0)?.toFixed(6)||'--',
+              total_profit_ratio:Number(newToken?.pnl?.totalProfitRatio||0)?.toFixed(6)||'--',
+              average_purchase_price_usd: new BigNumber(newToken?.pnl?.averageNetPurchasePrice||0).toString(),
+              current_price_usd: Number(newToken?.price||0),
+              price_change: 0,
+              decimals: Number(newToken?.decimals||0),
+              risk_level: Number(newToken?.risk_level||0),
+              risk_score: Number(newToken?.risk_score||0),
+            }
+
+            console.log('newToken',data,newToken)
+            listData.value.unshift(data)
+            nextTick(() => {
+              triggerRef(listData)
+            })
+          }
+        }
+        console.log('listData.value',listData.value)
+      }
+      // listData.value = listData.value.map(item => {
+      //   if (item.token === token && item.chain === chain) {
+      //     return {
+      //       ...item,
+      //       balance: tokens[0].balance,
+      //       balance_usd: new BigNumber(tokens[0].balance || 0)
+      //         .times(item.current_price_usd || 0).toNumber()
+      //     }
+      //   }
+      //   return {...item}
+      // })
+    })
+  }
+}, 0, false, true)
+
 watch(() => wsStore.wsResult[WSEventType.ASSET], (val: IAssetResponse) => {
+  // getTokenBalance('','bsc')
   // 处理 token 交易
   if (val.swap) {
     const token = ((val.swap.token === 'So11111111111111111111111111111111111111112')
@@ -122,59 +201,43 @@ watch(() => wsStore.wsResult[WSEventType.ASSET], (val: IAssetResponse) => {
     }
     //   处理转账
   } else if (val.transfer) {
+    console.log('val.transfer',val)
     const chain = val.transfer.chain
     const token = val.transfer.token
     const type = val.transfer.type
-    if (token && chain) {
-      const index = listData.value.findIndex(i => i.token === token && i.chain === chain)
-      const isBuy = type === '0'
-      if (index > -1) {
-        const indexObj = listData.value[index]
-        const balance = Number(indexObj.balance)
-        const price = indexObj.current_price_usd
-        const newBalance = new BigNumber(balance).plus(isBuy ? val.transfer.amount : -val.transfer?.amount)
-        const newBalanceUsd = newBalance.multipliedBy(price)
-        indexObj.balance = newBalance.toString()
-        indexObj.balance_usd = newBalanceUsd.toNumber()
-        if(!isBuy){
-          console.log('indexObj.balance',newBalance.toString())
-          if(Number(indexObj.balance)<=0){
-            listData.value.splice(index, 1);
+    if( ["bsc", "eth", "base", "xlayer", "solana","polygon", "arbitrum", "optimism", "monad"].includes(chain)){
+      getTokenBalance(token,chain)
+    }else{
+      if (token && chain) {
+        const index = listData.value.findIndex(i => i.token === token && i.chain === chain)
+        const isBuy = type === '0'
+        if (index > -1) {
+          const indexObj = listData.value[index]
+          const balance = Number(indexObj.balance)
+          const price = indexObj.current_price_usd
+          const newBalance = new BigNumber(balance).plus(isBuy ? val.transfer.amount : -val.transfer?.amount)
+          const newBalanceUsd = newBalance.multipliedBy(price)
+          indexObj.balance = newBalance.toString()
+          indexObj.balance_usd = newBalanceUsd.toNumber()
+          if(!isBuy){
+            console.log('indexObj.balance',newBalance.toString())
+            if(Number(indexObj.balance)<=0){
+              listData.value.splice(index, 1);
+            }
           }
+          triggerRef(listData)
+        } else {
+          setTimeout(()=>{
+            resetStatus()
+            getDataOnResize()
+          },5000)
         }
-        triggerRef(listData)
-      } else {
-        setTimeout(()=>{
-          resetStatus()
-          getDataOnResize()
-        },5000)
       }
     }
   }
 })
-const getTokenBalance = useThrottleFn(function (token: string, chain: string) {
-  const walletAddress = botStore.getWalletAddress(chain)
-  if (walletAddress) {
-    bot_getTokenBalance({
-      chain,
-      walletAddress,
-      tokens: [token]
-    }).then(tokens => {
-      listData.value = listData.value.map(item => {
-        if (item.token === token && item.chain === chain) {
-          return {
-            ...item,
-            balance: tokens[0].balance,
-            balance_usd: new BigNumber(tokens[0].balance || 0)
-              .times(item.current_price_usd || 0).toNumber()
-          }
-        }
-        return {...item}
-      })
-    })
-  }
 
-}, 1000, false, true)
+
 
 function resetHolderList(walletAddress: string | undefined) {
   [5000, 1000, 15000].forEach(interval => {
@@ -197,13 +260,17 @@ function resetStatus() {
 const isEvmChainWallet = computed(() => {
   return getChainInfo(walletStore.chain)?.vm_type === 'evm'
 })
-
 const userIds = computed(() => {
+  if(!selectedChains.value.length){
+    console.log('selectedChains.value.length',botStore.evmAddress)
+    selectedChains.value = botStore.evmAddress ? ['bsc', 'solana'] : ['bsc', 'base', 'eth']
+  }
+  // const selectedChains = botStore.evmAddress ? ['bsc', 'solana'] : ['bsc', 'base', 'eth']
   if (botStore.userInfo) {
-    return botStore.userInfo.addresses.filter(({chain})=> ['bsc','solana'].includes(chain)).map(({address, chain}) => address + '-' + chain)
+    return botStore.userInfo.addresses.filter(({chain})=> selectedChains.value.includes(chain)).map(({address, chain}) => address + '-' + chain)
   } else {
-     if (walletStore.address && isEvmChainWallet.value && (walletStore.walletName!=='WatchWallet')) {
-      return [walletStore.address + '-' + 'bsc', walletStore.address + '-' + 'base', walletStore.address + '-' + 'eth']
+    if (walletStore.address && isEvmChainWallet.value && (walletStore.walletName!=='WatchWallet')) {
+      return selectedChains.value.map(i => walletStore.address + '-' + i)
     }
     else {
       return [walletStore.address + '-' + walletStore.chain]
@@ -280,6 +347,12 @@ const listStatus = shallowRef({
 })
 const listData = shallowRef<(GetUserBalanceResponse & { index: string })[]>([])
 
+const filterListData = computed(() => {
+  const sort=backendSort.value.sort||'balance_usd'
+  return listData.value.toSorted((a, b) => backendSort.value.sort_dir ==='asc' ? a?.[sort] - b?.[sort] : b?.[sort] - a?.[sort])
+})
+
+
 onMounted(() => {
   _getUserBalance()
 })
@@ -305,6 +378,7 @@ async function _getUserBalance() {
       ...tableFilter.value,
       ...backendSort.value,
     })
+
     if (Array.isArray(res?.data) && res.data.length > 0) {
       if (pageNo === 1) {
         listData.value = res.data.map(i => ({
@@ -572,7 +646,7 @@ function handleTxSuccess(res: any, _batchId: string, tokenId: string, row: GetUs
       >
         <div class="pb-20px pr-30px">
           <NuxtLink
-            v-for="(row,$index) in listData" :key="$index"
+            v-for="(row,$index) in filterListData" :key="$index"
             class="text-12px flex justify-between pl-10px py-10px cursor-pointer hover:bg-[--dialog-bg]"
             :to="`/token/${row.index}`"
           >
@@ -586,6 +660,7 @@ function handleTxSuccess(res: any, _batchId: string, tokenId: string, row: GetUs
                 </template>
               </el-tooltip>
               <div class="ml-6px">
+                <!-- {{ $index }} -->
                 <div class="flex">
                   <span class="color-[var(--main-text)]">{{ row.symbol }}</span>
                   <Icon

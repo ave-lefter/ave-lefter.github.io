@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useLocalStorage } from '@vueuse/core'
 import {formatImgUrl} from '~/utils'
 
 const emit = defineEmits(['update:userIds'])
@@ -15,14 +16,16 @@ const visible = shallowRef(false)
 const options = computed(() => {
   return botStore.evmAddress?useBotStore().isSupportChains:botStore.isSupportEvmChains
 })
-const selectedChains = shallowRef<string[]>([])
+const selectedChains = useLocalStorage<string[]>('positionsSelectedChains', [])
 
 const selectedChainDisplay=shallowRef<string[]>([])
 const displayChains = ref<string[]>([])
 const displayLen=ref(0)
 onMounted(() => {
   nextTick(() => {
-    selectedChains.value = botStore.evmAddress ? ['bsc', 'solana'] : ['bsc', 'base', 'eth']
+    if(!selectedChains.value.length){
+      selectedChains.value = botStore.evmAddress ? ['bsc', 'solana'] : ['bsc', 'base', 'eth']
+    }
     displayChains.value=selectedChains.value.slice(0, 2)
     selectedChainDisplay.value=displayChains.value
     displayLen.value=selectedChains.value.length
