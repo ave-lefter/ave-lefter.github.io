@@ -1,5 +1,4 @@
 <script setup lang="ts">
-definePageMeta({ keepalive: true })
 import { useStorage, useSessionStorage } from '@vueuse/core'
 import CategoryTabs from './components/categoryTabs.vue'
 import hot from './components/hotRank/hot.vue'
@@ -9,6 +8,7 @@ import gainer from './components/gainerRank/gainer.vue'
 import { getTreasureConfig, type IGetTreasureConfig } from '~/api/market'
 
 import { trackRef } from '~/api/tracking'
+definePageMeta({ keepalive: true })
 
 const pumpComponent = defineAsyncComponent(() => import('./components/pump/pump.vue'))
 const activityComponent = defineAsyncComponent(() => import('./components/activity/activity.vue'))
@@ -34,11 +34,11 @@ const activeSubTab = useStorage('rankSubTab', 'pump_in_hot')
 const activeChain = useStorage('rankChain', 'AllChains')
 const chains = useSessionStorage<IGetTreasureConfig[]>('treasureConfig', [])
 const currentChainObj = computed(() => {
-  return chains.value.find((el) => el.net_name === activeChain.value)
+  return chains.value?.find((el) => el.net_name === activeChain.value)
 })
 const isPump = computed(() => {
-  if (Array.isArray(currentChainObj.value?.categories)) {
-    return currentChainObj.value.categories.find((el) => el.category === activeTab.value)?.is_pump
+  if (Array.isArray(currentChainObj?.value?.categories)) {
+    return currentChainObj?.value?.categories?.find?.((el) => el.category === activeTab.value)?.is_pump
   }
   return 0
 })
@@ -47,7 +47,7 @@ const _activityComponent = computed(() => {
   return components?.[activeTab.value as keyof typeof components] || activityComponent
 })
 const walletAddress = computed(() => {
-  return botStore.evmAddress || walletStore.address
+  return botStore.evmAddress || walletStore.address || ''
 })
 
 // 切换 tab 时重置该 tab 的 pageNO sessionStorage，确保子组件下次加载从第1页开始
