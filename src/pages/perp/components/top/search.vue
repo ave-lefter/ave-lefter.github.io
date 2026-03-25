@@ -176,7 +176,6 @@ function onClearQuery() {
 }
 
 function onCategoryClick(category: string) {
-  debugger;
   if (activeCategory.value === category) return
   activeCategory.value = category
   fetchContractList(false)

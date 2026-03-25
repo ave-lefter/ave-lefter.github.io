@@ -1,14 +1,62 @@
 import type { PumpConfig, PumpObj } from '@/api/types/pump'
-export function _getPumpList(params): Promise<PumpObj[]> {
+import localforage from 'localforage'
+import { cloneDeep } from 'lodash-es'
+
+const PUMP_CONFIG_CACHE_KEY = 'pump_config_cache'
+const CACHE_DURATION = 10 * 60 * 1000 // 10 分钟
+export function _getPumpList(params: any): Promise<PumpObj[]> {
   const { $api } = useNuxtApp()
   return $api('/v2api/pump/v1/all', {
     method: 'get',
     query: params,
   })
 }
-export function _getPumpConfig(): Promise<PumpConfig[]> {
+export async function _getPumpConfig(): Promise<PumpConfig[]> {
   const { $api } = useNuxtApp()
-  return $api('/v2api/pump/v1/config')
+  
+  try {
+    // 尝试从缓存读取
+    const cachedData = await localforage.getItem<{ data: PumpConfig[], timestamp: number }>(PUMP_CONFIG_CACHE_KEY)
+    
+    if (cachedData) {
+      const { data, timestamp } = cachedData
+      const now = Date.now()
+      
+      // 检查缓存是否有效（10 分钟内）
+      if (now - timestamp < CACHE_DURATION) {
+        console.log('[PumpConfig] 使用缓存数据')
+        return cloneDeep(data)
+      } else {
+        console.log('[PumpConfig] 缓存已过期，清除旧缓存')
+        await localforage.removeItem(PUMP_CONFIG_CACHE_KEY)
+      }
+    }
+    
+    // 缓存不存在或已过期，从 API 获取
+    console.log('[PumpConfig] 从 API 获取最新数据')
+    const freshData = await $api('/v2api/pump/v1/config')
+    
+    // 保存到缓存
+    await localforage.setItem(PUMP_CONFIG_CACHE_KEY, {
+      data: freshData,
+      timestamp: Date.now()
+    })
+    
+    return freshData
+  } catch (error) {
+    console.error('[PumpConfig] 获取配置失败:', error)
+    // 如果出错，尝试返回缓存数据（即使已过期）
+    try {
+      const expiredCache = await localforage.getItem<{ data: PumpConfig[], timestamp: number }>(PUMP_CONFIG_CACHE_KEY)
+      if (expiredCache?.data) {
+        console.warn('[PumpConfig] API 失败，使用过期缓存')
+        return cloneDeep(expiredCache.data)
+      }
+    } catch (fallbackError) {
+      console.error('[PumpConfig] 获取过期缓存也失败:', fallbackError)
+    }
+    throw error
+  }
 }
 
 

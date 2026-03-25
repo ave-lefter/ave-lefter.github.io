@@ -179,7 +179,7 @@ export function useKlineMarks() {
   }) {
 
     const isTokenKline = tokenStore?.selectedToken
-    console.log('----------migrate_uprice-2----------', migrated, tokenStore?.selectedToken)
+    // console.log('----------migrate_uprice-2----------', migrated, tokenStore?.selectedToken)
     if (migrated?.migrate_time && isTokenKline) {
       getMigrated(onDataCallback, migrated)
     }

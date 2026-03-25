@@ -67,7 +67,7 @@ function setSortConditions(params: { sort: string; sort_dir: string }) {
 }
 function setFilterForm(...args: any[]) {
   args.forEach((keyVal) => {
-    set(rankConditions.value.inclusion.filter, keyVal[0], keyVal[1])
+    set(rankConditions.value?.inclusion?.filter, keyVal[0], keyVal[1])
   })
   pageInfo.value.pageNO = 1
   _getTreasureList()
@@ -75,7 +75,7 @@ function setFilterForm(...args: any[]) {
 const listData = ref<any[]>([])
 const filteredListData = computed(() => {
   // todo
-  if (globalStore.pumpSetting.isBlacklist) {
+  if (globalStore.pumpSetting?.isBlacklist) {
     return listData.value.filter((el) => !inBlackList(el))
   }
   return listData.value

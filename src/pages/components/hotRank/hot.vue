@@ -67,7 +67,7 @@ function setSortConditions(params: { sort: string; sort_dir: string }) {
 
 function setFilterForm(...args: any[]) {
   args.forEach((keyVal) => {
-    set(rankConditions.value.hot.filter, keyVal[0], keyVal[1])
+    set(rankConditions.value?.hot?.filter, keyVal[0], keyVal[1])
   })
   pageInfo.value.pageNO = 1
   _getTreasureList()
@@ -75,10 +75,10 @@ function setFilterForm(...args: any[]) {
 const listData = ref<any[]>([])
 const filteredListData = computed(() => {
   let result = [...listData.value]
-  if (globalStore.pumpSetting.isBlacklist) {
+  if (globalStore.pumpSetting?.isBlacklist) {
     result = result.filter((el) => !inBlackList(el))
   }
-  if (rankKlineStore.klineRow.id) {
+  if (rankKlineStore.klineRow?.id) {
     const index = result.findIndex((el) => el.id === rankKlineStore.klineRow.id)
     if (index !== -1) {
       result.splice(index + 1, 0, {
@@ -91,7 +91,7 @@ const filteredListData = computed(() => {
 function inBlackList(row) {
   const symbol = row.token0_address === row.target_token ? row.token0_symbol : row.token1_symbol
   return (
-    globalStore.pumpBlackList.findIndex(
+    globalStore.pumpBlackList?.findIndex(
       (i) =>
         (i.address == row.token && i.type == 'ca') || (i.address == symbol && i.type == 'keyword')
     ) !== -1

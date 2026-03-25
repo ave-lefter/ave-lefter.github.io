@@ -72,21 +72,21 @@ function setSortConditions(params: { sort: string; sort_dir: string }) {
 }
 function setFilterForm(...args: any[]) {
   args.forEach((keyVal) => {
-    set(rankConditions.value[props.activeTab].filter, keyVal[0], keyVal[1])
+    set(rankConditions.value[props.activeTab]?.filter, keyVal[0], keyVal[1])
   })
   pageInfo.value.pageNO = 1
   _getTreasureList()
 }
 const listData = ref<any[]>([])
 const filteredListData = computed(() => {
-  if (globalStore.pumpSetting.isBlacklist) {
+  if (globalStore.pumpSetting?.isBlacklist) {
     return listData.value.filter((el) => !inBlackList(el))
   }
   return listData.value
 })
 function inBlackList(row) {
   return (
-    globalStore.pumpBlackList.findIndex(
+    globalStore.pumpBlackList?.findIndex(
       (i) =>
         (i.address == row.token && i.type == 'ca') ||
         (i.address == row.symbol && i.type == 'keyword')
