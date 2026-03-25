@@ -137,7 +137,8 @@ watch(() => wsStore.wsResult[WSEventType.ASSET], (val: IAssetResponse) => {
         indexObj.balance = newBalance.toString()
         indexObj.balance_usd = newBalanceUsd.toNumber()
         if(!isBuy){
-          if(!Number(indexObj.balance)){
+          console.log('indexObj.balance',newBalance.toString())
+          if(Number(indexObj.balance)<=0){
             listData.value.splice(index, 1);
           }
         }
