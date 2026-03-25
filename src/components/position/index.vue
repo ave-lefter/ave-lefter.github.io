@@ -10,7 +10,7 @@
           @click.self="positionStore.visible = false" />
       </div>
     </div>
-    <div v-if="botStore.evmAddress || walletStore.address" class="w-full relative">
+    <div v-if="currentAddress" class="w-full relative">
       <PositionsTable :height="scrollHeight" class="absolute w-[calc(100%+21px)] left--10px" />
     </div>
     <AveEmpty
@@ -33,6 +33,7 @@
 
 <script setup lang="ts">
 import PositionsTable from '@/pages/token/components/left/positionsTable.vue'
+import { useLocalStorage } from '@vueuse/core'
 const { t } = useI18n()
 const botStore = useBotStore()
 const walletStore = useWalletStore()
@@ -48,9 +49,15 @@ const props = defineProps({
     default: false
   }
 })
-
+const {currentAddress} = storeToRefs(useFollowStore())
 const positionStore = usePositionStore()
-
+const selectedChains = useLocalStorage<string[]>('positionsSelectedChains', [])
+watch(() => currentAddress.value, () => {
+  console.log('currentAddress.value',currentAddress.value)
+  if(!currentAddress.value) {
+    selectedChains.value=[]
+  }
+})
 </script>
 
 <style scoped lang="scss">

@@ -6,7 +6,7 @@ import {bot_createSolTx, bot_createSwapEvmTx, bot_createSwapTonTx, bot_getTokenB
 import {ElNotification} from 'element-plus'
 import {formatBotGasTips, hasCreateTxError, getCreateTxErrorMsg, handleBotError} from '~/utils/bot'
 import BigNumber from 'bignumber.js'
-import {useDebounceFn, useThrottleFn} from '@vueuse/core'
+import {useDebounceFn, useLocalStorage, useThrottleFn} from '@vueuse/core'
 import {useWalletStore} from '~/stores/wallet'
 import type { BotChain, BotSettingKey } from '~/utils/types'
 import { recordTxV2, updateTxV2 } from '~/api/tracking'
@@ -21,6 +21,8 @@ const priceV2Store = usePriceV2Store()
 const walletStore = useWalletStore()
 const tokenStore = useTokenStore()
 const {hide_risk, hide_small} = storeToRefs(useGlobalStore())
+const {currentAddress} = storeToRefs(useFollowStore())
+const selectedChains = useLocalStorage<string[]>('positionsSelectedChains', [])
 
 watch(() => wsStore.wsResult[WSEventType.PRICEV2], (val: IPriceV2Response) => {
   const idToPriceMap: { [key: string]: IPriceV2Response['prices'][0] } = {}
@@ -197,13 +199,17 @@ function resetStatus() {
 const isEvmChainWallet = computed(() => {
   return getChainInfo(walletStore.chain)?.vm_type === 'evm'
 })
-
 const userIds = computed(() => {
+  if(!selectedChains.value.length){
+    console.log('selectedChains.value.length',botStore.evmAddress)
+    selectedChains.value = botStore.evmAddress ? ['bsc', 'solana'] : ['bsc', 'base', 'eth']
+  }
+  // const selectedChains = botStore.evmAddress ? ['bsc', 'solana'] : ['bsc', 'base', 'eth']
   if (botStore.userInfo) {
-    return botStore.userInfo.addresses.filter(({chain})=> ['bsc','solana'].includes(chain)).map(({address, chain}) => address + '-' + chain)
+    return botStore.userInfo.addresses.filter(({chain})=> selectedChains.value.includes(chain)).map(({address, chain}) => address + '-' + chain)
   } else {
-     if (walletStore.address && isEvmChainWallet.value && (walletStore.walletName!=='WatchWallet')) {
-      return [walletStore.address + '-' + 'bsc', walletStore.address + '-' + 'base', walletStore.address + '-' + 'eth']
+    if (walletStore.address && isEvmChainWallet.value && (walletStore.walletName!=='WatchWallet')) {
+      return selectedChains.value.map(i => walletStore.address + '-' + i)
     }
     else {
       return [walletStore.address + '-' + walletStore.chain]
