@@ -995,7 +995,7 @@ const { list, containerProps, wrapperProps, scrollTo } = useVirtualList(tableLis
   itemHeight: 110.8,
   // 必须增加过采样，否则 translateY(-20px) 向上移动时，
   // 顶部刚进入视口的节点会因为高度计算没到视口而无法渲染，导致动画“闪现”
-  overscan: 20,
+  overscan: 3,
 })
 
 onDeactivated(() => {
