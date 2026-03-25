@@ -721,7 +721,7 @@ const isMounted = ref(false)
 // 拖拽放大相关
 const minHeight = 327
 const maxHeight = 800
-const minWidth = 360
+const minWidth = 335
 const maxWidth = 900
 const defaultHeight = 327
 const defaultWidth = 360
@@ -1150,7 +1150,7 @@ onBeforeUnmount(() => {
   font-size: 12px;
   background: var(--dialog-bg);
   border-radius: 8px;
-  min-width: 360px;
+  min-width: 335px;
   min-height: 327px;
   max-width: 900px;
   max-height: 800px;
