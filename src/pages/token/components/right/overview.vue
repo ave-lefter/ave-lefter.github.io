@@ -13,7 +13,7 @@
         </div>
         <Icon class="ml-4px" :name= " isExpand? 'material-symbols:keyboard-arrow-up': 'material-symbols:keyboard-arrow-down'" />
       </div>
-      <div v-if="activeTab == 'info'" class="tabs">
+      <!-- <div v-if="activeTab == 'info'" class="tabs">
         <span
           v-for="item in tabs"
           :key="item.id"
@@ -23,7 +23,7 @@
         >
           <Icon :name="`custom:${item.icon}`" />
         </span>
-      </div>
+      </div> -->
 
     </div>
     <div v-if="activeTab == 'info' && isExpand" class="mr-15px overflow-x-hidden mt-12px">

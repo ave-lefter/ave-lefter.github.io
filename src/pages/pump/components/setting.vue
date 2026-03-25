@@ -4,7 +4,7 @@
     @update:visible="updateVisible"
     popper-class="new-popover"
     placement="bottom"
-    :width="320"
+    :width="380"
     trigger="click"
     :teleported="false"
     :persistent="false"

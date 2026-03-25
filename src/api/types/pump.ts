@@ -129,6 +129,7 @@ export interface PumpObj {
     token: string
   }
   is_pump_agent: number
+  favorite_holder_count: number
 }
 
 interface Pair {
