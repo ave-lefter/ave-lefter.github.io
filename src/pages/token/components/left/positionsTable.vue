@@ -199,7 +199,7 @@ const isEvmChainWallet = computed(() => {
 
 const userIds = computed(() => {
   if (botStore.userInfo) {
-    return botStore.userInfo.addresses.map(({address, chain}) => address + '-' + chain)
+    return botStore.userInfo.addresses.filter(({chain})=> ['bsc','solana'].includes(chain)).map(({address, chain}) => address + '-' + chain)
   } else {
      if (walletStore.address && isEvmChainWallet.value && (walletStore.walletName!=='WatchWallet')) {
       return [walletStore.address + '-' + 'bsc', walletStore.address + '-' + 'base', walletStore.address + '-' + 'eth']

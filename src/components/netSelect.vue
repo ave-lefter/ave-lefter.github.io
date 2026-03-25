@@ -17,13 +17,13 @@ const options = computed(() => {
 })
 const selectedChains = shallowRef<string[]>([])
 
-const displayChains = computed(() => {
-  return selectedChains.value.slice(0, 2)
-})
-
+const displayChains = ref<string[]>([])
+const displayLen=ref(0)
 onMounted(() => {
   nextTick(() => {
-    selectedChains.value = botStore.evmAddress ? (botStore.isSupportChains as unknown as string[]) : ['bsc', 'base', 'eth', 'xlayer']
+    selectedChains.value = botStore.evmAddress ? ['bsc', 'solana'] : ['bsc', 'base', 'eth', 'xlayer']
+    displayChains.value=selectedChains.value.slice(0, 2)
+    displayLen.value=selectedChains.value.length
   })
 })
 function getDisabled(val: string) {
@@ -31,18 +31,22 @@ function getDisabled(val: string) {
 }
 
 function onConfirm() {
+  const arr: string[] = []
+  displayChains.value=[]
   if (botStore.userInfo && Array.isArray(botStore.userInfo.addresses)) {
-    const arr: string[] = []
-    botStore.userInfo.addresses.map(el => {
+    botStore.userInfo.addresses.map((el,index) => {
       if (selectedChains.value.includes(el.chain)) {
         arr.push(el.address + '-' + el.chain)
+        if(index<2) displayChains.value.push(el.chain)
       }
     })
     emit('update:userIds', arr)
   }else{
     const arr =selectedChains.value.map(i => walletStore.address + '-' + i)
+    displayChains.value=selectedChains.value.slice(0, 2)
     emit('update:userIds', arr)
   }
+  displayLen.value=arr.length||0
   visible.value = false
 }
 
@@ -79,7 +83,7 @@ function onCancel() {
               :class="['rounded-50% mr--4px relative','z-'+(index+1), (index === displayChains.length - 1) && 'mr-0']"
               :src="formatImgUrl('chain',item)"
               alt="">
-            <span class="inline-block bg-[#333] text-[#fff] min-w-14px h-14px lh-14px text-12px ml-4px border-rd-4px">{{ selectedChains.length }}</span>
+            <span class="inline-block bg-[#333] text-[#fff] min-w-14px h-14px lh-14px text-12px ml-4px border-rd-4px">{{ displayLen }}</span>
           </el-button>
         </div>
       </template>
