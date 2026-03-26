@@ -328,7 +328,7 @@ const columns = computed(() => {
     flex: 'flex-[1.5]',
     sort: true
   }, {
-    label: t('profit2'),
+    label: `${t('bal')}/${t('profit2')}`,
     value: 'total_profit',
     flex: 'flex-1 justify-end',
     sort: true
@@ -352,9 +352,32 @@ const filterListData = computed(() => {
   return listData.value.toSorted((a, b) => backendSort.value.sort_dir ==='asc' ? a?.[sort] - b?.[sort] : b?.[sort] - a?.[sort])
 })
 
+let timer: ReturnType<typeof setTimeout> | null = null;
+
+const checkCondition = () => {
+  if (botStore.userInfo || walletStore.address) {
+    // 1. 清除可能存在的定时器（防止重复）
+    if (timer) {
+      clearTimeout(timer)
+      timer = null
+    }
+    _getUserBalance()
+    return // 结束本次执行，不再设置定时器
+  }
+  // 只有在不满足条件时，才设置下一次定时器
+  timer = setTimeout(checkCondition, 1000)
+}
+
+
 
 onMounted(() => {
-  _getUserBalance()
+ checkCondition()
+})
+onUnmounted(() => {
+  if(timer){
+    timer = null
+    clearTimeout(timer)
+  }
 })
 watch(() => [
   backendSort.value,
@@ -709,7 +732,7 @@ function handleTxSuccess(res: any, _batchId: string, tokenId: string, row: GetUs
                 style="padding:4px"
                 @click.stop.prevent="handleSellAmount(row)"
               >
-                {{ $t('closePosition') }}
+                {{ $t('sellAl') }}
               </el-button>
               <span v-else class="color-[var(--d-EAECEF-l-333)]">--</span>
             </div>
