@@ -39,35 +39,8 @@ function formatRate(val) {
 // Top10 颜色
 function top10Color(val) {
   if (val == null || val === 0) return 'color-[--third-text]'
-  if (val >= 30) return 'color-[--up-color]'
-  return ''
-}
-
-// Dev 颜色
-function devColor(val) {
-  if (val == null || Number(val) < 0.1) return 'color-[--secondary-text]'
-  if (val > 10) return 'color-[--up-color]'
-  return ''
-}
-
-function formatDev(val) {
-  if (val > 0 && val < 0.1) return '<0.1'
-  return formatNumber(val || 0, 1)
-}
-
-
-// 狙击人数颜色
-function sniperColor(val) {
-  if (val > 30) return 'color-[--down-color]'
+  if (val >= 30) return 'color-[--dwon-color]'
   return 'color-[--up-color]'
-}
-
-// 占比通用颜色（>30%红色）
-function rateColor(val) {
-  if (val == null) return 'color-[--third-text]'
-  if (val > 30) return 'color-[--down-color]'
-  if (val === 0) return 'color-[--third-text]'
-  return ''
 }
 
 // 跑路颜色
@@ -75,19 +48,6 @@ function getRugColor(val) {
   if (val === 0) return 'color-[--third-text]'
   if (val > 60) return 'color-[--down-color]'
   return 'color-[--main-text]'
-}
-
-// 跑路历史颜色
-function ruggedColor(row) {
-  const data = row.rugged
-  if (typeof data === 'string' || typeof data === 'number') {
-    const value = new BigNumber(data)
-    if (value.lte(2) && value.gt(0)) return ''
-    if (value.lte(10) && value.gt(2)) return 'color-[--yellow]'
-    if (value.gt(10)) return 'color-[--down-color]'
-    return ''
-  }
-  return ''
 }
 
 const isSolana = computed(() => ['AllChains', 'solana'].includes(props.activeChain))
@@ -111,63 +71,127 @@ function getRiskIcon(row) {
     <div class="flex gap-4px">
       <!-- Top10 持仓 -->
       <div class="sec-card" :class="top10Color(row.holders_top10_ratio)">
-        <Icon name="custom:top3" class="text-12px shrink-0" />
-        <span>{{
-          row.holders_top10_ratio > 0 && row.holders_top10_ratio < 0.1
-            ? '<0.1'
-            : formatNumber(row.holders_top10_ratio || 0, 1)
-        }}%</span>
+        <Icon
+          class="text-12px shrink-0"
+          name="custom:top3"
+        />
+        <span
+          >{{
+            ((Number(row?.holders_top10_ratio || 0)<0.01)&&(Number(row?.holders_top10_ratio || 0)>0))? '<0.01':formatNumber(row?.holders_top10_ratio || 0, 1)
+          }}%</span
+        >
       </div>
+
       <!-- Dev 持仓（hover 展示主币来源） -->
-      <DevPop :tokenId="(row.token || row.target_token) + '-' + row.chain">
-        <div class="sec-card cursor-pointer" :class="devColor(row.dev_balance_ratio_cur)">
-          <Icon name="custom:dev-ds" class="text-12px shrink-0" />
-          <span>{{ formatDev(row.dev_balance_ratio_cur) }}%</span>
-        </div>
+      <DevPop
+        class="sec-card cursor-pointer"
+        :style="{
+          background: Number(formatNumber(row?.dev_balance_ratio_cur || 0, 1)) == 0 ? '' : (Number(row?.dev_balance_ratio_cur) > 5 ? '#f6465d1a' : '#12b8861a'),
+          color: Number(formatNumber(row?.dev_balance_ratio_cur || 0, 1)) == 0 ? 'var(--third-text1)' : (Number(row?.dev_balance_ratio_cur) > 5 ? '#F6465D' : '#12B886')
+        }"
+        :tokenId="(row?.token || row?.target_token) + '-' + row?.chain"
+      >
+        <template v-if="row?.max_dev_ratio !== null && row?.max_dev_ratio !== undefined && Number(row?.max_dev_ratio) !== 0 && Number(row?.dev_balance_ratio_cur) == 0">
+          <Icon
+            class="text-10px shrink-0 color-[--x-blue]"
+            name="custom:dev-ds"
+          />
+          <span class="color-[--x-blue]">DS</span>
+        </template>
+        <template v-else>
+          <Icon
+            class="text-10px shrink-0"
+            name="custom:dev-ds"
+          />
+          <span>{{formatNumber(
+            Number(row?.dev_balance_ratio_cur) >= 0.1
+              ? row?.dev_balance_ratio_cur || 0
+              : (Number(row?.dev_balance_ratio_cur) == 0 ? '0' : '<0.1'),
+            1
+          )}}%</span>
+        </template>
+        <img
+          v-if="row.dev_first_transfer_in_from_label"
+          class="w-12px h-12px cursor-pointer rounded-full ml-4px"
+          :src="formatIconPumpDev(row.dev_first_transfer_in_from_label)"
+          alt=""
+        >
+        <span v-if="row?.dev_age_seconds" class="ml-4px color-[--main-text1]">{{ formatSeconds(Number(row?.dev_age_seconds || 0)) }}</span>
       </DevPop>
-      <!-- 狙击 sniper_tx_count -->
-      <div class="sec-card" :class="sniperColor(row.sniper_tx_count)">
+
+      <!-- 狙击 sniper_balance_ratio_cur -->
+      <div
+        class="sec-card"
+        :style="{
+          color: Number(formatNumber(row?.sniper_balance_ratio_cur || 0, 1)) == 0 ? 'var(--third-text1)' : (Number(row?.sniper_balance_ratio_cur) > 5 ? '#F6465D' : '#12B886'),
+          background: Number(formatNumber(row?.sniper_balance_ratio_cur || 0, 1)) == 0 ? '' : (Number(row?.sniper_balance_ratio_cur) > 5 ? '#f6465d1a' : '#12b8861a'),
+        }"
+      >
         <Icon name="custom:gun" class="text-10px shrink-0" />
-        <span>{{ formatNumber(row.sniper_balance_ratio_cur) }}%</span>
+        <span>{{ formatNumber(Number(row?.sniper_balance_ratio_cur) > 0.001 ? row?.sniper_balance_ratio_cur || 0 : 0, 1) }}%</span>
       </div>
-      <!-- 老鼠仓 rat_rate -->
-      <div class="sec-card" :class="rateColor(row.rat_rate)">
+      <!-- 老鼠仓 insider_balance_ratio_cur -->
+      <div
+        class="sec-card"
+        :style="{
+          color: Number(formatNumber(row?.insider_balance_ratio_cur || 0, 1)) == 0 ? 'var(--third-text1)' : (Number(row?.insider_balance_ratio_cur) > 5 ? '#F6465D' : '#12B886'),
+          background: Number(formatNumber(row?.insider_balance_ratio_cur || 0, 1)) == 0 ? '' : (Number(row?.insider_balance_ratio_cur) > 5 ? '#f6465d1a' : '#12b8861a'),
+        }"
+      >
         <img
           :src="themeStore.isDark ? insidersWhite : insidersBlack"
           width="12" height="12" alt=""
           class="opacity-70"
         >
-        <span>{{ formatRate(row.rat_rate) }}</span>
+        <span>{{ formatNumber(Number(row?.insider_balance_ratio_cur) > 0.001 ? row?.insider_balance_ratio_cur || 0 : 0, 1) }}%</span>
       </div>
     </div>
 
     <div class="flex gap-4px">
-      <!-- 钓鱼 phishing_rate -->
-      <div class="sec-card" :class="rateColor(row.phishing_rate)">
+      <!-- 钓鱼 phishing_ratio -->
+      <div
+        class="sec-card"
+        :style="{
+          color: Number(formatNumber(row?.phishing_ratio || 0, 1)) == 0 ? 'var(--third-text1)' : (Number(row?.phishing_ratio) > 5 ? '#F6465D' : '#12B886'),
+          background: Number(formatNumber(row?.phishing_ratio || 0, 1)) == 0 ? '' : (Number(row?.phishing_ratio) > 5 ? '#f6465d1a' : '#12b8861a'),
+        }"
+      >
         <img
           :src="themeStore.isDark ? phishingWhite : phishingBlack"
           width="12" height="12" alt=""
           class="opacity-70"
         >
-        <span>{{ formatRate(row.phishing_rate) }}</span>
+        <span>{{ formatNumber(Number(row?.phishing_ratio) > 0.001 ? row?.phishing_ratio || 0 : 0, 1) }}%</span>
       </div>
-      <!-- 捆绑 boulder_rate -->
-      <div class="sec-card" :class="rateColor(row.boulder_rate)">
+      <!-- 捆绑 address_binding_ratio -->
+      <div
+        class="sec-card"
+        :style="{
+          color: Number(formatNumber(row?.address_binding_ratio || 0, 1)) == 0 ? 'var(--third-text1)' : (Number(row?.address_binding_ratio) > 5 ? '#F6465D' : '#12B886'),
+          background: Number(formatNumber(row?.address_binding_ratio || 0, 1)) == 0 ? '' : (Number(row?.address_binding_ratio) > 5 ? '#f6465d1a' : '#12b8861a'),
+        }"
+      >
         <img
           :src="themeStore.isDark ? bundleWhite : bundleBlack"
           width="12" height="12" alt=""
           class="opacity-70"
         >
-        <span>{{ formatRate(row.boulder_rate) }}</span>
+        <span>{{ formatNumber(Number(row?.address_binding_ratio) > 0.001 ? row?.address_binding_ratio || 0 : 0, 1) }}%</span>
       </div>
-      <!-- 阴谋集团 cluster_rate -->
-      <div class="sec-card" :class="rateColor(row.cluster_rate)">
+      <!-- 阴谋集团 colluded_cluster_ratio -->
+      <div
+        class="sec-card"
+        :style="{
+          color: Number(formatNumber(row?.colluded_cluster_ratio || 0, 1)) == 0 ? 'var(--third-text1)' : (Number(row?.colluded_cluster_ratio) > 5 ? '#F6465D' : '#12B886'),
+          background: Number(formatNumber(row?.colluded_cluster_ratio || 0, 1)) == 0 ? '' : (Number(row?.colluded_cluster_ratio) > 5 ? '#f6465d1a' : '#12b8861a'),
+        }"
+      >
         <img
           :src="themeStore.isDark ? cabalWhite : cabalBlack"
           width="12" height="12" alt=""
           class="opacity-70"
         >
-        <span>{{ formatRate(row.cluster_rate) }}</span>
+        <span>{{ formatNumber(Number(row?.colluded_cluster_ratio) > 0.001 ? row?.colluded_cluster_ratio || 0 : 0, 1) }}%</span>
       </div>
       <!-- 安全 risk_score -->
       <div class="sec-card">
