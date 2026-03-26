@@ -1,12 +1,12 @@
 <template>
   <div>
-    <div class="flex items-center gap-4px mb-12px">
+    <div class="flex items-center gap-4px mb-12px color-[--main-text1]">
       {{ $t('preferredTokenMarketCap') }}
       <Icon v-tooltip="$t('preferedTips')" name="custom:infomation-line" />
     </div>
-    <div class="text-24px font-700 lh-30px color-[--main-text] mb-24px">{{ mostLikeText }}</div>
+    <div class="text-24px font-700 lh-30px color-[--main-text1] mb-24px">{{ mostLikeText }}</div>
     <template v-if="mostLikeText">
-      <div class="flex justify-between text-14px mb-12px">
+      <div class="flex justify-between text-14px mb-12px color-[--main-text1]">
         {{ $t('mCap') }}
         <span>{{ $t('buyFrequency') }}</span>
       </div>
@@ -22,7 +22,7 @@
           :show-text="false"
           :color="getCssVariable('--up-color')"
         />
-        <div class="w-57px text-right color-[--main-text]">{{ item.count }}</div>
+        <div class="w-57px text-right color-[--main-text1]">{{ item.count }}</div>
       </div>
     </template>
     <AveEmpty v-else class="pt-50px">

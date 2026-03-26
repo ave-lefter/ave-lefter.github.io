@@ -93,6 +93,8 @@ export interface Pair {
   smart_money_sell_count_24h: number
   progress: number
   risk_score: number
+  sell_tax: string
+  buy_tax: string
 }
 
 export interface Token {
@@ -155,6 +157,10 @@ export interface TokenInfoExtra {
   max: number
   limit: number
   insiders_balance_ratio_cur: number
+  is_cloned: number
+  deployer_platform: string
+  is_pump_agent: number
+  t_price_change_24h: number
 }
 
 

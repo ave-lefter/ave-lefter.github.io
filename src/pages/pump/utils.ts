@@ -5,14 +5,15 @@ export function useSimilarTokenPopup() {
 
     const $tooltip = $createTooltip('similar-tooltip')
 
-    function onEnter(e: { target: any },row,type,getDataColor) {
+    function onEnter(e: { target: any },row,type,getDataColor, hideImage = false) {
       $tooltip.show({
         content: {
           is:ImageLarge,
           props: {
             row: row,
             type: type,
-            getDataColor
+            getDataColor,
+            hideImage
           }
         },
         target: e.target,
@@ -115,6 +116,51 @@ export function useSimilarTokenPopup() {
       // }
       if (filterList.includes('ltvl') && filterList.includes('rtvl')) {
         const index = filterList.indexOf('rtvl')
+        if (index !== -1) {
+          filterList.splice(index, 1)
+        }
+      }
+
+      if (filterList.includes('ldtc') && filterList.includes('rdtc')) {
+        const index = filterList.indexOf('rdtc')
+        if (index !== -1) {
+          filterList.splice(index, 1)
+        }
+      }
+
+      if (filterList.includes('ldmc') && filterList.includes('rdmc')) {
+        const index = filterList.indexOf('rdmc')
+        if (index !== -1) {
+          filterList.splice(index, 1)
+        }
+      }
+      if (filterList.includes('ldmr') && filterList.includes('rdmr')) {
+        const index = filterList.indexOf('rdmr')
+        if (index !== -1) {
+          filterList.splice(index, 1)
+        }
+      }
+      if (filterList.includes('lbdr') && filterList.includes('rbdr')) {
+        const index = filterList.indexOf('rbdr')
+        if (index !== -1) {
+          filterList.splice(index, 1)
+        }
+      }
+
+      if (filterList.includes('lfsr') && filterList.includes('rfsr')) {
+        const index = filterList.indexOf('rfsr')
+        if (index !== -1) {
+          filterList.splice(index, 1)
+        }
+      }
+      if (filterList.includes('lccr') && filterList.includes('rccr')) {
+        const index = filterList.indexOf('rccr')
+        if (index !== -1) {
+          filterList.splice(index, 1)
+        }
+      }
+      if (filterList.includes('lfans') && filterList.includes('rfans')) {
+        const index = filterList.indexOf('rfans')
         if (index !== -1) {
           filterList.splice(index, 1)
         }

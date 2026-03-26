@@ -1,7 +1,7 @@
 <template>
   <a
     v-if="['solana', 'bsc']?.includes(chain)"
-    class="bubble ml--12px"
+    class="bubble"
     href=""
     @click.stop.prevent="show_bubble = !show_bubble"
   >
@@ -66,10 +66,9 @@ function openDialog() { }
   display: flex;
   align-items: center;
   border: none;
-  font-size: 12px;
-  padding: 6px 8px;
-  border-radius: 4px;
-  background: var(--border);
-  transition: all .2s;
+  font-size: 14px;
+  // padding: 6px 8px;
+  // border-radius: 4px;
+  // transition: all .2s;
 }
 </style>

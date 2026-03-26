@@ -4,11 +4,13 @@ import { ref, onMounted, watch, computed } from 'vue'
 import BigNumber from 'bignumber.js'
 import dayjs from 'dayjs'
 import { formatNumber2 } from '~/utils/formatNumber'
-import { getRemarksDetail } from '~/api/fav'
+import { getRemarksDetail,batchFavRemarks } from '~/api/fav'
 // import { deleteAttention, updateWhaleRemark, addAttention, addAddressMonitor, favUsersPauseMonitor } from '~/api/attention'
 import { deleteAttention, updateWhaleRemark, addAttentionNew, addAddressMonitor, favUsersPauseMonitor } from '~/api/attention'
+import type { TableInstance } from 'element-plus'
+import { useThrottleFn } from '@vueuse/core'
 const globalStore = useGlobalStore()
-const { updateNum1, updateNum2, updateNum3 } = storeToRefs(useFollowStore())
+const { updateNum12,updateNum13,updateNum14, updateNum2, updateNum3 } = storeToRefs(useFollowStore())
 const botStore = useBotStore()
 const walletStore = useWalletStore()
 const router = useRouter()
@@ -51,13 +53,92 @@ const addressValue = computed(() => {
   return botStore.evmAddress || walletStore.address
 })
 
+// 3-18 批量
+let timeoutId: any = null;
+const favHover=ref(false)
+const tableRef = ref<TableInstance | null>(null)
+
+const checkedList=ref(<any[]>[])
+const checkedListByUserLength= computed(() => {
+  return (checkedList.value.length-tableList.value.filter(i => i.is_wallet_address_fav === 1).length)>0?checkedList.value.length-tableList.value.filter(i => i.is_wallet_address_fav === 1).length :0
+})
+
+const selectable=(row:any) => {
+  return row.is_wallet_address_fav !== 1
+}
+
+const handleSelectionChange = (val: {user_address:string,user_chain:string,remark:string}[]) => {
+  console.log('handleSelectionChange', val)
+  checkedList.value=val.map(i => {
+    return {
+      user_address:i?.user_address,
+      user_chain:i?.user_chain,
+      remark: i?.remark
+    }
+  })
+}
+
+const batchDelete=async ()=>{
+  if(!checkedListByUserLength.value) return
+  await ElMessageBox.confirm(t('favRemarksTips'), t('tips'), {
+    confirmButtonText: t('confirm'),
+    cancelButtonText: t('cancel'),
+    customClass:'w-320px p-16px inputPop',
+    cancelButtonClass:'w-140px h-30px',
+    confirmButtonClass:'w-140px h-30px ml-8px!',
+    dangerouslyUseHTMLString: true,
+  })
+  console.log('batchDelete', checkedList.value)
+  batchFavRemarks({
+    address: botStore.evmAddress || walletStore.address,
+    group:0,
+    fav_addrs: checkedList.value
+  }).then(() => {
+    ElMessage.success(t('success'))
+    pageData.value.page = 1
+    getList()
+    updateNum14.value++
+    tableRef.value!.clearSelection()
+    checkedList.value = []
+  }).catch((e) => {
+    ElMessage.error(String(e))
+  })
+}
+const handlerMouseoverFavHover=useThrottleFn(()=>{
+  favHover.value=true
+  tableList.value.filter((i:any) => i.is_wallet_address_fav === 1).forEach((j:any) => {
+    console.log('j', j)
+    tableRef.value?.toggleRowSelection(j, true)
+  })
+  clearTimeout(timeoutId);
+},500)
+
+const handlerMouseoutFavHover=()=>{
+  if (timeoutId) {
+    clearTimeout(timeoutId);
+  }
+  timeoutId = setTimeout(() => {
+    favHover.value = false; // 3 秒后将 favHover 设置为 false
+    console.log('favHover set to false');
+  }, 3000);
+}
+
+onActivated(() => {
+  console.log('onDeactivated')
+  favHover.value = false;
+  checkedList.value = []
+  tableRef.value!.clearSelection()
+  clearTimeout(timeoutId);
+  // reCreateChild()
+})
+
 watch(() => walletStore.walletSignature[walletStore.address], (newValue) => {
   if (newValue) {
     getList()
   }
 })
 
-watch(() => updateNum2.value+updateNum3.value, () => {
+watch(() => updateNum13.value+updateNum12.value+updateNum2.value+updateNum3.value, () => {
   getList()
 })
 
@@ -93,7 +174,7 @@ const handleMonitor = async (row: any) => {
     }).then(() => {
       ElMessage.success(t('openMonitorSuccess'))
       getList()
-      updateNum1.value++
+      updateNum14.value++
     }).catch((e) => {
       ElMessage.error(String(e))
     })
@@ -104,7 +185,7 @@ const handleMonitor = async (row: any) => {
     }).then(() => {
       ElMessage.success(t('cancelMonitorSuccess'))
       getList()
-      updateNum1.value++
+      updateNum14.value++
     })
   }
 }
@@ -181,6 +262,13 @@ const collect = async (row: any) => {
   }).then(() => {
     ElMessage.success(row.is_wallet_address_fav === 1 ? t('attention1Canceled') : t('attention1Success'))
     getList()
+    // tableList.value.filter((i:any) => i.is_wallet_address_fav === 1).forEach((j:any) => {
+    //   console.log('j', j)
+    // })
+    updateNum14.value++
+    nextTick(() => {
+      tableRef.value?.toggleRowSelection(row, row.is_wallet_address_fav !== 1)
+    })
   }).catch((err) => {
     ElMessage.error(String(err))
   }).finally(() => {
@@ -189,7 +277,7 @@ const collect = async (row: any) => {
 }
 
 // 获取列表
-const getList = async () => {
+const getList = useThrottleFn(async () => {
   loading.value = true
   const res: any = await getRemarksDetail({
     address: addressValue.value,
@@ -209,7 +297,7 @@ const getList = async () => {
   pageData.value.total = res.total
   tableList.value = tableData
   loading.value = false
-}
+}, 1000)
 
 function safeBigNumber(value: any) {
   try {
@@ -277,9 +365,9 @@ function copyTrade(row:  {user_chain: string, user_address: string}) {
 
 <template>
   <div class="flex-1 h-[calc(100%-76px)] flex flex-col">
-    <el-table
+    <el-table ref="tableRef"
 v-loading="loading" class="mt-12px" :height="pageData.total > 50 ? 'calc(100% - 84px)' : '100%'"
-      row-class-name="group" :data="tableList" fit @sort-change="handleSortChange" @row-click="tableRowClick">
+      row-class-name="group" :data="tableList" fit @sort-change="handleSortChange" @row-click="tableRowClick" @selection-change="handleSelectionChange" :row-key="(row:any)=>`${row.user_address}-${row.user_chain}`">
       <template #empty>
         <div v-if="botStore.evmAddress || walletStore.address">
           <div v-if="!loading" class="flex flex-col items-center justify-center py-30px">
@@ -296,7 +384,12 @@ v-loading="loading" class="mt-12px" :height="pageData.total > 50 ? 'calc(100% - 
           </el-button>
         </AveEmpty>
       </template>
+      <el-table-column v-if="favHover||checkedListByUserLength" type="selection" :selectable="selectable" width="22" fixed="left" reserve-selection/>
       <el-table-column :label="t('address')" min-width="160">
+        <template #header>
+          <div v-if="favHover||(checkedList.length&&checkedListByUserLength)" :class="`batchDel mr-8px ${(checkedListByUserLength&&'warning')}`" @click="batchDelete">{{ $t('batchFav') }}{{checkedListByUserLength?`(${checkedListByUserLength})`:''}}</div>
+          <span>{{ t('address') }}</span>
+        </template>
         <template #default="{ row, $index }">
           <div class="flex items-center">
             <span class="text-[--third-text] text-10px mr-5px">
@@ -307,6 +400,7 @@ v-loading="loading" class="mt-12px" :height="pageData.total > 50 ? 'calc(100% - 
               name="custom:attention"
               :class="row.is_wallet_address_fav === 1 ? 'color-[#F45469]' : 'color-[--icon-color]'"
               class="color-[--icon-color] text-12px clickable shrink-0"
+              @mouseover="handlerMouseoverFavHover" @mouseout="handlerMouseoutFavHover" 
               @click.stop.prevent="collect(row)" />
             <UserAvatar
 :key="`${row.user_address}-${row.user_chain}`" class="mx-8px" :wallet_logo="row.wallet_logo"
@@ -483,5 +577,24 @@ class="flex-1 text-center cursor-pointer text-14px color-[#F5F5F5] bg-[#3F80F7] 
 
 :deep() .el-table {
   --el-table-text-color: var(--secondary-text);
+}
+.batchDel{
+  display: inline-block;
+  padding: 0 8px;
+  height: 24px;
+  line-height: 24px;
+  cursor: not-allowed;
+  background-color: var(--main-input-button-bg);
+  justify-content: center;
+  align-items: center;
+  color: var(--secondary-text);
+  border-radius: 4px;
+  font-weight: 500;
+  font-size: 12px;
+  &.warning{
+    cursor: pointer;
+    background-color: #3F80F71A;
+    color: var(--primary-color);
+  }
 }
 </style>

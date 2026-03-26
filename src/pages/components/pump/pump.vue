@@ -50,6 +50,7 @@ import { addFavorite, removeFavorite } from '~/api/fav'
 import type { RowEventHandlerParams } from 'element-plus'
 
 const { t } = useI18n()
+const {updateNum4} = storeToRefs(useFollowStore())
 const globalStore = useGlobalStore()
 const walletStore = useWalletStore()
 const botStore = useBotStore()
@@ -72,21 +73,21 @@ function setSortConditions(params: { sort: string; sort_dir: string }) {
 }
 function setFilterForm(...args: any[]) {
   args.forEach((keyVal) => {
-    set(rankConditions.value[props.activeTab].filter, keyVal[0], keyVal[1])
+    set(rankConditions.value[props.activeTab]?.filter, keyVal[0], keyVal[1])
   })
   pageInfo.value.pageNO = 1
   _getTreasureList()
 }
 const listData = ref<any[]>([])
 const filteredListData = computed(() => {
-  if (globalStore.pumpSetting.isBlacklist) {
+  if (globalStore.pumpSetting?.isBlacklist) {
     return listData.value.filter((el) => !inBlackList(el))
   }
   return listData.value
 })
 function inBlackList(row) {
   return (
-    globalStore.pumpBlackList.findIndex(
+    globalStore.pumpBlackList?.findIndex(
       (i) =>
         (i.address == row.token && i.type == 'ca') ||
         (i.address == row.symbol && i.type == 'keyword')
@@ -100,7 +101,18 @@ const pageInfo = ref({
 })
 watch(
   () => pageInfo.value.pageNO,
-  (val) => { useSessionStorage('pump-pageNO', 1).value = val }
+  (val) => { 
+    useSessionStorage('pump-pageNO', 1).value = val 
+    nextTick(() => tableRef.value?.scrollToTop(0))
+  }
+)
+
+watch(
+  () => updateNum4.value,
+  () => {  
+    pageInfo.value.pageNO = 1
+    _getTreasureList()
+  }
 )
 const tableRef = shallowRef()
 const loading = shallowRef(false)
@@ -166,7 +178,6 @@ async function _getTreasureList(shouldLoading = true) {
     })
     pageInfo.value.total = res.total
     listData.value = (res.data || []).map(props.listMapFunction)
-    nextTick(() => tableRef.value?.scrollToTop(0))
     if (shouldLoading) {
       initWs()
     }

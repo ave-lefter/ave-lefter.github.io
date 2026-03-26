@@ -1,6 +1,4 @@
-<script lang="tsx">
-export default { name: 'ActivityRank' }
-</script>
+
 <script setup lang="tsx">
 import { useStorage, useSessionStorage } from '@vueuse/core'
 import { getActivityDefaultColumns } from './columnRender/columusService'
@@ -39,7 +37,7 @@ import dayjs from 'dayjs'
 
 const { t } = useI18n()
 const globalStore = useGlobalStore()
-
+const {updateNum4} = storeToRefs(useFollowStore())
 const props = defineProps<{
   listMapFunction(i: Record<string, any>): Record<string, any>
   activeChain: string
@@ -56,21 +54,21 @@ function setSortConditions(params: { sort: string; sort_dir: string }) {
 }
 function setFilterForm(...args: any[]) {
   args.forEach((keyVal) => {
-    set(rankConditions.value[props.activeTab].filter, keyVal[0], keyVal[1])
+    set(rankConditions.value[props.activeTab]?.filter, keyVal[0], keyVal[1])
   })
   pageInfo.value.pageNO = 1
   _getTreasureList()
 }
 const listData = ref<any[]>([])
 const filteredListData = computed(() => {
-  if (globalStore.pumpSetting.isBlacklist) {
+  if (globalStore.pumpSetting?.isBlacklist) {
     return listData.value.filter((el) => !inBlackList(el))
   }
   return listData.value
 })
 function inBlackList(row) {
   return (
-    globalStore.pumpBlackList.findIndex(
+    globalStore.pumpBlackList?.findIndex(
       (i) =>
         (i.address == row.token && i.type == 'ca') ||
         (i.address == row.symbol && i.type == 'keyword')
@@ -84,7 +82,17 @@ const pageInfo = ref({
 })
 watch(
   () => pageInfo.value.pageNO,
-  (val) => { useSessionStorage('activity-pageNO', 1).value = val }
+  (val) => {
+    useSessionStorage('activity-pageNO', 1).value = val
+    nextTick(() => tableRef.value?.scrollToTop(0))
+  }
+)
+watch(
+  () => updateNum4.value,
+  () => {
+    pageInfo.value.pageNO = 1
+    _getTreasureList()
+  }
 )
 const tableRef = shallowRef()
 const loading = shallowRef(false)
@@ -167,7 +175,6 @@ async function _getTreasureList(shouldLoading = true) {
     })
     pageInfo.value.total = res.total
     listData.value = (res.data || []).map(props.listMapFunction)
-    nextTick(() => tableRef.value?.scrollToTop(0))
     if (shouldLoading) {
       initWs()
     }
@@ -207,7 +214,7 @@ watch(
       }
       return el
     })
-    const { sort, sort_dir } = rankConditions.value[props.activeTab]?.sort
+    const { sort, sort_dir } = rankConditions.value[props.activeTab]?.sort || {}
     const sortVal = { asc: '1', desc: '-1' }[sort_dir]
     if (sortVal) {
       listData.value = updateList.toSorted((a, b) => (a[sort] - b[sort]) * sortVal)
@@ -317,6 +324,9 @@ function initCache() {
     }
   }
 }
+</script>
+<script lang="tsx">
+export default { name: 'ActivityRank' }
 </script>
 <template>
   <div v-loading="loading" :style="`height:${height}`">

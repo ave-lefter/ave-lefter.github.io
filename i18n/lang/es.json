@@ -669,5 +669,9 @@
   "OnlyDev": "Sólo desarrollador",
   "OnlyYou": "Sólo tu",
   "you": "Tú",
-  "reasonInvalid": "Razón inválida"
+  "reasonInvalid": "Razón inválida",
+  "favRemarksTips": "¿Quieres seguir el Wallet seleccionado?",
+  "batchFav": "Seguimiento por lotes",
+  "removeTokenTips2": "¿Eliminar el seguimiento seleccionado?",
+  "monitor": "Monitor"
 }

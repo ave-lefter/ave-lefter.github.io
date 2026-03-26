@@ -1666,13 +1666,13 @@ const disabledSave = computed(()=>{
 })
 
 function getGradient(row: IGetSimpleTxsResponse) {
-  const str = `true-${isBuy(row)}`
-  // const str = `${useThemeStore().isDark}-${isBuy(row)}`
+  // const str = `true-${isBuy(row)}`
+  const str = `${useThemeStore().isDark}-${isBuy(row)}`
   const map = {
     'true-true': 'bg-[linear-gradient(90deg,#111_0%,#12654C_70%,#12B886_100%)]',
     'true-false': 'bg-[linear-gradient(90deg,#111_0%,#7F2A36_70%,#F6465D_100%)]',
-    'false-false': 'bg-[linear-gradient(90deg,#FFF_0%,#88DBC3_70%,#12B886_100%)]',
-    'false-true': 'bg-[linear-gradient(90deg,#FFF_0%,#FBA2AE_70%,#F6465D_100%)]',
+    'false-false': 'bg-[linear-gradient(90deg,#F6F9FF_0%,#F6465D_100%)]',
+    'false-true': 'bg-[linear-gradient(90deg,#F6F9FF_0%,#12B886_100%)]',
   } as { [key: string]: string }
   return map[str]
 }

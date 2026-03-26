@@ -81,7 +81,7 @@
           :model-value="currentSetting.priorityFee"
           @update:model-value="onPriorityFeeInput"
           :placeholder="chain === 'solana' ? $t('customFee1') : $t('customEvmFee1')"
-          
+
           style="width: 221px"
           @input="(val) => onValidateInput(val,'priorityFee')"
         >
@@ -146,11 +146,17 @@ const estimatedGas = computed(() => {
   if (!botStore.isSupportChains.includes(props.chain)) return '0'
 
   const mev = currentSetting.value.isPrivate
-  const nativePrice =
-    botSwapStore.mainTokensPrice?.find(
-      i => i.chain === props.chain
-    )?.current_price_usd || tokenStore.swap.native.price || 0
+  // const nativePrice =
+  //   botSwapStore.mainTokensPrice?.find(
+  //     i => i.chain === props.chain
+  //   )?.current_price_usd || tokenStore.swap.native.price || 0
 
+    const nativePrice =
+      botSwapStore.mainTokensPrice?.find(
+        (item) => item.chain === props.chain && item.token === getChainInfo(props.chain)?.wmain_wrapper
+      )?.current_price_usd ||
+      tokenStore.swap.native.price ||
+      0
   const gasLimit =
     botSwapStore.gasTip?.find(i => i.chain === props.chain && i.mev === !!mev)
       ?.gasLimit || 200000

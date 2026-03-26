@@ -1,14 +1,18 @@
 <template>
   <button
-    class="order-book-btn mr--12px clickable"
+    class="order-book-btn clickable"
     :class="{ 'active': modelValue }"
     @click.stop="handleClick"
   >
     <Icon
-      name="i-codicon:layout-sidebar-left"
-      :class="{ 'rotate-90': !modelValue }"
+    v-if="modelValue"
+      name="custom:order-book-top"
     />
-    <span class="ml-5px">{{ $t('orderBook') }}</span>
+    <Icon
+      v-else
+      name="custom:order-book-down"
+    />
+    <!-- <span class="ml-5px">{{ $t('orderBook') }}</span> -->
   </button>
 </template>
 
@@ -30,19 +34,20 @@ function handleClick() {
 
 <style scoped>
 .order-book-btn {
-  color: #3F80F799;
-  background: #3F80F71A;
+  color: var(--third-text);
+  background: transparent;
   display: flex;
   align-items: center;
   border: none;
-  font-size: 12px;
-  padding: 6px 8px;
+  font-size: 14px;
+  padding: 0;
+  /* padding: 6px 8px;
   border-radius: 4px;
-  margin-left: 8px;
+  */
 }
 
 .order-book-btn.active {
-  background: #3F80F71A;
-  color: #3F80F7;
+  /* background: #3F80F71A; */
+  color: var(--third-text);
 }
 </style>

@@ -41,6 +41,21 @@ const symbol = computed(() => {
 
 let loading = false
 
+// rAF 批量合并同帧内的 onTick 调用，避免高频 WS 消息导致图表反复重绘
+let _pendingBar: KLineBar | null = null
+let _rafTickId: number | null = null
+function scheduleOnTick(bar: KLineBar, onTick: (bar: KLineBar) => void) {
+  _pendingBar = bar
+  if (_rafTickId !== null) return
+  _rafTickId = requestAnimationFrame(() => {
+    _rafTickId = null
+    if (_pendingBar) {
+      onTick(_pendingBar)
+      _pendingBar = null
+    }
+  })
+}
+
 watch(() => contractId.value, (val) => {
   if (!val) return
   isCatch.value = false
@@ -164,7 +179,8 @@ async function initChart() {
       'header_saveload',
       'timeframes_toolbar',
       'symbol_search_hot_key',
-      'show_interval_dialog_on_key_press'
+      'show_interval_dialog_on_key_press',
+      'header_quick_search',
     ],
     enabled_features: [
       'request_only_visible_range_on_reset',
@@ -523,7 +539,7 @@ function onWsKline(resolution: string, onTick: SubscribeBarsCallback, ws = perpW
         // if (onResetCacheNeededCallback) {
         //   onResetCacheNeededCallback()
         // }
-        bars.forEach(bar => onTick(bar))
+        bars.forEach(bar => scheduleOnTick(bar, onTick))
       }
 
       if (data?.length > 0 && !loading && dataType === 'changed') {
@@ -539,7 +555,7 @@ function onWsKline(resolution: string, onTick: SubscribeBarsCallback, ws = perpW
         }))[0]
         // const msInterval = switchResolution(resolution)
         // const bar = updatePerpLastBar(wsData, contractId.value, lastBar, msInterval) as KLineBar
-        onTick(wsData)
+        scheduleOnTick(wsData, onTick)
       }
     }
   }, 'kline')
@@ -591,20 +607,29 @@ function drag(e: MouseEvent) {
 
 
 function setIframeCssVar() {
-  const iframe = document.querySelector('#tv_chart_container_p iframe') as HTMLIFrameElement
-  const iframeRoot = iframe?.contentWindow?.document.documentElement
-  if (!iframeRoot) {
-    console.error('无法获取 iframe 内部的根元素')
-    return
-  }
-  // 给 iframe 内部设置 CSS 变量
-  iframeRoot.style.setProperty('--secondary-bg', getCssVariable('--secondary-bg'))
+  requestAnimationFrame(() => {
+    const iframe = document.querySelector('#tv_chart_container_p iframe') as HTMLIFrameElement
+    const iframeRoot = iframe?.contentWindow?.document.documentElement
+    if (!iframeRoot) {
+      console.error('无法获取 iframe 内部的根元素')
+      return
+    }
+    // 给 iframe 内部设置 CSS 变量
+    iframeRoot.style.setProperty('--secondary-bg', getCssVariable('--secondary-bg'))
+  })
 }
 
 
 onBeforeUnmount(() => {
   isUnload = true
+  // 先取消挂起的 rAF，再销毁 widget，防止回调访问已销毁实例
+  if (_rafTickId !== null) {
+    cancelAnimationFrame(_rafTickId)
+    _rafTickId = null
+  }
+  _pendingBar = null
   _widget?.remove?.()
+  _widget = null
 })
 
 onMounted(() => {

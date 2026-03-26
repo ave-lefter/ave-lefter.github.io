@@ -643,5 +643,9 @@
   "OnlyDev": "Yalnızca Geliştirici",
   "OnlyYou": "Sadece sen",
   "you": "Sen",
-  "reasonInvalid": "Geçersiz Neden"
+  "reasonInvalid": "Geçersiz Neden",
+  "favRemarksTips": "Seçilen Cüzdan'ı takip etmek istiyor musunuz?",
+  "batchFav": "Toplu Takip",
+  "removeTokenTips2": "Seçilen izleme silinsin mi?",
+  "monitor": "monitör"
 }

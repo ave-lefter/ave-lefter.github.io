@@ -58,6 +58,7 @@ export const useBotSettingStore = defineStore('botSetting', () => {
   } = {}
   chains.forEach(chain => {
     const s = { ...defaultSettings }
+    const sBuy = { ...defaultSettings, mev: true }
     // if (chain === 'base') {
     //   s.buyValueList = ['0.01', '0.02', '0.5', '1']
     // }
@@ -68,9 +69,9 @@ export const useBotSettingStore = defineStore('botSetting', () => {
       s3: s,
       buy: {
         selected: 's1',
-        s1: s,
-        s2: s,
-        s3: s,
+        s1: sBuy,
+        s2: sBuy,
+        s3: sBuy,
       },
       sell: {
         selected: 's1',
@@ -80,7 +81,7 @@ export const useBotSettingStore = defineStore('botSetting', () => {
       },
     }
   })
-  const botSettings = useLocalStorage('bot_settings_v4', settings, { mergeDefaults: (storageValue, defaults) => deepMerge(defaults, storageValue) })
+  const botSettings = useLocalStorage('bot_settings_v5', settings, { mergeDefaults: (storageValue, defaults) => deepMerge(defaults, storageValue) })
   chains.forEach(chain => {
     if (botSettings.value[chain]) {
       const settings = botSettings.value[chain]

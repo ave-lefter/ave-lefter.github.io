@@ -119,7 +119,7 @@ export function onResponse({ response, request,options }: MyFetchContext) {
     return
   }
   if (data?.status === 1) {
-    response._data = data?.data || data
+    response._data = data?.data ?? data
     return
   }
   response._data = data

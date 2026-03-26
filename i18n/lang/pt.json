@@ -647,5 +647,9 @@
   "OnlyDev": "Somente desenvolvedor",
   "OnlyYou": "Só você",
   "you": "Você",
-  "reasonInvalid": "Razão inválida"
+  "reasonInvalid": "Razão inválida",
+  "favRemarksTips": "Você quer seguir a carteira selecionada",
+  "batchFav": "Acompanhamento em lote",
+  "removeTokenTips2": "Excluir o monitoramento selecionado?",
+  "monitor": "monitor"
 }

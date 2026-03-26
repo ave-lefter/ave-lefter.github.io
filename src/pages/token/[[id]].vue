@@ -7,13 +7,13 @@
       <TokenHistory v-if="globalStore.tokenHistoryVisible" class="mb-1px" />
       <Top />
       <div class="flex gap-1px">
-        <div class="hide-scrollbar">
+        <!-- <div class="hide-scrollbar">
           <el-scrollbar :height="scrollbarHeight">
             <Left class="w-292px flex flex-col flex-shrink-0" />
           </el-scrollbar>
-        </div>
+        </div> -->
         <div class="flex-1 hide-scrollbar min-w-0 relative">
-          <div
+          <!-- <div
             v-show="globalStore.showLeft"
             class="absolute bg-[--main-list-hover] w-10px h-32px z-2 cursor-pointer flex items-center justify-center left--11px hover:w-30px hover:left--31px hover:h-36px transition-all rounded-tl-4px rounded-bl-4px color-[--third-text] hover:color-[--main-text]"
             @click="globalStore.$patch({ showLeft: false })"
@@ -26,7 +26,7 @@
             @click="globalStore.$patch({ showLeft: true })"
           >
             <Icon name="material-symbols:arrow-forward-ios" class="text-12px" />
-          </div>
+          </div> -->
 
 
           <div

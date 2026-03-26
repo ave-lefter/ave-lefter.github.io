@@ -39,12 +39,15 @@
         :class="collected ? 'color-#ffbb19' : 'color-[--icon-color]'"
         @click="collect"
       /> -->
-      <Collect iconClass="text-16px cursor-pointer" :isCollected="collected" :userFavoriteGroups="userFavoriteGroups" @confirmSwitchGroup="confirmSwitchGroup" @collect="collect" @newGroupAndCollect="newGroupAndCollect"/>
+      <div class="flex">
+        <Collect iconClass="text-16px cursor-pointer" :isCollected="collected" :userFavoriteGroups="userFavoriteGroups" @confirmSwitchGroup="confirmSwitchGroup" @collect="collect" @newGroupAndCollect="newGroupAndCollect"/>
+      </div>
+      
       <div class="pump-item_item token-info ml-16px flex items-center color-[--third-text] ">
         <div class="black-container">
           <span
             v-tooltip="pumpBlackList?.findIndex(i => (i.address == token?.token && i.type == 'ca') || (i.address == token?.symbol && i.type == 'keyword')) !== -1 ? $t('cancel') + $t('BlackListToken') : $t('BlackListToken')"
-            class="bg-[--d-000-l-FFF] cursor-pointer px-2px py-2px color-[--third-text1] block rounded-2px hover:color-[--secondary-text] w-14px h-14px flex items-center justify-center"
+            class="bg-[--d-000-l-FFF] cursor-pointer px-2px py-2px color-[--third-text1] block rounded-2px hover:color-[--primary-color] w-14px h-14px flex items-center justify-center"
           >
             <Icon
               v-if="
@@ -54,8 +57,8 @@
                     (i.address == token?.symbol && i.type == 'keyword')
                 ) !== -1
               "
-              name="custom:key-visible"
-              class="text-12px"
+              name="custom:key-invisible"
+              class="text-12px color-[#F6465D]"
               @click.stop="addOrRemoveBlaclList('ca')"
             />
             <Icon
@@ -67,7 +70,7 @@
           </span>
           <span
             v-tooltip="pumpBlackList?.findIndex(i => i.address == token?.token && i.type == 'dev') !== -1 ? $t('cancel') + $t('BlackListDev') : $t('BlackListDev')"
-            class="bg-[--d-000-l-FFF] cursor-pointer px-2px py-2px color-[--third-text1] block rounded-2px mt-2px hover:color-[--secondary-text] w-14px h-14px flex items-center justify-center"
+            class="bg-[--d-000-l-FFF] cursor-pointer px-2px py-2px color-[--third-text1] block rounded-2px mt-2px hover:color-[--primary-color] w-14px h-14px flex items-center justify-center"
           >
             <Icon
               v-if="
@@ -75,8 +78,8 @@
                   (i) => i.address == token?.token && i.type == 'dev'
                 ) !== -1
               "
-              name="custom:dev"
-              class="text-12px"
+              name="custom:invisible"
+              class="text-12px color-[#F6465D]"
               @click.stop="addOrRemoveBlaclList('dev')"
             />
             <Icon
@@ -89,7 +92,7 @@
           <span
             v-if="medias?.filter?.(i => i.icon === 'twitter')?.length > 0 && medias?.filter?.(i => i.icon === 'twitter')?.[0] && formatXUser(medias?.filter?.(i => i.icon === 'twitter')?.[0]?.url)"
             v-tooltip="pumpBlackList?.findIndex(i => i.address == formatXUser(medias?.filter?.(m => m.icon === 'twitter')?.[0]?.url) && i.type == 'twitter') !== -1 ? $t('cancel') + $t('BlackListTwitter') : $t('BlackListTwitter')"
-            class="bg-[--d-000-l-FFF] cursor-pointer px-2px py-2px color-[--third-text1] block rounded-2px mt-2px hover:color-[--secondary-text] w-14px h-14px flex items-center justify-center"
+            class="bg-[--d-000-l-FFF] cursor-pointer px-2px py-2px color-[--third-text1] block rounded-2px mt-2px hover:color-[--primary-color] w-14px h-14px flex items-center justify-center"
           >
             <Icon
               v-if="
@@ -97,8 +100,8 @@
                   (i) => i.address == formatXUser(medias?.filter?.(m => m.icon === 'twitter')?.[0]?.url) && i.type == 'twitter'
                 ) !== -1
               "
-              name="custom:twitter-visible"
-              class="text-12px text-[--third-text]"
+              name="custom:twitter-unvisible"
+              class="text-12px color-[#F6465D]"
               @click.stop="addOrRemoveBlaclList('twitter')"
             />
             <Icon
@@ -281,7 +284,6 @@
                   </div>
                 </template>
               </el-popover>
-
               <!-- <template v-if="pair && getTags(pair)?.normal_tag?.length > 0">
                 <div
                   v-for="(i, index) in getTags(pair)?.normal_tag"
@@ -698,6 +700,30 @@
               <span>{{ formatNumber(tagsRatio?.smart_wallet_count || 0, 2) }}</span>
             </div>
             </HolderRank>
+            <div
+              v-if="tokenStore.tokenInfoExtra?.is_cloned"
+              class="minor color-text-2 tag-btn signal cursor-pointer mr-4px bg-btn text-10px lh-none"
+              v-tooltip="$t('deployerPlatform', {tool: tokenStore.tokenInfoExtra?.deployer_platform})"
+            >
+              <img
+                class="rounded-100%"
+                :src="formatIconTag(tokenStore.tokenInfoExtra?.deployer_platform)"
+                alt=""
+                :width="12"
+              >
+            </div>
+            <div
+              v-if="tokenStore.tokenInfoExtra?.is_pump_agent"
+              class="minor color-text-2 tag-btn signal cursor-pointer mr-4px bg-btn text-10px lh-none"
+              v-tooltip="$t('agentToken')"
+            >
+              <img
+                class="rounded-100%"
+                :src="formatIconTag('pumpt_agent')"
+                alt=""
+                :width="12"
+              >
+            </div>
           </div>
         </div>
       </div>
@@ -850,7 +876,7 @@
         }}</span>
       </div>
       <div v-if="(tokenInfoExtra?.buy_tax??0) > 0 || (tokenInfoExtra?.sell_tax??0) > 0" class="item ml-24px">
-        <span v-tooltip="$t('taxTip')" class="border-b border-b-dashed cursor-pointer">{{ $t('totalTax') }}</span>
+        <span>{{ $t('totalTax') }}</span>
         <div class="block mt-8px color-[--third-text]">
           <span
             v-if="(tokenInfoExtra?.buy_tax??0) > 0"
@@ -858,7 +884,7 @@
           >
             {{ formatNumber(tokenInfoExtra?.buy_tax ||0, 1) }}%
           </span>
-          <span >/</span>
+          <span v-if="(tokenInfoExtra?.buy_tax??0) > 0 && (tokenInfoExtra?.sell_tax??0) > 0">/</span>
           <span
             v-if="(tokenInfoExtra?.sell_tax??0) > 0"
             :style="{ color: downColor[0] }"
@@ -1047,7 +1073,7 @@ const themeStore = useThemeStore()
 const { t } = useI18n()
 const route = useRoute()
 const { mode, dialogVisible_search, dialogSearchText, showMarket, clickHolderCount, popVisible, tagsRatio, pumpBlackList } = storeToRefs(useGlobalStore())
-
+const wsStore = useWSStore()
 const editableGroup = shallowRef(false)
 const groupId = shallowRef(0)
 const selectedGroup = shallowRef(0)
@@ -1244,12 +1270,18 @@ const pairTooltipContent = computed(() => {
   }
   return `${t('createdAt')}: ${formatDate(publish_at)}`
 })
-
 const price = computed(() => {
   return tokenStore.price
 })
+const tokenAllPair = computed(() => {
+  return tokenStore.tokenAllPair
+})
 const priceChange = computed(() => {
-  return tokenStore.priceChangeV2 || 0
+  if (tokenStore.selectedToken && tokenAllPair.value) {
+    return tokenStore.tokenInfoExtra?.t_price_change_24h || 0
+  } else {
+    return tokenStore.priceChangeV2 || 0
+  }
 })
 const marketCap = computed(() => {
   return tokenStore.marketCap || 0
@@ -1335,6 +1367,22 @@ watch(
     }
   }
 )
+watch(() => wsStore.wsResult[WSEventType.PRICEV2], (val) => {
+  if (WSEventType.PRICEV2 == val.event) {
+    if (Array.isArray(val.prices) && val.prices?.length > 0 && tokenStore.tokenInfoExtra) {
+      const find = val.prices?.find(i => i.target_token == address.value)
+      if (find) {
+        tokenStore.tokenInfoExtra.t_price_change_24h = find.tprice_change_24h
+        if (!tokenStore.tokenInfoExtra) return
+        tokenStore.tokenInfoExtra = {
+          ...tokenStore.tokenInfoExtra,
+          t_price_change_24h: find.tprice_change_24h
+        }
+      }
+    }
+  }
+})
+
 // const collected = shallowRef(false)
 const loading = shallowRef(false)
 

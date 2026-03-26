@@ -56,11 +56,19 @@ export function _getDevList(params: {
   token_id: string
   pageNO: number
   pageSize: number
+  sort?: string
+  sort_dir?: string
 }) {
   const { $api } = useNuxtApp()
   return $api('/v2api/token_info/v1/token/dev', {
     method: 'get',
-    query: params,
+    query:{
+      token_id: params.token_id,
+      pageNO: params.pageNO,
+      pageSize: params.pageSize,
+      sort: params.sort,
+      sort_dir: params.sort&&params.sort_dir
+    }
   })
 }
 

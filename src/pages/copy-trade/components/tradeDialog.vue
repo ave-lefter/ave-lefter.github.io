@@ -28,9 +28,9 @@
           </div>
           <div class="flex-between gap-16px mt-8px mb-19px">
             <div
-              class="item bg-[--border] px-12px py-12px rounded-8px hover:opacity-80"
               v-for="(item, $index) in strategyList"
               :key="$index"
+              class="item bg-[--border] px-12px py-12px rounded-8px hover:opacity-80"
             >
               <div class="flex-between text-14px">
                 <span class="color-[--main-text]">{{ item.label }}</span>
@@ -45,7 +45,7 @@
             <el-input v-model.trim="form.followAddress"  :placeholder="$t('enterAddress')" />
           </el-form-item>
           <el-form-item :label="$t('chain')" label-position="top">
-            <el-select style="width: 100%" :suffix-icon="SuffixIcon" v-model="form.chain" :persistent="false">
+            <el-select v-model="form.chain" style="width: 100%" :suffix-icon="SuffixIcon" :persistent="false">
               <template #prefix>
                 <ChainToken :chain="form.chain" :width="16" />
               </template>
@@ -108,8 +108,8 @@
                 </template>
               </el-input>
               <el-input
-                class="mt-10px"
                 v-model.trim="form.buyAmount"
+                class="mt-10px"
 
                 :placeholder="$t('maxBuyAmount')"
                 @input="(val) => onValidateInput(val, 'buyAmount')"
@@ -133,7 +133,7 @@
             </div>
           </el-form-item>
           <el-form-item :label="$t('buyType')" label-position="top">
-            <el-select style="width: 100%" :suffix-icon="SuffixIcon" v-model="form.sellType" :persistent="false">
+            <el-select v-model="form.sellType" style="width: 100%" :suffix-icon="SuffixIcon" :persistent="false">
               <el-option
                 v-for="(item, $index) in sellTypeList"
                 :key="$index"
@@ -147,8 +147,8 @@
           <template v-if="form.sellType === 2">
             <el-form-item prop="takeProfitRatio">
               <el-input
-                class="mt-10px"
                 v-model.trim="form.takeProfitRatio"
+                class="mt-10px"
 
                 :placeholder="$t('takeProfitRatio')"
                 @input="(val) => onValidateInput(val, 'takeProfitRatio')"
@@ -160,8 +160,8 @@
             </el-form-item>
             <el-form-item prop="stopLossRatio">
               <el-input
-                class="mt-10px"
                 v-model.trim="form.stopLossRatio"
+                class="mt-10px"
 
                 :placeholder="$t('stopLossRatio')"
                 @input="(val) => onValidateInput(val, 'stopLossRatio')"
@@ -179,13 +179,20 @@
               style="--el-switch-on-color: #3c6cf6; zoom: 0.9; height: 14px"
             />
           </el-form-item>
+          <el-form-item :label="$t('buyOnce')" label-position="left">
+            <el-switch
+              v-model="form.buyOnce"
+              class="ml-auto"
+              style="--el-switch-on-color: #3c6cf6; zoom: 0.9; height: 14px"
+            />
+          </el-form-item>
           <el-form-item>
             <div class="w-full">
               <div class="flex-between">
                 <span class="text-16px">{{ $t('advanced') }}</span>
                 <div
+                  class="flex-center cursor-pointer text-12px color-[--primary-color] ml-8px mr-auto"
                   @click="isExpanded = !isExpanded"
-                  class="flex-center cursor-pointer text-12px color-[--primary-color] ml-8px"
                 >
                   <span>{{ isExpanded ? $t('Collapse') : $t('Expand') }}</span>
                   <Icon
@@ -193,7 +200,6 @@
                     class="text-16px"
                   />
                 </div>
-                <div class="flex-1"></div>
                 <el-button class="reset" type="primary" @click.stop="reset">
                   <Icon
                     name="custom:refresh-left"
@@ -201,8 +207,8 @@
                   />{{ $t('reset') }}
                 </el-button>
               </div>
-              <transition name="fade" v-if="isExpanded">
-                <div>
+              <transition name="fade">
+                <div v-if="isExpanded">
                   <div class="flex-start item">
                     <span class="flex-1">{{ $t('buyAmount') }}</span>
                     <el-input
@@ -308,6 +314,62 @@
                     </el-input>
                   </div>
                   <div class="flex-start item mt-16px">
+                    <span class="flex-1">{{ $t('liquidityLimit') }}</span>
+                    <el-input
+                      v-model.trim.number="advancedForm.minLiquidity"
+                      class="flex-1"
+                      :placeholder="$t('minor')"
+
+                      @blur="
+                        (e) =>
+                          handleBlur(
+                            ['minLiquidity', 'maxLiquidity'] as (keyof FormType)[],
+                            (e.target as HTMLInputElement).value,
+                            0
+                          )
+                      "
+                      @input="
+                        (val) =>
+                          handleInput(
+                            ['minLiquidity', 'maxLiquidity'] as (keyof FormType)[],
+                            val,
+                            0
+                          )
+                      "
+                    >
+                      <template #suffix>
+                        <span>$</span>
+                      </template>
+                    </el-input>
+                    <span class="gap px-4px">~</span>
+                    <el-input
+                      v-model.trim.number="advancedForm.maxLiquidity"
+                      class="flex-1"
+                      :placeholder="$t('max1')"
+
+                      @blur="
+                        (e) =>
+                          handleBlur(
+                            ['minLiquidity', 'maxLiquidity'] as (keyof FormType)[],
+                            (e.target as HTMLInputElement).value,
+                            1
+                          )
+                      "
+                      @input="
+                        (val) =>
+                          handleInput(
+                            ['minLiquidity', 'maxLiquidity'] as (keyof FormType)[],
+                            val,
+                            1
+                          )
+                      "
+                    >
+                      <template #suffix>
+                        <span>$</span>
+                      </template>
+                    </el-input>
+                  </div>
+                  <div class="flex-start item mt-16px">
                     <span class="flex-1">{{ $t('tokenCreationTime') }}</span>
                     <DateTime ref="dateTime_Ref" @change="onDateTimeChange" />
                   </div>
@@ -317,20 +379,18 @@
                   </div>
                   <div class="mt-16px">
                     <div class="flex-between">
-                      <span class="text-14px">{{ $t('black') }}</span>
-                      <div class="flex-1"></div>
+                      <span class="text-14px mr-auto">{{ $t('black') }}</span>
                       <!-- <el-button class="reset !color-[--yellow]" type="primary">
                         查看全部
                         <Icon name="majesticons:arrow-right" />
                       </el-button> -->
                     </div>
-                    <div class="flex-start mb-5px" v-for="(token, index) in blacklist" :key="index">
+                    <div v-for="(token, index) in blacklist" :key="index" class="flex-start mb-5px">
                       <el-input
                         v-model.trim="blacklist[index].value"
-
                         :placeholder="$t('plsEnterAddress')"
                         @blur="validateAddress(index)"
-                      ></el-input>
+                      />
                       <Icon
                         class="text-18px text-[--third-text] cursor-pointer ml-30px hover:color-[--primary-color]"
                         name="ic:baseline-delete"
@@ -362,7 +422,7 @@
                   {{ $t('sellOutTip') }}
                 </div>
               </template>
-              <Setting :chain="form.chain" :visible="visible"/>
+              <Setting :chain="(form.chain as BotChain)" :visible="visible"/>
             </div>
           </el-form-item>
         <!-- </el-scrollbar> -->
@@ -375,9 +435,9 @@
           size="large"
           class="w-full"
           :disabled="disabled"
+          :loading="loading"
           @click.stop.prevent="createFollowOrder"
           @keydown.enter.prevent="createFollowOrder"
-          :loading="loading"
           >{{ $t('confirm') }}</el-button
         >
       </div>
@@ -394,17 +454,17 @@ import { _createFollowOrder } from '~/api/copyTrade'
 import BigNumber from 'bignumber.js'
 import { ElMessage, type FormInstance } from 'element-plus'
 import type { BotChain } from '~/utils/types'
-type TimeUnit = 'second' | 'minute' | 'hour' | 'day'
-const unitMs: Record<TimeUnit, number> = {
-  second: 1000,
-  minute: 60 * 1000,
-  hour: 60 * 60 * 1000,
-  day: 24 * 60 * 60 * 1000,
-}
-const route = useRoute()
+// type TimeUnit = 'second' | 'minute' | 'hour' | 'day'
+// const unitMs: Record<TimeUnit, number> = {
+//   second: 1000,
+//   minute: 60 * 1000,
+//   hour: 60 * 60 * 1000,
+//   day: 24 * 60 * 60 * 1000,
+// }
+// const route = useRoute()
 const { t } = useI18n()
 const botStore = useBotStore()
-const { setting, settingCopyTrade, form, advancedForm, blacklist, activeCopyAddress,type } = storeToRefs(useCopyTradeStore())
+const { settingCopyTrade, form, advancedForm, blacklist, activeCopyAddress,type } = storeToRefs(useCopyTradeStore())
 const { getFollowingInfo } = useCopyTradeStore()
 const props = defineProps({
   modelValue: Boolean,
@@ -415,6 +475,8 @@ interface FormType {
   maxBuyValue: string
   minMarketCap: string
   maxMarketCap: string
+  minLiquidity: string
+  maxLiquidity: string
 }
 //新手跟单低频策略
 const lowStrategy = ref({
@@ -613,7 +675,7 @@ const sellTypeList = computed(() => {
 const tokenBlacklist = computed(() => {
   return blacklist?.value?.map?.((i) => i.value) || []
 })
-watch(() => visible.value, (val) => {
+watch(() => visible.value, () => {
   if (type.value == 2) {
     const copy_setting_default = localStorage.getItem('copy_setting_add')
     if (copy_setting_default && JSON.parse(copy_setting_default)?.[form.value.chain]) {
@@ -632,8 +694,10 @@ watch(() => visible.value, (val) => {
     } else {
       blacklist.value = []
     }
-
   }
+  // if (Object.keys(advancedForm.value)?.some(Boolean)) {
+  //   isExpanded.value = true
+  // }
 })
 watch(
   () => form.value.chain,
@@ -741,6 +805,7 @@ function createFollowOrder() {
     takeProfitRatio: Number(form.value.takeProfitRatio) * 100,
     stopLossRatio: Number(form.value.stopLossRatio) * 100,
     ignoreHeld: form.value.ignoreHeld,
+    buyOnce: form.value.buyOnce,
 
     slippage: (form.value.slippage || 9) * 100, //滑点
     isPrivate: form.value.isPrivate, //防夹

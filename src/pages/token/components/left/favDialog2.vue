@@ -14,7 +14,7 @@ const props = defineProps({
     type: Function,
     default: () => {
     }
-  }
+  },
 })
 const {t} = useI18n()
 const emit = defineEmits(['update:visible'])

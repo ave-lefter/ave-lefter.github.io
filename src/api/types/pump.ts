@@ -8,14 +8,23 @@ interface BaseToken {
   logo_url: string
   name: string
 }
+interface deployerPlatforms {
+  logo_url: string
+  name: string
+  platform: string
+}
+
 export interface PumpConfig {
   chain: ChainKey
   chain_show: string
   platforms: Platform[]
   base_tokens: BaseToken[]
+  deployer_platforms: deployerPlatforms[]
 }
 
 export interface PumpObj {
+  deployer_platform: string
+  is_cloned: any
   colluded_cluster_ratio: any
   summary_score: number | undefined
   following: number
@@ -27,9 +36,9 @@ export interface PumpObj {
   co_holders_count: string
   buy_tax: any
   sell_tax: any
-  dev_migrated_count?: number
-  dev_migrated_ratio?: number
-  dev_total_count?: number
+  dev_migrated_count: number
+  dev_migrated_ratio: number
+  dev_total_count: number
   dev_age_seconds?: any
   dev_first_transfer_in_from?: string
   dev_first_transfer_in_from_label?: any
@@ -119,6 +128,7 @@ export interface PumpObj {
     logo_url: string
     token: string
   }
+  is_pump_agent: number
 }
 
 interface Pair {

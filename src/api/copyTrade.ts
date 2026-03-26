@@ -23,6 +23,8 @@ interface CopyTradeParams {
   minBuyValue: string // 跟单目标最小买入金额usd, 小于此金额不跟买
   maxMarketCap: string // 买入代币的最大marketcap, 大于此不跟买
   minMarketCap: string // 买入代币的最小marketcap, 小于此不跟买
+  maxLiquidity: string // 买入代币的最大流动性, 大于此不跟买
+  minLiquidity: string // 买入代币的最小流动性, 小于此不跟买
   maxTokenAge: number // token的最大创建时间, 单位秒，大于此不跟买
   minTokenAge: number // token的最小创建时间，单位秒，小于此不跟买
   enableAt: number // 开始时间点，整点，每天再此后开始跟

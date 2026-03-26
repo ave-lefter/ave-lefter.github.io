@@ -127,17 +127,7 @@ export const usePumpStore = defineStore('pumpStore', () => {
       pumpConfig.value.forEach(i => {
         if (!pumpV3.value[i.chain]?.platforms?.length) {
           // const platforms = i.platforms.map(y => y?.platform) || []
-          const platforms =
-            i.platforms?.map((y) => {
-              if (i.chain == 'solana') {
-                if (y.platform !== 'believe') {
-                  return y.platform || ''
-                }
-                return ''
-              } else {
-                return y.platform || ''
-              }
-            }) || []
+          const platforms = i.platforms?.map(y => y.platform) || []
           pumpV3.value[i.chain] = {
             ...(pumpV3.value[i.chain] || {}),
             platforms,
@@ -173,10 +163,10 @@ export const usePumpStore = defineStore('pumpStore', () => {
 
   const pump_solana_platforms = useStorage(
     'pump_solana_platforms18',
-    ['pump', 'moonshot', 'raydium', 'jupstudio', 'moon_new', 'cookingcity', 'bonk', 'bags']
+    ['pump', 'moonshot', 'believe', 'raydium', 'jupstudio', 'moon_new', 'cookingcity', 'bonk', 'bags', 'heaven']
   )
   const pumpV3: RemovableRef<Record<ChainKey, pumpData>> = useStorage(
-    'pumpV19',
+    'pumpV22',
     {
       solana: {
         platforms: [],

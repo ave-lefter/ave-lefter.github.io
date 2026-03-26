@@ -5,6 +5,7 @@ import XIcon from '~/components/xPopup/xIcon.vue'
 import Collect from '~/components/collect.vue'
 
 const emit = defineEmits(['toggleKline'])
+const {updateNum11,updateNum4} = storeToRefs(useFollowStore())
 const rankKlineStore = useRankKlineStore()
 const walletStore = useWalletStore()
 const botStore = useBotStore()
@@ -118,6 +119,8 @@ function removeTokenFavorite(row) {
     .then(() => {
       ElMessage.success(t('cancelled1'))
       row.is_fav = false
+      updateNum11.value++
+      console.log('removeTokenFavorite')
     })
     .catch((err) => {
       console.log(err)
@@ -130,6 +133,8 @@ function addTokenFavorite(row, newGroupId: number) {
     .then(() => {
       ElMessage.success(t('collected'))
       row.is_fav = true
+      updateNum11.value++
+      console.log('addTokenFavorite')
     })
     .catch((err) => {
       console.log(err)
@@ -207,6 +212,22 @@ function addTokenFavorite(row, newGroupId: number) {
           >
             <Icon name="custom:search" class="text-12px" />
           </a>
+          <img
+            v-if="row?.is_cloned"
+            v-tooltip="$t('deployerPlatform', {tool: row?.deployer_platform})"
+            class="rounded-100% ml-4px cursor-pointer"
+            :src="formatIconTag(row?.deployer_platform)"
+            alt=""
+            :width="12"
+          >
+          <img
+            v-if="row.is_pump_agent"
+            v-tooltip="$t('agentToken')"
+            class="rounded-100% ml-4px cursor-pointer"
+            :src="formatIconTag('pumpt_agent')"
+            alt=""
+            :width="12"
+          >
           <img
             v-if="row.issue_platform"
             v-tooltip="row.issue_platform"

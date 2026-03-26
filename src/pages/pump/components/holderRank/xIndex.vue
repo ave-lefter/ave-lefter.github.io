@@ -1,6 +1,6 @@
 <template>
   <div class="bg-[--main-input-button-bg]" :class="type==='rank' ? 'w-382px' : 'w-200px'">
-    <component :is="Com" :tokenId="data.tokenId" :loading="data.loading" :tableList="data.tableList" :onFetch="props.onFetch" :type="type" :ratio="ratio"/>
+    <component :is="Com" :tokenId="data.tokenId" :loading="data.loading" :tableList="data.tableList" :onFetch="props.onFetch" :type="type" :ratio="ratio" :symbol="symbol" :logo_url="logo_url"/>
     <!-- <el-skeleton v-if="data.loading && type !=='rank'" :rows="5" animated style="--el-skeleton-circle-size: 32px;padding: 12px" >
       <template #template>
         <el-skeleton-item variant="p" style="width: 100%" />
@@ -27,7 +27,9 @@ const props = defineProps<{
     tableList: HolderRankItem[]
   }>
   type: String,
-   ratio: String,
+  ratio: String,
+  symbol: String,
+  logo_url: String,
   onFetch: (tokenId: string, tagType?: number) => void
 }>()
 const data = computed(() => props.data.value)

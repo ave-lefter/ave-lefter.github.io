@@ -212,9 +212,9 @@ onUnmounted(() => {
         </div>
       </a>
       <div class="flex-1" />
-      <div class="flex  gap-20px mt--12px items-stretch">
-        <OrderBookButton v-model="orderBookVisible"/>
+      <div class="flex  gap-12px mt--12px items-stretch">
         <OneClick/>
+        <OrderBookButton v-model="orderBookVisible"/>
         <Bubble/>
       </div>
     </div>

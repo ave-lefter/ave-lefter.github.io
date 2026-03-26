@@ -1496,5 +1496,8 @@
   "onlyFollowed": "팔로우한 사람만",
   "OnlyDev": "개발자 전용",
   "OnlyYou": "당신만",
-  "you": "너"
+  "you": "너",
+  "favRemarksTips": "선택한 지갑을 팔로우하시겠습니까?",
+  "batchFav": "일괄 팔로우",
+  "removeTokenTips2": "선택한 모니터링을 삭제하시겠습니까?"
 }

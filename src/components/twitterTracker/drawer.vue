@@ -328,7 +328,11 @@ const clickToHot = () => {
 }
 
 const getIndexWidth = () => {
-  if (list.value.length > 99) {
+  if (list.value.length > 999) {
+    return '40px'
+  } else if (list.value.length > 999) {
+    return '32px'
+  } else if (list.value.length > 99) {
     return '24px'
   } else if (list.value.length > 9) {
     return '16px'

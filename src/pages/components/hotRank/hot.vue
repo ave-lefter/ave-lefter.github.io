@@ -49,7 +49,7 @@ const localeStore = useLocaleStore()
 const globalStore = useGlobalStore()
 const rankKlineStore = useRankKlineStore()
 const klineChartsData = ref<any[]>([])
-
+const {updateNum4} = storeToRefs(useFollowStore())
 const props = defineProps<{
   listMapFunction(i: Record<string, any>): Record<string, any>
   activeChain: string
@@ -68,7 +68,7 @@ function setSortConditions(params: { sort: string; sort_dir: string }) {
 
 function setFilterForm(...args: any[]) {
   args.forEach((keyVal) => {
-    set(rankConditions.value.hot.filter, keyVal[0], keyVal[1])
+    set(rankConditions.value?.hot?.filter, keyVal[0], keyVal[1])
   })
   pageInfo.value.pageNO = 1
   _getTreasureList()
@@ -76,10 +76,10 @@ function setFilterForm(...args: any[]) {
 const listData = ref<any[]>([])
 const filteredListData = computed(() => {
   let result = [...listData.value]
-  if (globalStore.pumpSetting.isBlacklist) {
+  if (globalStore.pumpSetting?.isBlacklist) {
     result = result.filter((el) => !inBlackList(el))
   }
-  if (rankKlineStore.klineRow.id) {
+  if (rankKlineStore.klineRow?.id) {
     const index = result.findIndex((el) => el.id === rankKlineStore.klineRow.id)
     if (index !== -1) {
       result.splice(index + 1, 0, {
@@ -92,7 +92,7 @@ const filteredListData = computed(() => {
 function inBlackList(row) {
   const symbol = row.token0_address === row.target_token ? row.token0_symbol : row.token1_symbol
   return (
-    globalStore.pumpBlackList.findIndex(
+    globalStore.pumpBlackList?.findIndex(
       (i) =>
         (i.address == row.token && i.type == 'ca') || (i.address == symbol && i.type == 'keyword')
     ) !== -1
@@ -105,8 +105,20 @@ const pageInfo = ref({
 })
 watch(
   () => pageInfo.value.pageNO,
-  (val) => { useSessionStorage('hot-pageNO', 1).value = val }
+  (val) => { 
+    useSessionStorage('hot-pageNO', 1).value = val 
+    nextTick(() => aveTableRef.value?.scrollToTop(0))
+  }
 )
+
+watch(
+  () => updateNum4.value,
+  () => {  
+    pageInfo.value.pageNO = 1
+    _getTreasureList()
+  }
+)
+
 const loading = shallowRef(false)
 const columns = useStorage(CategoryTabsCacheKey.hot, getHotDefaultColumns(t))
 const secCol = columns.value.find((c: any) => c.render === 'securityContent')
@@ -192,17 +204,6 @@ watch(
   () => {
     pageInfo.value.pageNO = 1
     _getTreasureList()
-  }
-)
-
-watch(
-  () => pageInfo.value.pageNO,
-  () => {
-    if (aveTableRef.value) {
-      setTimeout(() => {
-        aveTableRef.value.scrollToTop(0)
-      }, 20)
-    }
   }
 )
 

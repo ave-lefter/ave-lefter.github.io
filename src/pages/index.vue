@@ -1,6 +1,6 @@
 <template>
-  <div v-if="route.name=='index'" class="pump w-full bg-[--main-bg]">
-    <div class="flex-start p-x-17px py-12px bg-[--main-bg] mb-1px mt-1px">
+  <div v-if="route.name=='index'" class="pump w-full bg-[--d-0E0F10-l-FFF]">
+    <div class="flex-start p-x-17px py-12px bg-[--d-0E0F10-l-FFF] mb-1px mt-1px">
       <div class="tabs mr-8px">
         <div
           v-for="item in pumpConfig"
@@ -85,7 +85,7 @@
         </template>
       </el-popover> -->
       <div class="flex-1" />
-      <Setting :chain="activeChain" :pumpConfig="pumpConfig"/>
+      <Setting :chain="(activeChain as BotChain)" :pumpConfig="pumpConfig"/>
       <BlackList />
       <!-- <QuickSwapSet
         v-model:quickBuyValue="quickBuyValue"
@@ -93,12 +93,12 @@
         :settingsButtonVisible="true"
         class="mr-12px"
       /> -->
-      <SlippageSetMarket class="mr-10px ml-auto" :chain="activeChain" @mousedown.stop />
-      <AutoSellSetting :chain="activeChain" root-class="mr-0"/>
+      <SlippageSetMarket class="mr-10px ml-auto" :chain="(activeChain as BotChain)" @mousedown.stop />
+      <AutoSellSetting :chain="(activeChain as BotChain)" root-class="mr-0"/>
     </div>
     <el-row type="flex" :gutter="pumpSetting.isGutter ? 10 : 2" class="w-full pl-16px" :class="pumpSetting.isGutter? 'pr-6px': 'pr-14px'">
       <el-col v-show="single('new') && pumpSetting.grid['new']?.show" :span="getSpan()" :style="{order: orderNew}">
-        <div class="pump-item  rounded-4px" style="padding-top: 15px;">
+        <div class="pump-item  rounded-4px pt-10px">
           <div class="pump-item_header flex-start px-12px rounded-4px">
             <template v-if="width > 1024">
               <!-- <img
@@ -149,12 +149,12 @@
             <el-input
               v-if="pumpSetting?.show_search"
               ref="inputSearch"
-              v-model.trim="pumpStore.pumpV3[activeChain].new.pumpFilter.q"
-              class="search-input1 px-20px mr-4px"
+              v-model.trim="pumpV3Pointer[activeChain].new.pumpFilter.q"
+              class="search-input1 px-20px mr-8px"
               size="small"
               :placeholder="$t('keywordsPlaceholder')"
               @input="(val) => {
-                pumpStore.pumpV3[activeChain].new.pumpFilter.q = val.replace(/\s/g, '')
+                pumpV3Pointer[activeChain].new.pumpFilter.q = val.replace(/\s/g, '')
                 debouncedFetch('new')
               }"
             >
@@ -166,23 +166,23 @@
               </template>
               <template #suffix>
                 <Icon
-                  v-if="pumpStore.pumpV3[activeChain].new.pumpFilter.q"
+                  v-if="pumpV3Pointer[activeChain].new.pumpFilter.q"
                   name="pajamas:clear"
                   class="color-[--third-text9] text-12px hover:opacity-70% cursor-pointer mr-10px"
-                  @click="pumpStore.pumpV3[activeChain].new.pumpFilter.q = ''; debouncedFetch('new')"
+                  @click="pumpV3Pointer[activeChain].new.pumpFilter.q = ''; debouncedFetch('new')"
                 />
               </template>
             </el-input>
             <QuickSwapSetCustom
               v-model:quickBuyValue="quickBuyValue1"
               v-model:customSelected="swapSetSelected1"
-              :chain="activeChain"
+              :chain="(activeChain as BotChain)"
               class="mr-8px"
             />
             <AudioSelect activeTab="new" :chain="activeChain"/>
             <PumpFilterButton
               :key="`pumpFilterButton_${activeChain}_new`"
-              :filterNumber="getFilterNumber(pumpStore.pumpV3[activeChain].new.pumpFilter || {},platforms,baseTokensAllStr)"
+              :filterNumber="getFilterNumber(pumpV3Pointer[activeChain].new.pumpFilter || {},platforms,baseTokensAllStr)"
               :visible="filterVisible && activeFilterType === 'new'"
               @update:visible="(val) => handleFilterVisibleChange(val, 'new')"
             />
@@ -197,7 +197,7 @@
             :quickBuyValue="quickBuyValue1"
             :swapSetSelected="swapSetSelected1"
             :loading="pumpV3[activeChain]['new']['loading']"
-            :hasFilter="getFilterNumber(pumpStore.pumpV3[activeChain].new.pumpFilter || {},platforms,baseTokensAllStr) > 0"
+            :hasFilter="getFilterNumber(pumpV3Pointer[activeChain].new.pumpFilter || {},platforms,baseTokensAllStr) > 0"
             @mouseover="isPausedObj.new = true"
             @mouseleave="isPausedObj.new = false"
             @clearFilter="handleClearFilter('new')"
@@ -205,7 +205,7 @@
         </div>
       </el-col>
       <el-col v-show="single('soon') && pumpSetting.grid['soon'].show" :span="getSpan()" :style="{order: orderSoon}">
-        <div class="pump-item" style="padding-top: 15px;">
+        <div class="pump-item pt-10px">
           <div class="pump-item_header flex-start px-12px rounded-4px">
             <template v-if="width > 1024">
               <!-- <img
@@ -256,12 +256,12 @@
             <el-input
               v-if="pumpSetting?.show_search"
               ref="inputSearch"
-              v-model.trim="pumpStore.pumpV3[activeChain].soon.pumpFilter.q"
-              class="search-input1 px-20px mr-4px"
+              v-model.trim="pumpV3Pointer[activeChain].soon.pumpFilter.q"
+              class="search-input1 px-20px mr-8px"
               size="small"
               :placeholder="$t('keywordsPlaceholder')"
               @input="(val) => {
-                pumpStore.pumpV3[activeChain].soon.pumpFilter.q = val.replace(/\s/g, '')
+                pumpV3Pointer[activeChain].soon.pumpFilter.q = val.replace(/\s/g, '')
                 debouncedFetch('soon')
               }"
             >
@@ -273,23 +273,23 @@
               </template>
               <template #suffix>
                 <Icon
-                  v-if="pumpStore.pumpV3[activeChain].soon.pumpFilter.q"
+                  v-if="pumpV3Pointer[activeChain].soon.pumpFilter.q"
                   name="pajamas:clear"
                   class="color-[--third-text9] text-12px hover:opacity-70% cursor-pointer mr-10px"
-                  @click="pumpStore.pumpV3[activeChain].soon.pumpFilter.q = ''; debouncedFetch('soon')"
+                  @click="pumpV3Pointer[activeChain].soon.pumpFilter.q = ''; debouncedFetch('soon')"
                 />
               </template>
             </el-input>
             <QuickSwapSetCustom
               v-model:quickBuyValue="quickBuyValue2"
               v-model:customSelected="swapSetSelected2"
-              :chain="activeChain"
+              :chain="(activeChain as BotChain)"
               class="mr-8px"
             />
             <AudioSelect activeTab="soon" :chain="activeChain"/>
             <PumpFilterButton
               :key="`pumpFilterButton_${activeChain}_soon`"
-               :filterNumber="getFilterNumber(pumpStore.pumpV3[activeChain].soon.pumpFilter || {},platforms,baseTokensAllStr)"
+               :filterNumber="getFilterNumber(pumpV3Pointer[activeChain].soon.pumpFilter || {},platforms,baseTokensAllStr)"
               :visible="filterVisible && activeFilterType === 'soon'"
               @update:visible="(val) => handleFilterVisibleChange(val, 'soon')"
             />
@@ -304,7 +304,7 @@
             :swapSetSelected="swapSetSelected2"
             :loading="pumpV3[activeChain]['soon']['loading']"
             isSoon
-            :hasFilter="getFilterNumber(pumpStore.pumpV3[activeChain].soon.pumpFilter || {},platforms,baseTokensAllStr) > 0"
+            :hasFilter="getFilterNumber(pumpV3Pointer[activeChain].soon.pumpFilter || {},platforms,baseTokensAllStr) > 0"
             @mouseover="isPausedObj.soon = true"
             @mouseleave="isPausedObj.soon = false"
             @clearFilter="handleClearFilter('soon')"
@@ -312,7 +312,7 @@
         </div>
       </el-col>
       <el-col v-show="single('graduated') && pumpSetting.grid['graduated'].show" :span="getSpan()" :style="{order: orderGraduated}">
-        <div class="pump-item" style="padding-top: 15px;">
+        <div class="pump-item pt-10px">
           <div class="pump-item_header flex-start px-12px rounded-4px">
             <template v-if="width > 1024">
               <!-- <img
@@ -364,12 +364,12 @@
             <el-input
               v-if="pumpSetting?.show_search"
               ref="inputSearch"
-              v-model.trim="pumpStore.pumpV3[activeChain].graduated.pumpFilter.q"
-              class="search-input1 px-20px mr-4px"
+              v-model.trim="pumpV3Pointer[activeChain].graduated.pumpFilter.q"
+              class="search-input1 px-20px mr-8px"
               size="small"
               :placeholder="$t('keywordsPlaceholder')"
               @input="(val) => {
-                pumpStore.pumpV3[activeChain].graduated.pumpFilter.q = val.replace(/\s/g, '')
+                pumpV3Pointer[activeChain].graduated.pumpFilter.q = val.replace(/\s/g, '')
                 debouncedFetch('graduated')
               }"
             >
@@ -381,23 +381,23 @@
               </template>
               <template #suffix>
                 <Icon
-                  v-if="pumpStore.pumpV3[activeChain].graduated.pumpFilter.q"
+                  v-if="pumpV3Pointer[activeChain].graduated.pumpFilter.q"
                   name="pajamas:clear"
                   class="color-[--third-text] text-12px hover:opacity-70% cursor-pointer mr-10px"
-                  @click="pumpStore.pumpV3[activeChain].graduated.pumpFilter.q = ''; debouncedFetch('graduated')"
+                  @click="pumpV3Pointer[activeChain].graduated.pumpFilter.q = ''; debouncedFetch('graduated')"
                 />
               </template>
             </el-input>
             <QuickSwapSetCustom
               v-model:quickBuyValue="quickBuyValue3"
               v-model:customSelected="swapSetSelected3"
-              :chain="activeChain"
+              :chain="(activeChain as BotChain)"
               class="mr-8px"
             />
             <AudioSelect activeTab="graduated" :chain="activeChain"/>
             <PumpFilterButton
               :key="`pumpFilterButton_${activeChain}_graduated`"
-               :filterNumber="getFilterNumber(pumpStore.pumpV3[activeChain].graduated.pumpFilter || {},platforms,baseTokensAllStr)"
+               :filterNumber="getFilterNumber(pumpV3Pointer[activeChain].graduated.pumpFilter || {},platforms,baseTokensAllStr)"
               :visible="filterVisible && activeFilterType === 'graduated'"
               @update:visible="(val) => handleFilterVisibleChange(val, 'graduated')"
             />
@@ -412,7 +412,7 @@
             :swapSetSelected="swapSetSelected3"
             :loading="pumpV3[activeChain]['graduated']['loading']"
             isOut
-            :hasFilter="getFilterNumber(pumpStore.pumpV3[activeChain].graduated.pumpFilter || {},platforms,baseTokensAllStr) > 0"
+            :hasFilter="getFilterNumber(pumpV3Pointer[activeChain].graduated.pumpFilter || {},platforms,baseTokensAllStr) > 0"
             @mouseover="isPausedObj.graduated = true"
             @mouseleave="isPausedObj.graduated = false"
             @clearFilter="handleClearFilter('graduated')"
@@ -427,6 +427,7 @@
       :activeChain="activeChain"
       :activeFilterType="activeFilterType"
       :platformsList="platformsList"
+      :deployerPlatforms="deployerPlatforms"
       :baseTokens="baseTokenMap.values().toArray()"
       @update:filterData="handlerFilterConfirm"
     />
@@ -441,6 +442,9 @@
 
 <script setup lang="ts">
 import { useStorage, useWindowSize, useThrottleFn, useDocumentVisibility, useDebounceFn } from '@vueuse/core'
+import { wrap, type Remote } from 'comlink'
+import { toRaw } from 'vue'
+import PumpWsMappingWorker from '@/workers/pumpWsMapping.worker?worker'
 import PumpList from './pump/components/pumpList.vue'
 import Setting from './pump/components/setting.vue'
 import BlackList from './pump/components/blackList.vue'
@@ -455,6 +459,7 @@ import type {
   WSPumpObj,
   pumpBlack
 } from '@/api/types/pump'
+import type { BotChain } from '@/utils/types'
 import AutoSellSetting from '@/components/autoSellSetting/index.vue'
 import AudioSelect from './pump/components/audioSelect.vue'
 import { getFilterNumber } from './pump/utils'
@@ -484,12 +489,13 @@ const route = useRoute()
 const { t } = useI18n()
 const wsv2Store = useV2WSStore()
 const pumpStore = usePumpStore()
+const pumpV3Pointer = computed(() => pumpStore.pumpV3 as any)
 let isInitObj = {
   new: true,
   soon: true,
   graduated: true
 }
-const quickBuyValue = useStorage('quickBuyValue', '0.01')
+// const quickBuyValue = useStorage('quickBuyValue', '0.01')
 const quickBuyValue1 = useStorage('quickBuyValue1', '0.01')
 const quickBuyValue2 = useStorage('quickBuyValue2', '0.01')
 const quickBuyValue3 = useStorage('quickBuyValue3', '0.01')
@@ -516,10 +522,10 @@ const orderGraduated= computed(() => {
 })
 
 const pumpConfig = useStorage<PumpConfig[]>('pumpConfig', [])
-const isRotate = ref(false)
+// const isRotate = ref(false)
 const { pump_notice, pumpV3, pumpFilterDefault, pump_query} = storeToRefs(usePumpStore())
 const pumpAudio = useTemplateRef('pumpAudio')
-const visible_platforms = shallowRef(false)
+// const visible_platforms = shallowRef(false)
 const pumpState = useState('pumpState', () => ({
   fourmemeListObj: {
     bsc: {
@@ -549,7 +555,8 @@ const pumpState = useState('pumpState', () => ({
     },
   }
 }))
-const fourmemeListObj = reactive(pumpState.value.fourmemeListObj)
+type FourmemeListByCategory = Record<CategoryKey, PumpObj[]>
+const fourmemeListObj = reactive<Record<ChainKey, FourmemeListByCategory>>(pumpState.value.fourmemeListObj)
 // const fourmemeListObj = reactive<Record<ChainKey, Record<CategoryKey, PumpObj[]>>>({
 //   bsc: {
 //     new: [],
@@ -590,7 +597,28 @@ const activeFilterType = ref<'new' | 'soon' | 'graduated'>('new')
 // let wsTableListCache: PumpObj[] = []
 let wsTableListCache: Record<string, PumpObj[]> = {}
 const wsTableList = shallowRef<PumpObj[]>([])
-const logoList = shallowRef<{ logo_url: string, name: string, token: string, symbol: string, rTime: number, appendix: string, twitter_type: number, buy_tax: number, sell_tax: number }[]>([])
+const logoList = shallowRef<{
+  is_pump_agent: number
+  logo_url: string,
+  name: string,
+  token: string,
+  symbol: string,
+  rTime: number,
+  appendix: string,
+  twitter_type: number,
+  buy_tax: number,
+  sell_tax: number,
+  deployer_platform: string
+  is_cloned: number,
+}[]>([])
+
+type PumpWorkerAPI = {
+  mapWsList(wsList: WSPumpObj[]): Promise<PumpObj[]>
+}
+
+let pumpWsMappingWorker: Remote<PumpWorkerAPI> | null = null
+let pumpWsNativeWorker: Worker | null = null
+let rafHandle: number | null = null
 type StatisticsItem = {
   first_transfer_in_from_label: any
   volume_u_24h: number
@@ -643,6 +671,9 @@ const mapStatistics = shallowRef(new Map<string, StatisticsItem>())
 const platformsList = computed(() => {
   return pumpConfig.value?.filter(i=> i.chain == activeChain.value)?.[0]?.platforms || []
 })
+const deployerPlatforms = computed(() => {
+  return pumpConfig.value?.filter(i=> i.chain == activeChain.value)?.[0]?.deployer_platforms || []
+})
 const platforms = computed(() => {
     return pumpV3.value?.[activeChain.value]?.platforms?.filter?.(Boolean).join(',')
 })
@@ -675,238 +706,141 @@ const tabsList = computed(() => {
     }
   ]
 })
-const list1 = computed(() => {
-  let list = fourmemeListObj?.[activeChain.value]?.new || []
-  const list1 = (wsTableList.value || [])?.filter(i => i.state === 'new' && i.chain === activeChain.value)
+const syncCategory = (category: 'new' | 'soon' | 'graduated') => {
+  const currentChain = activeChain.value
+  if (!currentChain) return []
 
-  const wsList1 = list1?.filter((i: { pair: string }) => !list?.some(j => j.pair === i.pair))
-  let filterList = [...wsList1, ...list].map(i => {
-  const baseHash =
-    i.target_token === i.token0_address
-      ? i.token1_address
-      : i.token0_address
+  const stateMap = {
+    new: 'new',
+    soon: 'migrating',
+    graduated: 'migrated'
+  } as const
+  const wsState = stateMap[category]
 
-  return {
-    ...i,
-    baseToken: baseTokenMap.value.get(baseHash)
-  }
-})
-  if (logoList.value?.length && filterList?.length) {
-    const logoMap = new Map(
-      logoList.value.map(item => [item.token, item])
-    )
-    filterList = filterList.map(i => {
-      const obj = logoMap.get(i.target_token)
-      if (!obj) return i
-      return {
-        ...i,
-        ...(obj.logo_url
-          ? {
-              logo_url: obj.logo_url
-            }
-          : {}
-        ),
-        ...(obj.buy_tax
-          ? {
-              buy_tax: obj.buy_tax
-            }
-          : {}
-        ),
-        ...(obj.sell_tax
-          ? {
-              sell_tax: obj.sell_tax
-            }
-          : {}
-        ),
-        ...(obj.name
-          ? {
-              name: obj.name
-            }
-          : {}
-        ),
-        ...(obj.symbol
-          ? {
-              symbol: obj.symbol
-            }
-          : {}
-        ),
-        ...(obj.appendix
-          ? {
-              medias: getMedias(obj.appendix),
-              twitter_type: obj.twitter_type
-            }
-          : {}
-        )
-      }
-    })
-  }
-  if (filterList?.length) {
-    const pumpFilter = pumpStore.pumpV3[activeChain.value].new.pumpFilter
-    filterList = mergeStatisticsList(mapStatistics.value, filterList)
-    filterList = getFilterData(filterList,pumpFilter)
-    fourmemeListObj[activeChain.value].new = filterList?.slice?.(0, 100) || []
-  }
-  return filterList?.slice?.(0, 100)
-})
-const list2 = computed(() => {
-  let list = fourmemeListObj?.[activeChain.value]?.soon || []
-  const list1 = (wsTableList.value || [])?.filter(i => (i.state === 'migrating') && i.chain === activeChain.value)
-  const wsList1 = list1?.filter((i: { pair: string }) => !list?.some(j => j.pair === i.pair))
-  let filterList = [...wsList1, ...list].map(i => {
-  const baseHash =
-    i.target_token === i.token0_address
-      ? i.token1_address
-      : i.token0_address
+  const existing = fourmemeListObj?.[currentChain]?.[category] || []
+  const wsItems = wsTableList.value.filter(
+    (item) => item.chain === currentChain && item.state === wsState
+  )
 
-  return {
-    ...i,
-    baseToken: baseTokenMap.value.get(baseHash)
-  }
-})
-  if (logoList.value?.length && filterList?.length) {
-    const logoMap = new Map(
-      logoList.value.map(item => [item.token, item])
-    )
-    filterList = filterList.map(i => {
-      const obj = logoMap.get(i.target_token)
-      if (!obj) return i
-      return {
-        ...i,
-        ...(obj.logo_url
-          ? {
-              logo_url: obj.logo_url
-            }
-          : {}
-        ),
-        ...(obj.buy_tax
-          ? {
-              buy_tax: obj.buy_tax
-            }
-          : {}
-        ),
-        ...(obj.sell_tax
-          ? {
-              sell_tax: obj.sell_tax
-            }
-          : {}
-        ),
-        name: obj.name,
-        symbol: obj.symbol,
-        ...(obj.appendix
-          ? {
-              medias: getMedias(obj.appendix),
-              twitter_type: obj.twitter_type
-            }
-          : {}
-        )
-      }
-    })
-  }
-  if (filterList?.length) {
-    const pumpFilter = pumpStore.pumpV3[activeChain.value].soon.pumpFilter
-    filterList = mergeStatisticsList(mapStatistics.value, filterList)
-    filterList = getFilterData(filterList, pumpFilter)
-    const tokenSet = new Set(
-      list3.value?.map(j => j.target_token)
-    )
-    filterList = filterList?.filter(
-      (i: { target_token: string }) =>
-        !tokenSet.has(i.target_token)
-    )
+  const existingPairs = new Set(existing.map((i) => i.pair))
+  const mergedRaw = [...wsItems.filter((i) => !existingPairs.has(i.pair)), ...existing]
 
-    if (pumpSetting.value.isBlacklist && pumpBlackList.value?.length) {
-        filterList = filterList.filter(
-        item => !pumpBlackList.value.some(black => hitBlacklist(item, black))
-      )
-    }
-     filterList = getFilterData(filterList, pumpFilter)
-     fourmemeListObj[activeChain.value].soon = filterList?.slice?.(0, 100) || []
-    return filterList?.slice?.(0, 100)
-  }
-})
-const list3 = computed(() => {
-let list = fourmemeListObj?.[activeChain.value]?.graduated || []
-  const list1 = (wsTableList.value || [])?.filter(i => i.state === 'migrated' && i.chain === activeChain.value)
-  const wsList1 = list1?.filter((i: { pair: string }) => !list?.some(j => j.pair === i.pair))
-  let filterList = [...wsList1, ...list].map(i => {
-  const baseHash =
-      i.target_token === i.token0_address
-        ? i.token1_address
-        : i.token0_address
-
+  const mappedWithBaseToken = mergedRaw.map((i) => {
+    const baseHash =
+      i.target_token === i.token0_address ? i.token1_address : i.token0_address
     return {
       ...i,
-      baseToken: baseTokenMap.value.get(baseHash)
+      baseToken:
+        baseTokenMap.value.get(baseHash) ||
+        ({ symbol: '', token: '', logo_url: '' } as any)
     }
   })
-  if (logoList.value?.length && filterList?.length) {
-    const logoMap = new Map(
-      logoList.value.map(item => [item.token, item])
-    )
-    filterList = filterList.map(i => {
-      const obj = logoMap.get(i.target_token)
-      if (!obj) return i
-      return {
-        ...i,
-        ...(obj.logo_url
-          ? {
-              logo_url: obj.logo_url
-            }
-          : {}
-        ),
-        ...(obj.buy_tax
-          ? {
-              buy_tax: obj.buy_tax
-            }
-          : {}
-        ),
-        ...(obj.sell_tax
-          ? {
-              sell_tax: obj.sell_tax
-            }
-          : {}
-        ),
-        ...(obj.name
-          ? {
-              name: obj.name
-            }
-          : {}
-        ),
-        ...(obj.symbol
-          ? {
-              symbol: obj.symbol
-            }
-          : {}
-        ),
-        ...(obj.appendix
-          ? {
-              medias: getMedias(obj.appendix),
-              twitter_type: obj.twitter_type
-            }
-          : {}
-        )
+
+  let list = mappedWithBaseToken as PumpObj[]
+
+  if (logoList.value?.length && list?.length) {
+    const logoMap = new Map(logoList.value.map((item) => [item.token, item]))
+    list = list.map((item) => {
+      const obj = logoMap.get(item.target_token)
+      if (!obj) return item
+      const merged = {
+        ...item,
+        ...(obj.logo_url ? { logo_url: obj.logo_url } : {}),
+        ...(obj.buy_tax ? { buy_tax: obj.buy_tax } : {}),
+        ...(obj.sell_tax ? { sell_tax: obj.sell_tax } : {}),
+        ...(obj.name ? { name: obj.name } : {}),
+        ...(obj.symbol ? { symbol: obj.symbol } : {}),
+        ...(obj.appendix ? { medias: getMedias(obj.appendix), twitter_type: obj.twitter_type } : {}),
+        ...(obj.is_cloned ? { is_cloned: obj.is_cloned } : {}),
+        ...(obj.deployer_platform ? { deployer_platform: obj.deployer_platform } : {}),
+        ...(obj.is_pump_agent ? { is_pump_agent: obj.is_pump_agent } : {})
       }
+      return merged as PumpObj
     })
   }
-  if (filterList?.length) {
-    const pumpFilter = pumpStore.pumpV3[activeChain.value].graduated.pumpFilter
-    filterList = mergeStatisticsList(mapStatistics.value, filterList)
-    if (pumpSetting.value.isBlacklist && pumpBlackList.value?.length) {
-        filterList = filterList.filter(
-        item => !pumpBlackList.value.some(black => hitBlacklist(item, black))
+
+  if (list?.length) {
+    const pumpFilter = pumpStore.pumpV3[currentChain]?.[category]?.pumpFilter || {}
+    list = mergeStatisticsList(mapStatistics.value, list)
+
+    if (category === 'soon') {
+      const tokenSet = new Set(
+        (fourmemeListObj?.[currentChain]?.graduated || []).map((j) => j.target_token)
       )
+      list = list.filter((i) => !tokenSet.has(i.target_token))
     }
-    filterList = getFilterData(filterList, pumpFilter)
-    fourmemeListObj[activeChain.value].graduated = filterList?.slice?.(0, 100) || []
+
+    if (pumpSetting.value.isBlacklist && pumpBlackList.value?.length) {
+      list = list.filter((item: any) => !pumpBlackList.value.some((black: any) => hitBlacklist(item, black)))
+    }
+
+    list = getFilterData(list, pumpFilter)
+    fourmemeListObj[currentChain][category] = list.slice(0, 100)
+
+    return list.slice(0, 100)
   }
-  return filterList?.slice?.(0, 100)
-})
+
+  fourmemeListObj[currentChain][category] = []
+  return []
+}
+
+// 需要刷新的类别队列
+const refreshQueue = new Set<'new' | 'soon' | 'graduated'>()
+let isFlushing = false
+let rafId: number | null = null
+
+const handleRefreshLists = useThrottleFn(() => {
+  if (!route.name || route.name !== 'index') return
+
+  // 如果已经在排队，直接返回（rAF 会自动处理）
+  if (rafId !== null) return
+
+  // 使用 rAF 调度渲染任务，避免掉帧
+  rafId = requestAnimationFrame(() => {
+    if (isFlushing) {
+      rafId = null
+      return
+    }
+
+    isFlushing = true
+    const categories = refreshQueue.size > 0
+      ? Array.from(refreshQueue)
+      : ['new', 'soon', 'graduated'] as const
+
+    refreshQueue.clear()
+
+    try {
+      for (const category of categories) {
+        syncCategory(category as 'new' | 'soon' | 'graduated')
+      }
+    } finally {
+      isFlushing = false
+      rafId = null
+      // 如果排队期间又有新请求，继续处理
+      if (refreshQueue.size > 0) {
+        handleRefreshLists()
+      }
+    }
+  })
+}, 100)
+
+// 按需刷新特定类别
+function requestRefresh(category?: 'new' | 'soon' | 'graduated') {
+  if (category) {
+    refreshQueue.add(category)
+  }
+  handleRefreshLists()
+}
+
+const list1 = computed(() => fourmemeListObj?.[activeChain.value]?.new || [])
+const list2 = computed(() => fourmemeListObj?.[activeChain.value]?.soon || [])
+const list3 = computed(() => fourmemeListObj?.[activeChain.value]?.graduated || [])
 const mergedBaseList = computed(() => {
   return [...list1.value, ...list2.value, ...list3.value]
 })
 const scrollHeight = computed(()=>{
   // return 'calc(100vh - 215px)'
-  return globalStore.tokenHistoryVisible ? 'calc(100vh - 248px)':'calc(100vh - 215px)'
+  return globalStore.tokenHistoryVisible ? 'calc(100vh - 160px)':'calc(100vh - 195px)'
 })
 
 
@@ -985,8 +919,8 @@ function unbindAudioCanPlay() {
 watch(() => [pump_notice.value?.[activeChain.value]?.new,
 pump_notice.value?.[activeChain.value]?.soon,
 pump_notice.value?.[activeChain.value]?.graduated
-], useThrottleFn((val, old) => {
-  if(val.some(el=>!!el)){
+], useThrottleFn((val: (string | null | undefined)[], old: (string | null | undefined)[]) => {
+  if (val.some((el) => !!el)) {
     const url = getChangedValue(val, old)
     if (pumpAudio.value && url) {
       audioUrl.value = audioNameToResource[url as keyof typeof audioNameToResource] || audioNameToResource.Handgun
@@ -1041,11 +975,22 @@ watch(activeChain, (val, old) => {
 })
 
 const pumpStateBuffer: any[] = []
+let flushPumpStateRafId: number | null = null
 const flushPumpState = useThrottleFn(() => {
   if (!pumpStateBuffer.length) return
-  wsUpdateTableList(pumpStateBuffer)
-  subscribePortrait(pumpStateBuffer)
-  pumpStateBuffer.length = 0
+
+  // 取消之前的 rAF 任务，使用最新数据
+  if (flushPumpStateRafId !== null) {
+    cancelAnimationFrame(flushPumpStateRafId)
+  }
+
+  // 使用 rAF 调度，避免频繁更新导致的卡顿
+  flushPumpStateRafId = requestAnimationFrame(() => {
+    wsUpdateTableList(pumpStateBuffer)
+    subscribePortrait(pumpStateBuffer)
+    pumpStateBuffer.length = 0
+    flushPumpStateRafId = null
+  })
 }, 100)
 
 // 保存 watch 监听器的 unwatch 函数，用于组件卸载时清理
@@ -1055,7 +1000,8 @@ let watchPortraitStatsUnwatch: (() => void) | null = null
 
 watchPumpStateUnwatch = watch(() => wsv2Store.wsResult[WSEventV2Type.PUMPSTATE], (val) => {
   if (Array.isArray(val)) {
-    pumpStateBuffer.push(...val)
+    // 使用 toRaw 去除 Proxy，性能优于 JSON 序列化
+    pumpStateBuffer.push(...val.map(v => toRaw(v)))
     if (pumpStateBuffer.length > 300) {
       pumpStateBuffer.splice(0, pumpStateBuffer.length - 300)
     }
@@ -1063,26 +1009,48 @@ watchPumpStateUnwatch = watch(() => wsv2Store.wsResult[WSEventV2Type.PUMPSTATE],
   }
 })
 const bufferLogoMap = new Map<string, any>()
+let logoThrottledRafId: number | null = null
 const logoThrottled = useThrottleFn(() => {
   if (!bufferLogoMap.size) return
-  const mergedList = Array.from(bufferLogoMap.values())
-  logoList.value = [
-    ...mergedList,
-    ...logoList.value,
-  ].slice(0, 300)
-  bufferLogoMap.clear()
+
+  // 取消之前的 rAF 任务
+  if (logoThrottledRafId !== null) {
+    cancelAnimationFrame(logoThrottledRafId)
+  }
+
+  // 使用 rAF 调度 logo 更新，避免阻塞渲染
+  logoThrottledRafId = requestAnimationFrame(() => {
+    const mergedList = Array.from(bufferLogoMap.values())
+    const map = new Map()
+    // 新数据优先
+    mergedList.forEach(item => {
+      map.set(item.token, item)
+    })
+    // 旧数据补充
+    logoList.value.forEach(item => {
+      if (!map.has(item.token)) {
+        map.set(item.token, item)
+      }
+    })
+    logoList.value = Array.from(map.values()).slice(0, 300)
+
+    bufferLogoMap.clear()
+    logoThrottledRafId = null
+  })
 }, 100)
 
 watchTokenUpdatedUnwatch = watch(
   () => wsv2Store.wsResult[WSEventV2Type.TOKEN_UPDATED],
   (val) => {
     if (!val?.token) return
-    const prev = bufferLogoMap.get(val.token)
+    // 使用 toRaw 去除 Proxy，性能更好
+    const rawVal = toRaw(val)
+    const prev = bufferLogoMap.get(rawVal.token)
     setLRU(
       bufferLogoMap,
-      val.token,
-      prev ? mergeLogo(prev, val) : val,
-      100
+      rawVal.token,
+      prev ? mergeLogo(prev, rawVal) : rawVal,
+      300
     )
     logoThrottled()
   }
@@ -1102,7 +1070,14 @@ function setLRU(map: Map<string, any>, key: string, value: any, limit = 100) {
 
 const flushStatistics = useThrottleFn(() => {
   if (!mapStatistics.value.size) return
+
+  // 触发响应式更新
   triggerRef(mapStatistics)
+
+  // 使用 rAF 调度列表刷新，与浏览器渲染同步
+  requestAnimationFrame(() => {
+    requestRefresh()
+  })
 }, 300)
 // watch(
 
@@ -1112,7 +1087,9 @@ watchPortraitStatsUnwatch = watch(
   () => wsv2Store.wsResult[WSEventV2Type.PORTRAIT_STATISTICS],
   (val) => {
     if (!Array.isArray(val) || !val.length ) return
-    val.forEach((item) => {
+    // 使用 toRaw 去除 Proxy，性能更好
+    const rawVal = val.map(v => toRaw(v))
+    rawVal.forEach((item) => {
       setLRUStatistics(mapStatistics.value, item.token, item, 500)
     })
     flushStatistics()
@@ -1141,10 +1118,11 @@ function bufRender() {
   logoThrottled()
   flushStatistics()
 }
-const getChangedValue = (A: string[], B: string[]): string | null => {
+const getChangedValue = (A: Array<string | null | undefined>, B: Array<string | null | undefined>): string | null => {
   for (let i = 0; i < A.length; i++) {
     if (A[i] !== B[i]) {
-      return A[i]
+      const value = A[i]
+      return typeof value === 'string' ? value : null
     }
   }
   return null
@@ -1181,7 +1159,12 @@ function initPage() {
   }
 }
 
-onMounted(() => {
+onBeforeMount(() => {
+  // 初始化 Web Worker（非阻塞主线程处理 WS item 转换）
+  const worker = new PumpWsMappingWorker()
+  pumpWsNativeWorker = worker
+  pumpWsMappingWorker = wrap<PumpWorkerAPI>(worker)
+
   initPage()
   getPumpConfig().then(() => {
     getPumpList()
@@ -1198,16 +1181,16 @@ onUnmounted(() => {
     timerAutoFresh = null
   }
   // 清理 watch 监听器，防止内存泄漏
-  // watchPumpStateUnwatch?.()
-  // watchTokenUpdatedUnwatch?.()
-  // watchPortraitStatsUnwatch?.()
-  // watchPumpStateUnwatch = null
-  // watchTokenUpdatedUnwatch = null
-  // watchPortraitStatsUnwatch = null
+  watchPumpStateUnwatch?.()
+  watchTokenUpdatedUnwatch?.()
+  watchPortraitStatsUnwatch?.()
+  watchPumpStateUnwatch = null
+  watchTokenUpdatedUnwatch = null
+  watchPortraitStatsUnwatch = null
 
-  // stopWatchList1()
-  // stopWatchList2()
-  // stopWatchList3()
+  stopWatchList1()
+  stopWatchList2()
+  stopWatchList3()
   unbindAudioCanPlay()
   isPausedObj.value.new = false
   isPausedObj.value.soon = false
@@ -1237,6 +1220,31 @@ onUnmounted(() => {
     clearTimeout(portraitTimer)
   }
   unsubscribePortrait()
+
+  if (pumpWsMappingWorker) {
+    pumpWsMappingWorker = null
+  }
+  if (pumpWsNativeWorker) {
+    pumpWsNativeWorker.terminate()
+    pumpWsNativeWorker = null
+  }
+  // 清理所有 rAF 任务
+  if (rafHandle) {
+    cancelAnimationFrame(rafHandle)
+    rafHandle = null
+  }
+  if (rafId !== null) {
+    cancelAnimationFrame(rafId)
+    rafId = null
+  }
+  if (flushPumpStateRafId !== null) {
+    cancelAnimationFrame(flushPumpStateRafId)
+    flushPumpStateRafId = null
+  }
+  if (logoThrottledRafId !== null) {
+    cancelAnimationFrame(logoThrottledRafId)
+    logoThrottledRafId = null
+  }
 })
 const startPortraitTimer = () => {
   if (portraitTimer) {
@@ -1248,7 +1256,7 @@ const startPortraitTimer = () => {
     startPortraitTimer()
   }, 1 * 60 * 1000)
 }
-const subscribePortrait = (list) => {
+const subscribePortrait = (list: PumpObj[]) => {
   if (!Array.isArray(list) || list.length === 0 || isLeave) return
 
   wsv2Store.send({
@@ -1280,125 +1288,113 @@ const unsubscribePortrait = () => {
   // isPortraitSubscribed = false
 }
 
-function wsUpdateTableList(wsList: WSPumpObj[]) {
+function applyMappedWsList(mappedList: PumpObj[]) {
   const c = ['new', 'soon', 'graduated'] as const
-  if (!wsList?.length) return
-  // const rTime = Date.now()
-  const list = wsList?.map?.(i => ({
-    ...i,
-    ...(i.pair),
-    // rTime: rTime,
-    id: `${i.pair.target_token}-${i.chain}`,
-    pair_id: `${i.pair.pair}-${i.chain}`,
-    token: i.pair.target_token,
-    progress: 0,
-    symbol:
-      i.pair.target_token == i.pair.token0_address
-        ? i?.pair.token0_symbol
-        : i?.pair.token1_symbol,
-    name:  i.pair.target_token == i.pair.token0_address
-          ? i.pair?.token0_name
-          : i.pair?.token1_name,
-    logo_url:
-    i.pair.target_token == i.pair.token0_address
-      ? i?.pair.token0_logo_url
-      : i?.pair.token1_logo_url,
-
-  }))
   const currentChain = activeChain.value
   if (!wsTableListCache[currentChain]) wsTableListCache[currentChain] = []
-  const wsTableList1 = wsTableListCache[currentChain]?.filter?.(i => !list?.some?.(j => j.pump_pair_address === i.pump_pair_address))
-  wsTableListCache[currentChain] = [...(list?.filter(i => i.chain === currentChain) || []), ...(wsTableList1 || [])]?.slice(0, 100)
-  // let wsTime = this.wsTableListCache?.time || 0
-  // if (wsTime < Date.now() - 15000) {
-  //   this.wsTableListCache = {
-  //     list,
-  //     time: Date.now()
-  //   }
-  // } else {
-  //   let wsTableList = this.wsTableListCache?.list?.filter?.(i => !list?.some?.(j => j.pump_pair_address === i.pump_pair_address))
-  //   this.wsTableListCache.list = [...list, ...(wsTableList || [])]
-  // }
+
+  const wsTableList1 = wsTableListCache[currentChain]?.filter?.(
+    (i) => !mappedList?.some?.(j => j.pump_pair_address === i.pump_pair_address)
+  )
+
+  wsTableListCache[currentChain] = [
+    ...(mappedList?.filter(i => i.chain === currentChain) || []),
+    ...(wsTableList1 || [])
+  ]?.slice(0, 100)
 
   let list1 = wsTableListCache[currentChain]
   const list2 = wsTableList?.value.filter(i => i.chain === currentChain)
+
   if (isPausedObj?.value?.new) {
     list1 = [...(list1?.filter?.(i => i.state !== 'new') || []), ...(list2?.filter?.(i => i.state === 'new') || [])]
   }
   if (isPausedObj?.value?.soon) {
-    // list1 = list1?.filter?.(i => i.state !== 'soon' && i.state !== 'migrating')
     list1 = [...(list1?.filter?.(i => i.state !== 'soon' && i.state !== 'migrating') || []), ...(list2?.filter?.(i => i.state === 'soon' || i.state === 'migrating') || [])]
   }
   if (isPausedObj?.value?.graduated) {
-    // list1 = list1?.filter?.(i => i.state !== 'graduated')
     list1 = [...(list1?.filter?.(i => i.state !== 'graduated' && i.state !== 'migrated') || []), ...(list2?.filter?.(i => i.state === 'graduated' || i.state === 'migrated') || [])]
   }
+
   wsTableList.value = [...list1]
 
-  c.forEach((i) => {
-    fourmemeListObj[activeChain.value][i] = fourmemeListObj?.[activeChain.value][i]?.map((j) => {
-      const item = list?.find(
-        (k) => k.pump_pair_address === j.pair && k.chain === j.chain
-      )
-      let res = {}
-      if (item) {
-        res = {
-          ...item,
-        }
-      }
-      return {
-        ...j,
-        ...(res || {})
-      }
+  // 只更新受影响的类别
+  const affectedCategories = new Set<'new' | 'soon' | 'graduated'>()
+  c.forEach((category) => {
+    const item = mappedList?.find(
+      (k) => k.pump_pair_address === fourmemeListObj?.[activeChain.value]?.[category]?.[0]?.pair && k.chain === fourmemeListObj?.[activeChain.value]?.[category]?.[0]?.chain
+    )
+    if (item) {
+      affectedCategories.add(category)
+    }
+  })
+
+  // 如果没有找到受影响的项目，默认刷新所有
+  if (affectedCategories.size === 0) {
+    requestRefresh()
+  } else {
+    // 只刷新受影响的类别
+    affectedCategories.forEach(cat => {
+      syncCategory(cat)
     })
+  }
+}
+
+function wsUpdateTableList(wsList: WSPumpObj[]) {
+  if (!wsList?.length || !pumpWsMappingWorker) return
+
+  // 使用 toRaw 批量处理，性能优于 JSON 序列化
+  const cleanList = wsList.map(item => toRaw(item))
+
+  pumpWsMappingWorker.mapWsList(cleanList).then((mappedList) => {
+    if (rafHandle) {
+      cancelAnimationFrame(rafHandle)
+    }
+    rafHandle = requestAnimationFrame(() => {
+      applyMappedWsList(mappedList)
+    })
+  }).catch((err) => {
+    console.error('Pump worker mapWsList failed:', err)
   })
 }
 function getPumpConfig() {
   return _getPumpConfig().then((res) => {
     pumpConfig.value = Array.isArray(res) ? res : []
-    pumpConfig.value?.forEach(i => {
-      if (!pumpV3.value[i.chain]?.platforms?.length) {
-        const platforms = i.platforms?.map(y => {
-          if (i.chain == 'solana') {
-            if (y.platform !== 'believe') {
-              return y.platform || ''
-            }
-            return ''
-          } else {
-            return y.platform || ''
-          }
-        }) || []
+    pumpConfig.value?.forEach((i) => {
+      const chainKey = i.chain as ChainKey
+      if (!pumpV3.value[chainKey]?.platforms?.length) {
+        const platforms = i.platforms?.map((y) => y.platform) || []
         const platformsString = platforms.filter(Boolean).join(',')
 
-        pumpV3.value[i.chain] = {
-          ...(pumpV3.value[i.chain] || {}),
+        pumpV3.value[chainKey] = {
+          ...(pumpV3.value[chainKey] || {}),
           platforms,
           new: {
             count: 0,
             loading: false,
-            pumpFilter: {...pumpFilterDefault.value,platforms:platformsString},
+            pumpFilter: { ...pumpFilterDefault.value, platforms: platformsString },
           },
           soon: {
             count: 0,
             loading: false,
-            pumpFilter: {...pumpFilterDefault.value,platforms:platformsString},
+            pumpFilter: { ...pumpFilterDefault.value, platforms: platformsString },
           },
           graduated: {
             count: 0,
             loading: false,
-            pumpFilter: {...pumpFilterDefault.value,platforms:platformsString},
+            pumpFilter: { ...pumpFilterDefault.value, platforms: platformsString },
           },
         }
       }
-      const baseTokensString = i.base_tokens?.map(y => y.hash).concat('other').join(',')
-      if(!('base_tokens' in pumpV3.value[i.chain].new.pumpFilter)) {
-        pumpV3.value[i.chain].new.pumpFilter.base_tokens = baseTokensString
+      const baseTokensString = i.base_tokens?.map((y) => y.hash).concat('other').join(',')
+      const chainPump = pumpV3.value[chainKey]
+      if (chainPump?.new?.pumpFilter && !('base_tokens' in chainPump.new.pumpFilter)) {
+        (chainPump.new.pumpFilter as any).base_tokens = baseTokensString
       }
-      if(!('base_tokens' in pumpV3.value[i.chain].soon.pumpFilter)) {
-        pumpV3.value[i.chain].soon.pumpFilter.base_tokens = baseTokensString
+      if (chainPump?.soon?.pumpFilter && !('base_tokens' in chainPump.soon.pumpFilter)) {
+        (chainPump.soon.pumpFilter as any).base_tokens = baseTokensString
       }
-      if(!('base_tokens' in pumpV3.value[i.chain].graduated.pumpFilter)) {
-        pumpV3.value[i.chain].graduated.pumpFilter.base_tokens = baseTokensString
+      if (chainPump?.graduated?.pumpFilter && !('base_tokens' in chainPump.graduated.pumpFilter)) {
+        (chainPump.graduated.pumpFilter as any).base_tokens = baseTokensString
       }
       if (!pump_notice.value?.[i.chain]) {
         pump_notice.value[i.chain] = {
@@ -1438,23 +1434,30 @@ function handleFilterVisibleChange(visible: boolean, type: 'new' | 'soon' | 'gra
 
 const debouncedFetch = useDebounceFn((type) => search(type), 500)
 function search(type: string) {
+  const common = {
+    chain: activeChain.value,
+    platforms: pumpV3.value?.[activeChain.value]?.platforms?.join(',') || 'all',
+  }
   if (type == 'new') {
-    const params1 = {
+    const params1: PumpRequestParams = {
       category: 'new',
+      ...common,
       ...(pumpStore.pumpV3[activeChain.value].new.pumpFilter),
     }
     getPump(params1, true)
   }
   if (type == 'soon') {
-    const params2 = {
+    const params2: PumpRequestParams = {
       category: 'soon',
+      ...common,
       ...(pumpStore.pumpV3[activeChain.value].soon.pumpFilter),
     }
     getPump(params2, true)
   }
   if (type == 'graduated') {
-    const params3 = {
+    const params3: PumpRequestParams = {
       category: 'graduated',
+      ...common,
       ...(pumpStore.pumpV3[activeChain.value].graduated.pumpFilter),
     }
     getPump(params3, true)
@@ -1500,34 +1503,46 @@ function single(type: string) {
   }
 }
 function getPumpList(isFilter = false) {
-  const new1 = pumpStore.pumpV3[activeChain.value].new.pumpFilter
-  const soon = pumpStore.pumpV3[activeChain.value].soon.pumpFilter
-  const graduated = pumpStore.pumpV3[activeChain.value].graduated.pumpFilter
-  const params1 = {
-    category: 'new',
-    ...(new1 ?? ''),
-  }
-  getPump(params1, isFilter)
-  const params2 = {
-    category: 'soon',
-    ...(soon ?? ''),
-  }
+  const new1 = pumpStore.pumpV3[activeChain.value].new.pumpFilter || {}
+  const soon = pumpStore.pumpV3[activeChain.value].soon.pumpFilter || {}
+  const graduated = pumpStore.pumpV3[activeChain.value].graduated.pumpFilter || {}
 
-  getPump(params2, isFilter)
-  const params3 = {
-    category: 'graduated',
-    ...(graduated ?? ''),
+  const params1 = {
+    category: 'new' as CategoryKey,
+    chain: activeChain.value,
+    platforms: pumpV3.value?.[activeChain.value]?.platforms?.join(',') || 'all',
+    ...new1,
   }
-  getPump(params3, isFilter)
+  getPump(params1 as any, isFilter)
+
+  const params2 = {
+    category: 'soon' as CategoryKey,
+    chain: activeChain.value,
+    platforms: pumpV3.value?.[activeChain.value]?.platforms?.join(',') || 'all',
+    ...soon,
+  }
+  getPump(params2 as any, isFilter)
+
+  const params3 = {
+    category: 'graduated' as CategoryKey,
+    chain: activeChain.value,
+    platforms: pumpV3.value?.[activeChain.value]?.platforms?.join(',') || 'all',
+    ...graduated,
+  }
+  getPump(params3 as any, isFilter)
 }
 
-async function getPump(rawParams: {
+type PumpRequestParams = {
   category: CategoryKey
   chain: ChainKey
   platforms: string
   has_sm?: boolean
   sm_list?: string[] | string
-}, isFilter = false) {
+  q?: string
+  [key: string]: any
+}
+
+async function getPump(rawParams: PumpRequestParams, isFilter = false) {
   const { category } = rawParams
   const currentChain = activeChain.value
 
@@ -1539,7 +1554,7 @@ async function getPump(rawParams: {
 
   // 2. 状态拦截
   const isInactive = route.name !== 'index'
-  const isPaused = isPausedObj.value?.[category] || route.name !== 'index'
+  // const isPaused = isPausedObj.value?.[category] || route.name !== 'index'
 
   if (isInactive) return
 
@@ -1549,18 +1564,20 @@ async function getPump(rawParams: {
   // }
 
   // 3. 构建参数 (浅拷贝避免污染)
-  const queryParams = { ...rawParams, chain: currentChain }
+  const queryParams: any = { ...rawParams, chain: currentChain }
   const platformList = pumpV3.value?.[currentChain]?.platforms
 
   if (platformList?.length > 0) {
     queryParams.platforms = rawParams.platforms
   }
 
-  if (pump_query.value[currentChain][queryParams.category]) {
+  const chainQuery = (pump_query.value[currentChain] || {}) as Record<CategoryKey, string>
+  const queryWord = chainQuery[queryParams.category as CategoryKey]
+  if (queryWord) {
     if (isFilter) {
-      queryParams.q = queryParams.q + pump_query.value[currentChain][queryParams.category]
+      queryParams.q = (queryParams.q || '') + queryWord
     } else {
-      queryParams.q =  pump_query.value[currentChain][queryParams.category]
+      queryParams.q = queryWord
     }
   }
   if (queryParams.has_sm) {
@@ -1639,6 +1656,8 @@ async function getPump(rawParams: {
       state.loading = false
       state.count++
     }
+    // HTTP 请求完成后刷新对应类别
+    requestRefresh(finalParams.category as 'new' | 'soon' | 'graduated')
     // Timer[category] = setTimeout(() => getPump(rawParams), 10000)
   }
 }
@@ -1667,7 +1686,7 @@ function getFilterData(list: PumpObj[], conditions: any) {
 
     if (conditions?.q) {
       const arr = conditions?.q.split(',')
-      pass = pass && arr?.findIndex(y=> i.target_token == y || i.name?.includes?.(y) || i.symbol?.includes?.(y)) !== -1
+      pass = pass && arr?.findIndex((y: string) => i.target_token == y || i.name?.includes?.(y) || i.symbol?.includes?.(y)) !== -1
     }
     if (conditions?.dev_sale_out) {
       const isSellOut = i.max_dev_ratio!==0 &&i.dev_balance_ratio_cur===0
@@ -1700,7 +1719,7 @@ function getFilterData(list: PumpObj[], conditions: any) {
     // 搜索推特账号
     if (conditions?.twitter_usernames) {
       const twitterUsernames = conditions?.twitter_usernames.split(',')
-      pass = pass && twitterUsernames?.findIndex?.(y=> formatXUser(i.medias?.filter?.(i => i.icon === 'twitter')?.[0]?.url)?.replace?.('@', '') == y) !== -1
+      pass = pass && twitterUsernames?.findIndex?.((y: string) => formatXUser(i.medias?.filter?.(i => i.icon === 'twitter')?.[0]?.url)?.replace?.('@', '') == y) !== -1
     }
     if (conditions?.progress_min) {
       pass = pass && i.progress >= Number(conditions.progress_min)
@@ -1708,11 +1727,14 @@ function getFilterData(list: PumpObj[], conditions: any) {
     if (conditions?.progress_max) {
       pass = pass && i.progress <= Number(conditions.progress_max)
     }
-    if (conditions?.lage) {
-      pass = pass && (new Date().getTime()/1000- (i.time || i.created_at))/60 >= Number(conditions.lage)
-    }
-    if (conditions?.rage) {
-      pass = pass && (new Date().getTime()/1000 - (i.time || i.created_at))/60 <= Number(conditions.rage)
+    if (conditions?.lage || conditions?.rage) {
+      const pumpAgeMinutes = (Date.now() / 1000 - Number(parseDate(i.time || i.created_at, true))) / 60
+      if (conditions?.lage) {
+        pass = pass && pumpAgeMinutes >= Number(conditions.lage)
+      }
+      if (conditions?.rage) {
+        pass = pass && pumpAgeMinutes <= Number(conditions.rage)
+      }
     }
 
     if (conditions?.progress_min) {
@@ -1751,6 +1773,9 @@ function getFilterData(list: PumpObj[], conditions: any) {
     }
     if (conditions?.rbtx) {
       pass = pass && i.buys_tx_24h_count <= Number(conditions.rbtx)
+    }
+    if (conditions?.deployer_platform_exclude) {
+      pass = pass && !i.deployer_platform || !(conditions?.deployer_platform_exclude?.includes?.(i.deployer_platform))
     }
     if (conditions?.platforms) {
       pass = pass && (
@@ -1799,7 +1824,7 @@ function getFilterData(list: PumpObj[], conditions: any) {
       pass = pass && i.insider_balance_ratio_cur <= Number(conditions.rins)
     }
     if(conditions?.sm_list?.length > 0){
-      pass = pass && i.medias?.length > 0 && conditions.sm_list.some(y=> i.medias?.findIndex(i => y.includes(i.icon) || y.toLowerCase() === i.name.toLowerCase()) !== -1)
+      pass = pass && i.medias?.length > 0 && conditions.sm_list.some((y: string) => i.medias?.findIndex((m) => y.includes(m.icon) || y.toLowerCase() === m.name.toLowerCase()) !== -1)
     }
     if(conditions?.has_sm){
       pass = pass && i.medias?.length > 0
@@ -1815,6 +1840,53 @@ function getFilterData(list: PumpObj[], conditions: any) {
     }
     if(conditions?.rmks) {
       pass = pass && i.makers_24h <= Number(conditions.rmks)
+    }
+    if(conditions?.ldtc) {
+      pass = pass && i.dev_total_count >= Number(conditions.ldtc)
+    }
+    if(conditions?.rdtc) {
+      pass = pass && i.dev_total_count < Number(conditions.rdtc)
+    }
+
+    if(conditions?.ldmc) {
+      pass = pass && i.dev_migrated_count >= Number(conditions.ldmc)
+    }
+    if(conditions?.rdmc) {
+      pass = pass && i.dev_migrated_count < Number(conditions.rdmc)
+    }
+
+    if(conditions?.ldmr) {
+      pass = pass && i.dev_migrated_ratio >= Number(conditions.ldmr)
+    }
+    if(conditions?.rdmr) {
+      pass = pass && i.dev_migrated_ratio < Number(conditions.rdmr)
+    }
+
+    if(conditions?.lbdr) {
+      pass = pass && Number(i.address_binding_ratio || 0) >= Number(conditions.lbdr)
+    }
+    if(conditions?.rbdr) {
+      pass = pass && Number(i.address_binding_ratio|| 0) < Number(conditions.rbdr)
+    }
+
+    if(conditions?.lfsr) {
+      pass = pass && Number(i.phishing_ratio || 0) >= Number(conditions.lfsr)
+    }
+    if(conditions?.rfsr) {
+      pass = pass && Number(i.phishing_ratio|| 0) < Number(conditions.rfsr)
+    }
+
+    if(conditions?.lccr) {
+      pass = pass && Number(i.colluded_cluster_ratio || 0) >= Number(conditions.lccr)
+    }
+    if(conditions?.rccr) {
+      pass = pass && Number(i.colluded_cluster_ratio|| 0) < Number(conditions.rccr)
+    }
+    if(conditions?.lfans) {
+      pass = pass && Number(i.followers || 0) >= Number(conditions.lfans)
+    }
+    if(conditions?.rfans) {
+      pass = pass && Number(i.followers|| 0) < Number(conditions.rfans)
     }
     return pass
   })
@@ -1982,7 +2054,7 @@ function mergeStatisticsList(
           i.market_cap = 1000000000 * i.current_price_usd || i.market_cap || 0
         }
       } else {
-          i.market_cap =  i.market_cap
+          i.market_cap = i.market_cap || 0
       }
       return i
     }
@@ -2089,13 +2161,29 @@ function mergeStatistics(prev: any, next: any) {
   }
   return result
 }
+// function mergeLogo(prev: any, next: any) {
+//   return {
+//     ...prev,
+//     ...next,
+//     logo_url: next.logo_url || prev.logo_url,
+//     appendix: next.appendix || prev.appendix,
+//     buy_tax: next.buy_tax || prev.buy_tax,
+//     sell_tax: next.sell_tax || prev.sell_tax,
+//     is_cloned: next.is_cloned || prev.is_cloned,
+//     deployer_platform: next.deployer_platform || prev.deployer_platform
+//   }
+// }
 function mergeLogo(prev: any, next: any) {
-  return {
-    ...prev,
-    ...next,
-    logo_url: next.logo_url || prev.logo_url,
-    appendix: next.appendix || prev.appendix,
-  }
+  const result = { ...prev }
+
+  Object.keys(next).forEach((key) => {
+    const val = next[key]
+    if (val !== undefined) {
+      result[key] = val
+    }
+  })
+
+  return result
 }
 function handleClearFilter(type: 'new' | 'soon' | 'graduated') {
   const platformsString = pumpConfig.value?.find(i => i.chain === activeChain.value)?.platforms?.map(i => i.platform)?.filter(i=>i!=='believe').join?.(',') || ''
@@ -2240,8 +2328,7 @@ function hitBlacklist(item:PumpObj, black: pumpBlack) {
   .el-checkbox__input{
     &.is-checked{
       .el-checkbox__inner{
-        // background: var(--d-333-l-CCC);
-        // border-color: var(--d-333-l-CCC);
+        // background: var(--d-333-l-CCC, transparent);
       }
       &+ .el-checkbox__label {
         color: var(--main-text)
@@ -2252,7 +2339,7 @@ function hitBlacklist(item:PumpObj, black: pumpBlack) {
   color: var(--main-text);
 }
 .pump-item{
-  background: var(--main-bg);
+  background: var(--d-0E0F10-l-FFF);
   border: 1px solid var(--main-input-button-bg);
   border-radius: 4px;
 }

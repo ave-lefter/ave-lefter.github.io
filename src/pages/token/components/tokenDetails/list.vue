@@ -18,8 +18,9 @@ const props = defineProps({
   },
   loading:Boolean
 })
+const tokenStore = useTokenStore()
 const isShowDate = ref(false)
-const isVolUSDT = ref(true)
+const isPrice = ref(true)
 const visible = ref(false)
 const checkedTrend = computed({
   get() {
@@ -189,11 +190,11 @@ v-model:visible="visible"
         {{ $t('amountB') }}
       </div>
       <div class="flex items-center flex-[2] justify-end gap-3px">
-        <span>{{ $t('swapPrice') }}</span>
+        <span>{{ isPrice? $t('swapPrice'): $t('mCap') }}</span>
         <Icon
-          name="custom:price"
-          :class="`${isVolUSDT?'color-[--secondary-text]' : 'color-[--third-text]'} cursor-pointer`"
-          @click.self="isVolUSDT=!isVolUSDT"
+          :name="isPrice? 'custom:price': 'custom:mcap'"
+          class="color-[--secondary-text] cursor-pointer"
+          @click.self="isPrice=!isPrice"
         />
       </div>
       <div class="flex items-center flex-[2] justify-end gap-3px">
@@ -237,10 +238,10 @@ v-model:visible="visible"
             {{ filterType(row.event_type)?.name }}
           </span>
       </div>
-      <div class="flex items-center flex-[2] justify-end">
+      <div class="flex items-center flex-[2] justify-end color-[--main-text1]">
         ${{ formatNumber(row.volume || 0, 2) }}
       </div>
-      <div class="flex items-center flex-[2] justify-end text-right">
+      <div class="flex items-center flex-[2] justify-end text-right color-[--main-text1]">
         <div v-if="['ADD_LIQUIDITY','REMOVE_LIQUIDITY'].includes(row.event_type)">
           <div>
             {{ formatNumber(row.amount || 0, 2) }}
@@ -255,21 +256,20 @@ v-model:visible="visible"
           {{ formatNumber(row.amount, 2) }}
         </div>
       </div>
-      <div class="flex items-center flex-[2] justify-end">
+      <div class="flex items-center flex-[2] justify-end color-[--main-text1]">
         <div v-if="['ADD_LIQUIDITY','REMOVE_LIQUIDITY'].includes(row.event_type)">
           --
         </div>
         <div v-else>
-          <template v-if="isVolUSDT">
+          <template v-if="isPrice">
             ${{ formatNumber(row.token_price_u || 0, 3) }}
           </template>
           <template v-else>
-            {{ Number(row.main_token_price) === 0 ? '-' : formatNumber(Number(row.token_price_u) / Number(row.main_token_price) || 0, 2) }}
-            <span class="color-[--secondary-text]">{{ row.main_token_symbol }}</span>
+            {{ Number(row.main_token_price) === 0 ? '-' : formatNumber(Number(row.token_price_u) * Number(tokenStore.circulation) || 0, 2) }}
           </template>
         </div>
       </div>
-      <div class="flex items-center flex-[2] justify-end">
+      <div class="flex items-center flex-[2] justify-end color-[--main-text1]">
         ${{ formatNumber(row.gas || 0, 2) }}
       </div>
       <!--<div class="flex items-center w-50px text-right"/>-->

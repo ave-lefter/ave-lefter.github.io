@@ -46,7 +46,7 @@ import dayjs from 'dayjs'
 
 const { t } = useI18n()
 const globalStore = useGlobalStore()
-
+const {updateNum4} = storeToRefs(useFollowStore())
 const props = defineProps<{
   listMapFunction(i: Record<string, any>): Record<string, any>
   activeChain: string
@@ -63,7 +63,7 @@ function setSortConditions(params: { sort: string; sort_dir: string }) {
 }
 function setFilterForm(...args: any[]) {
   args.forEach((keyVal) => {
-    set(rankConditions.value.new.filter, keyVal[0], keyVal[1])
+    set(rankConditions.value?.new?.filter, keyVal[0], keyVal[1])
   })
   pageInfo.value.pageNO = 1
   _getTreasureList()
@@ -71,7 +71,7 @@ function setFilterForm(...args: any[]) {
 const listData = ref<any[]>([])
 const filteredListData = computed(() => {
   // todo
-  if (globalStore.pumpSetting.isBlacklist) {
+  if (globalStore.pumpSetting?.isBlacklist) {
     return listData.value.filter((el) => !inBlackList(el))
   }
   return listData.value
@@ -94,7 +94,18 @@ const pageInfo = ref({
 })
 watch(
   () => pageInfo.value.pageNO,
-  (val) => { useSessionStorage('new-pageNO', 1).value = val }
+  (val) => { 
+    useSessionStorage('new-pageNO', 1).value = val
+    nextTick(() => tableRef.value?.scrollToTop(0))
+  }
+)
+
+watch(
+  () => updateNum4.value,
+  () => {  
+    pageInfo.value.pageNO = 1
+    _getTreasureList()
+  }
 )
 const tableRef = shallowRef()
 const loading = shallowRef(false)
@@ -160,7 +171,6 @@ async function _getTreasureList(shouldLoading = true) {
     })
     pageInfo.value.total = res.total
     listData.value = (res.data || []).map(props.listMapFunction)
-    nextTick(() => tableRef.value?.scrollToTop(0))
     if (shouldLoading) {
       initWs()
     }

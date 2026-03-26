@@ -336,6 +336,37 @@ const amm = computed(() => {
 
 let loading = false
 
+// rAF 批量合并同帧内的 onTick 调用，避免高频 WS 消息导致图表反复重绘
+let _pendingBars: KLineBar[] = []
+let _rafTickId: number | null = null
+function scheduleOnTick(bar: KLineBar | KLineBar[], onTick: (bar: KLineBar) => void) {
+  if (Array.isArray(bar)) {
+    _pendingBars.push(...bar)
+  } else {
+    _pendingBars.push(bar)
+  }
+  if (_rafTickId !== null) return
+  _rafTickId = requestAnimationFrame(() => {
+    _rafTickId = null
+    if (_pendingBars.length) {
+      for (const pendingBar of _pendingBars) {
+        onTick(pendingBar)
+      }
+      _pendingBars = []
+    }
+  })
+}
+
+// rAF 批量合并同帧内的 refreshMarks 调用
+let _rafMarksId: number | null = null
+function scheduleRefreshMarks() {
+  if (_rafMarksId !== null) return
+  _rafMarksId = requestAnimationFrame(() => {
+    _rafMarksId = null
+    _widget?.activeChart?.()?.refreshMarks?.()
+  })
+}
+
 watch(
   () => token.value,
   (val) => {
@@ -395,6 +426,15 @@ function switchTokenKline() {
   isReadyLine = false
   const val = pair.value
   if (isReady.value && route.name === 'token-id') {
+    lastBar = null
+    lastPairPrice = 0
+    // 清空待处理的 bars 和取消 rAF
+    if (_rafTickId !== null) {
+      cancelAnimationFrame(_rafTickId)
+      _rafTickId = null
+    }
+    _pendingBars = []
+    
     resetLimitPriceLineId()
     // resetAvgPriceLineId()
     resetTop100AvgPriceLineId()
@@ -689,7 +729,8 @@ async function initChart() {
       'header_saveload',
       'timeframes_toolbar',
       'symbol_search_hot_key',
-      'show_interval_dialog_on_key_press'
+      'show_interval_dialog_on_key_press',
+      'header_quick_search',
     ],
     enabled_features: [
       'request_only_visible_range_on_reset',
@@ -1065,6 +1106,14 @@ async function initChart() {
         if (resolution.value !== interval) {
           resolution.value = interval
           localStorage.setItem('tv_resolution', interval)
+          lastBar = null
+          lastPairPrice = 0
+          // 清空待处理的 bars 和取消 rAF
+          if (_rafTickId !== null) {
+            cancelAnimationFrame(_rafTickId)
+            _rafTickId = null
+          }
+          _pendingBars = []
           _widget?.resetCache?.()
         }
       })
@@ -1232,22 +1281,24 @@ function onWsKline(
         const newBar1 = buildOrUpdateLastBarFromTx(tx, t, lastBar, interval)
         if (newBar1) {
           lastBar = { ...newBar1 }
-        }
-        const newBar = { ...newBar1 } as KLineBar
-        if (showMarket.value && newBar) {
-          newBar.open = new BigNumber(newBar.open || 0)
-            .times(tokenStore?.circulation || 0)
-            .toNumber()
-          newBar.high = new BigNumber(newBar.high || 0)
-            .times(tokenStore?.circulation || 0)
-            .toNumber()
-          newBar.low = new BigNumber(newBar.low || 0).times(tokenStore?.circulation || 0).toNumber()
-          newBar.close = new BigNumber(newBar.close || 0)
-            .times(tokenStore?.circulation || 0)
-            .toNumber()
-        }
-        if (newBar && newBar?.time) {
-          onTick(newBar)
+          let newBar = { ...newBar1 } as KLineBar
+
+          if (showMarket.value && newBar) {
+            newBar.open = new BigNumber(newBar.open || 0)
+              .times(tokenStore?.circulation || 0)
+              .toNumber()
+            newBar.high = new BigNumber(newBar.high || 0)
+              .times(tokenStore?.circulation || 0)
+              .toNumber()
+            newBar.low = new BigNumber(newBar.low || 0).times(tokenStore?.circulation || 0).toNumber()
+            newBar.close = new BigNumber(newBar.close || 0)
+              .times(tokenStore?.circulation || 0)
+              .toNumber()
+          }
+
+          if (newBar && newBar?.time) {
+            scheduleOnTick(newBar, onTick)
+          }
         }
       }
       wsTxUpdateMarks(
@@ -1258,6 +1309,7 @@ function onWsKline(
         },
         _widget
       )
+      scheduleRefreshMarks()
     } else if (event === WSEventType.PUBLIC_PORTRAIT) {
       const marksTabsIds = marksTabs.value.map((v) => v.id)
       const msgArr = (data?.msg || [])?.filter?.(el=>{
@@ -1267,10 +1319,11 @@ function onWsKline(
         return
       }
        const interval = switchResolution(resolution)
-      wsPublicPortraitUpdateMarks(msgArr,_widget,{
+      wsPublicPortraitUpdateMarks(msgArr, _widget, {
         interval: Number(interval),
         user: user.value
       })
+      scheduleRefreshMarks()
     }
   }, 'kline')
 }
@@ -1363,14 +1416,16 @@ const { resetKOLLine } = useKOLAvgPriceLine(
 )
 
 function setIframeCssVar() {
-  const iframe = document.querySelector('#tv_chart_container iframe') as HTMLIFrameElement
-  const iframeRoot = iframe?.contentWindow?.document.documentElement
-  if (!iframeRoot) {
-    console.error('无法获取 iframe 内部的根元素')
-    return
-  }
-  // 给 iframe 内部设置 CSS 变量
-  iframeRoot.style.setProperty('--secondary-bg', getCssVariable('--secondary-bg'))
+  requestAnimationFrame(() => {
+    const iframe = document.querySelector('#tv_chart_container iframe') as HTMLIFrameElement
+    const iframeRoot = iframe?.contentWindow?.document.documentElement
+    if (!iframeRoot) {
+      console.error('无法获取 iframe 内部的根元素')
+      return
+    }
+    // 给 iframe 内部设置 CSS 变量
+    iframeRoot.style.setProperty('--secondary-bg', getCssVariable('--secondary-bg'))
+  })
 }
 
 onBeforeUnmount(() => {
@@ -1398,6 +1453,16 @@ onUnmounted(() => {
     })
   })
   listenerGuidMap?.clear()
+  // 先取消挂起的 rAF，再销毁 widget，防止回调访问已销毁实例
+  if (_rafTickId !== null) {
+    cancelAnimationFrame(_rafTickId)
+    _rafTickId = null
+  }
+  if (_rafMarksId !== null) {
+    cancelAnimationFrame(_rafMarksId)
+    _rafMarksId = null
+  }
+  _pendingBars = []
   _widget?.remove?.()
   _widget = null
 })
@@ -1411,10 +1476,7 @@ const onMarkChanged = (val: boolean) => {
   if (!val) {
     _widget?.activeChart?.()?.clearMarks?.()
   }
-
-  setTimeout(() => {
-    _widget?.activeChart?.()?.refreshMarks?.()
-  }, 20)
+  scheduleRefreshMarks()
 }
 
 watch(

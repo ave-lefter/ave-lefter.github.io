@@ -1,8 +1,7 @@
 <template>
   <div :class="['filter-btn', { active: visible }, filterNumber > 0 ? 'hight' : '']" @click="handleClick">
-    <Icon id="custom-filter" name="custom:filter" class="text-10px cursor-pointer"
-      :class="!hideReferenceText ? 'mr-3px' : ''" />
-    <span v-if="!hideReferenceText">{{ $t('filter') }}</span>
+    <Icon id="custom-filter" name="custom:filter" class="text-10px cursor-pointer" />
+    <!-- <span v-if="!hideReferenceText">{{ $t('filter') }}</span> -->
     <span v-if="props.filterNumber > 0" class="filter-number">{{ props.filterNumber }}</span>
   </div>
 </template>

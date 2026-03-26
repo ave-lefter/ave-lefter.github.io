@@ -1025,6 +1025,7 @@ export function getMedias(appendix: string | undefined) {
     }
     if (obj?.btok) arr.push({ name: 'Btok', icon: 'btok', url: formatUrl(obj.btok) })
     if (obj?.qq) arr.push({ name: 'QQ', icon: 'qq', url: obj.qq })
+    if (obj?.debox) arr.push({ name: 'debox', icon: 'debox-lighter', url: obj.debox })
     if (obj?.telegram) arr.push({ name: 'Telegram', icon: 'tg', url: formatUrl(obj.telegram) })
     if (obj?.twitter) {
       arr.push({
