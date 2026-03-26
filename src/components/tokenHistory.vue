@@ -73,6 +73,8 @@ function _getUserBalance() {
     hide_risk:globalStore.hide_risk,
     hide_small:globalStore.hide_small,
     user_ids:userIds.value,
+    sort :'balance_usd',
+    sort_dir : 'desc',
     pageSize:20
   }).then(res => {
     console.log('------11111--------',res.data )

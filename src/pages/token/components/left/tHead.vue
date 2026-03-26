@@ -45,6 +45,7 @@ function switchSort(sortBy: string, activeSort?: number) {
     sort.activeSort = activeSort
   }
   sort.sortBy = sortBy
+  console.log('sortBy',sort, sortBy, activeSort)
   emit('update:sort', sort)
 }
 </script>

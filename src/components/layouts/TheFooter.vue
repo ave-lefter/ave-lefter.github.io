@@ -52,7 +52,7 @@
           <div class="flex items-center justify-center text-14px">
             <Icon name="custom:holding" />
           </div>
-          {{t('holding')}}
+          {{t('position')}}
         </div>
       </el-badge>
       <el-badge :is-dot="false">

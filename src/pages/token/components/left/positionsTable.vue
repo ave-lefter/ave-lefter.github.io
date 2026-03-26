@@ -10,7 +10,7 @@ import {useDebounceFn, useLocalStorage, useThrottleFn} from '@vueuse/core'
 import {useWalletStore} from '~/stores/wallet'
 import type { BotChain, BotSettingKey } from '~/utils/types'
 import { recordTxV2, updateTxV2 } from '~/api/tracking'
-
+import dayjs from 'dayjs'
 const {updateHolderNum}= storeToRefs(useUserStore())
 const {t} = useI18n()
 const wsStore = useWSStore()
@@ -135,6 +135,7 @@ const getTokenBalance = useThrottleFn(function (token: string, chain: string) {
             listData.value[index].current_price_usd = Number(newToken?.price||0)
             listData.value[index].total_profit = Number(newToken?.pnl?.totalProfit||0)?.toFixed(6)||'--'
             listData.value[index].total_profit_ratio =Number(newToken?.pnl?.totalProfitRatio||0)?.toFixed(6)||'--'
+            listData.value[index].last_txn_time=newToken?.pnl?.lastUpdateTime?new Date(newToken?.pnl?.lastUpdateTime+'').getTime().toString().slice(0, -3):new Date().getTime().toString().slice(0, -3)
             nextTick(() => {
               triggerRef(listData)
             })
@@ -159,6 +160,7 @@ const getTokenBalance = useThrottleFn(function (token: string, chain: string) {
               decimals: Number(newToken?.decimals||0),
               risk_level: Number(newToken?.risk_level||0),
               risk_score: Number(newToken?.risk_score||0),
+              last_txn_time:newToken?.pnl?.lastUpdateTime?new Date(newToken?.pnl?.lastUpdateTime+'').getTime().toString().slice(0, -3):new Date().getTime().toString().slice(0, -3)
             }
 
             console.log('newToken',data,newToken)
@@ -312,6 +314,7 @@ const sort = shallowRef({
 })
 const map: { [key: number]: string } = {
   '-1': 'asc',
+  0:'',
   1: 'desc'
 }
 const backendSort = computed(() => {
@@ -323,13 +326,13 @@ const backendSort = computed(() => {
 })
 const columns = computed(() => {
   return [{
-    label: `${t('token')}/${t('balance1')}`,
-    value: 'balance_usd',
+    label: `${t('token')}/${t('lastTx')}`,
+    value: 'last_txn_time',
     flex: 'flex-[1.5]',
     sort: true
   }, {
     label: 'Bal/PnL',
-    value: 'total_profit',
+    value: 'balance_usd',
     flex: 'flex-1 justify-end',
     sort: true
   }, {
@@ -348,8 +351,10 @@ const listStatus = shallowRef({
 const listData = shallowRef<(GetUserBalanceResponse & { index: string })[]>([])
 
 const filterListData = computed(() => {
-  const sort=backendSort.value.sort||'balance_usd'
-  return listData.value.toSorted((a, b) => backendSort.value.sort_dir ==='asc' ? a?.[sort] - b?.[sort] : b?.[sort] - a?.[sort])
+  const sort=backendSort.value.sort||'last_txn_time'
+  const sort_dir=backendSort.value.sort_dir||'desc'
+  // console.log('filterListData',sort,sort_dir,listData.value)
+  return listData.value.toSorted((a, b) => sort_dir ==='asc' ? a?.[sort] - b?.[sort] : b?.[sort] - a?.[sort])
 })
 
 let timer: ReturnType<typeof setTimeout> | null = null;
@@ -393,6 +398,7 @@ watch(() => [
 
 async function _getUserBalance() {
   try {
+    console.log('_getUserBalance',backendSort.value)
     listStatus.value.loading = true
     const pageNo = listStatus.value.pageNo
     const res = await getUserBalance({
@@ -648,6 +654,8 @@ function handleTxSuccess(res: any, _batchId: string, tokenId: string, row: GetUs
       </el-checkbox>
       <NetSelect
         v-if="botStore.evmAddress||(walletStore.address && isEvmChainWallet && (walletStore.walletName!=='WatchWallet'))"
+        class="absolute top--34px"
+        :style="{left:(Number(getTextWidth(t('position')).toFixed(0))+30)+'px'}"
         v-model:userIds="tableFilter.user_ids"
         @update:user-ids="resetStatus();_getUserBalance()"
       />
@@ -685,43 +693,59 @@ function handleTxSuccess(res: any, _batchId: string, tokenId: string, row: GetUs
               <div class="ml-6px">
                 <!-- {{ $index }} -->
                 <div class="flex">
-                  <span class="color-[var(--main-text)]">{{ row.symbol }}</span>
+                  <span class="color-[var(--main-text1)]">{{ row.symbol }}</span>
                   <Icon
                     v-if="row.risk_score > 55 || row.risk_level < 0"
                     name="custom:danger"
                     class="font-14 ml-2px color-#F72121"/>
                 </div>
-                <div class="mt-2px color-[--third-text]">
-                  <template v-if="row.balance === 0">$0</template>
+                <div class="mt-2px color-[--third-text1]">
+                  <!-- <template v-if="row.balance === 0">$0</template>
                   <template v-else-if="row.balance === '--'">--</template>
                   <template v-else>
                     {{ formatNumber(row.balance, 2) }}({{
                       '$' + formatNumber(row.balance_usd ||
                         0, 2)
                     }})
-                  </template>
+                  </template> -->
+                  <template v-if="!(row?.last_txn_time)||('--'===row?.last_txn_time)"><span>--</span></template>
+                  <TimerCount
+                    v-else-if="(row.last_txn_time) && Number(formatTimeFromNow(row.last_txn_time, true)) < 60"
+                    :key="`${row.index}`"
+                    :timestamp="Math.min(+(row.last_txn_time), dayjs().unix() - 1)" :end-time="60">
+                    <template #default="{ seconds }">
+                        <span class="color-#FFA622 text-12px">
+                            <template v-if="seconds < 60"> {{ seconds }}s </template>
+                            <template v-else>
+                                {{ formatTimeFromNow(row.last_txn_time) }}
+                            </template>
+                        </span>
+                    </template>
+                  </TimerCount>
+                  <span v-else class="text-12px">
+                      {{ formatTimeFromNow(row.last_txn_time) }}
+                  </span>
                 </div>
               </div>
             </div>
             <div class="flex-1 flex flex-col items-end">
+              <div class="text-[--main-text1]">
+                <template v-if="row.balance === 0">$0</template>
+                <template v-else-if="row.balance === '--'">--</template>
+                <template v-else>
+                  {{'$' + formatNumber(row.balance_usd ||0, 2)}}
+                </template>
+              </div>
               <div :class="getColorClass(row.total_profit)">
                 <template v-if="Number(row.total_profit) === 0">0</template>
                 <template v-else-if="row.total_profit === '--'">--</template>
                 <template v-else>
-                  {{ Number(row.total_profit) > 0 ? '$' : '-$' }}{{
+                  {{ Number(row.total_profit) > 0 ? '+$' : '-$' }}{{
                     formatNumber(Math.abs(Number(row.total_profit)), 2)
                   }}
                 </template>
               </div>
-              <div :class="getColorClass(row.total_profit_ratio)">
-                <template v-if="Number(row.total_profit_ratio) === 0">0</template>
-                <template v-else-if="row.total_profit_ratio === '--'">--</template>
-                <template v-else>
-                  {{
-                    Number(row.total_profit_ratio) > 0 ? '+' : '-'
-                  }}{{ formatNumber(Math.abs(Number(row.total_profit_ratio) * 100), 2) }}%
-                </template>
-              </div>
+           
             </div>
             <div class="flex-1 flex justify-end">
               <el-button
