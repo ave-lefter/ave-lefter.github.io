@@ -302,6 +302,35 @@ debox-chat-widget {
   }
 }
 
+// Global ElMessageBox style
+.el-message-box {
+  // Make dialog narrower and taller
+  width: 300px !important;
+  max-height: 95vh;
+
+  .el-message-box__header {
+    // Hide header when title is empty
+    &:has(.el-message-box__title:empty) {
+      display: none;
+    }
+  }
+
+  .el-message-box__content {
+    padding: 0 10px 30px;
+  }
+
+  .el-message-box__btns {
+    padding: 0 10px 10px;
+    display: flex;
+    justify-content: space-between;
+
+    button {
+      flex: 1;
+      min-width: 100px;
+    }
+  }
+}
+
 .delete_confirm.el-message-box {
   width: 420px;
   padding: 20px;
