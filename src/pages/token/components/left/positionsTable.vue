@@ -352,9 +352,32 @@ const filterListData = computed(() => {
   return listData.value.toSorted((a, b) => backendSort.value.sort_dir ==='asc' ? a?.[sort] - b?.[sort] : b?.[sort] - a?.[sort])
 })
 
+let timer: ReturnType<typeof setTimeout> | null = null;
+
+const checkCondition = () => {
+  if (botStore.userInfo || walletStore.address) {
+    // 1. 清除可能存在的定时器（防止重复）
+    if (timer) {
+      clearTimeout(timer)
+      timer = null
+    }
+    _getUserBalance()
+    return // 结束本次执行，不再设置定时器
+  }
+  // 只有在不满足条件时，才设置下一次定时器
+  timer = setTimeout(checkCondition, 1000)
+}
+
+
 
 onMounted(() => {
-  _getUserBalance()
+ checkCondition()
+})
+onUnmounted(() => {
+  if(timer){
+    timer = null
+    clearTimeout(timer)
+  }
 })
 watch(() => [
   backendSort.value,
