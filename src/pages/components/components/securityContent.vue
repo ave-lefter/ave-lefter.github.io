@@ -36,13 +36,6 @@ function formatRate(val) {
   return (formateMin(val) || formatNumber(val, 1)) + '%'
 }
 
-// Top10 颜色
-function top10Color(val) {
-  if (val == null || val === 0) return 'color-[--third-text]'
-  if (val >= 30) return 'color-[--dwon-color]'
-  return 'color-[--up-color]'
-}
-
 // 跑路颜色
 function getRugColor(val) {
   if (val === 0) return 'color-[--third-text]'
@@ -70,16 +63,20 @@ function getRiskIcon(row) {
     <!-- 第一行： Top10 + Dev -->
     <div class="flex gap-4px">
       <!-- Top10 持仓 -->
-      <div class="sec-card" :class="top10Color(row.holders_top10_ratio)">
+      <div
+        class="sec-card cursor-pointer"
+        :style="{
+          background: Number(formatNumber(row?.holders_top10_ratio || 0, 1)) == 0 ? '' : (Number(row?.holders_top10_ratio) > 30 ? '#f6465d1a' : '#12b8861a'),
+          color: Number(formatNumber(row?.holders_top10_ratio || 0, 1)) == 0 ? 'var(--third-text1)' : (Number(row?.holders_top10_ratio) > 30 ? '#F6465D' : '#12B886'),
+        }"
+      >
         <Icon
-          class="text-12px shrink-0"
+          class="text-10px shrink-0"
           name="custom:top3"
         />
-        <span
-          >{{
-            ((Number(row?.holders_top10_ratio || 0)<0.01)&&(Number(row?.holders_top10_ratio || 0)>0))? '<0.01':formatNumber(row?.holders_top10_ratio || 0, 1)
-          }}%</span
-        >
+        <span>{{
+          (Number(row?.holders_top10_ratio || 0) < 0.01 && Number(row?.holders_top10_ratio || 0) > 0) ? '<0.01' : formatNumber(row?.holders_top10_ratio || 0, 1)
+        }}%</span>
       </div>
 
       <!-- Dev 持仓（hover 展示主币来源） -->
@@ -163,12 +160,12 @@ function getRiskIcon(row) {
         >
         <span>{{ formatNumber(Number(row?.phishing_ratio) > 0.001 ? row?.phishing_ratio || 0 : 0, 1) }}%</span>
       </div>
-      <!-- 捆绑 address_binding_ratio -->
+      <!-- 捆绑 boulder_rate -->
       <div
         class="sec-card"
         :style="{
-          color: Number(formatNumber(row?.address_binding_ratio || 0, 1)) == 0 ? 'var(--third-text1)' : (Number(row?.address_binding_ratio) > 5 ? '#F6465D' : '#12B886'),
-          background: Number(formatNumber(row?.address_binding_ratio || 0, 1)) == 0 ? '' : (Number(row?.address_binding_ratio) > 5 ? '#f6465d1a' : '#12b8861a'),
+          color: Number(formatNumber(row?.boulder_rate || 0, 1)) == 0 ? 'var(--third-text1)' : (Number(row?.boulder_rate) > 5 ? '#F6465D' : '#12B886'),
+          background: Number(formatNumber(row?.boulder_rate || 0, 1)) == 0 ? '' : (Number(row?.boulder_rate) > 5 ? '#f6465d1a' : '#12b8861a'),
         }"
       >
         <img
@@ -176,14 +173,14 @@ function getRiskIcon(row) {
           width="12" height="12" alt=""
           class="opacity-70"
         >
-        <span>{{ formatNumber(Number(row?.address_binding_ratio) > 0.001 ? row?.address_binding_ratio || 0 : 0, 1) }}%</span>
+        <span>{{ formatNumber(Number(row?.boulder_rate) > 0.001 ? row?.boulder_rate || 0 : 0, 1) }}%</span>
       </div>
-      <!-- 阴谋集团 colluded_cluster_ratio -->
+      <!-- 阴谋集团 cluster_ratio -->
       <div
         class="sec-card"
         :style="{
-          color: Number(formatNumber(row?.colluded_cluster_ratio || 0, 1)) == 0 ? 'var(--third-text1)' : (Number(row?.colluded_cluster_ratio) > 5 ? '#F6465D' : '#12B886'),
-          background: Number(formatNumber(row?.colluded_cluster_ratio || 0, 1)) == 0 ? '' : (Number(row?.colluded_cluster_ratio) > 5 ? '#f6465d1a' : '#12b8861a'),
+          color: Number(formatNumber(row?.cluster_ratio || 0, 1)) == 0 ? 'var(--third-text1)' : (Number(row?.cluster_ratio) > 5 ? '#F6465D' : '#12B886'),
+          background: Number(formatNumber(row?.cluster_ratio || 0, 1)) == 0 ? '' : (Number(row?.cluster_ratio) > 5 ? '#f6465d1a' : '#12b8861a'),
         }"
       >
         <img
@@ -191,7 +188,7 @@ function getRiskIcon(row) {
           width="12" height="12" alt=""
           class="opacity-70"
         >
-        <span>{{ formatNumber(Number(row?.colluded_cluster_ratio) > 0.001 ? row?.colluded_cluster_ratio || 0 : 0, 1) }}%</span>
+        <span>{{ formatNumber(Number(row?.cluster_ratio) > 0.001 ? row?.cluster_ratio || 0 : 0, 1) }}%</span>
       </div>
       <!-- 安全 risk_score -->
       <div class="sec-card">

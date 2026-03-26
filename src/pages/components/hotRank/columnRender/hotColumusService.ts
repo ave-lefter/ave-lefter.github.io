@@ -9,7 +9,7 @@ export function getHotOptions(t: ReturnType<typeof useI18n>['t']) {
         'mCapContent',
         'liquidityContent',
         'holdersContent',
-        'top10PositionsContent',
+        // 'top10PositionsContent',
         'securityContent',
       ],
     },

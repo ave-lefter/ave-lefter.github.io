@@ -7,7 +7,7 @@ export function getActivityOptions(t: ReturnType<typeof useI18n>['t']) {
         'mCapContent',
         'liquidityContent',
         'holdersContent',
-        'top10PositionsContent',
+        // 'top10PositionsContent',
       ],
     },
     {

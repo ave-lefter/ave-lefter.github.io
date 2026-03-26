@@ -7,8 +7,8 @@ export function getPumpOptions(t: ReturnType<typeof useI18n>['t']) {
           'mCapContent',
           'liquidityContent',
           'holdersContent',
-          'top10PositionsContent',
-          'devContent',
+          // 'top10PositionsContent',
+          // 'devContent',
           'securityContent'
         ],
       },
@@ -203,13 +203,13 @@ export function getPumpOptions(t: ReturnType<typeof useI18n>['t']) {
         align:'right'
       },
       {
-        title: t('security'),
+        title: t('tokenInfoSecurity'),
         key: 'security',
         isVisible: true,
         render: 'securityContent',
         children:[
           {title:t('tokenInfoSecurity'),isVisible:true,render:'securityContent'},
-          {title:t('runPull'),isVisible:true,render:'runPullContent'},
+          // {title:t('runPull'),isVisible:true,render:'runPullContent'},
         ],
         minWidth:280,
         align:'right'
