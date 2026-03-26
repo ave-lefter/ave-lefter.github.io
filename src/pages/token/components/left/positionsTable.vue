@@ -328,7 +328,7 @@ const columns = computed(() => {
     flex: 'flex-[1.5]',
     sort: true
   }, {
-    label: t('profit2'),
+    label: `${t('bal')}/${t('profit2')}`,
     value: 'total_profit',
     flex: 'flex-1 justify-end',
     sort: true
@@ -732,7 +732,7 @@ function handleTxSuccess(res: any, _batchId: string, tokenId: string, row: GetUs
                 style="padding:4px"
                 @click.stop.prevent="handleSellAmount(row)"
               >
-                {{ $t('closePosition') }}
+                {{ $t('sellAl') }}
               </el-button>
               <span v-else class="color-[var(--d-EAECEF-l-333)]">--</span>
             </div>
