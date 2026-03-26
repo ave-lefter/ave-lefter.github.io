@@ -8,6 +8,7 @@
     :labelWidth="0"
     size="large"
     autocomplete="off"
+    @click.stop
     @submit.prevent="onSubmit"
 
   >
@@ -19,7 +20,7 @@
       <el-input
         v-model="form.remark"
         type="text"
-        
+
         maxlength="20"
         show-word-limit
         :placeholder="placeholder"
