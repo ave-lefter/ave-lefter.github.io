@@ -328,7 +328,7 @@ const columns = computed(() => {
     flex: 'flex-[1.5]',
     sort: true
   }, {
-    label: `${t('bal')}/${t('profit2')}`,
+    label: 'Bal/PnL',
     value: 'total_profit',
     flex: 'flex-1 justify-end',
     sort: true
