@@ -1063,3 +1063,45 @@ export function getAutoSlippage(query: {
     query
   })
 }
+
+export function getBalances(body: {
+  chain: string
+  creatorAddress: string
+  tokens: string[]
+  showZero?: boolean
+}): Promise<{
+    chain: string,
+    creatorAddress: string,
+    tokens: {
+        token: string,
+        balance: string,
+        symbol: string,
+        logoUrl: string,
+        decimals: number,
+        price: string,
+        pnl: {
+            buyAmount: string,
+            buyValue: string,
+            sellAmount: string,
+            sellValue: string,
+            avgBuyPrice: string,
+            avgSellPrice: string,
+            realizedProfit: string,
+            unrealizedProfit: string,
+            totalProfit: string,
+            realizedProfitRatio: string,
+            unrealizedProfitRatio: string,
+            totalProfitRatio: string,
+            averageNetPurchasePrice: string,
+            netPurchaseAmount: string
+        },
+        risk_level: number
+        risk_score: number
+    }[]
+}> {
+  const {$api} = useNuxtApp()
+  return $api('/aveswap/v1/swap/getBalances', {
+    method: 'post',
+    body
+  })
+}

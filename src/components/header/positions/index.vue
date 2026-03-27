@@ -54,6 +54,7 @@ const tableFilter = ref({
 const visible=ref(false)
 const holderNum = ref(0)
 const fetchHolderNum = async () => {
+  console.log('fetchHolderNum', tableFilter.value)
   try {
     const res = await getUserBalance({pageNO: 1, pageSize: 1, ...tableFilter.value})
     holderNum.value = res.total
@@ -82,7 +83,6 @@ watch(()=>updateHolderNum.value, () => {
   fetchHolderNum()
 })
 watch(tableFilter, () => {
-  // console.log('tableFilter changed', val)
   fetchHolderNum()
 }, { deep: true })
 

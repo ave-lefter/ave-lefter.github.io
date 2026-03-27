@@ -1334,6 +1334,8 @@ onUnmounted(() => {
               :addressClass="markerTooltipVisible && currentRow.wallet_address===row.wallet_address?'bg-#12B88633':''"
               :maxRemarkLength="8"
               :chain="row.chain"
+              :appendTo="1"
+              :popoverProps="{placement: 'bottom'}"
               :wallet_logo="row.wallet_logo" class="color-[--secondary-text]"
               :mouseoverAddress="e => openMarkerTooltip(row, e)"
             >

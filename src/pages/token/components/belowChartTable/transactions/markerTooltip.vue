@@ -2,6 +2,7 @@
 import {getTxsUserBrief} from '~/api/token'
 import BigNumber from 'bignumber.js'
 import dayjs from 'dayjs'
+import { addAttention2, deleteAttention } from '~/api/attention'
 
 const emit = defineEmits(['update:modelValue'])
 const props = defineProps({
@@ -31,6 +32,7 @@ const visible = computed({
 })
 const isLoading = shallowRef(false)
 const userBriefData = ref()
+const attentionKey = ref(0)
 watch(() => props.currentRow?.wallet_address||'', () => {
   if (props.currentRow) {
     _getTxsUserBrief()
@@ -65,6 +67,59 @@ async function _getTxsUserBrief() {
     isLoading.value = false
   }
 }
+
+const attentionTriggerRef = ref()
+const globalStore = useGlobalStore()
+// const tokenDetailStore = useTokenDetailsStore()
+const { t } = useI18n()
+
+const collect = async () => {
+  if(!useFollowStore().currentAddress){
+    useBotStore().changeConnectVisible(true)
+  }
+  if (useWalletStore().address && !useWalletStore().walletSignature[useWalletStore().address]) {
+    await useWalletStore().signMessageForFavorite()
+  }
+  const currentRow = props.currentRow
+  if(currentRow.is_wallet_address_fav !== 1){
+    useFollowStore().confirmAttention(attentionTriggerRef.value,currentRow.chain, (form) => {
+      console.log('confirmAttention', form)
+      return addAttention2({
+        address: useFollowStore().currentAddress,
+        user_address: currentRow.wallet_address,
+        user_chain: currentRow.chain,
+        group: form.group,
+        is_monitored: form.is_monitored,
+      }).then((res) => {
+        currentRow.is_wallet_address_fav = 1
+        attentionKey.value++
+        globalStore.getFollowsNum()
+        // getList()
+        return Promise.resolve(res)
+      }).catch((err) => {
+        return Promise.reject(err)
+      })
+    })
+    return
+  }
+  // loading.value = true
+  deleteAttention({
+    address: useFollowStore().currentAddress,
+    user_address: currentRow.wallet_address,
+    user_chain: currentRow.chain
+  }).then(() => {
+    globalStore.getFollowsNum()
+    currentRow.is_wallet_address_fav = 0
+    attentionKey.value++
+    ElMessage.success( t('attention1Canceled'))
+    // getList()
+  }).catch((err) => {
+    console.log(err)
+  }).finally(() => {
+    // loading.value = false
+  })
+}
+
 </script>
 
 <template>
@@ -90,24 +145,28 @@ async function _getTxsUserBrief() {
           <el-skeleton-item v-for="i in 10" :key="i" variant="p" style="width: 100%"/>
         </template>
       </el-skeleton>
-      <div v-else class="flex flex-col gap-6px w-210px color-[--main-text]">
+      <div v-else :key="attentionKey" class="flex flex-col gap-6px w-210px color-[--main-text]">
         <div class="flex gap-6px items-center">
           <UserAvatar
             class="relative"
-            :chain="currentRow.chain"
-            :address="currentRow.address"
+            :chain="props.currentRow.chain"
+            :address="props.currentRow.address"
             icon-size="20px"
           />
           <UserRemark
-            :canEdit="false"
-            :remark="currentRow.remark"
-            :address="currentRow.wallet_address"
-            :chain="currentRow.chain"
-            :wallet_logo="currentRow.wallet_logo"
+            :canEdit="true"
+            :remark="props.currentRow.remark"
+            :address="props.currentRow.wallet_address"
+            :chain="props.currentRow.chain"
+            :wallet_logo="props.currentRow.wallet_logo"
+            :popoverProps="{placement: 'bottom'}"
             class="color-[--d-CCC-l-333]"
+            :appendTo="1"
             :formatAddress="(address: string) => address.slice(0, 4) + '...' + address.slice(-4)"
           />
-          <Icon v-copy="currentRow.wallet_address" name="bxs:copy" class="cursor-pointer color-[--third-text] text-10px"/>
+          <Icon ref="attentionTriggerRef" name="custom:attention"
+              :class="props.currentRow.is_wallet_address_fav === 1 ? 'color-[#F45469]' : 'color-[--third-text]'" class="h-16px w-16px clickable shrink-0" @click.stop.prevent="collect()" />
+          <Icon v-copy="props.currentRow.wallet_address" name="bxs:copy" class="cursor-pointer color-[--third-text] text-14px"/>
           <slot/>
         </div>
         <div class="flex justify-between">
