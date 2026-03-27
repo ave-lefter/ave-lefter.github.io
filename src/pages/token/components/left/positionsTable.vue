@@ -315,10 +315,11 @@ const getDataOnResize = useDebounceFn(() => {
   }
 }, 200)
 watch(scrollbarHeight, getDataOnResize)
-const sort = shallowRef({
-  sortBy: undefined,
-  activeSort: 0
-})
+// const sort = shallowRef({
+//   sortBy: undefined,
+//   activeSort: 0
+// })
+const sort = useLocalStorage<{ sortBy: string | undefined, activeSort: number }>('positionsSort', {sortBy: undefined, activeSort: 0})
 const map: { [key: number]: string } = {
   '-1': 'asc',
   0:'',
