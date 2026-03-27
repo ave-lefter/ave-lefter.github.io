@@ -9,6 +9,10 @@ import cabalBlack from '@/assets/images/rugPull/cabal-black.svg'
 import bundleWhite from '@/assets/images/rugPull/bundle-white.svg'
 import bundleBlack from '@/assets/images/rugPull/bundle-black.svg'
 import DevPop from '@/pages/pump/components/devPop/index.vue'
+import type { PumpObj } from '@/api/types/pump'
+
+const { $createTooltip } = useNuxtApp()
+const $tooltip = $createTooltip('bubble--tooltip')
 
 const props = defineProps<{
   activeChain: string
@@ -56,6 +60,29 @@ function getRiskIcon(row) {
   if (row.risk_score == 0) return new URL('@/assets/images/zhuyi1.svg', import.meta.url).href
   return null
 }
+
+function showBubbleTooltip(row: PumpObj, e: MouseEvent) {
+  $tooltip.show({
+    content: `<iframe
+      style='width:400px; height:400px;  border:none; overflow: hidden;'
+      src='https://app.insightx.network/bubblemaps/${row.chain === 'bsc' ? 56 : row.chain}/${row.target_token}?embed_id=9Pt12qHMl1KDeK'
+      allow='clipboard-write'
+    ></iframe>`,
+    target: e.target as HTMLElement,
+    props: {
+      showArrow: false,
+      rawContent: true,
+      placement: 'bottom',
+      trigger: 'hover',
+      'popper-class': 'x--tooltip',
+      'onUpdate:visible': (v: boolean) => {
+        if (v) return
+        $tooltip.hide()
+      },
+    },
+  })
+}
+
 </script>
 
 <template>
@@ -64,11 +91,12 @@ function getRiskIcon(row) {
     <div class="flex gap-4px">
       <!-- Top10 持仓 -->
       <div
-        class="sec-card cursor-pointer"
+        class="sec-card"
         :style="{
           background: Number(formatNumber(row?.holders_top10_ratio || 0, 1)) == 0 ? '' : (Number(row?.holders_top10_ratio) > 30 ? '#f6465d1a' : '#12b8861a'),
           color: Number(formatNumber(row?.holders_top10_ratio || 0, 1)) == 0 ? 'var(--third-text1)' : (Number(row?.holders_top10_ratio) > 30 ? '#F6465D' : '#12B886'),
         }"
+        @mouseover.stop="(e) => showBubbleTooltip(row, e)"
       >
         <Icon
           class="text-10px shrink-0"
@@ -81,7 +109,7 @@ function getRiskIcon(row) {
 
       <!-- Dev 持仓（hover 展示主币来源） -->
       <DevPop
-        class="sec-card cursor-pointer"
+        class="sec-card"
         :style="{
           background: Number(formatNumber(row?.dev_balance_ratio_cur || 0, 1)) == 0 ? '' : (Number(row?.dev_balance_ratio_cur) > 5 ? '#f6465d1a' : '#12b8861a'),
           color: Number(formatNumber(row?.dev_balance_ratio_cur || 0, 1)) == 0 ? 'var(--third-text1)' : (Number(row?.dev_balance_ratio_cur) > 5 ? '#F6465D' : '#12B886')
@@ -118,6 +146,7 @@ function getRiskIcon(row) {
 
       <!-- 狙击 sniper_balance_ratio_cur -->
       <div
+        v-tooltip="$t('sniper2')"
         class="sec-card"
         :style="{
           color: Number(formatNumber(row?.sniper_balance_ratio_cur || 0, 1)) == 0 ? 'var(--third-text1)' : (Number(row?.sniper_balance_ratio_cur) > 5 ? '#F6465D' : '#12B886'),
@@ -129,6 +158,7 @@ function getRiskIcon(row) {
       </div>
       <!-- 老鼠仓 insider_balance_ratio_cur -->
       <div
+        v-tooltip="$t('insider_balance_ratio_cur_tips')"
         class="sec-card"
         :style="{
           color: Number(formatNumber(row?.insider_balance_ratio_cur || 0, 1)) == 0 ? 'var(--third-text1)' : (Number(row?.insider_balance_ratio_cur) > 5 ? '#F6465D' : '#12B886'),
@@ -147,6 +177,7 @@ function getRiskIcon(row) {
     <div class="flex gap-4px">
       <!-- 钓鱼 phishing_ratio -->
       <div
+        v-tooltip="$t('phishing1')"
         class="sec-card"
         :style="{
           color: Number(formatNumber(row?.phishing_ratio || 0, 1)) == 0 ? 'var(--third-text1)' : (Number(row?.phishing_ratio) > 5 ? '#F6465D' : '#12B886'),
@@ -162,6 +193,7 @@ function getRiskIcon(row) {
       </div>
       <!-- 捆绑 boulder_rate -->
       <div
+        v-tooltip="$t('Bundle')"
         class="sec-card"
         :style="{
           color: Number(formatNumber(row?.boulder_rate || 0, 1)) == 0 ? 'var(--third-text1)' : (Number(row?.boulder_rate) > 5 ? '#F6465D' : '#12B886'),
@@ -175,12 +207,13 @@ function getRiskIcon(row) {
         >
         <span>{{ formatNumber(Number(row?.boulder_rate) > 0.001 ? row?.boulder_rate || 0 : 0, 1) }}%</span>
       </div>
-      <!-- 阴谋集团 cluster_ratio -->
+      <!-- 阴谋集团 cluster_rate -->
       <div
+        v-tooltip="$t('Cabal')"
         class="sec-card"
         :style="{
-          color: Number(formatNumber(row?.cluster_ratio || 0, 1)) == 0 ? 'var(--third-text1)' : (Number(row?.cluster_ratio) > 5 ? '#F6465D' : '#12B886'),
-          background: Number(formatNumber(row?.cluster_ratio || 0, 1)) == 0 ? '' : (Number(row?.cluster_ratio) > 5 ? '#f6465d1a' : '#12b8861a'),
+          color: Number(formatNumber(row?.cluster_rate || 0, 1)) == 0 ? 'var(--third-text1)' : (Number(row?.cluster_rate) > 5 ? '#F6465D' : '#12B886'),
+          background: Number(formatNumber(row?.cluster_rate || 0, 1)) == 0 ? '' : (Number(row?.cluster_rate) > 5 ? '#f6465d1a' : '#12b8861a'),
         }"
       >
         <img
@@ -188,15 +221,15 @@ function getRiskIcon(row) {
           width="12" height="12" alt=""
           class="opacity-70"
         >
-        <span>{{ formatNumber(Number(row?.cluster_ratio) > 0.001 ? row?.cluster_ratio || 0 : 0, 1) }}%</span>
+        <span>{{ formatNumber(Number(row?.cluster_rate) > 0.001 ? row?.cluster_rate || 0 : 0, 1) }}%</span>
       </div>
       <!-- 安全 risk_score -->
-      <div class="sec-card">
+      <div v-tooltip="$t('safe')" class="sec-card">
         <img v-if="getRiskIcon(row)" :src="getRiskIcon(row)" class="w-12px h-12px" alt="" />
         <span>{{ $t('safe') }}</span>
       </div>
       <!-- 跑路（仅 solana） -->
-      <div v-if="runPullVisible" class="sec-card">
+      <div v-tooltip="$t('flag_rug_pull')" v-if="runPullVisible" class="sec-card">
         <Icon name="custom:rug" class="text-12px shrink-0" />
         <span :class="getRugColor(row.rug_rate)">{{ row.rug_rate == -1 ? $t('unKnown1') : formatRate(row.rug_rate) }}</span>
       </div>
@@ -214,7 +247,7 @@ function getRiskIcon(row) {
   background: var(--main-divider);
   font-size: 11px;
   line-height: 16px;
-  cursor: default;
+  cursor: pointer;
   white-space: nowrap;
 }
 </style>

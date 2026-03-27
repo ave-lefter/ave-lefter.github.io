@@ -33,7 +33,7 @@ export function getNewOptions(t: ReturnType<typeof useI18n>['t']) {
           // 'runTime2',
           'snipersContent',
           'snipers1mContent',
-          'insidersContent',
+          // 'insidersContent',
           'dexContent'
         ],
       },

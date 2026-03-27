@@ -8,6 +8,7 @@ export function getActivityOptions(t: ReturnType<typeof useI18n>['t']) {
         'liquidityContent',
         'holdersContent',
         // 'top10PositionsContent',
+        'securityContent',
       ],
     },
     {
@@ -119,6 +120,17 @@ export function getActivityDefaultColumns(t: ReturnType<typeof useI18n>['t']) {
       isVisible: false,
       render: 'top10PositionsContent',
       minWidth:getTextWidth(t('top10'), 50) + 40,
+      align:'right'
+    },
+     {
+      title: t('tokenInfoSecurity'),
+      key: 'security',
+      isVisible: true,
+      render: 'securityContent',
+      children:[
+        {title:t('tokenInfoSecurity'),isVisible:true,render:'securityContent'},
+      ],
+      minWidth:280,
       align:'right'
     },
     {

@@ -31,7 +31,7 @@ export function getHotOptions(t: ReturnType<typeof useI18n>['t']) {
       list: [
         'snipersContent',
         'dexContent',
-        'insidersContent',
+        // 'insidersContent',
       ],
     },
   ]

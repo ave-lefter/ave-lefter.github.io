@@ -564,12 +564,12 @@
                   <div class="flex-start text-12px absolute bottom--2px z-1 mt-5px">
                     <div
                       v-show="pumpSetting?.define?.some((i) => i === 'top')"
-class="flex-start mr-8px bg-btn"
+                      class="flex-start mr-8px bg-btn"
                       :style="{
                           background:Number(formatNumber(row?.holders_top10_ratio || 0, 1))==0? '': (Number(row?.holders_top10_ratio) > 30 ? '#f6465d1a' : '#12b8861a'),
                           color:Number(formatNumber(row?.holders_top10_ratio || 0, 1))==0? 'var(--third-text1)': (Number(row?.holders_top10_ratio) > 30 ? '#F6465D' : '#12B886'),
                       }"
-@mouseover.stop="(e) => showBubbleTooltip(row, e)"
+                      @mouseover.stop="(e) => showBubbleTooltip(row, e)"
                     >
                       <Icon
                         class="iconfont icon-TOP text-10px mr-4px"
