@@ -281,11 +281,19 @@ const estimateSellAmount = computed(() => {
 function addSpaceKeyDownEvent() {
   useEventListener(document, 'keydown', (e) => {
     if (e.code === 'Space') {
+      e.preventDefault()
+      if (document.getElementById('tv_chart_container')) {
+        document.getElementById('tv_chart_container')!.style.pointerEvents = 'none'
+      }
       isCanKeySwap.value = true
     }
   })
   useEventListener(document, 'keyup', (e) => {
     if (e.code === 'Space') {
+      e.preventDefault()
+      if (document.getElementById('tv_chart_container')) {
+        document.getElementById('tv_chart_container')!.style.pointerEvents = 'auto'
+      }
       isCanKeySwap.value = false
     }
   })
@@ -309,6 +317,13 @@ function addSpaceKeyDownEvent() {
         handleSellAmount(sellPer || '', index2)
       }
     }
+  })
+  useEventListener(window, 'blur', () => {
+    setTimeout(() => {
+      if (document.activeElement === document.querySelector('#tv_chart_container iframe') && visible.value) {
+        window.focus() // 强制抢回焦点，确保主页面能捕捉空格键
+      }
+    }, 0)
   })
 }
 
