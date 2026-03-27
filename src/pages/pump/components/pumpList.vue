@@ -6,7 +6,6 @@
             v-for="({data: row}, $index) in list"
             :id="row?.target_token + '-' + row?.chain"
             :key="row?.pair + '-' + row?.chain"
-
             class="pump-item_item relative item-row"
             :style="{ background:  pumpSetting.bgList?.includes(row.platform)? pumpSetting?.bg?.[row.platform]?.bg : '' }"
             @click.stop="tableRowClick(row)"
@@ -93,14 +92,9 @@
                       class="token-icon"
                       :class="{ small: pumpSetting.Progress_isCircle == 'horizontal' }"
                       fit="cover"
-                      :src="
-                        getSymbolDefaultIcon(
-                          row,
-                          pumpSetting.avatar_isCircle == 'circle' ? 'circle' : 'rect'
-                        )
-                      "
+                      :src="srcMap[row.target_token + '-' + row.chain] || getSymbolDefaultIcon(row, pumpSetting.avatar_isCircle == 'circle' ? 'circle' : 'rect')"
                       :style="{
-                        'border-radius': pumpSetting.avatar_isCircle == 'circle' ? '100%' : '4px',
+                        'border-radius': pumpSetting.avatar_isCircle == 'circle' ? '100%' : '4px'
                       }"
                     >
                       <template #error>
@@ -118,7 +112,7 @@
                           :style="{
                             'border-radius': pumpSetting.avatar_isCircle == 'circle' ? '100%' : '0',
                           }"
-                          :src="getChainDefaultIcon(row.chain, row.symbol, pumpSetting.avatar_isCircle == 'circle' ? 'circle' : 'rect')"
+                          :src="srcMap[row.target_token + '-' + row.chain] || getSymbolDefaultIcon(row, pumpSetting.avatar_isCircle == 'circle' ? 'circle' : 'rect')"
                         >
                       </template>
                     </el-image>
@@ -169,7 +163,7 @@
                     {{row.token?.slice(0, 4) + '...' + row.token?.slice(-4)}}
                   </div>
                 </div>
-                <div class="flex flex-col self-stretch relative overflow-hidden">
+                <div class="flex flex-col self-stretch relative">
                   <div class="flex-start">
                     <span v-tooltip="row.symbol" v-copy="row.token" class="text-16px font-500 mr-5px symbol-ellipsis ellipsis-auto block color-[--d-F2F2F2-l-000]">{{
                       row.symbol
@@ -237,6 +231,7 @@
                     >
                       S {{ formatNumber(row?.sell_tax || 0, 2) }}%
                     </span>
+                    --{{srcMap[row.target_token + '-' + row.chain]}}--
                   </div>
                   <div class="flex-start text-12px mt-5px">
                       <div
@@ -418,20 +413,26 @@
                         {{ formatNumber(row?.holders || 0, 2) }}
                       </span>
                     </div>
-                    <!-- <div
-                      v-tooltip.raw="{
-                        content: `$t('followed')`,
-                        props: {
-                          placement: 'top-start',
-                        },
+                    <HolderRank
+                      v-if="route.name === 'index' && row?.favorite_holder_count> 0"
+                      :tokenId="(row?.token || row?.target_token) + '-' + row?.chain"
+                      :baseInfo="{
+                        symbol: row.symbol,
+                        logo_url: row.logo_url || ''
                       }"
-                      class="flex mr-8px items-center"
+                      :type="-100"
+                      :ratio="Number(0)"
                     >
-                      <Icon
-                        class="iconfont icon-rug text-10px vertical-middle color-[--yellow]"
-                        name="custom:fav"
-                      />
-                    </div> -->
+                      <div
+                        class="flex mr-8px items-center"
+                        :style="{color: row?.favorite_holder_count> 0 ?'var(--yellow)' : 'var(--third-text1)'}"
+                      >
+                        <Icon
+                          class="iconfont icon-rug text-10px vertical-middle"
+                          name="custom:fav"
+                        />
+                      </div>
+                    </HolderRank>
                     <div
                       v-show="pumpSetting?.define?.some((i) => i === 'markers')"
                       v-tooltip.raw="{
@@ -459,7 +460,7 @@
                       symbol: row.symbol,
                       logo_url: row.logo_url || ''
                     }"
-                    type="kol"
+                    :type="31"
                     :ratio="Number(row?.kol_ratio || 0)"
                     >
                       <div class="flex items-center">
@@ -481,7 +482,7 @@
                         symbol: row.symbol,
                         logo_url: row.logo_url || ''
                       }"
-                      type="smart"
+                      :type="30"
                       :ratio="Number(row?.smart_wallet_ratio || 0)"
                       >
                       <div class="flex items-center color-[--third-text1]">
@@ -728,7 +729,7 @@ class="flex-start mr-8px bg-btn"
                     (isSoon && row.progress > 99) || pumpSetting?.define?.some((i) => i === 'mcap')
                   "
                   class="flex-end text-12px pr-12px mb-10px bg-1"
-                  :class="pumpSetting.fontSize_mc =='12px'? 'mb-4px' : 'mb-4px'"
+                  :class="pumpSetting.fontSize_mc =='12px'? 'mb-1px' : 'mb-1px'"
                 >
                   <div class="bg-1 flex-end py-2px" v-if="isSoon && row.progress >= 99.99">
                     <el-image
@@ -966,11 +967,7 @@ const handleClearFilter = () => {
 }
 const { quickBuyValue, loading, isOut, isSoon , type} = toRefs(props)
 const tableList = shallowRef<PumpObj[]>(props.tableList || [])
-const hover = ref(false)
-// 只监听数组引用变化，不深度监听对象
-watch(() => props.tableList, (newList) => {
-  tableList.value = newList
-})
+const srcMap = ref<Record<string, string>>({})
 const router = useRouter()
 const route = useRoute()
 const { token_logo_url } = useConfigStore()
@@ -1249,6 +1246,25 @@ const newestId = ref('')
 
 // 监听原始列表数据 (假设 props.list 是 shallowRef)
 watch(() => props.tableList, (newList, oldList) => {
+  tableList.value = newList
+  const currentKeys = new Set<string>()
+  newList.forEach(row => {
+    const key = row.target_token + '-' + row.chain
+    currentKeys.add(key)
+    const logoUrl = String(row.logo_url || '').trim()
+    if (logoUrl) {
+      const src = /^https?:\/\//.test(logoUrl) ? logoUrl : token_logo_url + logoUrl
+      if (srcMap.value[key] !== src) {
+        srcMap.value[key] = src
+      }
+    }
+  })
+  // 移除不再存在的 key
+  for (const key in srcMap.value) {
+    if (!currentKeys.has(key)) {
+      delete srcMap.value[key]
+    }
+  }
   // 1. 判断是否是插入了新数据（长度增加，或第一个元素 ID 变了）
   const new1 = newList?.[0]
   const old1 = oldList?.[0]

@@ -253,6 +253,19 @@
               <Icon name="custom:stop" class="color-#FFA622 text-16px"/>
             </span>
             <span class="flex-1" />
+            <div class="flex items-center justify-between p-1px rounded-4px text-12px h-28px bg-[--main-input-button-bg] px-2px py-2px mr-8px">
+              <button
+                v-for="item in listTab"
+                :id="item.value"
+                :key="item.value"
+                class="cursor-pointer border-none font-400 rounded-4px min-w-24px py-5px px-5px text-center"
+                :class="`${item.value === pumpV3Pointer[activeChain].soon?.pumpFilter?.sort?'color-[--main-text1] bg-[--tab-active-bg]':'color-[--secondary-text] bg-transparent'}`"
+                type="button"
+                @click.stop.prevent = "switchTab(item)"
+              >
+                {{ item.name }}
+              </button>
+            </div>
             <el-input
               v-if="pumpSetting?.show_search"
               ref="inputSearch"
@@ -482,6 +495,8 @@ const Timer: {
 }
 const { width } = useWindowSize()
 const activeTab = shallowRef('new')
+const botStore = useBotStore()
+const walletStore = useWalletStore()
 const pumpListRefNew = useTemplateRef('pumpListRefNew')
 const pumpListRefSoon = useTemplateRef('pumpListRefSoon')
 const pumpListRefGraduated = useTemplateRef('pumpListRefGraduated')
@@ -510,7 +525,7 @@ const activeChain = useStorage<ChainKey>(
 const audioUrl = ref('')
 const globalStore = useGlobalStore()
 const { pumpSetting, token_logo_url, pumpBlackList } = storeToRefs(globalStore)
-
+const currentAddress = computed(() => botStore?.evmAddress || walletStore?.address || '')
 const orderNew = computed(() => {
   return pumpSetting.value.grid['new']?.order
 })
@@ -521,6 +536,10 @@ const orderGraduated= computed(() => {
   return pumpSetting.value.grid['graduated']?.order
 })
 
+const listTab = computed(() => ([
+  { name: '%', value: 'progress' },
+  { name: 'MC', value: 'market_cap' }
+]))
 const pumpConfig = useStorage<PumpConfig[]>('pumpConfig', [])
 // const isRotate = ref(false)
 const { pump_notice, pumpV3, pumpFilterDefault, pump_query} = storeToRefs(usePumpStore())
@@ -745,7 +764,7 @@ const syncCategory = (category: 'new' | 'soon' | 'graduated') => {
       if (!obj) return item
       const merged = {
         ...item,
-        ...(obj.logo_url ? { logo_url: obj.logo_url } : {}),
+        ...(obj.logo_url && !item.logo_url ? { logo_url: obj.logo_url } : {}),
         ...(obj.buy_tax ? { buy_tax: obj.buy_tax } : {}),
         ...(obj.sell_tax ? { sell_tax: obj.sell_tax } : {}),
         ...(obj.name ? { name: obj.name } : {}),
@@ -833,14 +852,20 @@ function requestRefresh(category?: 'new' | 'soon' | 'graduated') {
 }
 
 const list1 = computed(() => fourmemeListObj?.[activeChain.value]?.new || [])
-const list2 = computed(() => fourmemeListObj?.[activeChain.value]?.soon || [])
+const list2 = computed(() => {
+  const sort = pumpV3Pointer.value[activeChain.value].soon.pumpFilter.sort as 'progress' | 'market_cap'
+  if (sort) {
+    return fourmemeListObj?.[activeChain.value]?.soon?.sort((a,b)=> (b?.[sort]- a?.[sort]))
+  }
+  return fourmemeListObj?.[activeChain.value]?.soon || []
+})
 const list3 = computed(() => fourmemeListObj?.[activeChain.value]?.graduated || [])
 const mergedBaseList = computed(() => {
   return [...list1.value, ...list2.value, ...list3.value]
 })
 const scrollHeight = computed(()=>{
   // return 'calc(100vh - 215px)'
-  return globalStore.tokenHistoryVisible ? 'calc(100vh - 160px)':'calc(100vh - 195px)'
+  return globalStore.tokenHistoryVisible ? 'calc(100vh - 220px)':'calc(100vh - 195px)'
 })
 
 
@@ -1245,6 +1270,13 @@ onUnmounted(() => {
     cancelAnimationFrame(logoThrottledRafId)
     logoThrottledRafId = null
   }
+  const categories = ['new', 'soon', 'graduated'] as const
+  categories.forEach((category) => {
+    if (Timer[category]) {
+      clearTimeout(Timer[category] as number)
+      Timer[category] = null
+    }
+  })
 })
 const startPortraitTimer = () => {
   if (portraitTimer) {
@@ -1376,7 +1408,7 @@ function getPumpConfig() {
           soon: {
             count: 0,
             loading: false,
-            pumpFilter: { ...pumpFilterDefault.value, platforms: platformsString },
+            pumpFilter: { ...pumpFilterDefault.value, platforms: platformsString, sort: 'progress' },
           },
           graduated: {
             count: 0,
@@ -1464,7 +1496,18 @@ function search(type: string) {
   }
 }
 
-
+function switchTab(item:any ){
+  pumpV3Pointer.value[activeChain.value].soon.pumpFilter.sort = item.value
+  // pumpV3Pointer.value[activeChain.value].soon.pumpFilter.sort_dir = 'desc'
+  const soon = pumpV3Pointer.value[activeChain.value].soon.pumpFilter || {}
+  const params = {
+      ...soon,
+      category: 'soon' as CategoryKey,
+      chain: activeChain.value,
+      platforms: pumpV3.value?.[activeChain.value]?.platforms?.join(',') || 'all'
+    }
+  getPump(params, true)
+}
 function handlerFilterConfirm(
   val: { progress_min?: string; progress_max?: string; chain: ChainKey; platforms: string; has_sm?: boolean},
   type: string
@@ -1585,7 +1628,6 @@ async function getPump(rawParams: PumpRequestParams, isFilter = false) {
   } else if (Array.isArray(queryParams.sm_list) && queryParams.sm_list.length > 0) {
     queryParams.sm_list = queryParams.sm_list.join(',')
   }
-
   // 过滤无效键值
   const finalParams = Object.fromEntries(
     Object.entries(queryParams).filter(([_, v]) => v != null && v !== '' && Boolean(v))
@@ -1595,7 +1637,6 @@ async function getPump(rawParams: PumpRequestParams, isFilter = false) {
   const state = pumpV3.value[currentChain]?.[category]
   if (state?.loading) return
   if (state?.count === 0) state.loading = true
-
 
   try {
     if(isFilter){
@@ -1607,6 +1648,9 @@ async function getPump(rawParams: PumpRequestParams, isFilter = false) {
     }
     if (!finalParams.platforms) {
       finalParams.platforms = 'all'
+    }
+    if (currentAddress.value) {
+      finalParams.self_address = currentAddress.value
     }
     const res = await _getPumpList(finalParams)
 
@@ -1658,9 +1702,18 @@ async function getPump(rawParams: PumpRequestParams, isFilter = false) {
     }
     // HTTP 请求完成后刷新对应类别
     requestRefresh(finalParams.category as 'new' | 'soon' | 'graduated')
-    // Timer[category] = setTimeout(() => getPump(rawParams), 10000)
+    const isTrue = getFilterNumber(state.pumpFilter || {}, platforms.value, baseTokensAllStr.value) > 0
+    if (isTrue) {
+      Timer[category] = setTimeout(() => getPump(rawParams), 5000)
+    } else {
+      if (Timer[category]) {
+        clearTimeout(Timer[category] as number)
+        Timer[category] = null
+      }
+    }
   }
 }
+
 
 /** 辅助函数：统一处理后端无效时间 */
 function parseDate(dateStr?: string | number, toSeconds = false) {
@@ -1917,6 +1970,12 @@ const documentVisible = computed(() => {
   return documentVisible1.value === 'visible'
 })
 
+
+watch(()=>currentAddress.value, (val) => {
+  getPumpConfig().then(() => {
+    getPumpList()
+  })
+})
 watch(documentVisible, (val) => {
   if (route.name !== 'index') return
   if (val) {
@@ -2286,7 +2345,7 @@ function hitBlacklist(item:PumpObj, black: pumpBlack) {
 :deep().search-input1 {
   background: var(--main-input-button-bg);
   padding: 1px;
-  width: 120px;
+  width: 80px;
   border-radius: 4px;
   border: none;
   .el-input__wrapper {
@@ -2340,7 +2399,7 @@ function hitBlacklist(item:PumpObj, black: pumpBlack) {
 }
 .pump-item{
   background: var(--d-0E0F10-l-FFF);
-  border: 1px solid var(--main-input-button-bg);
+  border: 1px solid var(--d-1F242C-l-E0ECFF);
   border-radius: 4px;
 }
 </style>

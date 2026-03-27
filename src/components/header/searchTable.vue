@@ -255,11 +255,11 @@
                       }}
                     </span>
                   </div>
-                  <span class="color-[--third-text]">{{ row.token?.slice(0, 4) + '...' + row.token?.slice(-4) }}</span>
+                  <span class="color-[--third-text] hight">{{ row.token?.slice(0, 4) + '...' + row.token?.slice(-4) }}</span>
                   <Icon
                     v-copy="row.token"
                     name="bxs:copy"
-                    class="text-10px ml-2px cursor-pointer color-[--third-text] ml-4px"
+                    class="text-10px ml-2px cursor-pointer color-[--third-text] ml-4px hight"
                     @click.stop.prevent
                   />
                 </div>
@@ -589,6 +589,9 @@ function switchSort(sortBy1: string, activeSort1?: SortValue) {
       padding: 0 20px;
       &:hover {
         background-color: var(--border);
+        .hight{
+          color: var(--main-text1)
+        }
       }
     }
     .token-info {

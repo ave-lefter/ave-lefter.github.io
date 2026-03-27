@@ -42,7 +42,8 @@
           <div
             v-for="(item, $index) in tableList"
             :key="$index"
-            class="grid grid-cols-[2fr_1fr_1fr_1fr] items-center mt-8px rounded-8px"
+            class="grid grid-cols-[2fr_1fr_1fr_1fr] items-center mt-8px rounded-8px cursor-pointer hover:bg-[--dialog-list-hover] item"
+            @click.stop.prevent="jumpBalance(item)"
           >
             <!-- 地址 -->
             <div class="flex items-center min-w-0">
@@ -70,7 +71,7 @@
                 <span
                   class="color-[--third-text] text-12px leading-16px inline-flex items-center"
                 >
-                    <span class="l text-12px">
+                    <span class="l text-12px hight">
                     {{
                       item.account_address?.slice(0, 6) + '...' + item.account_address?.slice(-4)
                     }}
@@ -150,9 +151,13 @@ const props = defineProps<{
 }>()
 const botStore = useBotStore()
 const walletStore = useWalletStore()
+const tokenDetailSStore = useTokenDetailsStore()
+const tokenStore = useTokenStore()
 const { getHolderRank } = useDevPop()
 const { t } = useI18n()
 const chain = computed(() => getAddressAndChainFromId(props.tokenId)?.chain)
+const token = computed(() => getAddressAndChainFromId(props.tokenId)?.address)
+
 
 const activeTab = ref(0)
 
@@ -185,6 +190,29 @@ function onTabChange(tagType: number) {
   activeTab.value = tagType
   props.onFetch(props.tokenId, tagType)
 }
+
+function jumpBalance(row: TagsRatioHoverItem) {
+  console.log('-----------wallet_address-------',row.account_address)
+  tokenDetailSStore.$patch({
+    drawerVisible: true,
+    tokenInfo: {
+      id: props.tokenId,
+      symbol: tokenStore?.token?.symbol,
+      logo_url:  tokenStore?.token?.logo_url,
+      chain: chain.value,
+      address: token.value,
+      remark: row?.remark || '',
+    },
+    pairInfo: {
+      target_token: token.value,
+      token0_address: token.value,
+      token0_symbol:  tokenStore?.token?.symbol || '',
+      token1_symbol: '',
+      pairAddress: '',
+    },
+    user_address: row.account_address || useBotStore().getWalletAddress(chain.value) || useWalletStore().address,
+  })
+}
 </script>
 
 <style scoped lang="scss">
@@ -192,5 +220,12 @@ function onTabChange(tagType: number) {
   --el-button-hover-text-color: var(--white);
   --el-button-hover-bg-color: var(--primary-button-hover);
   --el-button-hover-border-color: var(--primary-button-hover);
+}
+.item {
+  &:hover {
+    .hight{
+      color: var(--secondary-text1)
+    }
+  }
 }
 </style>
