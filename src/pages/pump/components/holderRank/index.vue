@@ -17,8 +17,8 @@ const props = defineProps({
     default: () => {},
   },
   type: {
-    type: String,
-    default: ''
+    type: Number,
+    default: 0
   },
   ratio: {
     type: Number,

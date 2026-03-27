@@ -169,7 +169,7 @@
                     {{row.token?.slice(0, 4) + '...' + row.token?.slice(-4)}}
                   </div>
                 </div>
-                <div class="flex flex-col self-stretch relative overflow-hidden">
+                <div class="flex flex-col self-stretch relative">
                   <div class="flex-start">
                     <span v-tooltip="row.symbol" v-copy="row.token" class="text-16px font-500 mr-5px symbol-ellipsis ellipsis-auto block color-[--d-F2F2F2-l-000]">{{
                       row.symbol
@@ -418,20 +418,26 @@
                         {{ formatNumber(row?.holders || 0, 2) }}
                       </span>
                     </div>
-                    <!-- <div
-                      v-tooltip.raw="{
-                        content: `$t('followed')`,
-                        props: {
-                          placement: 'top-start',
-                        },
+                    <HolderRank
+                      v-if="route.name === 'index' && row?.favorite_holder_count> 0"
+                      :tokenId="(row?.token || row?.target_token) + '-' + row?.chain"
+                      :baseInfo="{
+                        symbol: row.symbol,
+                        logo_url: row.logo_url || ''
                       }"
-                      class="flex mr-8px items-center"
+                      :type="-100"
+                      :ratio="Number(0)"
                     >
-                      <Icon
-                        class="iconfont icon-rug text-10px vertical-middle color-[--yellow]"
-                        name="custom:fav"
-                      />
-                    </div> -->
+                      <div
+                        class="flex mr-8px items-center"
+                        :style="{color: row?.favorite_holder_count> 0 ?'var(--yellow)' : 'var(--third-text1)'}"
+                      >
+                        <Icon
+                          class="iconfont icon-rug text-10px vertical-middle"
+                          name="custom:fav"
+                        />
+                      </div>
+                    </HolderRank>
                     <div
                       v-show="pumpSetting?.define?.some((i) => i === 'markers')"
                       v-tooltip.raw="{
@@ -459,7 +465,7 @@
                       symbol: row.symbol,
                       logo_url: row.logo_url || ''
                     }"
-                    type="kol"
+                    :type="31"
                     :ratio="Number(row?.kol_ratio || 0)"
                     >
                       <div class="flex items-center">
@@ -481,7 +487,7 @@
                         symbol: row.symbol,
                         logo_url: row.logo_url || ''
                       }"
-                      type="smart"
+                      :type="30"
                       :ratio="Number(row?.smart_wallet_ratio || 0)"
                       >
                       <div class="flex items-center color-[--third-text1]">
@@ -728,7 +734,7 @@ class="flex-start mr-8px bg-btn"
                     (isSoon && row.progress > 99) || pumpSetting?.define?.some((i) => i === 'mcap')
                   "
                   class="flex-end text-12px pr-12px mb-10px bg-1"
-                  :class="pumpSetting.fontSize_mc =='12px'? 'mb-4px' : 'mb-4px'"
+                  :class="pumpSetting.fontSize_mc =='12px'? 'mb-1px' : 'mb-1px'"
                 >
                   <div class="bg-1 flex-end py-2px" v-if="isSoon && row.progress >= 99.99">
                     <el-image

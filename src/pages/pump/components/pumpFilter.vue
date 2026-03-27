@@ -818,7 +818,12 @@ function reset() {
   const form = { ...initForm,platforms:props.platformsList.map(platform => platform.platform).join(',')
   ,base_tokens:baseTokensAllStr.value,no_repeat_social_media:false }
   tableFilter = { ...form }
-  pumpStore.pumpV3[props.activeChain][activeTab.value].pumpFilter = { ...form }  // 更新过滤器数据
+  const storeFilter = pumpStore.pumpV3[props.activeChain][activeTab.value]?.pumpFilter
+  const sort = storeFilter?.sort
+  pumpStore.pumpV3[props.activeChain][activeTab.value].pumpFilter = {
+    ...form,
+    ...(sort ? { sort } : {}),
+   }  // 更新过滤器数据
   // 触发更新事件
   emit('update:filterData', { ...form }, storage.value)
 }

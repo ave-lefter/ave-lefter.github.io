@@ -118,6 +118,7 @@ export const usePumpStore = defineStore('pumpStore', () => {
     rstx: '',
     has_sm: 0,
     sm_list: [],
+    sort: ''
   }
 
   function getPumpConfig() {
@@ -139,7 +140,7 @@ export const usePumpStore = defineStore('pumpStore', () => {
             soon: {
               count: 0,
               loading: false,
-              pumpFilter: {...pumpFilterDefault},
+              pumpFilter: {...pumpFilterDefault, sort: 'progress'},
             },
             graduated: {
               count: 0,
@@ -166,7 +167,7 @@ export const usePumpStore = defineStore('pumpStore', () => {
     ['pump', 'moonshot', 'believe', 'raydium', 'jupstudio', 'moon_new', 'cookingcity', 'bonk', 'bags', 'heaven']
   )
   const pumpV3: RemovableRef<Record<ChainKey, pumpData>> = useStorage(
-    'pumpV22',
+    'pumpV23',
     {
       solana: {
         platforms: [],
