@@ -5,7 +5,7 @@
       class="flex items-center text-14px cursor-pointer color-[--main-text]"
       @click="showBlackList"
     >
-      <Icon name="custom:black" class="mr-4px" />
+      <Icon name="custom:black2" class="mr-4px" />
       {{ t('BlackList') }}
     </span>
     <el-dialog

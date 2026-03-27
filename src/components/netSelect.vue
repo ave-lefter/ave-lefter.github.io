@@ -90,6 +90,7 @@ function onCancel() {
           <el-button
             size="small"
             color="transparent"
+            text
             class="[&&]:px-3px [&&]:py-4px justify-between [--el-button-size:20px!important] [--el-button-font-weight: 400]"
           >
             <img
