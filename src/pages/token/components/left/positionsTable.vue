@@ -13,6 +13,7 @@ import { recordTxV2, updateTxV2 } from '~/api/tracking'
 import dayjs from 'dayjs'
 import BlackList from  '~/components/header/positions/blackList.vue'
 import HideTokenDialog from '~/pages/address/[[userAddress]]/components/hideTokenDialog.vue'
+import { getTokensPrice } from '@/api/token'
 const {updateHolderNum}= storeToRefs(useUserStore())
 const {t} = useI18n()
 const wsStore = useWSStore()
@@ -26,6 +27,8 @@ const {hide_risk, hide_small} = storeToRefs(useGlobalStore())
 const {currentAddress} = storeToRefs(useFollowStore())
 const selectedChains = useLocalStorage<string[]>('positionsSelectedChains', [])
 const AmountU = useLocalStorage<boolean>('positionsAmountU', true)
+const { mode, token_logo_url, isDark } = storeToRefs(useGlobalStore())
+
 watch(() => wsStore.wsResult[WSEventType.PRICEV2], (val: IPriceV2Response) => {
   const idToPriceMap: { [key: string]: IPriceV2Response['prices'][0] } = {}
   val.prices.forEach((item) => {
@@ -308,6 +311,7 @@ const getDataOnResize = useDebounceFn(() => {
   const {value} = scrollContainerRef
   if (value && value.scrollHeight <= value.clientHeight && !listStatus.value.finished) {
     _getUserBalance()
+    // getMainTokenPrice()
   }
 }, 200)
 watch(scrollbarHeight, getDataOnResize)
@@ -329,7 +333,7 @@ const backendSort = computed(() => {
 })
 const columns = computed(() => {
   return [{
-    label: `${t('token')}/${t('lastTx')}`,
+    label: ``,
     value: 'last_txn_time',
     flex: 'flex-[1.3]',
     sort: true
@@ -349,7 +353,7 @@ const listStatus = shallowRef({
   finished: false,
   loading: false,
   pageNo: 1,
-  pageSize: 20
+  pageSize: 50
 })
 const listData = shallowRef<(GetUserBalanceResponse & { index: string })[]>([])
 
@@ -357,7 +361,7 @@ const filterListData = computed(() => {
   const sort=backendSort.value.sort||'last_txn_time'
   const sort_dir=backendSort.value.sort_dir||'desc'
   // console.log('filterListData',sort,sort_dir,listData.value)
-  return listData.value.toSorted((a, b) => sort_dir ==='asc' ? a?.[sort] - b?.[sort] : b?.[sort] - a?.[sort])
+  return [...listData.value.filter(i => i.token===NATIVE_TOKEN).toSorted((a, b) => a.symbol.localeCompare(b.symbol)),...listData.value.filter(i => i.token!==NATIVE_TOKEN).toSorted((a, b) => sort_dir ==='asc' ? a?.[sort] - b?.[sort] : b?.[sort] - a?.[sort])]
 })
 
 let timer: ReturnType<typeof setTimeout> | null = null;
@@ -370,6 +374,7 @@ const checkCondition = () => {
       timer = null
     }
     _getUserBalance()
+    // getMainTokenPrice()
     return // 结束本次执行，不再设置定时器
   }
   // 只有在不满足条件时，才设置下一次定时器
@@ -397,7 +402,22 @@ watch(() => [
 ], () => {
   resetStatus()
   _getUserBalance()
+  // getMainTokenPrice()
 })
+
+const mainTokenPrices = ref({} as any)
+
+function getMainTokenPrice() {
+  const ids=selectedChains.value.map(i=>'0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'+'-'+i)
+  getTokensPrice(ids).then(res => {
+    console.log('getTokensPrice',res)
+    if(res&&!res.length) return
+    selectedChains.value.forEach((chain,index) => {
+      mainTokenPrices.value[chain]=res[index].current_price_usd
+    })
+    console.log('mainTokenPrices.value',mainTokenPrices.value)
+  })
+}
 
 async function _getUserBalance() {
   try {
@@ -408,7 +428,8 @@ async function _getUserBalance() {
       pageNO: listStatus.value.pageNo,
       pageSize: listStatus.value.pageSize,
       ...tableFilter.value,
-      ...backendSort.value,
+      sort_dir: (backendSort.value.sort_dir&&backendSort.value.sort)?backendSort.value.sort_dir:'desc',
+      sort: (backendSort.value.sort_dir&&backendSort.value.sort)?backendSort.value.sort:'last_txn_time',
     })
 
     if (Array.isArray(res?.data) && res.data.length > 0) {
@@ -421,7 +442,9 @@ async function _getUserBalance() {
         }))
       } else {
         const list = res.data
-          .filter(i => listData.value.every(j => j.index !== `${i.token}-${i.chain}`))
+          .filter(i => listData.value.every(j => j.index !== (i.token === NATIVE_TOKEN
+              ? getChainInfo(i.chain)?.wmain_wrapper + '-' + i.chain
+              : `${i.token}-${i.chain}`)))
           .map(i => ({
             ...i,
             index: i.token === NATIVE_TOKEN
@@ -662,7 +685,7 @@ function hideToken(row:any) {
       class="absolute top--34px"
       :style="{left:(Number(getTextWidth(t('position2')).toFixed(0))+12+16)+'px'}"
       v-model:userIds="tableFilter.user_ids"
-      @update:user-ids="resetStatus();_getUserBalance()"
+      @update:user-ids="resetStatus();_getUserBalance();"
     />
     <BlackList
       class="absolute top--30px right-40px"
@@ -694,11 +717,22 @@ function hideToken(row:any) {
         :columns="columns"
         class="pr-20px!"
       >
+        <template #last_txn_time>
+           <div>
+            <span>{{ t('token') }}</span>
+            <span>/</span>
+            <span :class="(sort.sortBy === 'last_txn_time') && sort.activeSort ? 'color-[--main-text]' : ''">{{ t('lastTx') }}</span>
+           </div>
+        </template>
         <template #balance_usd>
           <div class="flex flex-center gap-4px">
             <Icon :name="`custom:${!AmountU ? 'amount2' : 'price2'}`"  :class="`color-[--third-text] cursor-pointer text-10px`"
                 @click.self.stop="AmountU = !AmountU" />
-          {{ t('bal')}}/{{t('profit2') }} 
+            <div>
+              <span :class="(sort.sortBy === 'balance_usd')&& sort.activeSort ? 'color-[--main-text]' : ''">{{ t('bal') }}</span>
+              <span>/</span>
+              <span>{{ t('profit2') }}</span>
+            </div>
           </div>
         </template>
       </t-head>
@@ -719,7 +753,7 @@ function hideToken(row:any) {
               class="text-12px flex justify-between pl-10px py-7px cursor-pointer hover:bg-[--dialog-bg] group"
               :to="`/token/${row.index}`"
             >
-              <div class="flex-[1.3] flex items-center relative">
+              <div class="flex-[1.3] flex items-center relative min-w-0">
                 <el-tooltip popper-class="tooltip-pd-0" placement="bottom-start" :show-arrow="false" :persistent="false">
                   <template #default>
                     <TokenImg :row="row"/>
@@ -737,7 +771,7 @@ function hideToken(row:any) {
                       name="custom:danger"
                       class="font-14 ml-2px color-#F72121"/>
                   </div>
-                  <div class="mt-2px color-[--third-text1] text-11px lh-14px">
+                  <div v-if="row.token!==NATIVE_TOKEN" class="mt-2px color-[--third-text1] text-11px lh-14px">
                     <!-- <template v-if="row.balance === 0">$0</template>
                     <template v-else-if="row.balance === '--'">--</template>
                     <template v-else>
@@ -765,7 +799,7 @@ function hideToken(row:any) {
                     </span>
                   </div>
                 </div>
-                <div v-if="walletStore.walletName!=='WatchWallet'" class="bg-[--d-000-l-FFF] absolute top-0 left-0 z-auto flex flex-center w-12px h-12px invisible group-hover:visible">
+                <div v-if="(walletStore.walletName!=='WatchWallet')&&(row.token!==NATIVE_TOKEN)" class="bg-[--d-000-l-FFF] absolute top-0 left-0 z-auto flex flex-center w-12px h-12px invisible group-hover:visible">
                   <Icon 
                     v-tooltip="$t('BlackListToken')"
                     name="custom:key-invisible"
@@ -774,15 +808,17 @@ function hideToken(row:any) {
                   />
                 </div>
               </div>
-              <div class="flex-1 flex flex-col items-end">
-                <div class="text-[--main-text1] font-400 text-13px lh-16px">
+              <div class="flex-1 flex flex-col items-end" :class="row.token===NATIVE_TOKEN&&'flex-row! items-center! justify-end'">
+                <div class="text-[--main-text1] font-400 text-13px lh-16px flex items-center gap-2px">
                   <template v-if="row.balance === 0">$0</template>
                   <template v-else-if="row.balance === '--'">--</template>
                   <template v-else>
+                    <img v-if="!AmountU&&(row?.token===NATIVE_TOKEN)" :src="`${token_logo_url}chain/${row?.chain}.png`" class="border-rd-[50%] text-12px lh-12px" height="12" alt=""></img>
+                    <!-- {{!AmountU? (formatNumber(Number(row?.balance_usd || 0) / Number(mainTokenPrices[row?.chain] || 1), 2)): '$' + formatNumber(row.balance_usd ||0, 2)}} -->
                     {{!AmountU? formatNumber(row.balance, 2): '$' + formatNumber(row.balance_usd ||0, 2)}}
                   </template>
                 </div>
-                <div class="mt-2px text-11px lh-14px"  :class="getColorClass(row.total_profit)">
+                <div v-if="row.token!==NATIVE_TOKEN" class="mt-2px text-11px lh-14px"  :class="getColorClass(row.total_profit)">
                   <template v-if="Number(row.total_profit) === 0">0</template>
                   <template v-else-if="row.total_profit === '--'">--</template>
                   <template v-else>

@@ -48,7 +48,7 @@
                 <div class="flex items-center" @click="jumpToTokenDetail(row)">
                   <TokenImg
                     :row="{
-                      logo_url: `${s3BaseUrl}${row?.logo_url}`,
+                      logo_url: `${row?.logo_url?(s3BaseUrl+row?.logo_url):''}`,
                       symbol: row.symbol,
                       chain: row.chain,
                     }"
