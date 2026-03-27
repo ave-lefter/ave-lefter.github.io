@@ -168,7 +168,7 @@ function _updateWhaleRemark(data: { remark: string }) {
 function sendRemarkToServer(remark: string) {
   const form = {
     user_address: props.address as string,
-    self_address: (botStore?.userInfo?.evmAddress || walletStore.address) as string,
+    self_address: (botStore?.userInfo?.evmAddress || walletStore.address || '') as string,
     remark,
     user_chain: props.chain
   }

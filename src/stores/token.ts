@@ -128,6 +128,25 @@ export const useTokenStore = defineStore('token', () => {
     }
   })
 
+  // 从 sessionStorage 初始化 payToken
+  const savedPayToken = sessionStorage.getItem('token_payToken')
+  if (savedPayToken) {
+    try {
+      swap.payToken = JSON.parse(savedPayToken)
+    } catch (e) {
+      console.error('Failed to parse payToken from sessionStorage:', e)
+    }
+  }
+
+  // 监听 payToken 变化并同步到 sessionStorage
+  watch(
+    () => swap.payToken,
+    (newPayToken) => {
+      sessionStorage.setItem('token_payToken', JSON.stringify(newPayToken))
+    },
+    { deep: true }
+  )
+
   const circulation = computed(() => {
     const circulation = new BigNumber(token.value?.total || 0)
       .minus(token.value?.lock_amount_dec || 0)

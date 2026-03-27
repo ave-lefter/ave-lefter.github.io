@@ -53,15 +53,15 @@
           </div>
           <div v-if="!isEdit" class="mt-10px tabs flex-1 flex-wrap" @mousedown.stop>
             <el-button
-              v-for="(item, $index) in buyValueList"
+              v-for="(item, $index) in buyUList"
               :key="$index" class="one-click-button green clickable" :class="{ 'active': isCanKeySwap && isEnableHotkey }" :style="{height: isShow8 ? 'calc(50% - 4px)' : '100%'}" :loading="loadingSwapBuy[$index]"
               :disabled="loadingSwapBuy[$index]" @click.stop.prevent="submitBotSwap(item, 'buy', $index)" @mousedown.stop @mouseover.stop="hoverBuyAmount = item" @mouseleave.stop="hoverBuyAmount = ''"
             >{{ !loadingSwapBuy[$index] ? item : '' }}</el-button>
           </div>
           <ul v-else class="mt-10px tabs flex-1 flex-wrap" @mousedown.stop>
-            <li v-for="(item, index) in buyValueList" :key="index" class="w-[calc((100%-30px)/4)]"  :style="{height: isShow8 ? 'calc(50% - 4px)' : '100%'}">
+            <li v-for="(item, index) in buyUList" :key="index" class="w-[calc((100%-30px)/4)]"  :style="{height: isShow8 ? 'calc(50% - 4px)' : '100%'}">
               <el-input
-                v-model="botSettings![chain]!.buy![botSettings?.[chain]?.buy.selected || 's1'].buyValueList[index]"
+                v-model="botSettings![chain]!.buy![botSettings?.[chain]?.buy.selected || 's1'].buyUList[tokenStore.swap.payToken?.address + '-' + chain][index]"
                 class="input-number h-full"
                 inputmode="decimal"
                 placeholder="0.0"
@@ -93,7 +93,7 @@
             >{{ !loadingSwapSell[$index] ? item + '%' : '' }}</el-button>
           </div>
           <ul v-else class="mt-10px tabs flex-1 flex-wrap" @mousedown.stop>
-            <li v-for="(item, index) in buyValueList" :key="index" class="w-[calc((100%-30px)/4)]"  :style="{height: isShow8 ? 'calc(50% - 4px)' : '100%'}">
+            <li v-for="(item, index) in sellPerList" :key="index" class="w-[calc((100%-30px)/4)]"  :style="{height: isShow8 ? 'calc(50% - 4px)' : '100%'}">
               <el-input
                 v-model="botSettings[chain].sell[botSettings?.[chain]?.sell.selected || 's1'].sellPerList[index]"
                 class="input-number h-full"
@@ -303,7 +303,7 @@ function addSpaceKeyDownEvent() {
       if (index >= 0) {
         const botSettings = botSettingStore.botSettings?.[chain.value]?.buy
         const selected = botSettings?.selected || 's1'
-        const buyValue = botSettings?.[selected]?.buyValueList[index]
+        const buyValue = botSettings?.[selected]?.buyUList[tokenStore.swap.payToken?.address + '-' + chain.value][index]
         submitBotSwap(buyValue || '', 'buy', index)
       }
       const index2 = ['a', 's', 'd', 'f'].indexOf(e.key)
@@ -751,11 +751,12 @@ const isShow8 = computed(() => {
   return dialogHeight.value >= 420
 })
 
-const buyValueList = computed(() => {
+const buyUList = computed(() => {
   const chain = getChain()
+  const key = tokenStore.swap.payToken?.address + '-' + chain
   const botSettings = botSettingStore.botSettings
-  const _buyValueList = botSettings?.[chain]?.buy![botSettings?.[chain]?.buy?.selected || 's1']?.buyValueList
-  return isShow8.value ? _buyValueList : _buyValueList?.slice(0, 4) || []
+  const _buyUList = botSettings?.[chain]?.buy![botSettings?.[chain]?.buy?.selected || 's1']?.buyUList[key]
+  return isShow8.value ? _buyUList : _buyUList?.slice(0, 4) || []
 })
 
 const sellPerList = computed(() => {
@@ -1079,7 +1080,7 @@ function handleBuyValue(value: string, index: number) {
   const chain = getChain()
   const botSetting = botSettingStore.botSettings?.[chain]
   const selected = botSetting?.buy?.selected || 's1'
-  botSetting!.buy![selected].buyValueList[index] = v
+  botSetting!.buy![selected].buyUList[tokenStore.swap.payToken?.address + '-' + chain][index] = v
 }
 
 function handleBlurBuyValue(index: number) {
@@ -1088,15 +1089,16 @@ function handleBlurBuyValue(index: number) {
   // 限制合法性，可添加逻辑
   const decimals = 4
   const selected = botSetting?.buy?.selected || 's1'
-  const v = botSetting?.buy?.[selected]?.buyValueList?.[index]
+  const key = tokenStore.swap.payToken?.address + '-' + chain
+  const v = botSetting?.buy?.[selected]?.buyUList?.[key]?.[index]
   const v1 = new BigNumber(v || 0)
     .toFixed()
     ?.match?.(new RegExp(`[0-9]*(\\.[0-9]{0,${decimals || 18}})?`))?.[0]
   if (String(v) !== String(v1) && botSetting?.buy) {
     if (Number(v1) === 0) {
-      botSetting.buy[selected].buyValueList[index] = '0'
+      botSetting.buy[selected].buyUList[key][index] = '0'
     } else {
-      botSetting.buy[selected].buyValueList[index] = v1 || '0'
+      botSetting.buy[selected].buyUList[key][index] = v1 || '0'
     }
   }
 }

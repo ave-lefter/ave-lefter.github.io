@@ -45,15 +45,21 @@ interface TooltipController {
  * 修改点：根据指令参数绑定对应的 Tooltip 实例
  */
 function resolveTooltip(el: HTMLElementDirective, arg?: string): TooltipController | undefined {
-  const { $tooltip, $createTooltip } = useNuxtApp()
+  try {
+    const { $tooltip, $createTooltip } = useNuxtApp()
 
-  // 如果使用了 v-tooltip:customId，则通过 $createTooltip(id) 获取或创建指定实例
-  if (arg && typeof $createTooltip === 'function') {
-    return $createTooltip(arg)
+    // 如果使用了 v-tooltip:customId，则通过 $createTooltip(id) 获取或创建指定实例
+    if (arg && typeof $createTooltip === 'function') {
+      return $createTooltip(arg)
+    }
+
+    // 否则返回默认单例
+    return ($tooltip as TooltipController)
+  } catch (error) {
+    // 在非Nuxt环境（如ElMessage）中，无法获取tooltip实例
+    console.warn('[Tooltip Directive] Cannot access tooltip instances, tooltip disabled for this element')
+    return undefined
   }
-
-  // 否则返回默认单例
-  return ($tooltip as TooltipController)
 }
 
 function isTooltipConfig(val: unknown): val is { content: any; props?: any } {
@@ -70,7 +76,7 @@ const tooltipDirective: Directive<HTMLElementDirective, TooltipValue> = {
     // 1. 获取指定实例
     const tooltip = resolveTooltip(el, binding.arg)
     if (!tooltip) {
-      console.warn('[Tooltip Directive] Instance not found')
+      // 静默跳过，不显示警告以避免控制台噪音
       return
     }
     el._tooltipInstance = tooltip // 缓存实例

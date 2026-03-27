@@ -1553,7 +1553,10 @@ const editMode2 = ref(false)
 function handleEdit(value: Ref<Array<{value: string}>>,type: string) {
   editMode.value = !editMode.value
   const botSetting = (botSettingStore?.botSettings?.[chain.value]?.buy || {}) as typeof botSettingStore.botSettings.solana
-  botSettingStore.botSettings[chain.value][type][botSetting?.selected || 's1'].buyValueList = value.map(el=>el.value)
+  const payToken = tokenStore.swap.payToken
+  const key = payToken?.address + '-' + chain.value
+  const list = botSetting?.[botSetting.selected]?.buyUList?.[key]
+  botSettingStore.botSettings[chain.value][type][botSetting?.selected || 's1'].buyUList[key] = [...value.map(el=>el.value), ...list.slice(4)]
 }
 
 function handleEdit2(value: Ref<Array<{value: string}>>,type: string) {
@@ -1583,7 +1586,7 @@ const parser = (value: string) => {
   }
   const cleanValue = value.trim()
   const numValue = parseFloat(cleanValue)
-  
+
   if (isNaN(numValue)) {
     return ''
   }
