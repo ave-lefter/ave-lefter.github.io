@@ -10,7 +10,7 @@ export function getInclusionOptions(t: ReturnType<typeof useI18n>['t']) {
           'holdersContent',
           // 'top10PositionsContent',
           // 'devContent'
-          'securityContent',
+          // 'securityContent',
         ],
       },
       {

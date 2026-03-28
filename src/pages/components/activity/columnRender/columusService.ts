@@ -8,7 +8,7 @@ export function getActivityOptions(t: ReturnType<typeof useI18n>['t']) {
         'liquidityContent',
         'holdersContent',
         // 'top10PositionsContent',
-        'securityContent',
+        // 'securityContent',
       ],
     },
     {
