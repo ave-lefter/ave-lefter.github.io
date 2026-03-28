@@ -134,6 +134,18 @@ const getTokenBalance = useThrottleFn(function (token: string, chain: string) {
         const tokens = res.tokens.filter(i => i.token === token)
         const newToken=tokens?.[0]||{}
         if (tokens.length > 0) {
+          const balance_usd = new BigNumber(newToken?.balance || 0)
+              .times(newToken?.price || 0)
+          if(balance_usd.lt(0.000000001) && (![NATIVE_TOKEN,'sol','TON'].includes(newToken.token))){
+            listData.value.splice(index, 1);
+            return 
+          }
+          if(balance_usd.lt(1)&&hide_small.value){
+            return 
+          }
+          if((newToken.risk_score > 55 || newToken.risk_level < 0) && hide_risk.value){
+            return
+          }
           if(index>-1){
             listData.value[index].balance = new BigNumber(newToken?.balance || 0).toNumber()
             listData.value[index].balance_usd = new BigNumber(newToken?.balance || 0)
