@@ -35,7 +35,7 @@ export function useSimilarTokenPopup() {
   }
 
   export function getFilterNumber(form:Record<string, any>, allPlatformsValue?: string, allBaseTokensValue?: string,debug = false) {
-      let filterList = Object.keys(form).filter((key) => form[key] !== null && form[key] !== undefined && form[key] !== '' && form[key] !== 0 && (form[key]?.length > 0 || form[key] == 1 || form[key] === 2))
+      let filterList = Object.keys(form).filter((key) => form[key] !== null && form[key] !== undefined && key !=='sort' && key !=='sort_dir'&& form[key] !== '' && form[key] !== 0 && (form[key]?.length > 0 || form[key] == 1 || form[key] === 2))
       filterList = Array.from(new Set(filterList.map(key => key.replace(/_min|_max$/g, ''))))
       // platforms 全选则不统计
       // 将 platforms 转为数组，判断数组是否相等，如果相等则不统计
