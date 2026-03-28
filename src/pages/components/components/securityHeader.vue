@@ -70,7 +70,9 @@ function handleConfirm() {
       v-model:visible="popoverVisible"
       placement="bottom"
       :width="240"
+      class="hidden"
       trigger="click"
+      style="display: none;"
       :persistent="false"
     >
       <template #reference>
