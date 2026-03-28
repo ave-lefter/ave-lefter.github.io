@@ -123,42 +123,43 @@ export const usePumpStore = defineStore('pumpStore', () => {
 
   function getPumpConfig() {
     return _getPumpConfig().then((res) => {
-      console.log('----set----',res)
+      // console.log('----set----',res)
       pumpConfig.value = res || []
-      pumpConfig.value.forEach(i => {
-        if (!pumpV3.value[i.chain]?.platforms?.length) {
-          // const platforms = i.platforms.map(y => y?.platform) || []
-          const platforms = i.platforms?.map(y => y.platform) || []
-          pumpV3.value[i.chain] = {
-            ...(pumpV3.value[i.chain] || {}),
-            platforms,
-            new: {
-              count: 0,
-              loading: false,
-              pumpFilter: {...pumpFilterDefault},
-            },
-            soon: {
-              count: 0,
-              loading: false,
-              pumpFilter: {...pumpFilterDefault, sort: 'progress'},
-            },
-            graduated: {
-              count: 0,
-              loading: false,
-              pumpFilter: {...pumpFilterDefault},
-            },
-          }
+      // console.log('pumpConfig.value', pumpConfig.value)
+      // pumpConfig.value.forEach(i => {
+      //   if (!pumpV3.value[i.chain]?.platforms?.length) {
+      //     // const platforms = i.platforms.map(y => y?.platform) || []
+      //     const platforms = i.platforms?.map(y => y.platform) || []
+      //     pumpV3.value[i.chain] = {
+      //       ...(pumpV3.value[i.chain] || {}),
+      //       platforms,
+      //       new: {
+      //         count: 0,
+      //         loading: false,
+      //         pumpFilter: {...pumpFilterDefault},
+      //       },
+      //       soon: {
+      //         count: 0,
+      //         loading: false,
+      //         pumpFilter: {...pumpFilterDefault, sort: 'progress'},
+      //       },
+      //       graduated: {
+      //         count: 0,
+      //         loading: false,
+      //         pumpFilter: {...pumpFilterDefault},
+      //       },
+      //     }
 
-          if (!pump_notice.value?.[i.chain]) {
-            pump_notice.value[i.chain] = {
-              new: '',
-              soon: '',
-              graduated: '',
-            }
-          }
-          console.log('------pump_notice.value------', pump_notice.value)
-        }
-      })
+      //     if (!pump_notice.value?.[i.chain]) {
+      //       pump_notice.value[i.chain] = {
+      //         new: '',
+      //         soon: '',
+      //         graduated: '',
+      //       }
+      //     }
+      //     console.log('------pump_notice.value------', pump_notice.value)
+      //   }
+      // })
     })
   }
 

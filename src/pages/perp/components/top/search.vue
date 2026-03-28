@@ -1,17 +1,17 @@
 <template>
   <div class="">
-    <div class="px-16px py-16px pb-8px flex justify-between items-center">
+    <div class="px-16px py-16px pb-0px flex justify-between items-center">
       <el-input
         ref="inputSearch"
         v-model.trim="query"
-        class="search-input px-20px mr-10px flex-1"
+        class="search-input px-20px flex-1"
         :placeholder="$t('search')"
         autofocus
-        size="large"
+        size="default"
         @input="onSearchInput"
       >
         <template #prefix>
-          <Icon class="text-12px text-[--third-text]" name="custom:search" />
+          <Icon class="text-14px text-[--third-text]" name="custom:search" />
         </template>
         <template #suffix>
           <Icon
@@ -22,7 +22,7 @@
           />
         </template>
       </el-input>
-      <ul class="flex gap-8px">
+      <!-- <ul class="flex gap-8px">
         <li
           v-for="item in categoryList"
           :key="item.category"
@@ -32,8 +32,14 @@
         >
           {{ item.name }}
         </li>
-      </ul>
+      </ul> -->
     </div>
+    <div class="px-16px">
+      <el-tabs v-model="activeCategory" class="category-tabs">
+        <el-tab-pane v-for="item in categoryList" :key="item.category" :label="item.name === 'All' ? $t('all') : item.name" :name="item.category"/>
+      </el-tabs>
+    </div>
+
 
     <SearchTable
       :tokens="contractList"
@@ -175,11 +181,15 @@ function onClearQuery() {
   fetchContractList(false)
 }
 
-function onCategoryClick(category: string) {
-  if (activeCategory.value === category) return
-  activeCategory.value = category
+watch(activeCategory, () => {
   fetchContractList(false)
-}
+})
+
+// function onCategoryClick(category: string) {
+//   if (activeCategory.value === category) return
+//   activeCategory.value = category
+//   fetchContractList(false)
+// }
 
 function onLoadMore() {
   fetchContractList(true)
@@ -229,6 +239,21 @@ watch(
     border-bottom: 1px solid var(--border);
     .el-input__inner::placeholder {
       color: var(--third-text);
+    }
+  }
+}
+.category-tabs {
+  --el-color-primary: var(--main-text);
+  --el-text-color-primary: var(--third-text);
+  --el-border-color-light: var(--dialog-divider);
+  margin-bottom: 0px;
+  :deep() {
+    .el-tabs__item {
+      padding: 0 8px;
+      font-weight: 400;
+    }
+    .el-tabs__header {
+      margin-bottom: 5px;
     }
   }
 }

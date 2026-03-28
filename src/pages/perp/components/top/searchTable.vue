@@ -264,7 +264,7 @@ function switchSort(sortBy1: string, activeSort1?: SortValue) {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 20px;
+    padding: 10px 16px;
     > :nth-child(1) {
       flex: 2;
     }
@@ -304,7 +304,7 @@ function switchSort(sortBy1: string, activeSort1?: SortValue) {
   .content {
     padding: 0 0 20px;
     li {
-      padding: 0 20px;
+      padding: 0 16px;
       &:hover {
         background-color: var(--border);
       }

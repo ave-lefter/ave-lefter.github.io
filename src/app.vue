@@ -81,6 +81,7 @@
     usePerpStore().getPerpMetadata()
     usePerpWsPubStore().init()
     setRefCodeToCookie()
+    usePumpStore().getPumpConfig()
   }
 
   useMemorySentinel()
