@@ -1156,7 +1156,18 @@ const getChangedValue = (A: Array<string | null | undefined>, B: Array<string | 
 
 let isLeave = true
 
+function resetAllPumpLoading() {
+  Object.keys(pumpV3.value).forEach((chain) => {
+    const chainData = pumpV3.value[chain as ChainKey]
+    if (!chainData) return
+    ;['new', 'soon', 'graduated'].forEach((category) => {
+      chainData[category as CategoryKey].loading = false
+    })
+  })
+}
+
 function initPage() {
+  resetAllPumpLoading()
   bindAudioCanPlay()
   isLeave = false
   wsTableListCache = {}
