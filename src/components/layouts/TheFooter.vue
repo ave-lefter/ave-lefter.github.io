@@ -221,6 +221,8 @@ import navWhiteHoverIcon from '@/assets/icons/footer/nav-white-hover.svg?url'
 import { TokenImg, QuickSwap } from '#components'
 import Net from '@/components/net.vue'
 // import QuickSwap from '../quickSwapTsx.vue'
+import { useWindowSize } from '@vueuse/core'
+const { width } = useWindowSize()
 
 const { t } = useI18n()
 const { visible, hasRing } = storeToRefs(useMonitorStore())
@@ -348,7 +350,13 @@ const initPage = () => {
   })
 }
 
-const mainCoins = computed(() => data.value.filter(Boolean))
+const mainCoins = computed(() => {
+  let list = data.value.filter(Boolean)
+  if (width.value <= 1600) {
+    list = list?.filter(i=> i.symbol !=='BNB' && i.symbol !=='SOL')
+  }
+  return list
+})
 
 watch(
   () => globalStore.footerTokensPrice,

@@ -132,8 +132,8 @@ v-model:visible="visible"
             <div class="color-[--third-text] text-12px">{{ formatDate((item?.updateTime) || item?.createTime) }}</div>
           </li>
         </ul>
-        <div v-if="activeTab == 'remind'" class="min-h-400px">
-          <div v-for="(item, $index) in remindHistoryList" class="item" :keys="$index">
+        <div v-if="activeTab == 'remind'" class="min-h-500px">
+          <div v-for="(item, $index) in remindHistoryList" :key="$index" class="item">
             <div class="flex-between items-center parent cursor-pointer">
               <NuxtLink
                 :to="`/token/${item.token_address}-${item.chain}`"

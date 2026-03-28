@@ -10,7 +10,7 @@
       <div class="flex items-center color-#333066 text-center font-700 pl-30px mt-40px" :style="{color: refColor}">
         <div>
           <div class="text-45px">{{ Math.round(referralInfo?.chainRefRatio / 100) || 0 }}<span class="text-30px">%</span></div>
-          <div class="text-14px font-400 mt-20px">{{ $t('chainWalletRebate') }}</div>
+          <div class="text-14px font-400 mt-20px">Bot/{{ $t('chainWalletRebate') }}</div>
         </div>
         <div class="ml-70px">
           <div class="text-45px">{{ Math.round(referralInfo?.perpRefRatio / 100) || 0 }}<span class="text-30px">%</span></div>

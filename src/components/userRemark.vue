@@ -41,7 +41,8 @@
         :address="address"
         :chain="chain"
         :remark="remark"
-        :popoverProps="{width: 320,title:t('editRemark'),popperClass:'[&&]:[--el-popover-title-text-color:--main-text] [&&]:[--el-popover-title-font-size:14px]'}"
+        :popoverProps="{width: 320,title:t('editRemark'),popperClass:'[&&]:[--el-popover-title-text-color:--main-text] [&&]:[--el-popover-title-font-size:14px] text-left z-999', ...popoverProps}"
+        :appendTo="appendTo"
         @confirm="_updateWhaleRemark"
       />
       <Icon v-else name="custom:remark" class="text-12px ml-5px clickable icon-remark shrink-0" @click.stop.prevent="verifyLogin"/>
@@ -90,7 +91,9 @@ const props = defineProps({
     default: () => ({ logo: '', name: '', url: '', vip_logo: '' })
   },
   canEdit: { type: Boolean, default: true },
-  avatarClass: { type: String, default: 'mr-10px' }
+  avatarClass: { type: String, default: 'mr-10px' },
+  popoverProps: { type: Object as PropType<any>, default: () => ({}) },
+  appendTo: { type: [String, Number, HTMLElement] as PropType<string | number | HTMLElement>, default: 'body' },
 })
 
 // Emits

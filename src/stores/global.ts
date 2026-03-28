@@ -192,8 +192,8 @@ export const useGlobalStore = defineStore('global', () => {
     isUpdateExist: true,
   })
 
-  const hide_risk=shallowRef(1)
-  const hide_small=shallowRef(0)
+  const hide_risk=useStorage('positions_hide_risk',1)
+  const hide_small=useStorage('positions_hide_small',0)
   const rankCommon = useStorage('rankCommon', {
     activeInterval: '24h',
     quickVisible: true,

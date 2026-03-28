@@ -35,13 +35,7 @@ const contentKey = ref(0)
   },
  isGetData = true) {
     if (isGetData) {
-      let tag_type= 0
-      if (options?.type == 'kol') {
-        tag_type = 31
-      } else if (options?.type == 'smart') {
-        tag_type = 30
-      }
-    getHolderRank(tokenId, tag_type)
+    getHolderRank(tokenId, options?.type || 0)
   }
 
   contentKey.value++
@@ -83,27 +77,34 @@ async function getHolderRank(tokenId: string, tag_type = 0) {
     self_address: botStore?.evmAddress || walletStore?.address || '',
     tag_type ,
   }
-
-  try {
-    const res = await _getHolderRank(data)
-   contentKey.value++
-    contentProps.value = {
-      tokenId,
-      loading: false,
-      tableList: Array.isArray(res?.items)
-        ? res.items.map((i) => ({
-            ...i,
-            balance_radio: Number(i.balance_radio)?.toFixed(2) || '0',
-          }))
-        : [],
+    if (tag_type == -100 && !data.self_address) {
+      contentProps.value = {
+        tokenId: '',
+        loading: false,
+        tableList: [],
+      }
+      return
     }
-  } catch {
-    contentProps.value = {
-      tokenId: '',
-      loading: false,
-      tableList: [],
+    try {
+      const res = await _getHolderRank(data)
+      contentKey.value++
+      contentProps.value = {
+        tokenId,
+        loading: false,
+        tableList: Array.isArray(res?.items)
+          ? res.items.map((i) => ({
+              ...i,
+              balance_radio: Number(i.balance_radio)?.toFixed(2) || '0',
+            }))
+          : [],
+      }
+    } catch {
+      contentProps.value = {
+        tokenId: '',
+        loading: false,
+        tableList: [],
+      }
     }
-  }
 }
 
   return {

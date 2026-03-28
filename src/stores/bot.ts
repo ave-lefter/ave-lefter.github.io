@@ -35,7 +35,7 @@ export const useBotStore = defineStore('bot', () => {
   const walletStore = useWalletStore()
   const configStore = useConfigStore()
   const tokenStore = useTokenStore()
-  const isSupportChains = ['eth', 'bsc', 'solana', 'base', 'xlayer', 'polygon', 'ton'] as const
+  const isSupportChains = ['bsc', 'solana','eth', 'base', 'xlayer', 'polygon', 'ton'] as const
   const isSupportEvmChains = computed(() => {
     const chainConfig = configStore.chainConfig
     const isEvmChainWallet = getChainInfo(walletStore.chain)?.vm_type === 'evm'

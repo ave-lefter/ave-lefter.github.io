@@ -26,7 +26,7 @@ const props = defineProps<{
     loading: boolean
     tableList: HolderRankItem[]
   }>
-  type: String,
+  type: Number,
   ratio: String,
   symbol: String,
   logo_url: String,
@@ -34,7 +34,7 @@ const props = defineProps<{
 }>()
 const data = computed(() => props.data.value)
 const Com = computed(() => {
-  if(props.type === 'kol' || props.type === 'smart') {
+  if(props.type === 31 || props.type === 30 || props.type === -100) {
     return KolSmart
   } else {
     return Content

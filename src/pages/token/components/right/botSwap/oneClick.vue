@@ -281,11 +281,19 @@ const estimateSellAmount = computed(() => {
 function addSpaceKeyDownEvent() {
   useEventListener(document, 'keydown', (e) => {
     if (e.code === 'Space') {
+      e.preventDefault()
+      if (document.getElementById('tv_chart_container')) {
+        document.getElementById('tv_chart_container')!.style.pointerEvents = 'none'
+      }
       isCanKeySwap.value = true
     }
   })
   useEventListener(document, 'keyup', (e) => {
     if (e.code === 'Space') {
+      e.preventDefault()
+      if (document.getElementById('tv_chart_container')) {
+        document.getElementById('tv_chart_container')!.style.pointerEvents = 'auto'
+      }
       isCanKeySwap.value = false
     }
   })
@@ -309,6 +317,13 @@ function addSpaceKeyDownEvent() {
         handleSellAmount(sellPer || '', index2)
       }
     }
+  })
+  useEventListener(window, 'blur', () => {
+    setTimeout(() => {
+      if (document.activeElement === document.querySelector('#tv_chart_container iframe') && visible.value) {
+        window.focus() // 强制抢回焦点，确保主页面能捕捉空格键
+      }
+    }, 0)
   })
 }
 
@@ -721,7 +736,7 @@ const isMounted = ref(false)
 // 拖拽放大相关
 const minHeight = 327
 const maxHeight = 800
-const minWidth = 360
+const minWidth = 335
 const maxWidth = 900
 const defaultHeight = 327
 const defaultWidth = 360
@@ -1150,7 +1165,7 @@ onBeforeUnmount(() => {
   font-size: 12px;
   background: var(--dialog-bg);
   border-radius: 8px;
-  min-width: 360px;
+  min-width: 335px;
   min-height: 327px;
   max-width: 900px;
   max-height: 800px;
