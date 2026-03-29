@@ -1636,7 +1636,6 @@ async function getPump(rawParams: PumpRequestParams, isFilter = false) {
   const finalParams = Object.fromEntries(
     Object.entries(queryParams).filter(([_, v]) => v != null && v !== '' && Boolean(v))
   )
-
   if (finalParams.dev_sale_out) {
     if (finalParams.dev_sale_out == 2) {
       finalParams.dev_sale_out = 0 //. dev_sale_out：1 已清仓，0未清仓
