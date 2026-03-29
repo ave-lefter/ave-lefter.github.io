@@ -153,7 +153,7 @@ function showBubbleTooltip(row: PumpObj, e: MouseEvent) {
           background: Number(formatNumber(row?.sniper_balance_ratio_cur || 0, 1)) == 0 ? '' : (Number(row?.sniper_balance_ratio_cur) > 5 ? '#f6465d1a' : '#12b8861a'),
         }"
       >
-        <Icon name="custom:gun" class="text-10px shrink-0" />
+        <Icon class="iconfont icon-gun" name="custom:gun1" />
         <span>{{ formatNumber(Number(row?.sniper_balance_ratio_cur) > 0.001 ? row?.sniper_balance_ratio_cur || 0 : 0, 1) }}%</span>
       </div>
       <!-- 老鼠仓 insider_balance_ratio_cur -->
@@ -165,11 +165,10 @@ function showBubbleTooltip(row: PumpObj, e: MouseEvent) {
           background: Number(formatNumber(row?.insider_balance_ratio_cur || 0, 1)) == 0 ? '' : (Number(row?.insider_balance_ratio_cur) > 5 ? '#f6465d1a' : '#12b8861a'),
         }"
       >
-        <img
-          :src="themeStore.isDark ? insidersWhite : insidersBlack"
-          width="12" height="12" alt=""
-          class="opacity-70"
-        >
+        <Icon
+          class="iconfont icon-laoshucang"
+          name="custom:insider1"
+        />
         <span>{{ formatNumber(Number(row?.insider_balance_ratio_cur) > 0.001 ? row?.insider_balance_ratio_cur || 0 : 0, 1) }}%</span>
       </div>
     </div>
@@ -184,11 +183,7 @@ function showBubbleTooltip(row: PumpObj, e: MouseEvent) {
           background: Number(formatNumber(row?.phishing_ratio || 0, 1)) == 0 ? '' : (Number(row?.phishing_ratio) > 5 ? '#f6465d1a' : '#12b8861a'),
         }"
       >
-        <img
-          :src="themeStore.isDark ? phishingWhite : phishingBlack"
-          width="12" height="12" alt=""
-          class="opacity-70"
-        >
+        <Icon class="iconfont icon-fish" name="custom:fish"/>
         <span>{{ formatNumber(Number(row?.phishing_ratio) > 0.001 ? row?.phishing_ratio || 0 : 0, 1) }}%</span>
       </div>
       <!-- 捆绑 boulder_rate -->
@@ -200,11 +195,7 @@ function showBubbleTooltip(row: PumpObj, e: MouseEvent) {
           background: Number(formatNumber(row?.boulder_rate || 0, 1)) == 0 ? '' : (Number(row?.boulder_rate) > 5 ? '#f6465d1a' : '#12b8861a'),
         }"
       >
-        <img
-          :src="themeStore.isDark ? bundleWhite : bundleBlack"
-          width="12" height="12" alt=""
-          class="opacity-70"
-        >
+        <Icon class="iconfont icon-binding" name="custom:binding"/>
         <span>{{ formatNumber(Number(row?.boulder_rate) > 0.001 ? row?.boulder_rate || 0 : 0, 1) }}%</span>
       </div>
       <!-- 阴谋集团 cluster_rate -->
@@ -216,11 +207,7 @@ function showBubbleTooltip(row: PumpObj, e: MouseEvent) {
           background: Number(formatNumber(row?.cluster_rate || 0, 1)) == 0 ? '' : (Number(row?.cluster_rate) > 5 ? '#f6465d1a' : '#12b8861a'),
         }"
       >
-        <img
-          :src="themeStore.isDark ? cabalWhite : cabalBlack"
-          width="12" height="12" alt=""
-          class="opacity-70"
-        >
+        <Icon class="iconfont icon-binding" name="custom:cabal"></Icon>
         <span>{{ formatNumber(Number(row?.cluster_rate) > 0.001 ? row?.cluster_rate || 0 : 0, 1) }}%</span>
       </div>
       <!-- 安全 risk_score -->
@@ -230,7 +217,7 @@ function showBubbleTooltip(row: PumpObj, e: MouseEvent) {
       </div>
       <!-- 跑路（仅 solana） -->
       <div v-tooltip="$t('flag_rug_pull')" v-if="runPullVisible" class="sec-card">
-        <Icon name="custom:rug" class="text-12px shrink-0" />
+        <Icon name="custom:rug" class="shrink-0" />
         <span :class="getRugColor(row.rug_rate)">{{ row.rug_rate == -1 ? $t('unKnown1') : formatRate(row.rug_rate) }}</span>
       </div>
     </div>

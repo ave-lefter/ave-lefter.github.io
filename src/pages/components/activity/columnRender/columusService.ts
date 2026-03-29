@@ -122,17 +122,17 @@ export function getActivityDefaultColumns(t: ReturnType<typeof useI18n>['t']) {
       minWidth:getTextWidth(t('top10'), 50) + 40,
       align:'right'
     },
-     {
-      title: t('tokenInfoSecurity'),
-      key: 'security',
-      isVisible: true,
-      render: 'securityContent',
-      children:[
-        {title:t('tokenInfoSecurity'),isVisible:true,render:'securityContent'},
-      ],
-      minWidth:280,
-      align:'right'
-    },
+    // {
+    //   title: t('tokenInfoSecurity'),
+    //   key: 'security',
+    //   isVisible: true,
+    //   render: 'securityContent',
+    //   children:[
+    //     {title:t('tokenInfoSecurity'),isVisible:true,render:'securityContent'},
+    //   ],
+    //   minWidth:280,
+    //   align:'right'
+    // },
     {
       title: t('snipers'),
       key: 'sniper_tx_count',

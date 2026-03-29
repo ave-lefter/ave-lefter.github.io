@@ -670,8 +670,7 @@
                         background: Number(formatNumber(row?.phishing_ratio || 0, 1))==0? '' : (Number(row?.phishing_ratio) > 5 ? '#f6465d1a' : '#12b8861a'),
                       }"
                     >
-                      <Icon class="iconfont icon-fish text-12px mr-4px" name="custom:fish"
-                    />
+                      <Icon class="iconfont icon-fish text-12px mr-4px" name="custom:fish"/>
                       <span>{{
                         formatNumber(
                           Number(row?.phishing_ratio) > 0.001 ? row?.phishing_ratio || 0 : 0,
@@ -688,8 +687,7 @@
                       }"
                       class="flex mr-8px bg-btn"
                     >
-                      <Icon class="iconfont icon-binding text-12px mr-4px" name="custom:binding"
-                    />
+                      <Icon class="iconfont icon-binding text-12px mr-4px" name="custom:binding"/>
                       <span>{{
                         formatNumber(
                           Number(row?.address_binding_ratio) > 0.001 ? row?.address_binding_ratio || 0 : 0,
@@ -705,8 +703,7 @@
                       }"
                       class="flex mr-8px bg-btn"
                     >
-                      <Icon class="iconfont icon-binding text-12px mr-4px" name="custom:cabal"
-                    />
+                      <Icon class="iconfont icon-binding text-12px mr-4px" name="custom:cabal"/>
                       <span>{{
                         formatNumber(
                           Number(row?.colluded_cluster_ratio) > 0.001 ? row?.colluded_cluster_ratio || 0 : 0,
