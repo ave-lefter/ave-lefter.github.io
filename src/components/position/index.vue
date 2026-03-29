@@ -11,7 +11,7 @@
       </div>
     </div>
     <div v-if="currentAddress" class="w-full relative">
-      <PositionsTable :height="scrollHeight" class="absolute w-[calc(100%+21px)] left--10px" />
+      <PositionsTable :height="scrollHeight" class="absolute w-[calc(100%+24px)] left--12px" />
     </div>
     <AveEmpty
       v-else

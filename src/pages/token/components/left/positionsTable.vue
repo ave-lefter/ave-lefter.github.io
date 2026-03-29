@@ -706,7 +706,7 @@ function hideToken(row:any) {
       :userIds="tableFilter.user_ids"
       @addWhite="()=>{}"
     />
-    <div v-loading="listStatus.loading && listStatus.pageNo===1">
+    <div v-loading="listStatus.loading && listStatus.pageNo===1" class="hide-scrollbar">
       <div class="flex items-center mt-10px pr-15px gap-[12px]">
         <el-checkbox
           v-model="tableFilter['hide_risk']"
@@ -760,10 +760,10 @@ function hideToken(row:any) {
           :infinite-scroll-delay="10"
           :infinite-scroll-immediate="false"
         >
-          <div class="pb-20px pr-20px">
+          <div class="pb-20px pr-0px">
             <NuxtLink
               v-for="(row,$index) in filterListData" :key="$index"
-              class="text-12px flex justify-between pl-10px py-7px cursor-pointer hover:bg-[--dialog-bg] group"
+              class="text-12px flex justify-between px-12px py-7px cursor-pointer hover:bg-[--dialog-bg] group"
               :to="`/token/${row.index}`"
             >
               <div class="flex-[1.3] flex items-center relative min-w-0">
@@ -842,7 +842,7 @@ function hideToken(row:any) {
                 </div>
              
               </div>
-              <div class="flex-[0.8] flex justify-end">
+              <div class="flex-[0.8] flex justify-end items-center">
                 <el-button
                   v-if="botStore.evmAddress && row.token!=='0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'"
                   size="small"
@@ -857,7 +857,7 @@ function hideToken(row:any) {
               </div>
             </NuxtLink>
             <AveEmpty v-if="listData.length===0&&!listStatus.loading"
-              class="m-[0_auto] pl-30px"
+              class="m-[0_auto] pl-10px"
               :style="{paddingTop:Math.max((scrollbarHeight-90)/2,0)+'px'}"
             />
           </div>

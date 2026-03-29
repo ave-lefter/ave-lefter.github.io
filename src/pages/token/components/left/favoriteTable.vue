@@ -377,7 +377,7 @@ function toggleMode(mode: string) {
 </script>
 
 <template>
-  <div v-loading="listStatus.pageNo === 1 && listStatus.loading">
+  <div v-loading="listStatus.pageNo === 1 && listStatus.loading"  class="hide-scrollbar">
     <div class="flex items-center justify-between pr-15px pl-12px mt-10px">
       <div class="flex items-center min-w-0">
         <span
@@ -429,7 +429,7 @@ function toggleMode(mode: string) {
         :infinite-scroll-delay="10"
         :infinite-scroll-immediate="false"
       >
-        <div class="pb-0px">
+        <div class="pb-0px" >
           <NuxtLink
             v-for="(row, $index) in sortedFavList"
             :key="`${row.token}-${row.chain}`"

@@ -416,6 +416,9 @@ const columns = computed(() => {
 :deep() .el-table {
   --el-table-text-color:var(--d-E0E0E0-l-333);
   --el-table-header-bg-color:transparent;
+  .el-virtual-scrollbar{
+    display: none;
+  }
 }
 </style>
 
