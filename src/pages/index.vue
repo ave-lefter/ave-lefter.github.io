@@ -1636,7 +1636,6 @@ async function getPump(rawParams: PumpRequestParams, isFilter = false) {
   const finalParams = Object.fromEntries(
     Object.entries(queryParams).filter(([_, v]) => v != null && v !== '' && Boolean(v))
   )
-  
   if (finalParams.dev_sale_out) {
     if (finalParams.dev_sale_out == 2) {
       finalParams.dev_sale_out = 0 //. dev_sale_out：1 已清仓，0未清仓
@@ -1781,7 +1780,7 @@ function getFilterData(list: PumpObj[], conditions: any) {
       pass = pass && i.progress <= Number(conditions.progress_max)
     }
     if (conditions?.lage || conditions?.rage) {
-      const pumpAgeMinutes = (Date.now() / 1000 - Number(parseDate(i.time || i.created_at, true))) / 60
+      const pumpAgeMinutes = (Date.now() / 1000 - Number(i.time || i.created_at)) / 60
       if (conditions?.lage) {
         pass = pass && pumpAgeMinutes >= Number(conditions.lage)
       }
