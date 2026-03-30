@@ -70,15 +70,13 @@ function handleConfirm() {
       v-model:visible="popoverVisible"
       placement="bottom"
       :width="240"
-      class="hidden"
       trigger="click"
-      style="display: none;"
       :persistent="false"
     >
       <template #reference>
         <Icon
           name="custom:filter"
-          class="text-10px cursor-pointer"
+          class="text-10px cursor-pointer hidden"
           :class="isFilterHighlight ? 'color-[--primary-color]' : ''"
         />
       </template>

@@ -727,7 +727,7 @@
                   class="flex-end text-12px pr-12px mb-10px bg-1"
                   :class="pumpSetting.fontSize_mc =='12px'? 'mb-4px' : 'mb-4px'"
                 >
-                  <div class="bg-1 flex-end py-2px" v-if="isSoon && row.progress >= 99.99">
+                  <div v-if="isSoon && row.progress >= 99.99" class="bg-1 flex-end py-2px">
                     <el-image
                       v-if="row.issue_platform"
                       v-tooltip="row.issue_platform"

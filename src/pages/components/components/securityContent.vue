@@ -217,7 +217,7 @@ function showBubbleTooltip(row: PumpObj, e: MouseEvent) {
       </div>
       <!-- 跑路（仅 solana） -->
       <div v-tooltip="$t('flag_rug_pull')" v-if="runPullVisible" class="sec-card">
-        <Icon name="custom:rug" class="shrink-0" />
+        <Icon name="custom:rug" class="shrink-0 color-[--third-text1]"/>
         <span :class="getRugColor(row.rug_rate)">{{ row.rug_rate == -1 ? $t('unKnown1') : formatRate(row.rug_rate) }}</span>
       </div>
     </div>
@@ -236,5 +236,6 @@ function showBubbleTooltip(row: PumpObj, e: MouseEvent) {
   line-height: 16px;
   cursor: pointer;
   white-space: nowrap;
+  color: var(--second-text1);
 }
 </style>
