@@ -279,7 +279,7 @@
                           props: { 'raw-content': true, 'popper-class': 'pump-tooltip' }
                         }"
                         class="rounded-100% cursor-pointer mr-8px"
-                        :src="getSymbolDefaultIcon({ ...(row.baseToken || {}), chain: row.chain})"
+                        :src="row.baseToken?.logo_url ? `${configStore.token_logo_url}${row.baseToken?.logo_url}` : qsImage"
                         alt=""
                         :width="12"
                         style="border-radius: 100%"
@@ -608,14 +608,7 @@ class="flex-start mr-8px bg-btn"
                           name="custom:dev-ds"
                         />
                         <span
-                          >{{
-                            formatNumber(
-                              Number(row?.dev_balance_ratio_cur) >= 0.1
-                                ? row?.dev_balance_ratio_cur || 0
-                                : (Number(row?.dev_balance_ratio_cur) == 0  ? '0':'<0.1'),
-                              1
-                            )
-                          }}%
+                          >{{ Number(row?.dev_balance_ratio_cur) >= 0.1 ? formatNumber(row?.dev_balance_ratio_cur ,1) : (Number(row?.dev_balance_ratio_cur) == 0  ? '0':'<0.1')}}%
                         </span>
                       </template>
                       <img
@@ -923,6 +916,7 @@ import HolderRank from './holderRank/index.vue'
 import { useSimilarTokenPopup } from '../utils'
 import { windowEndpoint } from 'comlink'
 import AiPop from './aiPop/index.vue'
+import qsImage from '@/assets/images/pump/qs.svg'
 const props = defineProps({
   tableList: {
     type: Array<PumpObj>,
@@ -970,6 +964,7 @@ const emit = defineEmits(['clearFilter'])
 const handleClearFilter = () => {
   emit('clearFilter')
 }
+const configStore = useConfigStore()
 const { quickBuyValue, loading, isOut, isSoon , type} = toRefs(props)
 const tableList = shallowRef<PumpObj[]>(props.tableList || [])
 const hover = ref(false)

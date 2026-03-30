@@ -298,7 +298,6 @@ const limitData = {
   // platforms_moonshot: true,
   progress_min: 0, //进度
   progress_max: 100,
-
   lage: '', //代币时长
   rage: '',
   dev_balance_ratio_cur_min: 0, //dev 持仓%
@@ -307,6 +306,10 @@ const limitData = {
   holder_max: 1000000,
   holders_top10_ratio_min: 0, //top10 持仓%
   holders_top10_ratio_max: 100,
+  lbtax: '', //买入税
+  rbtax: '',
+  lstax: '', //税
+  rstax: '',
   lsniper_ratio: '',   //狙击%
   rsniper_ratio: '',
   smart_wallet_tag_count_min: 0, // 聪明钱钱包数
@@ -371,6 +374,10 @@ const initForm = {
   holder_max: '',
   holders_top10_ratio_min: '', //top10 持仓%
   holders_top10_ratio_max: '',
+  lbtax: '', //买入税
+  rbtax: '',
+  lstax: '', //税
+  rstax: '',
   lsniper_ratio: '',   //狙击人数
   rsniper_ratio: '',
   smart_wallet_tag_count_min: '', // 聪明钱钱包数
@@ -543,6 +550,22 @@ const columns = computed(() => {
       tab: Tabs2Enum.indicator
     },
     {
+      label: `${t('liquidity')}($)`,
+      prop: ['ltvl', 'rtvl'],
+      placeholder: [t('minor'), t('max1')],
+      type: 'inputRange',
+      suffix: '$',
+      tab: Tabs2Enum.indicator
+    },
+    {
+      label: `${t('MC')}($)`,
+      prop: ['market_cap_min', 'market_cap_max'],
+      placeholder: [t('minor'), t('max1')],
+      type: 'inputRange',
+      suffix: '$',
+      tab: Tabs2Enum.indicator
+    },
+    {
       label: `Dev ${t('positions')}(%)`,
       prop: ['dev_balance_ratio_cur_min', 'dev_balance_ratio_cur_max'],
       placeholder: [t('minor'), t('max1')],
@@ -558,6 +581,42 @@ const columns = computed(() => {
       tab: Tabs2Enum.indicator
     },
     {
+      label: `${t('24hMarkers')}`,
+      prop: ['lmks', 'rmks'],
+      placeholder: [t('minor'), t('max1')],
+      type: 'inputRange',
+      tab: Tabs2Enum.indicator
+    },
+    {
+      label: `${t('24Volume')}($)`,
+      prop: ['volume_u_24h_min', 'volume_u_24h_max'],
+      placeholder: [t('minor'), t('max1')],
+      type: 'inputRange',
+      suffix: '$',
+      tab: Tabs2Enum.indicator
+    },
+    {
+      label: `${t('24TxAddress')}`,
+      prop: ['tx_24h_count_min', 'tx_24h_count_max'],
+      placeholder: [t('minor'), t('max1')],
+      type: 'inputRange',
+      tab: Tabs2Enum.indicator
+    },
+    {
+      label: `${t('buyTxs')}`,
+      prop: ['lbtx', 'rbtx'],
+      placeholder: [t('minor'), t('max1')],
+      type: 'inputRange',
+      tab: Tabs2Enum.indicator
+    },
+    {
+      label: `${t('sellTxs')}`,
+      prop: ['lstx', 'rstx'],
+      placeholder: [t('minor'), t('max1')],
+      type: 'inputRange',
+      tab: Tabs2Enum.indicator
+    },
+    {
       label: `Top10 ${t('positions')}(%)`,
       prop: ['holders_top10_ratio_min', 'holders_top10_ratio_max'],
       placeholder: [t('minor'), t('max1')],
@@ -565,7 +624,22 @@ const columns = computed(() => {
       suffix: '%',
       tab: Tabs2Enum.indicator
     },
-
+    {
+      label: `${t('buyTax')}(%)`,
+      prop: ['lbtax', 'rbtax'],
+      placeholder: [t('minor'), t('max1')],
+      type: 'inputRange',
+      suffix: '%',
+      tab: Tabs2Enum.indicator
+    },
+    {
+      label: `${t('sellTax')}(%)`,
+      prop: ['lstax', 'rstax'],
+      placeholder: [t('minor'), t('max1')],
+      type: 'inputRange',
+      suffix: '%',
+      tab: Tabs2Enum.indicator
+    },
     {
       label: `${t('sniper2')}(%)`,
       prop: ['lsniper_ratio', 'rsniper_ratio'],
@@ -582,6 +656,16 @@ const columns = computed(() => {
       placeholder: [t('minor'), t('max1')],
       type: 'inputRange',
       suffix: '',
+      tab: Tabs2Enum.indicator
+    },
+    {
+      label: t('KOLTraders'),
+      prop: [
+        'lkol',
+        'rkol'
+      ],
+      placeholder: [t('minor'), t('max1')],
+      type: 'inputRange',
       tab: Tabs2Enum.indicator
     },
     {
@@ -672,16 +756,6 @@ const columns = computed(() => {
       suffix: '',
       tab: Tabs2Enum.indicator
     },
-    {
-      label: t('KOLTraders'),
-      prop: [
-        'lkol',
-        'rkol'
-      ],
-      placeholder: [t('minor'), t('max1')],
-      type: 'inputRange',
-      tab: Tabs2Enum.indicator
-    },
     // {
     //   label: `${t('runPullRatio')}`,
     //   prop: [
@@ -693,44 +767,6 @@ const columns = computed(() => {
     //   suffix: '%',
     //   tab: Tabs2Enum.indicator
     // },
-
-    {
-      label: `${t('MC')}($)`,
-      prop: ['market_cap_min', 'market_cap_max'],
-      placeholder: [t('minor'), t('max1')],
-      type: 'inputRange',
-      suffix: '$',
-      tab: Tabs2Enum.indicator
-    },
-    {
-      label: `${t('24Volume')}($)`,
-      prop: ['volume_u_24h_min', 'volume_u_24h_max'],
-      placeholder: [t('minor'), t('max1')],
-      type: 'inputRange',
-      suffix: '$',
-      tab: Tabs2Enum.indicator
-    },
-    {
-      label: `${t('buyTxs')}`,
-      prop: ['lbtx', 'rbtx'],
-      placeholder: [t('minor'), t('max1')],
-      type: 'inputRange',
-      tab: Tabs2Enum.indicator
-    },
-    {
-      label: `${t('sellTxs')}`,
-      prop: ['lstx', 'rstx'],
-      placeholder: [t('minor'), t('max1')],
-      type: 'inputRange',
-      tab: Tabs2Enum.indicator
-    },
-    {
-      label: `${t('24hMarkers')}`,
-      prop: ['lmks', 'rmks'],
-      placeholder: [t('minor'), t('max1')],
-      type: 'inputRange',
-      tab: Tabs2Enum.indicator
-    },
     {
       label: 'media',
       prop: 'sm_list',
@@ -764,21 +800,6 @@ const columns = computed(() => {
       prop: 'has_sm',
       type: 'checkbox',
       tab: Tabs2Enum.media
-    },
-    {
-      label: `${t('liquidity')}($)`,
-      prop: ['ltvl', 'rtvl'],
-      placeholder: [t('minor'), t('max1')],
-      type: 'inputRange',
-      suffix: '$',
-       tab: Tabs2Enum.indicator
-    },
-    {
-      label: t('Txs'),
-      prop: ['tx_24h_count_min', 'tx_24h_count_max'],
-      placeholder: [t('minor'), t('max1')],
-      type: 'inputRange',
-       tab: Tabs2Enum.indicator
     },
   ]
   return c || []
