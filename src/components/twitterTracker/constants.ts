@@ -40,6 +40,21 @@ export const useTrackerTypes = ()=>{
                 bg:'rgba(0, 197, 128, 0.10)',
                 color:'#00C580'
             },
+            [typeEnum.deletedTweets]: {
+                label:t('deletedTweets'),
+                bg:'rgba(222, 87, 90, 0.1)',
+                color:'#DE575A'
+            },
+            [typeEnum.top]: {
+                label:t('top'),
+                bg:'#46CBF01A',
+                color:'#46CBF0'
+            },
+            [typeEnum.unpin]: {
+                label:t('unpin'),
+                bg:'#E082351A',
+                color:'#E08235'
+            },
         }))
     }
 }

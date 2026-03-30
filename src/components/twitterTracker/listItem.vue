@@ -43,10 +43,10 @@
                         <Icon :name="followIdArray.includes(item.author.author_id) ? 'custom:twitter-collect' : 'custom:twitter-uncollect'" class="text-12px" />
                     </div>
                     <div class="flex items-center gap-4px py-6px px-4px rounded-4px text-12px"
-                    :style="{background: map[item.type]?.bg, color: map[item.type]?.color}"
+                    :style="{background: map[item.action||item.type]?.bg, color: map[item.action||item.type]?.color}"
                     >
-                        <Icon :name="`custom:twitter-${item.type}`" class="text-13px" />
-                        {{ map[item.type]?.label }}
+                        <Icon :name="`custom:twitter-${item.action||item.type}`" class="text-13px" />
+                        {{ map[item.action||item.type]?.label }}
                     </div>
                 </div>
             </div>
