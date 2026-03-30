@@ -122,7 +122,7 @@ const getTokenBalance = useThrottleFn(function (token: string, chain: string) {
       chain,
       creatorAddress,
       tokens: [token],
-      showZero: false
+      showZero: true
     }).then(res => {
       const index = listData.value.findIndex(i => i.token === token && i.chain === chain)
       if(!res?.tokens||!res?.tokens?.length){
@@ -214,10 +214,14 @@ watch(() => wsStore.wsResult[WSEventType.ASSET], (val: IAssetResponse) => {
       ? NATIVE_TOKEN : val.swap.token
     const chain = val.swap.chain
     if (token && chain) {
-      setTimeout(()=>{
-        resetStatus()
-        getDataOnResize()
-      },5000)
+      if( ["solana"].includes(chain)){
+        getTokenBalance(token,chain)
+      }else{
+        setTimeout(()=>{
+          resetStatus()
+          getDataOnResize()
+        },5000)
+      }
     }
     //   处理转账
   } else if (val.transfer) {
