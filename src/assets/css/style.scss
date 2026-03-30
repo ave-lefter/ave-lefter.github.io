@@ -546,3 +546,11 @@ debox-chat-widget {
     background-color: transparent;
   }
 }
+.notice-content {
+  a {
+    color: #3F80F7;
+    &:hover{
+      opacity: 0.8;
+    }
+  }
+}
