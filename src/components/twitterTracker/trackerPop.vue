@@ -297,7 +297,19 @@ const twitterHandler = async (val) => {
 
 watch([() => isPaused.value, () => activeParentTab.value], ([val,val2]) => {
   if (!val && val2 === 1) {
-    trackerStore.list.unshift(...wsCacheArr.value)
+
+    const map = new Map();
+
+    wsCacheArr.value.forEach(item => {
+      // 只有当 Map 中还没有这个 tweet_id 时，才设置
+      // 如果已经有了，什么都不做（从而保留了前面的值）
+      if (!map.has(item.tweet_id)) {
+        map.set(item.tweet_id, item);
+      }
+    });
+
+    const result = Array.from(map.values());
+    trackerStore.list.unshift(...result)
     trackerStore.list = trackerStore.list.slice(0,100)
     wsCacheArr.value = []
   }

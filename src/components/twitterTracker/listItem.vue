@@ -159,7 +159,7 @@ const measureEl = ref(null)
 const contentExpanded = ref(false)
 const isContentOverflow = ref(false)
 const followIds = useStorage('twFollowIds', [])
-const translationVisible = ref(false)
+const translationVisible = ref(true)
 
 const followIdArray = computed(() => {
     return followIds.value.map(el => el.author_id)

@@ -649,5 +649,7 @@
   "favRemarksTips": "Você quer seguir a carteira selecionada",
   "batchFav": "Acompanhamento em lote",
   "removeTokenTips2": "Excluir o monitoramento selecionado?",
-  "monitor": "monitor"
+  "monitor": "monitor",
+  "deletedTweets": "Tweets excluídos",
+  "unpin": "Liberar"
 }

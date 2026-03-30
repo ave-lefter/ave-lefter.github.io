@@ -1497,5 +1497,7 @@
   "you": "あなた",
   "favRemarksTips": "選択したウォレットをフォローしますか?",
   "batchFav": "バッチフォロー",
-  "removeTokenTips2": "選択したモニタリングを削除しますか?"
+  "removeTokenTips2": "選択したモニタリングを削除しますか?",
+  "deletedTweets": "削除されたツイート",
+  "unpin": "固定を解除する"
 }

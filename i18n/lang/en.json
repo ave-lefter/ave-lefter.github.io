@@ -2133,5 +2133,7 @@
   "favRemarksTips": "Do you want to follow the selected Wallet?",
   "batchFav": "Batch Follow",
   "removeTokenTips2": "Delete the selected monitoring?",
-  "twitterFollowers": "Twitter Followers"
+  "twitterFollowers": "Twitter Followers",
+  "deletedTweets": "Deleted Tweets",
+  "unpin": "Unpin"
 }

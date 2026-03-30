@@ -889,5 +889,7 @@
   "favRemarksTips": "Bạn có muốn theo dõi Ví đã chọn không?",
   "batchFav": "Theo dõi hàng loạt",
   "removeTokenTips2": "Xóa giám sát đã chọn?",
-  "monitor": "màn hình"
+  "monitor": "màn hình",
+  "deletedTweets": "Tweet đã xóa",
+  "unpin": "Bỏ ghim"
 }
