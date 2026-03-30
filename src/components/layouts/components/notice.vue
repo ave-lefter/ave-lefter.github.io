@@ -74,7 +74,7 @@ v-model:visible="visible"
             >
               {{ title }}
             </h2>
-            <div class="text-12px mb-4px notice-content" v-html="content"/>
+            <div class="text-12px mb-4px text-[--secondary-text] notice-content" v-html="content"/>
             <p class="text-12px color-[--third-text] my-0">
               {{ formatDate(time, 'YYYY/MM/DD HH:mm:ss') }}
             </p>
