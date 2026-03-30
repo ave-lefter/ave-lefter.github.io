@@ -183,8 +183,6 @@ const getTokenBalance = useThrottleFn(function (token: string, chain: string) {
             }
             console.log('newToken',data,newToken)
             listData.value.unshift(data)
-            priceV2Store.setMultiPriceParams('positions', listData.value.map(el => el.token + '-' + el.chain))
-            priceV2Store.sendPriceWs()
             nextTick(() => {
               triggerRef(listData)
             })
@@ -192,6 +190,8 @@ const getTokenBalance = useThrottleFn(function (token: string, chain: string) {
         }
         console.log('listData.value',listData.value)
       }
+      priceV2Store.setMultiPriceParams('positions', listData.value.map(el => el.token + '-' + el.chain))
+      priceV2Store.sendPriceWs()
       // listData.value = listData.value.map(item => {
       //   if (item.token === token && item.chain === chain) {
       //     return {
