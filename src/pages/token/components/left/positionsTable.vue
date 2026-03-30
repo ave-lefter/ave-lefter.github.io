@@ -154,6 +154,7 @@ const getTokenBalance = useThrottleFn(function (token: string, chain: string) {
             listData.value[index].total_profit = Number(newToken?.pnl?.totalProfit||0)?.toFixed(6)||'--'
             listData.value[index].total_profit_ratio =Number(newToken?.pnl?.totalProfitRatio||0)?.toFixed(6)||'--'
             listData.value[index].last_txn_time=newToken?.pnl?.lastUpdateTime?new Date(newToken?.pnl?.lastUpdateTime+'').getTime().toString().slice(0, -3):new Date().getTime().toString().slice(0, -3)
+           
             nextTick(() => {
               triggerRef(listData)
             })
@@ -180,9 +181,10 @@ const getTokenBalance = useThrottleFn(function (token: string, chain: string) {
               risk_score: Number(newToken?.risk_score||0),
               last_txn_time:newToken?.pnl?.lastUpdateTime?new Date(newToken?.pnl?.lastUpdateTime+'').getTime().toString().slice(0, -3):new Date().getTime().toString().slice(0, -3)
             }
-
             console.log('newToken',data,newToken)
             listData.value.unshift(data)
+            priceV2Store.setMultiPriceParams('positions', listData.value.map(el => el.token + '-' + el.chain))
+            priceV2Store.sendPriceWs()
             nextTick(() => {
               triggerRef(listData)
             })
