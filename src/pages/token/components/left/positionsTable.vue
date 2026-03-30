@@ -124,74 +124,82 @@ const getTokenBalance = useThrottleFn(function (token: string, chain: string) {
       tokens: [token],
       showZero: true
     }).then(res => {
-      const index = listData.value.findIndex(i => i.token === token && i.chain === chain)
-      if(!res?.tokens||!res?.tokens?.length){
-        if(index>-1){
-          console.log('index',index,token,chain)
-          listData.value.splice(index, 1);
-        }
-      }else if(res.chain === chain && res.creatorAddress === creatorAddress){
-        const tokens = res.tokens.filter(i => i.token === token)
-        const newToken=tokens?.[0]||{}
-        if (tokens.length > 0) {
-          const balance_usd = new BigNumber(newToken?.balance || 0)
-              .times(newToken?.price || 0)
-          if(balance_usd.lt(0.000000001) && (![NATIVE_TOKEN,'sol','TON'].includes(newToken.token))){
-            listData.value.splice(index, 1);
-            return 
-          }
-          if(balance_usd.lt(1)&&hide_small.value){
-            return 
-          }
-          if((newToken.risk_score > 55 || newToken.risk_level < 0) && hide_risk.value){
-            return
-          }
+      nextTick(() => {
+        console.log('getTokenBalance',res)
+        const index = listData.value.findIndex(i => i.token === token && i.chain === chain)
+        if(!res?.tokens||!res?.tokens?.length){
           if(index>-1){
-            listData.value[index].balance = new BigNumber(newToken?.balance || 0).toNumber()
-            listData.value[index].balance_usd = new BigNumber(newToken?.balance || 0)
-              .times(newToken?.price || 0).toNumber()
-            listData.value[index].current_price_usd = Number(newToken?.price||0)
-            listData.value[index].total_profit = Number(newToken?.pnl?.totalProfit||0)?.toFixed(6)||'--'
-            listData.value[index].total_profit_ratio =Number(newToken?.pnl?.totalProfitRatio||0)?.toFixed(6)||'--'
-            listData.value[index].last_txn_time=newToken?.pnl?.lastUpdateTime?new Date(newToken?.pnl?.lastUpdateTime+'').getTime().toString().slice(0, -3):new Date().getTime().toString().slice(0, -3)
-           
-            nextTick(() => {
-              triggerRef(listData)
-            })
-          }else{
-            const data={
-              index: newToken?.token === NATIVE_TOKEN
-            ? getChainInfo(res.chain)?.wmain_wrapper + '-' + res.chain
-            : `${newToken?.token}-${res.chain}`,
-              address: creatorAddress,
-              chain: res?.chain,
-              token: newToken?.token,
-              symbol: newToken?.symbol,
-              logo_url: newToken?.logoUrl,
-              balance: new BigNumber(newToken?.balance || 0).toNumber(),
-              balance_usd: new BigNumber(newToken?.balance || 0)
-                .times(newToken?.price || 0).toNumber(),
-              total_profit:  Number(newToken?.pnl?.totalProfit||0)?.toFixed(6)||'--',
-              total_profit_ratio:Number(newToken?.pnl?.totalProfitRatio||0)?.toFixed(6)||'--',
-              average_purchase_price_usd: new BigNumber(newToken?.pnl?.averageNetPurchasePrice||0).toString(),
-              current_price_usd: Number(newToken?.price||0),
-              price_change: 0,
-              decimals: Number(newToken?.decimals||0),
-              risk_level: Number(newToken?.risk_level||0),
-              risk_score: Number(newToken?.risk_score||0),
-              last_txn_time:newToken?.pnl?.lastUpdateTime?new Date(newToken?.pnl?.lastUpdateTime+'').getTime().toString().slice(0, -3):new Date().getTime().toString().slice(0, -3)
+            console.log('index',index,token,chain)
+            listData.value.splice(index, 1)
+            triggerRef(listData)
+          }
+        }else if(res.chain === chain && res.creatorAddress === creatorAddress){
+          const tokens = res.tokens.filter(i => i.token === token)
+          const newToken=tokens?.[0]||{}
+          console.log('newToken',newToken)
+          if (tokens.length > 0) {
+            const balance_usd = new BigNumber(newToken?.balance || 0)
+                .times(newToken?.price || 0)
+            if(balance_usd.lt(0.000000001) && (![NATIVE_TOKEN,'sol','TON'].includes(newToken.token))){
+              if(index>-1){
+                listData.value.splice(index, 1)
+                triggerRef(listData)
+              }
+              return 
             }
-            console.log('newToken',data,newToken)
-            listData.value.unshift(data)
-            nextTick(() => {
-              triggerRef(listData)
-            })
+            if(balance_usd.lt(1)&&hide_small.value){
+              return 
+            }
+            if((newToken.risk_score > 55 || newToken.risk_level < 0) && hide_risk.value){
+              return
+            }
+            if(index>-1){
+              listData.value[index].balance = new BigNumber(newToken?.balance || 0).toNumber()
+              listData.value[index].balance_usd = new BigNumber(newToken?.balance || 0)
+                .times(newToken?.price || 0).toNumber()
+              listData.value[index].current_price_usd = Number(newToken?.price||0)
+              listData.value[index].total_profit = Number(newToken?.pnl?.totalProfit||0)?.toFixed(6)||'--'
+              listData.value[index].total_profit_ratio =Number(newToken?.pnl?.totalProfitRatio||0)?.toFixed(6)||'--'
+              listData.value[index].last_txn_time=newToken?.pnl?.lastUpdateTime?new Date(newToken?.pnl?.lastUpdateTime+'').getTime().toString().slice(0, -3):new Date().getTime().toString().slice(0, -3)
+             
+              nextTick(() => {
+                triggerRef(listData)
+              })
+            }else{
+              const data={
+                index: newToken?.token === NATIVE_TOKEN
+              ? getChainInfo(res.chain)?.wmain_wrapper + '-' + res.chain
+              : `${newToken?.token}-${res.chain}`,
+                address: creatorAddress,
+                chain: res?.chain,
+                token: newToken?.token,
+                symbol: newToken?.symbol,
+                logo_url: newToken?.logoUrl,
+                balance: new BigNumber(newToken?.balance || 0).toNumber(),
+                balance_usd: new BigNumber(newToken?.balance || 0)
+                  .times(newToken?.price || 0).toNumber(),
+                total_profit:  Number(newToken?.pnl?.totalProfit||0)?.toFixed(6)||'--',
+                total_profit_ratio:Number(newToken?.pnl?.totalProfitRatio||0)?.toFixed(6)||'--',
+                average_purchase_price_usd: new BigNumber(newToken?.pnl?.averageNetPurchasePrice||0).toString(),
+                current_price_usd: Number(newToken?.price||0),
+                price_change: 0,
+                decimals: Number(newToken?.decimals||0),
+                risk_level: Number(newToken?.risk_level||0),
+                risk_score: Number(newToken?.risk_score||0),
+                last_txn_time:newToken?.pnl?.lastUpdateTime?new Date(newToken?.pnl?.lastUpdateTime+'').getTime().toString().slice(0, -3):new Date().getTime().toString().slice(0, -3)
+              }
+              console.log('newToken',data,newToken)
+              listData.value.unshift(data)
+              nextTick(() => {
+                triggerRef(listData)
+              })
+            }
           }
         }
-        console.log('listData.value',listData.value)
-      }
-      priceV2Store.setMultiPriceParams('positions', listData.value.map(el => el.token + '-' + el.chain))
-      priceV2Store.sendPriceWs()
+        console.log('setMultiPriceParams',listData.value.map(el => el.token + '-' + el.chain))
+        priceV2Store.setMultiPriceParams('positions', listData.value.map(el => el.token + '-' + el.chain))
+        priceV2Store.sendPriceWs()
+      })
       // listData.value = listData.value.map(item => {
       //   if (item.token === token && item.chain === chain) {
       //     return {
@@ -216,8 +224,13 @@ watch(() => wsStore.wsResult[WSEventType.ASSET], (val: IAssetResponse) => {
       ? NATIVE_TOKEN : val.swap.token
     const chain = val.swap.chain
     if (token && chain) {
-      if( ["solana"].includes(chain)){
+      if(["bsc", "eth", "base", "xlayer", "solana","polygon", "arbitrum", "optimism", "monad"].includes(chain)){
         getTokenBalance(token,chain)
+        if(["solana"].includes(chain)){
+          setTimeout(()=>{
+             getTokenBalance(token,chain)
+          },3000)
+        }
       }else{
         setTimeout(()=>{
           resetStatus()
@@ -233,31 +246,40 @@ watch(() => wsStore.wsResult[WSEventType.ASSET], (val: IAssetResponse) => {
     const type = val.transfer.type
     if( ["bsc", "eth", "base", "xlayer", "solana","polygon", "arbitrum", "optimism", "monad"].includes(chain)){
       getTokenBalance(token,chain)
+      if(["solana"].includes(chain)){
+        setTimeout(()=>{
+            getTokenBalance(token,chain)
+        },3000)
+      }
     }else{
       if (token && chain) {
-        const index = listData.value.findIndex(i => i.token === token && i.chain === chain)
-        const isBuy = type === '0'
-        if (index > -1) {
-          const indexObj = listData.value[index]
-          const balance = Number(indexObj.balance)
-          const price = indexObj.current_price_usd
-          const newBalance = new BigNumber(balance).plus(isBuy ? val.transfer.amount : -val.transfer?.amount)
-          const newBalanceUsd = newBalance.multipliedBy(price)
-          indexObj.balance = newBalance.toString()
-          indexObj.balance_usd = newBalanceUsd.toNumber()
-          if(!isBuy){
-            console.log('indexObj.balance',newBalance.toString())
-            if(Number(indexObj.balance)<=0){
-              listData.value.splice(index, 1);
-            }
-          }
-          triggerRef(listData)
-        } else {
-          setTimeout(()=>{
-            resetStatus()
-            getDataOnResize()
-          },5000)
-        }
+        // const index = listData.value.findIndex(i => i.token === token && i.chain === chain)
+        // const isBuy = type === '0'
+        // if (index > -1) {
+        //   const indexObj = listData.value[index]
+        //   const balance = Number(indexObj.balance)
+        //   const price = indexObj.current_price_usd
+        //   const newBalance = new BigNumber(balance).plus(isBuy ? val.transfer.amount : -val.transfer?.amount)
+        //   const newBalanceUsd = newBalance.multipliedBy(price)
+        //   indexObj.balance = newBalance.toString()
+        //   indexObj.balance_usd = newBalanceUsd.toNumber()
+        //   if(!isBuy){
+        //     console.log('indexObj.balance',newBalance.toString())
+        //     if(Number(indexObj.balance)<=0){
+        //       listData.value.splice(index, 1);
+        //     }
+        //   }
+        //   triggerRef(listData)
+        // } else {
+        //   setTimeout(()=>{
+        //     resetStatus()
+        //     getDataOnResize()
+        //   },5000)
+        // }
+        setTimeout(()=>{
+          resetStatus()
+          getDataOnResize()
+        },5000)
       }
     }
   }
@@ -782,9 +804,9 @@ function hideToken(row:any) {
                   </template>
                 </el-tooltip>
                 <div class="ml-6px w-[calc(100%-30px)]">
-                  <!-- {{ $index }} -->
+                  {{ $index }}
                   <div class="flex flex-row items-end">
-                    <span class="color-[var(--main-text1)] font-400 text-13px lh-16px ellipsis" :style="{maxWidth:(row.risk_score > 55 || row.risk_level < 0)?'calc(100% - 14.6px)':'100%'}">{{ row.symbol }}</span>
+                    <span class="color-[var(--main-text1)] font-400 text-13px lh-16px ellipsis" :style="{maxWidth:(row.risk_score > 55 || row.risk_level < 0)?'calc(100% - 14.6px)':'100%'}" :title="row.token">{{ row.symbol }}</span>
                     <Icon
                       v-if="row.risk_score > 55 || row.risk_level < 0"
                       name="custom:danger"
