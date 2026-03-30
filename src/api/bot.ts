@@ -1094,6 +1094,7 @@ export function getBalances(body: {
             totalProfitRatio: string,
             averageNetPurchasePrice: string,
             netPurchaseAmount: string
+            lastUpdateTime: string
         },
         risk_level: number
         risk_score: number

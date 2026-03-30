@@ -14,7 +14,7 @@ const props = defineProps({
   }
 })
 const emit = defineEmits(['update:sort'])
-
+const slots = useSlots()
 function getActiveClass(activeSort: number, sortBy: string, direction: string) {
   const isEqual = props.sort.activeSort === activeSort && props.sort.sortBy === sortBy
   if (direction === 't') {
@@ -45,6 +45,7 @@ function switchSort(sortBy: string, activeSort?: number) {
     sort.activeSort = activeSort
   }
   sort.sortBy = sortBy
+  console.log('sortBy',sort, sortBy, activeSort)
   emit('update:sort', sort)
 }
 </script>

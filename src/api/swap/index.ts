@@ -30,6 +30,7 @@ export interface GetUserBalanceResponse {
   decimals: number
   risk_level: number
   risk_score: number
+  last_txn_time: string
 }
 export type GetUserBalanceResponseResult = { data: GetUserBalanceResponse[] ; total: number ;pageNo: number; pageSize: number }
 
@@ -38,14 +39,16 @@ export const getUserBalance = createCacheRequest(async function(
     pageNO = 1,
     pageSize = 10,
     user_ids = [] as string[],
-    sort = 'balance_usd',
-    sort_dir = 'desc',
+    sort = '',
+    sort_dir = '',
     hide_risk = 1,
     hide_small = 0
   }): Promise<GetUserBalanceResponseResult> {
-  let tonAddressId = user_ids.find((i: string) => i?.endsWith?.('-ton'))
-  let polygonAddressId = user_ids.find((i: string) => i?.endsWith?.('-polygon'))
-  let otherUserIds = user_ids?.filter((i: string) => !i?.endsWith?.('-ton') && !i?.endsWith?.('-polygon'))
+  sort_dir=(sort&&sort_dir)?sort_dir:''
+  sort=(sort&&sort_dir)?sort:''
+  const tonAddressId = user_ids.find((i: string) => i?.endsWith?.('-ton'))
+  const polygonAddressId = user_ids.find((i: string) => i?.endsWith?.('-polygon'))
+  const otherUserIds = user_ids?.filter((i: string) => !i?.endsWith?.('-ton') && !i?.endsWith?.('-polygon'))
   let tonTokenList: any[] = []
   let polygonTokenList: any[] = []
   let _tokens: any = {

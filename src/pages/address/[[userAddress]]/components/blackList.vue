@@ -5,7 +5,7 @@
       class="flex items-center text-14px cursor-pointer color-[--main-text]"
       @click="showBlackList"
     >
-      <Icon name="custom:black" class="mr-4px" />
+      <Icon name="custom:black2" class="mr-4px" />
       {{ t('BlackList') }}
     </span>
     <el-dialog
@@ -46,7 +46,7 @@
                 <div class="flex items-center" @click="jumpToTokenDetail(row)">
                   <TokenImg
                     :row="{
-                      logo_url: `${s3BaseUrl}${row?.logo_url}`,
+                      logo_url: `${row?.logo_url?(s3BaseUrl+row?.logo_url):''}`,
                       symbol: row.symbol,
                       chain: row.chain,
                     }"

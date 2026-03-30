@@ -645,5 +645,6 @@
   "favRemarksTips": "Seçilen Cüzdan'ı takip etmek istiyor musunuz?",
   "batchFav": "Toplu Takip",
   "removeTokenTips2": "Seçilen izleme silinsin mi?",
-  "monitor": "monitör"
+  "monitor": "monitör",
+  "position2": "Konum"
 }
