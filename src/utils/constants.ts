@@ -277,14 +277,14 @@ export const SwapType = {
 }
 
 export const CategoryTabsCacheKey = {
-  hot:'hotRanks',
-  new:'newRanks',
-  gainer:'gainerRanks',
-  pump:'pumpRanks',
-  inclusion:'inclusionRanks',
-  binance_alpha:'binance_alphaRanks',
-  xstocks:'xstocksRanks',
-  volume:'volumeRanks',
+  hot:'hotRanks_v1',
+  new:'newRanks_v1',
+  gainer:'gainerRanks_v1',
+  pump:'pumpRanks_v1',
+  inclusion:'inclusionRanks_v1',
+  binance_alpha:'binance_alphaRanks_v1',
+  xstocks:'xstocksRanks_v1',
+  volume:'volumeRanks_v1',
 }
 
 export const holdersTooltip = (t)=>({
