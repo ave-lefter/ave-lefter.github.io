@@ -433,7 +433,7 @@ async function submitBotSwap(amount1: string | number, type: 'buy' | 'sell', ind
     const botSettings = botSettingStore.botSettings?.[chain]?.[type]
     const selected = botSettings?.selected as BotSettingKey
     const botSetting = botSettings?.[selected]
-    const mev = botSetting?.mev
+    const mev = botSetting?.mev ?? false
     const slippage = botSetting?.slippage || '9'
     const { gasTip1List, gasTip2List } = formatBotGasTips(botSwapStore.gasTip, chain)
     const gasTips = mev ? gasTip1List : gasTip2List

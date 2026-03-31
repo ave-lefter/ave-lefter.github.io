@@ -932,7 +932,10 @@ watch(show, (val) => {
 
 watch(() => props.chain, (val) => {
   if (val) {
-   botSetting.value = cloneDeep(props.setting ?? {})
+    botSetting.value = cloneDeep(props.setting ?? {})
+    initSlippage('buy')
+    initSlippage('sell')
+    loadAutoSellConfigs()
   }
 })
 

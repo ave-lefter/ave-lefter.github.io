@@ -863,7 +863,7 @@ async function submitBotSwap() {
     // let mev = this.botSettings?.solana?.mev
     const selected = botSettingStore?.botSettings?.[chain]?.[props.activeTab]?.selected || botSettingStore?.botSettings?.[chain]?.selected || 's1'
     const botSettings = botSettingStore.botSettings?.[chain]?.[props.activeTab]?.[selected]
-    const mev = botSettings?.mev
+    const mev = botSettings?.mev ?? false
 
     const { gasTip1List, gasTip2List } = formatBotGasTips(botSwapStore.gasTip, chain)
     const gasTips = mev ? gasTip1List : gasTip2List
@@ -998,7 +998,7 @@ async function submitBotSwap() {
   } else if (isEvmChain(chain)) {
     const selected = botSettingStore.botSettings?.[chain as BotChain]?.[props.activeTab]?.selected || 's1'
     const botSettings = botSettingStore.botSettings?.[chain as BotChain]?.[props.activeTab]?.[selected]
-    const mev = botSettings?.mev
+    const mev = botSettings?.mev ?? false
     const slippage = botSettings?.slippage || 9
     const { gasTip1List, gasTip2List } = formatBotGasTips(botSwapStore.gasTip, chain)
     const gasTips = mev ? gasTip1List : gasTip2List
@@ -1161,7 +1161,7 @@ function submitBotLimit() {
     // let mev = this.botSettings?.solana?.mev
     const selected = botSettingStore?.botSettings?.[chain]?.[props.activeTab]?.selected || botSettingStore.botSettings?.[chain]?.selected || 's1'
     const botSettings = botSettingStore.botSettings?.[chain]?.[selected]
-    const mev = botSettings?.mev
+    const mev = botSettings?.mev ?? false
 
     const { gasTip1List, gasTip2List } = formatBotGasTips(botSwapStore.gasTip, chain)
     const gasTips = mev ? gasTip1List : gasTip2List

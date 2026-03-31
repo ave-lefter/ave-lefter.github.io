@@ -218,6 +218,17 @@ export const useBotSwapStore = defineStore('botSwap', () => {
       //   price: 1,
       //   logo_url: 'token_icon/ton/EQCxE6mUtQJKFnGfaROTKOt1lZbDiiX1kCixRv7Nw2Id_sDs.png'
       // }
+    ],
+    polygon: [
+      {
+        chain: 'polygon',
+        balance: '0',
+        symbol: 'POL',
+        decimals: 18,
+        address: NATIVE_TOKEN,
+        price: 1,
+        logo_url: 'token_icon/polygon/0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270.png'
+      },
     ]
   })
 
@@ -284,6 +295,15 @@ export const useBotSwapStore = defineStore('botSwap', () => {
     )
   }
 
+  function getCanMev (chain: string) {
+    const mevChains = ['bsc', 'solana', 'eth']
+    if (!mevChains.includes(chain)) {
+      return false
+    }
+    return gasTip.value.some((i) => i.chain === chain && i.mev)
+  }
+
+
  const mainTokensPriceIds = computed(() => mainTokensPrice.value?.map(i => i.id))
 
 
@@ -297,6 +317,7 @@ export const useBotSwapStore = defineStore('botSwap', () => {
     botSwapSelectedWallets,
     bot_getGasTip: _bot_getGasTip,
     sendNativePriceWs,
-    onmessageNativePrice
+    onmessageNativePrice,
+    getCanMev
   }
 })

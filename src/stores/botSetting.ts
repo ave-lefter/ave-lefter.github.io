@@ -61,7 +61,8 @@ export const useBotSettingStore = defineStore('botSetting', () => {
   } = {}
   chains.forEach(chain => {
     const s = { ...defaultSettings }
-    const sBuy = { ...defaultSettings, mev: true }
+    const chainCanMev = botSwapStore.getCanMev(chain)
+    const sBuy = { ...defaultSettings, mev: !!chainCanMev }
     const list = botSwapStore?.botSwapBaseTokens?.[(chain || '') as BotChain]
     list?.forEach(i => {
       const key = i.address + '-' + chain
