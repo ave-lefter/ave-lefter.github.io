@@ -441,7 +441,7 @@
       :activeFilterType="activeFilterType"
       :platformsList="platformsList"
       :deployerPlatforms="deployerPlatforms"
-      :baseTokens="baseTokenMap.values()?.toArray()"
+      :baseTokens="baseTokenMap?.values()?.toArray?.() || []"
       @update:filterData="handlerFilterConfirm"
     />
 
@@ -708,7 +708,7 @@ const baseTokenMap = computed(() => {
   map.set('other', { symbol: t('other'), token: 'other', logo_url:'' })
   return map
 })
-const baseTokensAllStr = computed(() => baseTokenMap.value.values()?.toArray?.()?.map((i: any) => i.token)?.join(','))
+const baseTokensAllStr = computed(() => baseTokenMap.value?.values?.()?.toArray?.()?.map((i: any) => i.token)?.join?.(',') || '')
 const tabsList = computed(() => {
   return [
     {
@@ -2274,7 +2274,7 @@ function mergeLogo(prev: any, next: any) {
 }
 function handleClearFilter(type: 'new' | 'soon' | 'graduated') {
   const platformsString = pumpConfig.value?.find(i => i.chain === activeChain.value)?.platforms?.map(i => i.platform)?.filter(i=>i!=='believe').join?.(',') || ''
-  const baseTokensString = baseTokenMap.value.values()?.toArray?.()?.map((i: any) => i.token)?.join(',') || ''
+  const baseTokensString = baseTokenMap.value?.values?.()?.toArray?.()?.map((i: any) => i.token)?.join(',') || ''
   pumpStore.pumpV3[activeChain.value][type].pumpFilter = {...pumpFilterDefault.value,platforms:platformsString,base_tokens:baseTokensString}
   getPumpList(true)
 }
