@@ -1,6 +1,3 @@
-<script lang="tsx">
-export default { name: 'PumpRank' }
-</script>
 <script setup lang="tsx">
 import { useStorage, useSessionStorage } from '@vueuse/core'
 import { getPumpDefault } from './columnRender/pumpColumnsService'
@@ -101,15 +98,15 @@ const pageInfo = ref({
 })
 watch(
   () => pageInfo.value.pageNO,
-  (val) => { 
-    useSessionStorage('pump-pageNO', 1).value = val 
+  (val) => {
+    useSessionStorage('pump-pageNO', 1).value = val
     nextTick(() => tableRef.value?.scrollToTop(0))
   }
 )
 
 watch(
   () => updateNum4.value,
-  () => {  
+  () => {
     pageInfo.value.pageNO = 1
     _getTreasureList()
   }
@@ -117,7 +114,7 @@ watch(
 const tableRef = shallowRef()
 const loading = shallowRef(false)
 const storageKey = computed(() => {
-  return props.activeTab + 'Ranks'
+  return props.activeTab + MarketVersion
 })
 let columns = useStorage(storageKey.value, getPumpDefault(t))
 const secColPump = columns.value.find((c: any) => c.render === 'securityContent')
@@ -364,6 +361,9 @@ function initCache() {
     }
   }
 }
+</script>
+<script lang="tsx">
+export default { name: 'PumpRank' }
 </script>
 <template>
   <div v-loading="loading" :style="`height:${height}`">

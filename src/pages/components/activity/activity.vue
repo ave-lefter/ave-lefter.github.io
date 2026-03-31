@@ -97,7 +97,7 @@ watch(
 const tableRef = shallowRef()
 const loading = shallowRef(false)
 const storageKey = computed(() => {
-  return props.activeTab+'Ranks'
+  return props.activeTab+ MarketVersion
 })
 let columns = useStorage(storageKey.value, getActivityDefaultColumns(t))
 const isFirstMount = shallowRef(true)

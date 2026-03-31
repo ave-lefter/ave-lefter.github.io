@@ -276,15 +276,17 @@ export const SwapType = {
   LIMIT_SELL: 6,
 }
 
+export const MarketVersion = 'Ranks_v1'
+
 export const CategoryTabsCacheKey = {
-  hot:'hotRanks_v1',
-  new:'newRanks_v1',
-  gainer:'gainerRanks_v1',
-  pump:'pumpRanks_v1',
-  inclusion:'inclusionRanks_v1',
-  binance_alpha:'binance_alphaRanks_v1',
-  xstocks:'xstocksRanks_v1',
-  volume:'volumeRanks_v1',
+  hot: `hot${MarketVersion}`,
+  new: `new${MarketVersion}`,
+  gainer: `gainer${MarketVersion}`,
+  pump: `pump${MarketVersion}`,
+  inclusion: `inclusion${MarketVersion}`,
+  binance_alpha: `binance_alpha${MarketVersion}`,
+  xstocks:`xstocks${MarketVersion}`,
+  volume:`volume${MarketVersion}`,
 }
 
 export const holdersTooltip = (t)=>({
