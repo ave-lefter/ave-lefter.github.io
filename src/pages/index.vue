@@ -1736,12 +1736,29 @@ function getFilterData(list: PumpObj[], conditions: any) {
   return list?.filter((i) => {
     let pass = true
 
+    // if (conditions?.q) {
+    //   const arr = conditions?.q.split(',')
+    //   pass = pass && arr?.findIndex((y: string) => i.target_token == y || i.name?.includes?.(y) || i.symbol?.includes?.(y)) !== -1
+    // }
     if (conditions?.q) {
-      const arr = conditions?.q.split(',')
-      pass = pass && arr?.findIndex((y: string) => i.target_token == y || i.name?.includes?.(y) || i.symbol?.includes?.(y)) !== -1
+      const arr = conditions.q.toLowerCase().split(',')
+      pass =
+        pass &&
+        arr.some((y: string) => {
+          const target = String(i.target_token || '').toLowerCase()
+          const name = String(i.name || '').toLowerCase()
+          const symbol = String(i.symbol || '').toLowerCase()
+
+          return (
+            target === y ||
+            name.includes(y) ||
+            symbol.includes(y)
+          )
+        })
     }
     if (conditions?.dev_sale_out) {
-      const isSellOut = i.max_dev_ratio!==0 &&i.dev_balance_ratio_cur===0
+      // const isSellOut = i.max_dev_ratio!==0 &&i.dev_balance_ratio_cur===0
+      const isSellOut = i.dev_balance_ratio_cur===0
       if(conditions?.dev_sale_out === 1){
         pass = pass && isSellOut
       } else if(conditions?.dev_sale_out === 2){
@@ -1787,13 +1804,6 @@ function getFilterData(list: PumpObj[], conditions: any) {
       if (conditions?.rage) {
         pass = pass && pumpAgeMinutes <= Number(conditions.rage)
       }
-    }
-
-    if (conditions?.progress_min) {
-      pass = pass && i.progress >= Number(conditions.progress_min)
-    }
-    if (conditions?.progress_max) {
-      pass = pass && i.progress <= Number(conditions.progress_max)
     }
 
     if (conditions?.market_cap_min) {
@@ -1875,6 +1885,13 @@ function getFilterData(list: PumpObj[], conditions: any) {
     if(conditions?.rins) {
       pass = pass && i.insider_balance_ratio_cur <= Number(conditions.rins)
     }
+    if(conditions?.lkol) {
+      pass = pass && i.kol_tag_count >= Number(conditions.lkol)
+    }
+    if(conditions?.rkol) {
+      pass = pass && i.kol_tag_count <= Number(conditions.rkol)
+    }
+
     if(conditions?.sm_list?.length > 0){
       pass = pass && i.medias?.length > 0 && conditions.sm_list.some((y: string) => i.medias?.findIndex((m) => y.includes(m.icon) || y.toLowerCase() === m.name.toLowerCase()) !== -1)
     }
@@ -1897,48 +1914,60 @@ function getFilterData(list: PumpObj[], conditions: any) {
       pass = pass && i.dev_total_count >= Number(conditions.ldtc)
     }
     if(conditions?.rdtc) {
-      pass = pass && i.dev_total_count < Number(conditions.rdtc)
+      pass = pass && i.dev_total_count <= Number(conditions.rdtc)
     }
 
     if(conditions?.ldmc) {
       pass = pass && i.dev_migrated_count >= Number(conditions.ldmc)
     }
     if(conditions?.rdmc) {
-      pass = pass && i.dev_migrated_count < Number(conditions.rdmc)
+      pass = pass && i.dev_migrated_count <= Number(conditions.rdmc)
     }
 
     if(conditions?.ldmr) {
       pass = pass && i.dev_migrated_ratio >= Number(conditions.ldmr)
     }
     if(conditions?.rdmr) {
-      pass = pass && i.dev_migrated_ratio < Number(conditions.rdmr)
+      pass = pass && i.dev_migrated_ratio <= Number(conditions.rdmr)
     }
 
     if(conditions?.lbdr) {
       pass = pass && Number(i.address_binding_ratio || 0) >= Number(conditions.lbdr)
     }
     if(conditions?.rbdr) {
-      pass = pass && Number(i.address_binding_ratio|| 0) < Number(conditions.rbdr)
+      pass = pass && Number(i.address_binding_ratio|| 0) <= Number(conditions.rbdr)
     }
 
     if(conditions?.lfsr) {
       pass = pass && Number(i.phishing_ratio || 0) >= Number(conditions.lfsr)
     }
     if(conditions?.rfsr) {
-      pass = pass && Number(i.phishing_ratio|| 0) < Number(conditions.rfsr)
+      pass = pass && Number(i.phishing_ratio|| 0) <= Number(conditions.rfsr)
     }
 
     if(conditions?.lccr) {
       pass = pass && Number(i.colluded_cluster_ratio || 0) >= Number(conditions.lccr)
     }
     if(conditions?.rccr) {
-      pass = pass && Number(i.colluded_cluster_ratio|| 0) < Number(conditions.rccr)
+      pass = pass && Number(i.colluded_cluster_ratio|| 0) <= Number(conditions.rccr)
     }
     if(conditions?.lfans) {
       pass = pass && Number(i.followers || 0) >= Number(conditions.lfans)
     }
     if(conditions?.rfans) {
-      pass = pass && Number(i.followers|| 0) < Number(conditions.rfans)
+      pass = pass && Number(i.followers|| 0) <= Number(conditions.rfans)
+    }
+    if(conditions?.lbtax) {
+      pass = pass && Number(i.buy_tax || 0) >= Number(conditions.lbtax)
+    }
+    if(conditions?.rbtax) {
+      pass = pass && Number(i.buy_tax|| 0) <= Number(conditions.rbtax)
+    }
+    if(conditions?.lstax) {
+      pass = pass && Number(i.sell_tax || 0) >= Number(conditions.lstax)
+    }
+    if(conditions?.rstax) {
+      pass = pass && Number(i.sell_tax|| 0) <= Number(conditions.rstax)
     }
     return pass
   })
