@@ -711,6 +711,11 @@ export function bot_createSwapEvmTx(params: {
   //   params.autoSell = false
   //   params.autoSellConfig = []
   // }
+  const { getCanMev } = useBotSwapStore()
+  const isCanMev = getCanMev(params.chain)
+  if (!isCanMev) {
+    params.isPrivate = false
+  }
   return $api('/botapi/swap/createSwapEvmTxV2', {
     method: 'post',
     body: {
@@ -805,6 +810,11 @@ export function bot_createEvmLimitTx(params: {
 }) {
   const { $api } = useNuxtApp()
   const botStore = useBotStore()
+  const { getCanMev } = useBotSwapStore()
+  const isCanMev = getCanMev(params.chain)
+  if (!isCanMev) {
+    params.isPrivate = false
+  }
   return $api('/botapi/swap/createEvmLimitTx', {
     method: 'post',
     body: {
