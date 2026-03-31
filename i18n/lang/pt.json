@@ -652,5 +652,7 @@
   "monitor": "monitor",
   "deletedTweets": "Tweets excluídos",
   "unpin": "Liberar",
-  "actionDel": "excluí este tweet"
+  "actionDel": "excluí este tweet",
+  "actionTop": "fixei este tweet",
+  "actionUnpin": "desfixei este tweet"
 }

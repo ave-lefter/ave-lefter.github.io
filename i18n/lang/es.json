@@ -674,5 +674,7 @@
   "monitor": "Monitor",
   "deletedTweets": "Tweets eliminados",
   "unpin": "Desprender",
-  "actionDel": "he eliminado este tweet"
+  "actionDel": "he eliminado este tweet",
+  "actionTop": "he fijado este tweet",
+  "actionUnpin": "he desanclado este tweet"
 }

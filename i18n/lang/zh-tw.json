@@ -2123,5 +2123,7 @@
   "twitterFollowers": "推特粉丝数",
   "deletedTweets": "刪除推文",
   "unpin": "取消置頂",
-  "actionDel": "刪除了這則推文"
+  "actionDel": "刪除了這則推文",
+  "actionTop": "置頂了這則推文",
+  "actionUnpin": "取消置頂了這則推文"
 }

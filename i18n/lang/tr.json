@@ -648,5 +648,7 @@
   "monitor": "monitör",
   "deletedTweets": "Silinen Tweetler",
   "unpin": "Sabitlemeyi kaldır",
-  "actionDel": "bu tweeti sildim"
+  "actionDel": "bu tweeti sildim",
+  "actionTop": "bu tweeti sabitledim",
+  "actionUnpin": "bu tweetin sabitlemesini kaldırdım"
 }

@@ -12,7 +12,7 @@
                 <div class="font-500 text-14px mt--2px" :style="{color: map[item.action]?.color}">
                     {{ map[item.action]?.label }}
                 </div>
-                <div class="font-400 text-12px text-[--d-666-l-959A9F]">@{{ item.author.username }}{{ t('actionDel') }}•
+                <div class="font-400 text-12px text-[--d-666-l-959A9F]">@{{ item.author.username }}&nbsp;{{ map[item.action]?.action }}•
                     <TimerCount
                         v-if="item.action_at && Number(formatTimeFromNow(item.action_at, true)) < 60"
                         :key="`${item.action_at}`"
@@ -81,16 +81,28 @@
                     </div>
                 </div>
             </div>
-            <div v-show="+props.item.type!==typeEnum.retweet" class="relative" :class="index !== -1 ? 'ml-40px' : ''">
+            <div class="relative" :class="index !== -1 ? 'ml-40px' : ''">
                 <div ref="contentEl" :class="[
                     'text-14px lh-22px break-words',
+                ]">
+                    <div v-if="[2,3,4].includes(Number(item.type))&&(item?.quoted_tweet?.author?.username||item?.retweeted_tweet?.author?.username||item.type=='4')" class="text-14px lh-22px break-words flex">
+                        <span :style="{color: map[item.type]?.color}">{{ map[item.type]?.label }}</span>
+                        <a v-if="item?.quoted_tweet?.author?.username||item?.retweeted_tweet?.author?.username" :href="`https://twitter.com/${item?.quoted_tweet?.author?.username||item?.retweeted_tweet?.author?.username}`" class="[&amp;&amp;]:color-[--primary-color] hover:underline" target="_blank" rel="noopener noreferrer">@{{ item?.quoted_tweet?.author?.username||item?.retweeted_tweet?.author?.username }}</a>
+                    </div>
+                    <!-- <div>{{ showTranslation}}</div>
+                    <div>{{ lang.includes('zh') ? 'content_zh' : 'content_en'}}</div>
+                    <div>content_zh:{{item?.content_zh}}</div>
+                    <div>content:{{item?.content}}</div> -->
+                    <div :class="[
                     { 'line-11': !contentExpanded && isContentOverflow }
                 ]">
-                    <span>{{ map[item.type]?.label }}</span> <div class="cursor-pointer" @click="handleContentClick" v-html="processedContent" />
+                        <div v-if="+props.item.type!==typeEnum.retweet" class="cursor-pointer w-p-box" @click="handleContentClick" v-html="processedContent" />
+                    </div>
+                  
                     <div v-if="+props.item.type!==typeEnum.retweet" :class="index !== -1 ? 'ml-0px' : ''"
                         class="justify-between items-center flex mt-8px text-[--d-666-l-959A9F]">
-                        <div v-show="lang.includes('zh')&&showTranslation" class="flex items-center gap-4px cursor-pointer text-12px" @click="translationVisible=!translationVisible">
-                            <template v-if="props.item.content&&(lang.includes('zh'))">
+                        <div class="flex items-center gap-4px cursor-pointer text-12px" @click="translationVisible=!translationVisible">
+                            <template v-if="props.item.content&&showTranslation">
                                 <Icon name="custom:translation" />{{ t(translationVisible ? 'viewOrigin':'viewTranslation') }}
                             </template>
                         </div>
@@ -100,7 +112,7 @@
                             {{ !contentExpanded ? t('Expand') : t('Collapse') }}
                         </span>
                     </div>
-                    <template v-if="lang.includes('zh')&&translationVisible&&showTranslation">
+                    <template v-if="translationVisible&&showTranslation">
                         <div v-if="processedContentZh" class="mt-8px bg-[--d-15171C-l-F6F6F6] px-12px py-6px" v-html="processedContentZh"></div>
                         <el-skeleton v-else animated class="mt-8px">
                             <template #template>
@@ -212,10 +224,10 @@ const followIdArray = computed(() => {
     return followIds.value.map(el => el.author_id)
 })
 const showTranslation = computed(() => {
-    const {lang} = props.item || {}
-    const key = lang === 'en' ? 'content' : 'content_zh'
-    return props.item?.content && 
-        props.item?.content !== props.item.content_zh
+    // const {lang} = props.item || {}
+    const key = lang.value.includes('zh') ? 'content_zh' : 'content_en'
+    return props.item?.[key] && 
+        (props.item?.[key] !== props.item.content)
 })
 // 处理后的内容，包含可点击的链接
 const processedContent = computed(() => {
@@ -258,7 +270,7 @@ const processedTokenList = computed(() => {
 // 处理后的内容，包含可点击的链接
 const processedContentZh = computed(() => {
     // const {lang} = props.item || {}
-    let key = `content_zh`
+    const key = lang.value.includes('zh') ? 'content_zh' : 'content_en'
     const content = props.item?.[key]
     return processTwitterText(content,props.item.token&&[props.item.token])
 })
@@ -267,7 +279,7 @@ const checkContentOverflow = () => {
         const el = measureEl.value || contentEl.value
         if (!el) return
         const lineHeight = parseFloat(getComputedStyle(el).lineHeight) || 22
-        const maxHeight = lineHeight * 11
+        const maxHeight = lineHeight *11
         isContentOverflow.value = el.scrollHeight > maxHeight + 1
     })
 }

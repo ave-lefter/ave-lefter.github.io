@@ -1500,5 +1500,7 @@
   "removeTokenTips2": "選択したモニタリングを削除しますか?",
   "deletedTweets": "削除されたツイート",
   "unpin": "固定を解除する",
-  "actionDel": "このツイートは削除しました"
+  "actionDel": "このツイートは削除しました",
+  "actionTop": "このツイートを固定しました",
+  "actionUnpin": "このツイートの固定を外しました"
 }

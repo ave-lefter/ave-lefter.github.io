@@ -62,7 +62,7 @@ const virtualizer = useVirtualizer(
   computed(() => ({
     count: trackerStore.list.length,
     getScrollElement: () => parentRef.value,
-    estimateSize: () => 200,
+    estimateSize: () => 240,
     overscan: 5,
     gap: 16
   }))

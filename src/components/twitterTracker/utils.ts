@@ -90,7 +90,7 @@ export function processTwitterText(text: string | null | undefined, tokens?: Tok
       })
     },
     {
-      regex: /#([a-zA-Z0-9_]+)/g,
+      regex: /#([\w\u4e00-\u9fff]+)/g,
       type: 'hashtag',
       process: (match: string, capture?: string): ParsedToken => ({
         type: 'hashtag',
@@ -99,7 +99,7 @@ export function processTwitterText(text: string | null | undefined, tokens?: Tok
       })
     },
     {
-      regex: /@([a-zA-Z0-9_]+)/g,
+      regex: /@([\w\u4e00-\u9fff]+)/g,
       type: 'mention',
       process: (match: string, capture?: string): ParsedToken => ({
         type: 'mention',

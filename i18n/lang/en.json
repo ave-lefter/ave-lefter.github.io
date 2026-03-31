@@ -2136,5 +2136,7 @@
   "twitterFollowers": "Twitter Followers",
   "deletedTweets": "Deleted Tweets",
   "unpin": "Unpin",
-  "actionDel": "have deleted this tweet"
+  "actionDel": "have deleted this tweet",
+  "actionTop": "have pinned this tweet",
+  "actionUnpin": "have unpinned this tweet"
 }

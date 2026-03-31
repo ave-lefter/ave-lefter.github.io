@@ -15,7 +15,7 @@ export const useTwitterTrackerStore = defineStore('tracker', () => {
     const fixedWidth = useStorage('trackerFixedWidth', 438)
     const translateStyle = shallowRef(0)
     const query = useStorage('twitterQuery',{
-      types:[1,2,3,4,5,6,7],
+      types:[1,2,3,4,5,6],
       token_keyword:''
     })
     const loading = ref(false)
