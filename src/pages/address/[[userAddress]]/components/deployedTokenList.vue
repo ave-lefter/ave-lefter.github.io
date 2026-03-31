@@ -91,6 +91,7 @@
 <script setup lang="ts">
 import AveEmpty from '@/components/aveEmpty.vue'
 import TokenColumn from '@/components/tokenColumn.vue'
+import dayjs from '~/utils/day'
 
 const props = defineProps({
   tableData: {
