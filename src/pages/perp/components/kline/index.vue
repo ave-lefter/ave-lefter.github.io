@@ -42,16 +42,24 @@ const symbol = computed(() => {
 let loading = false
 
 // rAF 批量合并同帧内的 onTick 调用，避免高频 WS 消息导致图表反复重绘
-let _pendingBar: KLineBar | null = null
+let _pendingBars: KLineBar[] = []
 let _rafTickId: number | null = null
-function scheduleOnTick(bar: KLineBar, onTick: (bar: KLineBar) => void) {
-  _pendingBar = bar
+function scheduleOnTick(bar: KLineBar | KLineBar[], onTick: (bar: KLineBar) => void) {
+  if (Array.isArray(bar)) {
+    _pendingBars.push(...bar)
+  } else {
+    _pendingBars.push(bar)
+  }
+
   if (_rafTickId !== null) return
+
   _rafTickId = requestAnimationFrame(() => {
     _rafTickId = null
-    if (_pendingBar) {
-      onTick(_pendingBar)
-      _pendingBar = null
+    if (_pendingBars.length) {
+      for (const pendingBar of _pendingBars) {
+        onTick(pendingBar)
+      }
+      _pendingBars = []
     }
   })
 }
@@ -356,7 +364,6 @@ async function initChart() {
               close: Number(i.close),
               volume: Number(i.value || 0),
             })) || []
-            console.log('------res bars--------',bars1)
             const bars = bars1?.map?.(i => ({
               time: Number(i.klineTime),
               open: i.open,
@@ -366,7 +373,6 @@ async function initChart() {
               volume: Number(i.value || 0),
               type: i.close > i.open ? 'buy': 'sell'
             })) || []
-             console.log('------res-1--------',bars)
             if (firstDataRequest) {
               noData = bars?.length < 1
             }
@@ -424,20 +430,14 @@ async function initChart() {
         listenerGuidMap.set(`${contractId.value}.${interval}`, { type: 'subscribe', channel: `${WSPerpEventType.KLINE}.${contractId.value}.${interval}` })
       },
       unsubscribeBars: (listenerGuid) => {
-        if (listenerGuid) {
-          console.log('listenerGuidMap', listenerGuidMap)
-          const arr = listenerGuid?.split('_')
-          const interval = switchPerpResolution(arr[-1])
-          listenerGuidMap.forEach((value, key) => {
-            if (key !== `${contractId.value}.${interval}`) {
-              perpWsPubStore.send({
-                ...value,
-                type: 'unsubscribe'
-              })
-            }
+        console.log('unsubscribeBars listenerGuid:', listenerGuid)
+        listenerGuidMap.forEach((value) => {
+          perpWsPubStore.send({
+            ...value,
+            type: 'unsubscribe'
           })
-          listenerGuidMap?.clear()
-        }
+        })
+        listenerGuidMap.clear()
       },
       searchSymbols: (userInput, exchange, symbolType, onResult) => {
         console.log(userInput, exchange, symbolType, onResult)
@@ -627,7 +627,7 @@ onBeforeUnmount(() => {
     cancelAnimationFrame(_rafTickId)
     _rafTickId = null
   }
-  _pendingBar = null
+  _pendingBars = []
   _widget?.remove?.()
   _widget = null
 })

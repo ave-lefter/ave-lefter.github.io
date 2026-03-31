@@ -26,6 +26,8 @@ export const usePerpWsPubStore = defineStore('perpWsPub', () => {
   // 使用 shallowRef 代替 ref，WebSocket 本身是非响应式的
   const wsInstance = shallowRef<WS | null>(null)
   const isConnected = shallowRef(false)
+  const subscribedChannels = new Set<string>() // 去重订阅频道
+
   // const WSHost = 'wss://quote-testnet.edgex.exchange'
   // const WSHost = 'wss://quote.edgex.exchange'
   // const WS_URL = `wss://quote.edgex.exchange/api/v1/public/ws`
@@ -58,6 +60,7 @@ export const usePerpWsPubStore = defineStore('perpWsPub', () => {
       isConnected.value = true
     }).onclose(() => {
       isConnected.value = false
+      subscribedChannels.clear()
     }).onmessage((e) => {
       const msg = getWSMessage(e)
       if (!msg) {
@@ -96,9 +99,24 @@ export const usePerpWsPubStore = defineStore('perpWsPub', () => {
     time?: string
   }, options?: WSOptions) => {
     if (!wsInstance.value) {
+      subscribedChannels.clear()
       // 如果 WebSocket 未初始化，则自动调用 init 初始化
       const WS_URL = `${WSPerpHost}/api/v1/public/ws?timestamp=${Date.now()}`
       init(options || { url: WS_URL })  // 默认空 URL，或者你可以传递默认的初始化选项
+    }
+    // 只对频道订阅进行去重
+    if (msg.channel) {
+      if (msg.type === 'subscribe') {
+        if (subscribedChannels.has(msg.channel)) {
+          return wsInstance.value
+        }
+        subscribedChannels.add(msg.channel)
+      } else if (msg.type === 'unsubscribe') {
+        if (!subscribedChannels.has(msg.channel)) {
+          return wsInstance.value
+        }
+        subscribedChannels.delete(msg.channel)
+      }
     }
     wsInstance.value?.send(msg)
     return wsInstance.value
@@ -116,6 +134,7 @@ export const usePerpWsPubStore = defineStore('perpWsPub', () => {
 
   const close = () => {
     isConnected.value = false
+    subscribedChannels.clear()
     wsInstance.value?.close()
     wsInstance.value = null
     globalPerpWsSingleton = null
