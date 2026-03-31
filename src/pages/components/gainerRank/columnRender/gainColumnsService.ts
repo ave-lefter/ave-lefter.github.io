@@ -10,7 +10,8 @@ export function getGainOptions(t: ReturnType<typeof useI18n>['t']) {
         'mCapContent',
         'liquidityContent',
         'holdersContent',
-        'top10PositionsContent',
+        // 'top10PositionsContent',
+        'securityContent',
       ],
     },
     {
@@ -28,7 +29,6 @@ export function getGainOptions(t: ReturnType<typeof useI18n>['t']) {
       title: t('securityInfo'),
       list: [
         'snipersContent',
-        'securityContent',
         'dexContent',
       ],
     },
@@ -144,15 +144,15 @@ export function getGainDefaultColumns(t: ReturnType<typeof useI18n>['t']) {
       align: 'right'
     },
     {
-      title: t('security'),
+      title: t('tokenInfoSecurity'),
       key: 'security',
       isVisible: true,
       render: 'securityContent',
       children: [
-        { title: t('security'), isVisible: true, render: 'securityContent' },
-        { title: t('runPull'), isVisible: true, render: 'runPullContent' },
+        { title: t('tokenInfoSecurity'), isVisible: true, render: 'securityContent' },
+        // { title: t('runPull'), isVisible: true, render: 'runPullContent' },
       ],
-      minWidth: getTextWidth(t('security'), 50) + 55,
+      minWidth: 280,
       align: 'right'
     },
     {

@@ -38,6 +38,7 @@ import {
   DexHeader,
   TrendChart,
   TrendChartHeader,
+  SecurityHeader,
 } from '../components/index'
 import { set } from 'lodash-es'
 import dayjs from 'dayjs'
@@ -120,6 +121,8 @@ watch(
 
 const loading = shallowRef(false)
 const columns = useStorage(CategoryTabsCacheKey.hot, getHotDefaultColumns(t))
+const secCol = columns.value.find((c: any) => c.render === 'securityContent')
+if (secCol) secCol.minWidth = 280
 
 function tableRowClick({ rowData }: RowEventHandlerParams) {
   const {
@@ -383,7 +386,7 @@ const headerRenderer = computed(() => {
     holders: HoldersHeader,
     smart_money_buy_volume_24h: SmarterHeader,
     dex: DexHeader,
-    security: () => t('security'),
+    security: SecurityHeader,
     holders_top10_ratio: Top10Header,
     quick: () => t('quick'),
     insider_balance_ratio_cur: InsidersHeader,
