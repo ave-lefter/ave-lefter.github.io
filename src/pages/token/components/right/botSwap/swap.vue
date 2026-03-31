@@ -11,7 +11,7 @@
             @visible-change="visible => show = visible">
             <div class="inline-flex items-center clickable">
               <img :src="`${configStore.token_logo_url}${tokenStore.swap.payToken?.logo_url}`" class="rd-50%" height="20"  alt="" srcset="" >
-              <Icon v-if="swapBaseTokens?.length > 1" class="arrow-up" :class="{ active: show === true }" name="solar:alt-arrow-down-bold" />
+              <Icon v-if="swapBaseTokens?.length > 0" class="arrow-up" :class="{ active: show === true }" name="solar:alt-arrow-down-bold" />
             </div>
             <template #dropdown>
               <el-dropdown-menu>
@@ -95,7 +95,7 @@ size="small"
           <el-dropdown placement="bottom" trigger="click" @visible-change="visible => show = visible">
             <div class="inline-flex items-center clickable text-12px ml-4px">
               <span>{{ tokenStore.swap.payToken?.symbol || getChainInfo(chain || '')?.main_name }}</span>
-              <Icon v-if="swapBaseTokens?.length > 1" class="arrow-up" :class="{ active: show === true }" name="solar:alt-arrow-down-bold" />
+              <Icon v-if="swapBaseTokens?.length > 0" class="arrow-up" :class="{ active: show === true }" name="solar:alt-arrow-down-bold" />
             </div>
             <template #dropdown>
               <el-dropdown-menu>
@@ -436,6 +436,17 @@ const swapBaseTokens = computed(() => {
   return (botSwapStore?.botSwapBaseTokens?.[chain.value || ''] || [])?.filter(item => item?.address !== tokenStore.swap.payToken?.address)
 })
 
+watch(() => tokenStore.swap.payToken, () => {
+  if (props.activeTab === 'buy') {
+    amountNative.value = ''
+    amountNativeOut.value = ''
+  } else {
+    amountToken.value = ''
+    amountTokenOut.value = ''
+    amountSellTokenPercent.value = ''
+  }
+})
+
 const totalSelectWalletBalance = computed(() => {
   const chain = getChain()
   const addresses = [...botSwapStore.botSwapSelectedWallets, (botStore.evmAddress || '')]
@@ -577,6 +588,7 @@ function setAmountToken() {
   }
   amountToken.value = String(Number(a) < 0 ? 0 : a)
 }
+
 
 const watchAmount = debounce((type: 'buy' | 'sell') => {
   watchAmount2(type)

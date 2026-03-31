@@ -20,7 +20,7 @@
             <div class="inline-flex items-center clickable" @mousedown.stop @mouseup.stop>
               <img :src="`${configStore.token_logo_url}${tokenStore.swap.payToken?.logo_url}`" class="rd-50%" height="16"  alt="" srcset="" >
               <span class="text-12px font-400 ml-4px">{{ tokenStore.swap.payToken?.symbol || getChainInfo(chain || '')?.main_name }}</span>
-              <Icon v-if="swapBaseTokens?.length > 1" class="arrow-up" :class="{ active: show === true }" name="solar:alt-arrow-down-bold" />
+              <Icon v-if="swapBaseTokens?.length > 0" class="arrow-up" :class="{ active: show === true }" name="solar:alt-arrow-down-bold" />
             </div>
             <template #dropdown>
               <el-dropdown-menu>
