@@ -10,7 +10,10 @@ import {useDebounceFn, useLocalStorage, useThrottleFn} from '@vueuse/core'
 import {useWalletStore} from '~/stores/wallet'
 import type { BotChain, BotSettingKey } from '~/utils/types'
 import { recordTxV2, updateTxV2 } from '~/api/tracking'
-
+import dayjs from 'dayjs'
+import BlackList from  '~/components/header/positions/blackList.vue'
+import HideTokenDialog from '~/pages/address/[[userAddress]]/components/hideTokenDialog.vue'
+import { getTokensPrice } from '@/api/token'
 const {updateHolderNum}= storeToRefs(useUserStore())
 const {t} = useI18n()
 const wsStore = useWSStore()
@@ -23,6 +26,9 @@ const tokenStore = useTokenStore()
 const {hide_risk, hide_small} = storeToRefs(useGlobalStore())
 const {currentAddress} = storeToRefs(useFollowStore())
 const selectedChains = useLocalStorage<string[]>('positionsSelectedChains', [])
+const AmountU = useLocalStorage<boolean>('positionsAmountU', true)
+const { mode, token_logo_url, isDark } = storeToRefs(useGlobalStore())
+
 watch(() => wsStore.wsResult[WSEventType.PRICEV2], (val: IPriceV2Response) => {
   const idToPriceMap: { [key: string]: IPriceV2Response['prices'][0] } = {}
   val.prices.forEach((item) => {
@@ -116,7 +122,7 @@ const getTokenBalance = useThrottleFn(function (token: string, chain: string) {
       chain,
       creatorAddress,
       tokens: [token],
-      showZero: false
+      showZero: true
     }).then(res => {
       const index = listData.value.findIndex(i => i.token === token && i.chain === chain)
       if(!res?.tokens||!res?.tokens?.length){
@@ -128,6 +134,18 @@ const getTokenBalance = useThrottleFn(function (token: string, chain: string) {
         const tokens = res.tokens.filter(i => i.token === token)
         const newToken=tokens?.[0]||{}
         if (tokens.length > 0) {
+          const balance_usd = new BigNumber(newToken?.balance || 0)
+              .times(newToken?.price || 0)
+          if(balance_usd.lt(0.000000001) && (![NATIVE_TOKEN,'sol','TON'].includes(newToken.token))){
+            listData.value.splice(index, 1);
+            return 
+          }
+          if(balance_usd.lt(1)&&hide_small.value){
+            return 
+          }
+          if((newToken.risk_score > 55 || newToken.risk_level < 0) && hide_risk.value){
+            return
+          }
           if(index>-1){
             listData.value[index].balance = new BigNumber(newToken?.balance || 0).toNumber()
             listData.value[index].balance_usd = new BigNumber(newToken?.balance || 0)
@@ -135,6 +153,7 @@ const getTokenBalance = useThrottleFn(function (token: string, chain: string) {
             listData.value[index].current_price_usd = Number(newToken?.price||0)
             listData.value[index].total_profit = Number(newToken?.pnl?.totalProfit||0)?.toFixed(6)||'--'
             listData.value[index].total_profit_ratio =Number(newToken?.pnl?.totalProfitRatio||0)?.toFixed(6)||'--'
+            listData.value[index].last_txn_time=newToken?.pnl?.lastUpdateTime?new Date(newToken?.pnl?.lastUpdateTime+'').getTime().toString().slice(0, -3):new Date().getTime().toString().slice(0, -3)
             nextTick(() => {
               triggerRef(listData)
             })
@@ -159,6 +178,7 @@ const getTokenBalance = useThrottleFn(function (token: string, chain: string) {
               decimals: Number(newToken?.decimals||0),
               risk_level: Number(newToken?.risk_level||0),
               risk_score: Number(newToken?.risk_score||0),
+              last_txn_time:newToken?.pnl?.lastUpdateTime?new Date(newToken?.pnl?.lastUpdateTime+'').getTime().toString().slice(0, -3):new Date().getTime().toString().slice(0, -3)
             }
 
             console.log('newToken',data,newToken)
@@ -194,10 +214,14 @@ watch(() => wsStore.wsResult[WSEventType.ASSET], (val: IAssetResponse) => {
       ? NATIVE_TOKEN : val.swap.token
     const chain = val.swap.chain
     if (token && chain) {
-      setTimeout(()=>{
-        resetStatus()
-        getDataOnResize()
-      },5000)
+      if( ["solana"].includes(chain)){
+        getTokenBalance(token,chain)
+      }else{
+        setTimeout(()=>{
+          resetStatus()
+          getDataOnResize()
+        },5000)
+      }
     }
     //   处理转账
   } else if (val.transfer) {
@@ -303,15 +327,18 @@ const getDataOnResize = useDebounceFn(() => {
   const {value} = scrollContainerRef
   if (value && value.scrollHeight <= value.clientHeight && !listStatus.value.finished) {
     _getUserBalance()
+    // getMainTokenPrice()
   }
 }, 200)
 watch(scrollbarHeight, getDataOnResize)
-const sort = shallowRef({
-  sortBy: undefined,
-  activeSort: 0
-})
+// const sort = shallowRef({
+//   sortBy: undefined,
+//   activeSort: 0
+// })
+const sort = useLocalStorage<{ sortBy: string | undefined, activeSort: number }>('positionsSort', {sortBy: undefined, activeSort: 0})
 const map: { [key: number]: string } = {
   '-1': 'asc',
+  0:'',
   1: 'desc'
 }
 const backendSort = computed(() => {
@@ -323,19 +350,19 @@ const backendSort = computed(() => {
 })
 const columns = computed(() => {
   return [{
-    label: `${t('token')}/${t('balance1')}`,
-    value: 'balance_usd',
-    flex: 'flex-[1.5]',
+    label: ``,
+    value: 'last_txn_time',
+    flex: 'flex-[1.3]',
     sort: true
   }, {
-    label: 'Bal/PnL',
-    value: 'total_profit',
+    label: '',
+    value: 'balance_usd',
     flex: 'flex-1 justify-end',
     sort: true
   }, {
     label: '',
     value: '',
-    flex: 'flex-1 justify-end',
+    flex: 'flex-[0.8] justify-end',
     sort: false
   }]
 })
@@ -343,13 +370,15 @@ const listStatus = shallowRef({
   finished: false,
   loading: false,
   pageNo: 1,
-  pageSize: 20
+  pageSize: 50
 })
 const listData = shallowRef<(GetUserBalanceResponse & { index: string })[]>([])
 
 const filterListData = computed(() => {
-  const sort=backendSort.value.sort||'balance_usd'
-  return listData.value.toSorted((a, b) => backendSort.value.sort_dir ==='asc' ? a?.[sort] - b?.[sort] : b?.[sort] - a?.[sort])
+  const sort=backendSort.value.sort||'last_txn_time'
+  const sort_dir=backendSort.value.sort_dir||'desc'
+  // console.log('filterListData',sort,sort_dir,listData.value)
+  return [...listData.value.filter(i => i.token===NATIVE_TOKEN).toSorted((a, b) => a.symbol.localeCompare(b.symbol)),...listData.value.filter(i => i.token!==NATIVE_TOKEN).toSorted((a, b) => sort_dir ==='asc' ? a?.[sort] - b?.[sort] : b?.[sort] - a?.[sort])]
 })
 
 let timer: ReturnType<typeof setTimeout> | null = null;
@@ -362,6 +391,7 @@ const checkCondition = () => {
       timer = null
     }
     _getUserBalance()
+    // getMainTokenPrice()
     return // 结束本次执行，不再设置定时器
   }
   // 只有在不满足条件时，才设置下一次定时器
@@ -389,17 +419,34 @@ watch(() => [
 ], () => {
   resetStatus()
   _getUserBalance()
+  // getMainTokenPrice()
 })
+
+const mainTokenPrices = ref({} as any)
+
+function getMainTokenPrice() {
+  const ids=selectedChains.value.map(i=>'0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'+'-'+i)
+  getTokensPrice(ids).then(res => {
+    console.log('getTokensPrice',res)
+    if(res&&!res.length) return
+    selectedChains.value.forEach((chain,index) => {
+      mainTokenPrices.value[chain]=res[index].current_price_usd
+    })
+    console.log('mainTokenPrices.value',mainTokenPrices.value)
+  })
+}
 
 async function _getUserBalance() {
   try {
+    console.log('_getUserBalance',backendSort.value)
     listStatus.value.loading = true
     const pageNo = listStatus.value.pageNo
     const res = await getUserBalance({
       pageNO: listStatus.value.pageNo,
       pageSize: listStatus.value.pageSize,
       ...tableFilter.value,
-      ...backendSort.value,
+      sort_dir: (backendSort.value.sort_dir&&backendSort.value.sort)?backendSort.value.sort_dir:'desc',
+      sort: (backendSort.value.sort_dir&&backendSort.value.sort)?backendSort.value.sort:'last_txn_time',
     })
 
     if (Array.isArray(res?.data) && res.data.length > 0) {
@@ -412,7 +459,9 @@ async function _getUserBalance() {
         }))
       } else {
         const list = res.data
-          .filter(i => listData.value.every(j => j.index !== `${i.token}-${i.chain}`))
+          .filter(i => listData.value.every(j => j.index !== (i.token === NATIVE_TOKEN
+              ? getChainInfo(i.chain)?.wmain_wrapper + '-' + i.chain
+              : `${i.token}-${i.chain}`)))
           .map(i => ({
             ...i,
             index: i.token === NATIVE_TOKEN
@@ -625,130 +674,206 @@ function handleTxSuccess(res: any, _batchId: string, tokenId: string, row: GetUs
     })
   }
 }
+const self_address = computed(() => {
+  if (currentHideToken.value?.chain !== 'solana') {
+    return botStore.evmAddress || walletStore.address
+  } else {
+    return botStore.getWalletAddress('solana') || walletStore.address
+  }
+})
+const hideTokenVisible = ref(false)
+const currentHideToken = ref({} as any)
+function hideToken(row:any) {
+  hideTokenVisible.value = true
+  currentHideToken.value = row
+}
 </script>
 
 <template>
-  <div v-loading="listStatus.loading && listStatus.pageNo===1">
-    <div class="flex justify-between items-center mt-10px pr-15px">
-      <el-checkbox
-        v-model="tableFilter['hide_risk']"
-        class="ml-12px"
-        :style="{
-          marginRight:0
-        }"
-        size="small" :true-value="1" :false-value="0"
-      >
-        {{ $t('hideRiskTokenShort') }}
-      </el-checkbox>
-      <el-checkbox
-        v-model="tableFilter['hide_small']"
-        size="small" :true-value="1" :false-value="0"
-      >
-        {{ $t('hideSmallAssets1') + '<1USD' }}
-      </el-checkbox>
-      <NetSelect
-        v-if="botStore.evmAddress||(walletStore.address && isEvmChainWallet && (walletStore.walletName!=='WatchWallet'))"
-        v-model:userIds="tableFilter.user_ids"
-        @update:user-ids="resetStatus();_getUserBalance()"
-      />
-    </div>
-    <t-head
-      v-model:sort="sort"
-      :columns="columns"
+  <div>
+    <HideTokenDialog
+      v-model="hideTokenVisible"
+      :row="currentHideToken"
+      :self_address="self_address"
+      @hideToken="()=>{}"
     />
-    <el-scrollbar
-      :height="scrollbarHeight"
-    >
-      <div
-        ref="scrollContainerRef"
-        v-infinite-scroll="_getUserBalance"
-        :infinite-scroll-disabled="listStatus.finished|| listStatus.loading"
-        infinite-scroll-distance="200"
-        :infinite-scroll-delay="10"
-        :infinite-scroll-immediate="false"
+    <NetSelect
+      v-if="botStore.evmAddress||(walletStore.address && isEvmChainWallet && (walletStore.walletName!=='WatchWallet'))"
+      class="absolute top--34px"
+      :style="{left:(Number(getTextWidth(t('position2')).toFixed(0))+12+16)+'px'}"
+      v-model:userIds="tableFilter.user_ids"
+      @update:user-ids="resetStatus();_getUserBalance();"
+    />
+    <BlackList
+      class="absolute top--30px right-40px"
+      v-tooltip="t('BlackList')"
+      :userIds="tableFilter.user_ids"
+      @addWhite="()=>{}"
+    />
+    <div v-loading="listStatus.loading && listStatus.pageNo===1" class="hide-scrollbar">
+      <div class="flex items-center mt-10px pr-15px gap-[12px]">
+        <el-checkbox
+          v-model="tableFilter['hide_risk']"
+          class="ml-12px"
+          :style="{
+            marginRight:0
+          }"
+          size="small" :true-value="1" :false-value="0"
+        >
+          {{ $t('hideRiskTokenShort') }}
+        </el-checkbox>
+        <el-checkbox
+          v-model="tableFilter['hide_small']"
+          size="small" :true-value="1" :false-value="0"
+        >
+          {{ $t('hideSmallAssets1') + '<1USD' }}
+        </el-checkbox>
+      </div>
+      <t-head
+        v-model:sort="sort"
+        :columns="columns"
+        class="pr-20px!"
       >
-        <div class="pb-20px pr-30px">
-          <NuxtLink
-            v-for="(row,$index) in filterListData" :key="$index"
-            class="text-12px flex justify-between pl-10px py-10px cursor-pointer hover:bg-[--dialog-bg]"
-            :to="`/token/${row.index}`"
-          >
-            <div class="flex-[1.5] flex items-center">
-              <el-tooltip popper-class="tooltip-pd-0" placement="bottom-start" :show-arrow="false" :persistent="false">
-                <template #default>
-                  <TokenImg :row="row"/>
-                </template>
-                <template #content>
-                  <TokenImg :row="row" chain-class="hidden" token-class="w-240px h-240px [&&]:mr-0 rounded-16px" />
-                </template>
-              </el-tooltip>
-              <div class="ml-6px">
-                <!-- {{ $index }} -->
-                <div class="flex">
-                  <span class="color-[var(--main-text)]">{{ row.symbol }}</span>
-                  <Icon
-                    v-if="row.risk_score > 55 || row.risk_level < 0"
-                    name="custom:danger"
-                    class="font-14 ml-2px color-#F72121"/>
+        <template #last_txn_time>
+           <div>
+            <span>{{ t('token') }}</span>
+            <span>/</span>
+            <span :class="(sort.sortBy === 'last_txn_time') && sort.activeSort ? 'color-[--main-text]' : ''">{{ t('lastTx') }}</span>
+           </div>
+        </template>
+        <template #balance_usd>
+          <div class="flex flex-center gap-4px">
+            <Icon :name="`custom:${!AmountU ? 'amount2' : 'price2'}`"  :class="`color-[--third-text] cursor-pointer text-10px`"
+                @click.self.stop="AmountU = !AmountU" />
+            <div>
+              <span :class="(sort.sortBy === 'balance_usd')&& sort.activeSort ? 'color-[--main-text]' : ''">{{ t('bal') }}</span>
+              <span>/</span>
+              <span>{{ t('profit2') }}</span>
+            </div>
+          </div>
+        </template>
+      </t-head>
+      <el-scrollbar
+        :height="scrollbarHeight"
+      >
+        <div
+          ref="scrollContainerRef"
+          v-infinite-scroll="_getUserBalance"
+          :infinite-scroll-disabled="listStatus.finished|| listStatus.loading"
+          infinite-scroll-distance="200"
+          :infinite-scroll-delay="10"
+          :infinite-scroll-immediate="false"
+        >
+          <div class="pb-20px pr-0px">
+            <NuxtLink
+              v-for="(row,$index) in filterListData" :key="$index"
+              class="text-12px flex justify-between px-12px py-7px cursor-pointer hover:bg-[--dialog-bg] group"
+              :to="`/token/${row.index}`"
+            >
+              <div class="flex-[1.3] flex items-center relative min-w-0">
+                <el-tooltip popper-class="tooltip-pd-0" placement="bottom-start" :show-arrow="false" :persistent="false">
+                  <template #default>
+                    <TokenImg :row="row"/>
+                  </template>
+                  <template #content>
+                    <TokenImg :row="row" chain-class="hidden" token-class="w-240px h-240px [&&]:mr-0 rounded-16px" />
+                  </template>
+                </el-tooltip>
+                <div class="ml-6px w-[calc(100%-30px)]">
+                  <!-- {{ $index }} -->
+                  <div class="flex flex-row items-end">
+                    <span class="color-[var(--main-text1)] font-400 text-13px lh-16px ellipsis" :style="{maxWidth:(row.risk_score > 55 || row.risk_level < 0)?'calc(100% - 14.6px)':'100%'}">{{ row.symbol }}</span>
+                    <Icon
+                      v-if="row.risk_score > 55 || row.risk_level < 0"
+                      name="custom:danger"
+                      class="font-14 ml-2px color-#F72121"/>
+                  </div>
+                  <div v-if="row.token!==NATIVE_TOKEN" class="mt-2px color-[--third-text1] text-11px lh-14px">
+                    <!-- <template v-if="row.balance === 0">$0</template>
+                    <template v-else-if="row.balance === '--'">--</template>
+                    <template v-else>
+                      {{ formatNumber(row.balance, 2) }}({{
+                        '$' + formatNumber(row.balance_usd ||
+                          0, 2)
+                      }})
+                    </template> -->
+                    <template v-if="!(row?.last_txn_time)||('--'===row?.last_txn_time)"><span>--</span></template>
+                    <TimerCount
+                      v-else-if="(row.last_txn_time) && Number(formatTimeFromNow(row.last_txn_time, true)) < 60"
+                      :key="`${row.index}`"
+                      :timestamp="Math.min(+(row.last_txn_time), dayjs().unix() - 1)" :end-time="60">
+                      <template #default="{ seconds }">
+                          <span class="color-#FFA622 text-11px">
+                              <template v-if="seconds < 60"> {{ seconds }}s </template>
+                              <template v-else>
+                                  {{ formatTimeFromNow(row.last_txn_time) }}
+                              </template>
+                          </span>
+                      </template>
+                    </TimerCount>
+                    <span v-else class="text-11px">
+                        {{ formatTimeFromNow(row.last_txn_time) }}
+                    </span>
+                  </div>
                 </div>
-                <div class="mt-2px color-[--third-text]">
+                <div v-if="(walletStore.walletName!=='WatchWallet')&&(row.token!==NATIVE_TOKEN)" class="bg-[--d-000-l-FFF] absolute top-0 left-0 z-auto flex flex-center w-12px h-12px invisible group-hover:visible">
+                  <Icon 
+                    v-tooltip="$t('BlackListToken')"
+                    name="custom:key-invisible"
+                    class="cursor-pointer color-[--third-text1] text-8px hover:color-[--down-color]!"
+                    @click.self.stop.prevent="hideToken(row)"
+                  />
+                </div>
+              </div>
+              <div class="flex-1 flex flex-col items-end" :class="row.token===NATIVE_TOKEN&&'flex-row! items-center! justify-end'">
+                <div class="text-[--main-text1] font-400 text-13px lh-16px flex items-center gap-2px">
                   <template v-if="row.balance === 0">$0</template>
                   <template v-else-if="row.balance === '--'">--</template>
                   <template v-else>
-                    {{ formatNumber(row.balance, 2) }}({{
-                      '$' + formatNumber(row.balance_usd ||
-                        0, 2)
-                    }})
+                    <img v-if="!AmountU&&(row?.token===NATIVE_TOKEN)" :src="`${token_logo_url}chain/${row?.chain}.png`" class="border-rd-[50%] text-12px lh-12px" height="12" alt=""></img>
+                    <!-- {{!AmountU? (formatNumber(Number(row?.balance_usd || 0) / Number(mainTokenPrices[row?.chain] || 1), 2)): '$' + formatNumber(row.balance_usd ||0, 2)}} -->
+                    {{!AmountU? formatNumber(row.balance, 2): '$' + formatNumber(row.balance_usd ||0, 2)}}
                   </template>
                 </div>
+                <div v-if="row.token!==NATIVE_TOKEN" class="mt-2px text-11px lh-14px"  :class="getColorClass(row.total_profit)">
+                  <template v-if="Number(row.total_profit) === 0">0</template>
+                  <template v-else-if="row.total_profit === '--'">--</template>
+                  <template v-else>
+                    {{ Number(row.total_profit) > 0 ? '+$' : '-$' }}{{
+                      formatNumber(Math.abs(Number(row.total_profit)), 2)
+                    }}
+                  </template>
+                </div>
+             
               </div>
-            </div>
-            <div class="flex-1 flex flex-col items-end">
-              <div :class="getColorClass(row.total_profit)">
-                <template v-if="Number(row.total_profit) === 0">0</template>
-                <template v-else-if="row.total_profit === '--'">--</template>
-                <template v-else>
-                  {{ Number(row.total_profit) > 0 ? '$' : '-$' }}{{
-                    formatNumber(Math.abs(Number(row.total_profit)), 2)
-                  }}
-                </template>
+              <div class="flex-[0.8] flex justify-end items-center">
+                <el-button
+                  v-if="botStore.evmAddress && row.token!=='0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'"
+                  size="small"
+                  :loading="loadingSwap[row.index]"
+                  class="[--el-border:0] [&&]:[--el-button-bg-color:--d-222-l-F2F2F2] [&&]:font-normal"
+                  style="padding:4px"
+                  @click.stop.prevent="handleSellAmount(row)"
+                >
+                  {{ $t('sellAl') }}
+                </el-button>
+                <span v-else class="color-[var(--d-EAECEF-l-333)]">--</span>
               </div>
-              <div :class="getColorClass(row.total_profit_ratio)">
-                <template v-if="Number(row.total_profit_ratio) === 0">0</template>
-                <template v-else-if="row.total_profit_ratio === '--'">--</template>
-                <template v-else>
-                  {{
-                    Number(row.total_profit_ratio) > 0 ? '+' : '-'
-                  }}{{ formatNumber(Math.abs(Number(row.total_profit_ratio) * 100), 2) }}%
-                </template>
-              </div>
-            </div>
-            <div class="flex-1 flex justify-end">
-              <el-button
-                v-if="botStore.evmAddress && row.token!=='0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'"
-                size="small"
-                :loading="loadingSwap[row.index]"
-                class="[--el-border:0] [&&]:[--el-button-bg-color:--d-222-l-F2F2F2] [&&]:font-normal"
-                style="padding:4px"
-                @click.stop.prevent="handleSellAmount(row)"
-              >
-                {{ $t('sellAl') }}
-              </el-button>
-              <span v-else class="color-[var(--d-EAECEF-l-333)]">--</span>
-            </div>
-          </NuxtLink>
-          <AveEmpty class="mr--30px"
-            v-if="listData.length===0&&!listStatus.loading"
-          />
+            </NuxtLink>
+            <AveEmpty v-if="listData.length===0&&!listStatus.loading"
+              class="m-[0_auto] pl-10px"
+              :style="{paddingTop:Math.max((scrollbarHeight-90)/2,0)+'px'}"
+            />
+          </div>
+          <div
+            v-if="listStatus.loading&&listStatus.pageNo!==1"
+            class="color-#959a9f text-12px text-center"
+          >
+            {{ $t('loading') }}
+          </div>
         </div>
-        <div
-          v-if="listStatus.loading&&listStatus.pageNo!==1"
-          class="color-#959a9f text-12px text-center"
-        >
-          {{ $t('loading') }}
-        </div>
-      </div>
-    </el-scrollbar>
+      </el-scrollbar>
+    </div>
   </div>
 </template>
 

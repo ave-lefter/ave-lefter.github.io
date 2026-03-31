@@ -4,14 +4,14 @@
     <Icon name="custom:drag2" class="absolute top-3px left-50% ml--6px text-6px bg-[--dialog-list-hover] drag-handle" />
     <div
       class="flex items-center py-15.5px pr-6px justify-between mb-0px border-b-solid border-b-1px border-b-[--main-divider] cursor-move drag-handle">
-      <span class="color-[--main-text] text-14px">{{ $t('holding') }}</span>
+      <span class="color-[--main-text] text-14px">{{ $t('position2') }}</span>
       <div class="flex items-center gap-12px">
         <Icon name="custom:close" class="text-14px shrink-0 cursor-pointer color-[--main-text]"
           @click.self="positionStore.visible = false" />
       </div>
     </div>
     <div v-if="currentAddress" class="w-full relative">
-      <PositionsTable :height="scrollHeight" class="absolute w-[calc(100%+21px)] left--10px" />
+      <PositionsTable :height="scrollHeight" class="absolute w-[calc(100%+24px)] left--12px" />
     </div>
     <AveEmpty
       v-else
