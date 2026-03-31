@@ -369,7 +369,7 @@
         <span class="color-[--third-text]">~</span>
         <el-input
           v-model.trim.number="dialogFilter.maxVol"
-          
+
           type="text"
            class="text-12px"
            :placeholder="$t('max1')"
@@ -392,11 +392,11 @@
           size="default"
           class="flex-1 h-32px font-400 color-[--main-text1]"
           @click.stop="toggleClickMe();filterDialogVisible = false"
-        > 
+        >
           {{ $t('filterWallet') }}
         </el-button>
       </div>
-    
+
       <div class="mt-20px flex gap-8px">
         <el-button
           class="h-30px flex-1 color-[--main-text1]"
@@ -432,7 +432,7 @@ import type { SimpleWSTx } from '../kLine/types'
 import BigNumber from 'bignumber.js'
 import DateFilterCard from '../dateFilterCard.vue'
 import dayjs from 'dayjs'
-import { cloneDeep, min } from 'lodash-es'
+import { cloneDeep } from 'lodash-es'
 const tokenStore = useTokenStore()
 const themeStore = useThemeStore()
 
@@ -547,7 +547,7 @@ const defaultDialogFilter = {
   minVol:'' as string,
   maxVol:'' as string,
   timestamp:[] as string[]
-} 
+}
 const dialogFilter = ref(cloneDeep(defaultDialogFilter))
 const ignoreWs = computed(() => {
   return !['all'].includes(activeTab.value)
@@ -1319,7 +1319,7 @@ function toggleClickFollowed() {
   if (isMeActive.value) {
     tableFilter.value.markerAddress = ''
     dialogFilter.value.markerAddress = ''
-  } 
+  }
   if(activeTab.value==='-100'){
     resetData('all')
   }else{
@@ -1333,7 +1333,7 @@ function toggleClickDEV() {
   // if (isDEVActive.value) {
   //   tableFilter.value.markerAddress = ''
   //   dialogFilter.value.markerAddress = ''
-  // } 
+  // }
   if(activeTab.value==='25'){
     resetData('all')
   }else{
