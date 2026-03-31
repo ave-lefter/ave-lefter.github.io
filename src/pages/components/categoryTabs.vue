@@ -51,7 +51,7 @@ const configMap = computed(() => {
     if (cur.is_pump && cur.category !== 'pump') {
       prev[cur.category] = {
         icon: '',
-        storageKey: `${cur.category}Ranks`,
+        storageKey: `${cur.category}Ranks_v1`,
         getDefaultColumns: getPumpDefault,
         getOptions: getPumpOptions,
       }
