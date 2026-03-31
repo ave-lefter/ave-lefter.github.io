@@ -654,5 +654,6 @@
   "unpin": "Liberar",
   "actionDel": "excluí este tweet",
   "actionTop": "fixei este tweet",
-  "actionUnpin": "desfixei este tweet"
+  "actionUnpin": "desfixei este tweet",
+  "customSetting": "Configurações personalizadas"
 }

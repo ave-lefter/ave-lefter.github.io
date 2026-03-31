@@ -11,12 +11,12 @@ interface Token {
 }
 
 interface ParsedToken {
-  type: 'url' | 'email' | 'hashtag' | 'mention' | 'token'
+  type: 'url' | 'email' | 'hashtag' | 'mention' | 'token' |'quote'
   text: string
   href?: string
   tag?: string
   address?: string
-  chain?: string
+  chain?: string  
 }
 
 /**
@@ -45,6 +45,8 @@ function generateLink(parsed: ParsedToken, linkClass: string): string {
       return `<a href="/token/${escapeHtml(parsed.address as string)}-${escapeHtml(parsed.chain as string)}" class="${linkClass}">${escapeHtml(parsed.text)}</a>`
     // case 'token':
     //    return  `<a href="#" @click="navigateTo(\`/token/${escapeHtml(parsed.address as string)}-${escapeHtml(parsed.chain as string)}\`)" class="${linkClass}">${escapeHtml(parsed.text)}</a>`
+    case 'quote':
+      return `<span>${escapeHtml(parsed.text)}</span>`
     default:
       return escapeHtml(parsed.text)
   }
@@ -66,7 +68,7 @@ export function processTwitterText(text: string | null | undefined, tokens?: Tok
   // Define regex patterns for various matches
   const patterns: Array<{
     regex: RegExp
-    type: 'url' | 'email' | 'hashtag' | 'mention'
+    type: 'url' | 'email' | 'hashtag' | 'mention'|'quote'
     process: (match: string, capture?: string) => ParsedToken
   }> = [
     {
@@ -87,6 +89,14 @@ export function processTwitterText(text: string | null | undefined, tokens?: Tok
         type: 'email',
         text: match,
         href: `mailto:${match}`
+      })
+    },
+    {
+      regex: /"([^"]*)"/g,
+      type: 'quote',
+      process: (match: string, capture?: string): ParsedToken => ({
+        type: 'quote',
+        text: capture || match
       })
     },
     {

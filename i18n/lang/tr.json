@@ -650,5 +650,6 @@
   "unpin": "Sabitlemeyi kaldır",
   "actionDel": "bu tweeti sildim",
   "actionTop": "bu tweeti sabitledim",
-  "actionUnpin": "bu tweetin sabitlemesini kaldırdım"
+  "actionUnpin": "bu tweetin sabitlemesini kaldırdım",
+  "customSetting": "Özel Ayarlar"
 }

@@ -194,6 +194,7 @@ import { processTwitterText } from './utils'
 import { typeEnum, useTrackerTypes } from './constants'
 import { _tokenSearchV3 } from '@/api/hot'
 import TokenImg from '@/components/tokenImg.vue'
+import { useLocalStorage } from '@vueuse/core';
 const emits = defineEmits(['measureElement'])
 const trackerStore = useTwitterTrackerStore()
 const {map} = useTrackerTypes()
@@ -212,6 +213,9 @@ const props = defineProps({
     }
 })
 
+const quoteColor = useLocalStorage('tw-quoteColor', '#3F80F7')
+const symbolColor = useLocalStorage('tw-symbolColor', '#FFA622')
+const tokenAddressColor = useLocalStorage('tw-tokenAddressColor', '#3F80F7')
 const tooltipRefs = ref({})
 const contentEl = ref(null)
 const measureEl = ref(null)
@@ -234,7 +238,11 @@ const processedContent = computed(() => {
     // const {lang} = props.item || {}
     let key = `content`
     const content = props.item?.[key]
-    return processTwitterText(content || props.item.content,props.item.token&&[props.item.token])
+    return processTwitterText(content || props.item.content,props.item.token&&[props.item.token],{
+        quoteColor,
+        symbolColor,
+        tokenAddressColor
+    })
 })
 
 const tokenList = ref([])
@@ -272,7 +280,11 @@ const processedContentZh = computed(() => {
     // const {lang} = props.item || {}
     const key = lang.value.includes('zh') ? 'content_zh' : 'content_en'
     const content = props.item?.[key]
-    return processTwitterText(content,props.item.token&&[props.item.token])
+    return processTwitterText(content,props.item.token&&[props.item.token],{
+        quoteColor,
+        symbolColor,
+        tokenAddressColor
+    })
 })
 const checkContentOverflow = () => {
     nextTick(() => {

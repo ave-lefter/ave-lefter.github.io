@@ -1502,5 +1502,6 @@
   "unpin": "고정 해제",
   "actionDel": "이 트윗을 삭제했습니다",
   "actionTop": "이 트윗을 고정했습니다",
-  "actionUnpin": "이 트윗을 고정 해제했습니다"
+  "actionUnpin": "이 트윗을 고정 해제했습니다",
+  "customSetting": "맞춤 설정"
 }

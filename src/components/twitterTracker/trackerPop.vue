@@ -67,6 +67,7 @@
                 :name="(isMine ?globalStore.audioSettings.audio.twitterForMe : globalStore.audioSettings.audio.twitter) ? 'custom:ad' : 'custom:admute'" /> -->
           <Icon v-if="!isMine" class="cursor-pointer" ref="audioButtonRef" :name="(globalStore.audioSettings.audio.twitter) ? 'custom:ad' : 'custom:admute'" ></Icon>
           <Icon v-else class="cursor-pointer" ref="audioButtonRef1" :name="(globalStore.audioSettings.audio.twitterForMe) ? 'custom:ad' : 'custom:admute'" ></Icon>
+          <Icon name="material-symbols:30fps-sharp" @click="dialogVisible=true"></Icon>
           <Icon v-show="isPaused" name="custom:stop"/>
           <!-- <el-dropdown :persistent="false" trigger="click">
               <div class="w-24px h-24px bg-[--main-list-hover] flex items-center justify-center rounded-4px cursor-pointer"><Icon name="material-symbols:language"/></div>
@@ -109,6 +110,7 @@
       :volume="+globalStore.audioSettings.audio.volume / 100 || 0.5" />
     <audio ref="newsAudio" controls style="display: none" :src="getAudioUrl(globalStore.audioSettings.audio.news)"
       :volume="+globalStore.audioSettings.audio.volume / 100 || 0.5" />
+    <CustomSettingsDialog v-model="dialogVisible"></CustomSettingsDialog>
   </div>
 </template>
 
@@ -120,6 +122,7 @@ import useNews from './useNews'
 import { getAllFollowIds, getTwitterList } from '~/api/twitter'
 import { useV2WSStore } from '~/stores/v2ws'
 import { useTrackerTypes } from './constants'
+import CustomSettingsDialog from './customSettingsDialog'
 const emits = defineEmits(['setDrawerVisible'])
 const { t } = useI18n()
 const newsAudio = useTemplateRef('newsAudio')
@@ -143,7 +146,7 @@ const audioButtonRef2 = ref()
 const twitterAudio = useTemplateRef('twitterAudio')
 const twitterAudio1 = useTemplateRef('twitterAudio1')
 const followIds = useStorage('twFollowIds', [])
-
+const dialogVisible=shallowRef(false)
 const {dataSource: dataSource2, getList:getList2,total:total2} = useNews({newsAudio,activeParentTab,isPaused:isPaused2})
 const query = ref({ ...trackerStore.query })
 // defineProps({

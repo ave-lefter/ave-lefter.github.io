@@ -676,5 +676,6 @@
   "unpin": "Desprender",
   "actionDel": "he eliminado este tweet",
   "actionTop": "he fijado este tweet",
-  "actionUnpin": "he desanclado este tweet"
+  "actionUnpin": "he desanclado este tweet",
+  "customSetting": "Configuraciones personalizadas"
 }
