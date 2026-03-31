@@ -18,6 +18,13 @@ const computedVisible = computed({
   }
 })
 const filterArray = ref<(undefined | number)[]>([])
+watch(() => props.visible, (val) => {
+  if(val){
+    filterArray.value[0] = Number(props.modelValue[0])||undefined
+    filterArray.value[1] = Number(props.modelValue[1])||undefined
+  }
+})
+
 const isActive = computed(() => props.modelValue.filter(el => !!el).length > 0)
 const themeStore = useThemeStore()
 

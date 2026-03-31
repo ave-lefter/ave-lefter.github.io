@@ -18,7 +18,7 @@ import {
 } from '~/api/token'
 import {formatDate, formatTimeFromNow, getAddressAndChainFromId, getChainInfo, uuid} from '~/utils'
 
-import {useThrottleFn} from '@vueuse/core'
+import {useLocalStorage, useThrottleFn} from '@vueuse/core'
 // import { useStorage } from '@vueuse/core'
 import IconUnknown from '@/assets/images/icon-unknown.png'
 import type {AveTable} from '#components'
@@ -138,6 +138,8 @@ const wsPairCache = shallowRef<IGetSimpleTxsResponse[]>([])
 const pairLiq = shallowRef<GetPairLiqResponse[]>([])
 const wsLiqCache = shallowRef<GetPairLiqResponse[]>([])
 
+const minVol = useLocalStorage<string>('txMinVol','')
+const maxVol = useLocalStorage<string>('txMaxVol','')
 const tableFilter = ref<{
   timestamp: string[];
   amountU: string[];
@@ -145,7 +147,7 @@ const tableFilter = ref<{
   tag_type: string;
 }>({
   timestamp: [],
-  amountU: [],
+  amountU: [minVol.value, maxVol.value],
   markerAddress: '',
   tag_type: ''
 })
@@ -602,6 +604,8 @@ function confirmVolFilter(amountU: string[] = []) {
   txCount.value = {}
   tableFilterVisible.value.amountU = false
   tableFilter.value.amountU = amountU
+  minVol.value = amountU[0]||''
+  maxVol.value = amountU[1]||''
   filterSubmit()
 }
 
