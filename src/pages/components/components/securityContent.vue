@@ -41,10 +41,9 @@ function formatRate(val) {
 }
 
 // 跑路颜色
-function getRugColor(val) {
-  if (val === 0) return 'color-[--third-text]'
+function getRugColor(val: any) {
   if (val > 60) return 'color-[--down-color]'
-  return 'color-[--main-text]'
+  return 'color-[--third-text1]'
 }
 
 const isSolana = computed(() => ['AllChains', 'solana'].includes(props.activeChain))
@@ -53,12 +52,19 @@ const isSolana = computed(() => ['AllChains', 'solana'].includes(props.activeCha
 const runPullVisible = computed(() => isSolana.value)
 
 // 安全图标
-function getRiskIcon(row) {
+function getRiskIcon(row: any) {
   if (row.risk_level == -1 || row.risk_score >= 60) return new URL('@/assets/images/risk-gaoliang.svg', import.meta.url).href
   if (row.risk_score > 55 && row.risk_score < 60) return new URL('@/assets/images/yichang1-gaoliang.svg', import.meta.url).href
   if (row.risk_score > 0 && row.risk_score <= 55) return new URL('@/assets/images/安全.svg', import.meta.url).href
   if (row.risk_score == 0) return new URL('@/assets/images/zhuyi1.svg', import.meta.url).href
   return null
+}
+
+function getSafeColor(val: any ) {
+  if (val == -1 || val >= 60) return 'color-[--down-color]'
+  if (val > 55 && val < 60) return 'color-[--yellow-text1]'
+  if (val > 0 && val <= 55) return 'color-[--up-color]'
+  return 'color-[--third-text1]'
 }
 
 function showBubbleTooltip(row: PumpObj, e: MouseEvent) {
@@ -213,11 +219,11 @@ function showBubbleTooltip(row: PumpObj, e: MouseEvent) {
       <!-- 安全 risk_score -->
       <div v-tooltip="$t('safe')" class="sec-card">
         <img v-if="getRiskIcon(row)" :src="getRiskIcon(row)" class="w-12px h-12px" alt="" />
-        <span>{{ $t('safe') }}</span>
+        <span :class="getSafeColor(row.risk_score)">{{ $t('safe') }}</span>
       </div>
       <!-- 跑路（仅 solana） -->
-      <div v-tooltip="$t('flag_rug_pull')" v-if="runPullVisible" class="sec-card">
-        <Icon name="custom:rug" class="shrink-0 color-[--third-text1]"/>
+      <div v-if="runPullVisible" v-tooltip="$t('flag_rug_pull')" class="sec-card">
+        <Icon name="custom:rug" class="shrink-0" :class="getRugColor(row.rug_rate)"/>
         <span :class="getRugColor(row.rug_rate)">{{ row.rug_rate == -1 ? $t('unKnown1') : formatRate(row.rug_rate) }}</span>
       </div>
     </div>
