@@ -673,5 +673,6 @@
   "removeTokenTips2": "¿Eliminar el seguimiento seleccionado?",
   "monitor": "Monitor",
   "deletedTweets": "Tweets eliminados",
-  "unpin": "Desprender"
+  "unpin": "Desprender",
+  "actionDel": "he eliminado este tweet"
 }

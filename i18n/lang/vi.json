@@ -891,5 +891,6 @@
   "removeTokenTips2": "Xóa giám sát đã chọn?",
   "monitor": "màn hình",
   "deletedTweets": "Tweet đã xóa",
-  "unpin": "Bỏ ghim"
+  "unpin": "Bỏ ghim",
+  "actionDel": "đã xóa tweet này"
 }

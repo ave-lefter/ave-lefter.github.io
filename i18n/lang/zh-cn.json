@@ -2136,5 +2136,6 @@
   "liquidityLimit": "池子大小限制",
   "twitterFollowers": "推特粉丝数",
   "deletedTweets": "删除推文",
-  "unpin": "取消置顶"
+  "unpin": "取消置顶",
+  "actionDel": "删除了这条推文"
 }

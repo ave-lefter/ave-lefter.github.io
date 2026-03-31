@@ -1,6 +1,40 @@
 <template>
     <div class="pb-16px">
         <div class="flex flex-col gap-8px flex-1 min-w-0">
+            {{ JSON.stringify(processedTokenList) }}
+            <div v-for="(item, index) in tokenList" class="flex gap-8px items-center lh-none" :key="item.token+item.chain">
+                <TokenImg :row="item" class="w-24px h-24px mr-8px" />
+                <div class="whitespace-nowrap text-ellipsis overflow-hidden max-w-90px mr-8px">{{ row?.symbol }}</div>
+            </div>
+            <div v-if="(item.action&&item.action_at)&&((item.action!=='0')&&(item.action_at!=='0'))" class="flex  gap-8px items-center lh-none">
+                <div class="flex items-center p-5px rounded-4px text-12px"
+                :style="{background: map[item.action]?.bg, color: map[item.action]?.color}"
+                >
+                    <Icon :name="`custom:twitter-${item.action}`" class="text-10px" />
+                </div>
+                <div class="font-500 text-14px mt--2px" :style="{color: map[item.action]?.color}">
+                    {{ map[item.action]?.label }}
+                </div>
+                <div class="font-400 text-12px text-[--d-666-l-959A9F]">@{{ item.author.username }}{{ t('actionDel') }}•
+                    <TimerCount
+                        v-if="item.action_at && Number(formatTimeFromNow(item.action_at, true)) < 60"
+                        :key="`${item.action_at}`"
+                        :timestamp="Math.min(+item.action_at, dayjs().unix() - 1)" :end-time="60">
+                        <template #default="{ seconds }">
+                            <span class="text-12px color-[--up-color]">
+                                <template v-if="seconds < 60"> {{ seconds }}s </template>
+                                <template v-else>
+                                    {{ formatTimeFromNow(item.action_at) }}
+                                </template>
+                            </span>
+                        </template>
+                    </TimerCount>
+                    <span v-else v-tooltip="formatDate(item.action_at, 'YYYY-MM-DD HH:mm:ss')"
+                        class="text-12px">
+                        {{ formatTimeFromNow(item.action_at) }}
+                    </span>
+                </div>
+            </div>
             <div class="justify-between items-center flex">
                 <div class="min-w-0 flex-1">
                     <div class="min-w-0 flex-1 flex items-center gap-7px">
@@ -43,10 +77,10 @@
                         <Icon :name="followIdArray.includes(item.author.author_id) ? 'custom:twitter-collect' : 'custom:twitter-uncollect'" class="text-12px" />
                     </div>
                     <div class="flex items-center gap-4px py-6px px-4px rounded-4px text-12px"
-                    :style="{background: map[item.action||item.type]?.bg, color: map[item.action||item.type]?.color}"
+                    :style="{background: map[item.type]?.bg, color: map[item.type]?.color}"
                     >
-                        <Icon :name="`custom:twitter-${item.action||item.type}`" class="text-13px" />
-                        {{ map[item.action||item.type]?.label }}
+                        <Icon :name="`custom:twitter-${item.type}`" class="text-13px" />
+                        {{ map[item.type]?.label }}
                     </div>
                 </div>
             </div>
@@ -56,6 +90,27 @@
                     { 'line-11': !contentExpanded && isContentOverflow }
                 ]">
                     <div class="cursor-pointer" @click="handleContentClick" v-html="processedContent" />
+                    <div v-if="+props.item.type!==typeEnum.retweet" :class="index !== -1 ? 'ml-0px' : ''"
+                        class="justify-between items-center flex mt-8px text-[--d-666-l-959A9F]">
+                        <div v-show="lang.includes('zh')" class="flex items-center gap-4px cursor-pointer text-12px" @click="translationVisible=!translationVisible">
+                            <template v-if="props.item.content&&(lang.includes('zh'))">
+                                <Icon name="custom:translation" />{{ t(translationVisible ? 'viewOrigin':'viewTranslation') }}
+                            </template>
+                        </div>
+                        <span v-if="isContentOverflow" class="flex items-center gap-4px cursor-pointer color-[--primary-color] text-12px"
+                            @click="contentExpanded = !contentExpanded">
+                            <Icon name="custom:angle-down" :class="contentExpanded ? 'rotate-180' : ''" />
+                            {{ !contentExpanded ? t('Expand') : t('Collapse') }}
+                        </span>
+                    </div>
+                    <template v-if="lang.includes('zh')&&translationVisible">
+                        <div v-if="processedContentZh" class="mt-8px bg-[--d-15171C-l-F6F6F6] px-12px py-6px" v-html="processedContentZh"></div>
+                        <el-skeleton v-else animated class="mt-8px">
+                            <template #template>
+                                <el-skeleton-item variant="p" style="width: 100%" />
+                            </template>
+                        </el-skeleton>
+                    </template>
                 </div>
                 <div ref="measureEl" class="text-14px lh-22px break-words absolute opacity-0 pointer-events-none"
                     style="width: 100%; top: 0; left: 0; z-index: -1;" v-html="processedContent" />
@@ -113,19 +168,6 @@
                         @click="clickVideo(item.url)" />
                 </div> -->
             </div>
-            <div v-if="+props.item.type!==typeEnum.retweet" :class="index !== -1 ? 'ml-40px' : ''"
-                class="justify-between items-center flex">
-                <div v-show="showTranslation" class="flex items-center gap-4px cursor-pointer text-12px color-[--secondary-text]" @click="translationVisible=!translationVisible">
-                    <template v-if="props.item.content">
-                        <Icon name="custom:translation" />{{ t(translationVisible ? 'viewOrigin':'viewTranslation') }}
-                    </template>
-                </div>
-                <span v-if="isContentOverflow" class="flex items-center gap-4px cursor-pointer color-[--primary-color] text-12px"
-                    @click="contentExpanded = !contentExpanded">
-                    <Icon name="custom:angle-down" :class="contentExpanded ? 'rotate-180' : ''" />
-                    {{ !contentExpanded ? t('Expand') : t('Collapse') }}
-                </span>
-            </div>
         </div>
     </div>
 </template>
@@ -135,10 +177,12 @@ import dayjs from 'dayjs'
 import { followKol, unfollowKol } from '~/api/twitter'
 import { processTwitterText } from '~/utils'
 import { typeEnum, useTrackerTypes } from './constants'
-
+import { _tokenSearchV3 } from '@/api/hot'
+import TokenImg from '@/components/tokenImg.vue'
 const emits = defineEmits(['measureElement'])
 const trackerStore = useTwitterTrackerStore()
 const {map} = useTrackerTypes()
+const { lang } = storeToRefs(useGlobalStore())
 const { t } = useI18n()
 const botStore = useBotStore()
 
@@ -172,15 +216,49 @@ const showTranslation = computed(() => {
 })
 // 处理后的内容，包含可点击的链接
 const processedContent = computed(() => {
-    const {lang} = props.item || {}
-    let key = `content_${lang}`
-    if(translationVisible.value){
-        key = lang === 'en' ? 'content_zh' : 'content_en'
-    }
+    // const {lang} = props.item || {}
+    let key = `content`
     const content = props.item?.[key]
-    return processTwitterText(content || props.item.content)
+    return processTwitterText(content || props.item.content)?.html
 })
 
+const tokenList = ref([])
+
+
+
+const processedTokenList = computed(() => {
+    // const {lang} = props.item || {}
+    let key = `content`
+    const content = props.item?.[key]
+    return processTwitterText(content)?.tokenList
+})
+
+// watch(() => processedTokenList.value, (val, old) => {
+//     console.log('processedTokenList changed', val, old)
+//     if(JSON.stringify(val) === JSON.stringify(old)) return
+//     tokenList.value = []
+//     if (val.length) {
+//         val.forEach(el => {
+//             _tokenSearchV3({
+//                 query: el,
+//                 self_address: useFollowStore().currentAddress,
+//             }).then(res => {
+//                 const token_list = res?.token_list || []
+//                 console.log('token_list', res,token_list)
+//                 if(token_list[0]){
+//                     tokenList.value.push(token_list[0])
+//                 }
+//             })
+//         })
+//     }
+// })
+// 处理后的内容，包含可点击的链接
+const processedContentZh = computed(() => {
+    // const {lang} = props.item || {}
+    let key = `content_zh`
+    const content = props.item?.[key]
+    return processTwitterText(content)?.html
+})
 const checkContentOverflow = () => {
     nextTick(() => {
         const el = measureEl.value || contentEl.value

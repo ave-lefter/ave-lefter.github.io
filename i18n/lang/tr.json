@@ -647,5 +647,6 @@
   "removeTokenTips2": "Seçilen izleme silinsin mi?",
   "monitor": "monitör",
   "deletedTweets": "Silinen Tweetler",
-  "unpin": "Sabitlemeyi kaldır"
+  "unpin": "Sabitlemeyi kaldır",
+  "actionDel": "bu tweeti sildim"
 }

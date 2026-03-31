@@ -651,5 +651,6 @@
   "removeTokenTips2": "Excluir o monitoramento selecionado?",
   "monitor": "monitor",
   "deletedTweets": "Tweets excluídos",
-  "unpin": "Liberar"
+  "unpin": "Liberar",
+  "actionDel": "excluí este tweet"
 }

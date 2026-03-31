@@ -1499,5 +1499,6 @@
   "batchFav": "일괄 팔로우",
   "removeTokenTips2": "선택한 모니터링을 삭제하시겠습니까?",
   "deletedTweets": "삭제된 트윗",
-  "unpin": "고정 해제"
+  "unpin": "고정 해제",
+  "actionDel": "이 트윗을 삭제했습니다"
 }

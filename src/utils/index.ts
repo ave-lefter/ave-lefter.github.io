@@ -1373,8 +1373,12 @@ export function getAudioUrl(audio: string) {
  * @param text 原始文本
  * @returns 处理后的 HTML 字符串
  */
-export function processTwitterText(text: string): string {
-  if (!text) return ''
+export function processTwitterText(text: string): { html: string; tokenList: string[] } {
+  const tokenList:string[]=[]
+  if (!text) return {
+    html: '',
+    tokenList: []
+  }
 
   // 转义 HTML 特殊字符，防止 XSS
   let html = text
@@ -1427,8 +1431,29 @@ export function processTwitterText(text: string): string {
 
     return `<a href="https://twitter.com/hashtag/${hashtag}" class="[&&]:color-[--primary-color] hover:underline" target="_blank" rel="noopener noreferrer">#${hashtag}</a>`
   })
+  // 处理 # 话题标签（#hasToken），排除已经在 <a> 标签内的内容
+  const hasTokenRegex = /\$([a-zA-Z0-9_]+)/g
+  html = html.replace(hasTokenRegex, (match: string, hasToken: string, offset: number) => {
+    // 检查当前位置是否在 <a> 标签内
+    // 从字符串开头到当前位置
+    const beforeMatch = html.slice(0, offset)
+    const lastOpenTag = beforeMatch.lastIndexOf('<a')
+    const lastCloseTag = beforeMatch.lastIndexOf('</a>')
 
-  return html
+    // 如果最后一个 <a> 标签在最后一个 </a> 之后，说明在链接内
+    if (lastOpenTag > lastCloseTag) {
+      return match // 在链接内，不处理
+    }
+    if(hasToken && !tokenList.includes(hasToken)){
+      tokenList.push(hasToken)
+    }
+    return `<a href="javascript:void(0)" class="[&&]:color-[--primary-color] hover:underline" target="_blank" rel="noopener noreferrer">$${hasToken}</a>`
+  })
+
+  return {
+    html,
+    tokenList
+  }
 }
 
 export function formatSeconds(seconds: number) {

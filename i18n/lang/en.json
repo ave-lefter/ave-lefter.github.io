@@ -2135,5 +2135,6 @@
   "removeTokenTips2": "Delete the selected monitoring?",
   "twitterFollowers": "Twitter Followers",
   "deletedTweets": "Deleted Tweets",
-  "unpin": "Unpin"
+  "unpin": "Unpin",
+  "actionDel": "have deleted this tweet"
 }
