@@ -108,11 +108,11 @@
                             </template>
                         </el-skeleton>
                     </template>
-                    <div v-if="item?.token" class="mt-8px flex gap-4px items-center lh-none bg-[--up-bg] bg-[--down-bg] px-8px py-6px" :class="getBgClass(item?.token?.price_change_24h)">
-                        <Icon name="i-icon-park-solid:volume-notice" class="text-12px color-[--main-text1]"></Icon>{{ item?.token.kol_count }}{{ t('times') }}
+                    <div v-if="item?.token" class="mt-8px flex gap-4px items-center lh-none bg-[--up-bg] bg-[--down-bg] px-8px py-6px clickable" :class="getBgClass(item?.token?.price_change_24h)" @click="navigateTo(`/token/${item?.token?.address}-${item?.token?.chain}`)">
+                        <!-- <Icon name="i-icon-park-solid:volume-notice" class="text-12px color-[--main-text1]"></Icon>{{ item?.token.kol_count }}{{ t('times') }} -->
                         <TokenImg :row="item?.token" class="w-24px h-24px mr-8px" />
                         <div class="whitespace-nowrap text-ellipsis overflow-hidden max-w-90px mr-8px">{{ item?.token?.symbol }}</div>
-                        <span class="ml-4px" :class="getColorClass(item?.token?.price_change_24h)">{{ addSign(price_change_24h) }}{{ formatNumber(Math.abs(item?.token?.price_change_24h), 2) }}%</span>
+                        <span class="ml-4px" :class="getColorClass(item?.token?.price_change_24h)">{{ addSign(item?.token?.price_change_24h) }}{{ formatNumber(Math.abs(item?.token?.price_change_24h), 2) }}%</span>
                     </div>
                 </div>
                 <div ref="measureEl" class="text-14px lh-22px break-words absolute opacity-0 pointer-events-none"
@@ -178,7 +178,7 @@
 import { useStorage } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { followKol, unfollowKol } from '~/api/twitter'
-import { processTwitterText } from '~/utils'
+import { processTwitterText } from './utils'
 import { typeEnum, useTrackerTypes } from './constants'
 import { _tokenSearchV3 } from '@/api/hot'
 import TokenImg from '@/components/tokenImg.vue'
