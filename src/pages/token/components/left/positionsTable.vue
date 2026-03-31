@@ -804,7 +804,7 @@ function hideToken(row:any) {
                   </template>
                 </el-tooltip>
                 <div class="ml-6px w-[calc(100%-30px)]">
-                  {{ $index }}
+                  <!-- {{ $index }} -->
                   <div class="flex flex-row items-end">
                     <span class="color-[var(--main-text1)] font-400 text-13px lh-16px ellipsis" :style="{maxWidth:(row.risk_score > 55 || row.risk_level < 0)?'calc(100% - 14.6px)':'100%'}" :title="row.token">{{ row.symbol }}</span>
                     <Icon
