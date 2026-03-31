@@ -1,11 +1,8 @@
 <template>
     <div class="pb-16px">
         <div class="flex flex-col gap-8px flex-1 min-w-0">
-            {{ JSON.stringify(processedTokenList) }}
-            <div v-for="(item, index) in tokenList" class="flex gap-8px items-center lh-none" :key="item.token+item.chain">
-                <TokenImg :row="item" class="w-24px h-24px mr-8px" />
-                <div class="whitespace-nowrap text-ellipsis overflow-hidden max-w-90px mr-8px">{{ row?.symbol }}</div>
-            </div>
+            <!-- {{ item?.content }} -->
+            {{ item?.token?.symbol }}
             <div v-if="(item.action&&item.action_at)&&((item.action!=='0')&&(item.action_at!=='0'))" class="flex  gap-8px items-center lh-none">
                 <div class="flex items-center p-5px rounded-4px text-12px"
                 :style="{background: map[item.action]?.bg, color: map[item.action]?.color}"
@@ -89,10 +86,10 @@
                     'text-14px lh-22px break-words',
                     { 'line-11': !contentExpanded && isContentOverflow }
                 ]">
-                    <div class="cursor-pointer" @click="handleContentClick" v-html="processedContent" />
+                    <span>{{ map[item.type]?.label }}</span> <div class="cursor-pointer" @click="handleContentClick" v-html="processedContent" />
                     <div v-if="+props.item.type!==typeEnum.retweet" :class="index !== -1 ? 'ml-0px' : ''"
                         class="justify-between items-center flex mt-8px text-[--d-666-l-959A9F]">
-                        <div v-show="lang.includes('zh')" class="flex items-center gap-4px cursor-pointer text-12px" @click="translationVisible=!translationVisible">
+                        <div v-show="lang.includes('zh')&&showTranslation" class="flex items-center gap-4px cursor-pointer text-12px" @click="translationVisible=!translationVisible">
                             <template v-if="props.item.content&&(lang.includes('zh'))">
                                 <Icon name="custom:translation" />{{ t(translationVisible ? 'viewOrigin':'viewTranslation') }}
                             </template>
@@ -103,7 +100,7 @@
                             {{ !contentExpanded ? t('Expand') : t('Collapse') }}
                         </span>
                     </div>
-                    <template v-if="lang.includes('zh')&&translationVisible">
+                    <template v-if="lang.includes('zh')&&translationVisible&&showTranslation">
                         <div v-if="processedContentZh" class="mt-8px bg-[--d-15171C-l-F6F6F6] px-12px py-6px" v-html="processedContentZh"></div>
                         <el-skeleton v-else animated class="mt-8px">
                             <template #template>
@@ -111,6 +108,12 @@
                             </template>
                         </el-skeleton>
                     </template>
+                    <div v-if="item?.token" class="mt-8px flex gap-4px items-center lh-none bg-[--up-bg] bg-[--down-bg] px-8px py-6px" :class="getBgClass(item?.token?.price_change_24h)">
+                        <Icon name="i-icon-park-solid:volume-notice" class="text-12px color-[--main-text1]"></Icon>{{ item?.token.kol_count }}{{ t('times') }}
+                        <TokenImg :row="item?.token" class="w-24px h-24px mr-8px" />
+                        <div class="whitespace-nowrap text-ellipsis overflow-hidden max-w-90px mr-8px">{{ item?.token?.symbol }}</div>
+                        <span class="ml-4px" :class="getColorClass(item?.token?.price_change_24h)">{{ addSign(price_change_24h) }}{{ formatNumber(Math.abs(item?.token?.price_change_24h), 2) }}%</span>
+                    </div>
                 </div>
                 <div ref="measureEl" class="text-14px lh-22px break-words absolute opacity-0 pointer-events-none"
                     style="width: 100%; top: 0; left: 0; z-index: -1;" v-html="processedContent" />
@@ -210,16 +213,16 @@ const followIdArray = computed(() => {
 })
 const showTranslation = computed(() => {
     const {lang} = props.item || {}
-    const key = lang === 'en' ? 'content_zh' : 'content_en'
-    return props.item?.[key] && 
-        props.item?.[key] !== props.item.content
+    const key = lang === 'en' ? 'content' : 'content_zh'
+    return props.item?.content && 
+        props.item?.content !== props.item.content_zh
 })
 // 处理后的内容，包含可点击的链接
 const processedContent = computed(() => {
     // const {lang} = props.item || {}
     let key = `content`
     const content = props.item?.[key]
-    return processTwitterText(content || props.item.content)?.html
+    return processTwitterText(content || props.item.content,props.item.token&&[props.item.token])
 })
 
 const tokenList = ref([])
@@ -230,7 +233,7 @@ const processedTokenList = computed(() => {
     // const {lang} = props.item || {}
     let key = `content`
     const content = props.item?.[key]
-    return processTwitterText(content)?.tokenList
+    return processTwitterText(content)
 })
 
 // watch(() => processedTokenList.value, (val, old) => {
@@ -257,7 +260,7 @@ const processedContentZh = computed(() => {
     // const {lang} = props.item || {}
     let key = `content_zh`
     const content = props.item?.[key]
-    return processTwitterText(content)?.html
+    return processTwitterText(content,props.item.token&&[props.item.token])
 })
 const checkContentOverflow = () => {
     nextTick(() => {

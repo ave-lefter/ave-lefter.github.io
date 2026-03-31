@@ -630,6 +630,15 @@ export function getColorClass(val: string | number) {
     return 'color-[--third-text]'
   }
 }
+export function getBgClass(val: string | number) {
+  if (Number(val) > 0) {
+    return 'bg-[--up-bg]!'
+  } else if (Number(val) < 0) {
+    return 'bg-[--down-bg]!'
+  } else {
+    return 'bg-[--up-bg]!'
+  }
+}
 export function desensitizeEmail(email: string) {
   // 使用正则表达式匹配邮箱格式
   const emailPattern = /^(.+?)(@.*)$/
@@ -1369,92 +1378,327 @@ export function getAudioUrl(audio: string) {
 }
 
 /**
- * 处理 Twitter 文本，将 @、# 和 http 链接转换为可点击的链接
- * @param text 原始文本
- * @returns 处理后的 HTML 字符串
+ * Parse tweet content and convert mentions, hashtags, URLs, and emails to links
+ * Safe from XSS attacks
  */
-export function processTwitterText(text: string): { html: string; tokenList: string[] } {
-  const tokenList:string[]=[]
-  if (!text) return {
-    html: '',
-    tokenList: []
-  }
 
-  // 转义 HTML 特殊字符，防止 XSS
-  let html = text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;')
-
-  // 先处理换行符
-  html = html.replace(/\n/g, '<br>')
-
-  // 使用更精确的正则表达式，按顺序处理不同类型的链接
-  // 先处理 URL（http/https），避免与 @ 和 # 冲突
-  const urlRegex = /(https?:\/\/[^\s<>"']+)/g
-  html = html.replace(urlRegex, (url: string) => {
-    return `<a href="${url}" class="[&&]:color-[--primary-color] hover:underline" target="_blank" rel="noopener noreferrer">${url}</a>`
-  })
-
-  // 处理 @ 提及（@username），排除已经在 <a> 标签内的内容
-  const mentionRegex = /@([a-zA-Z0-9_]+)/g
-  html = html.replace(mentionRegex, (match: string, username: string, offset: number) => {
-    // 检查当前位置是否在 <a> 标签内
-    // 从字符串开头到当前位置
-    const beforeMatch = html.slice(0, offset)
-    const lastOpenTag = beforeMatch.lastIndexOf('<a')
-    const lastCloseTag = beforeMatch.lastIndexOf('</a>')
-
-    // 如果最后一个 <a> 标签在最后一个 </a> 之后，说明在链接内
-    if (lastOpenTag > lastCloseTag) {
-      return match // 在链接内，不处理
-    }
-
-    return `<a href="https://twitter.com/${username}" class="[&&]:color-[--primary-color] hover:underline" target="_blank" rel="noopener noreferrer">@${username}</a>`
-  })
-
-  // 处理 # 话题标签（#hashtag），排除已经在 <a> 标签内的内容
-  const hashtagRegex = /#([a-zA-Z0-9_]+)/g
-  html = html.replace(hashtagRegex, (match: string, hashtag: string, offset: number) => {
-    // 检查当前位置是否在 <a> 标签内
-    // 从字符串开头到当前位置
-    const beforeMatch = html.slice(0, offset)
-    const lastOpenTag = beforeMatch.lastIndexOf('<a')
-    const lastCloseTag = beforeMatch.lastIndexOf('</a>')
-
-    // 如果最后一个 <a> 标签在最后一个 </a> 之后，说明在链接内
-    if (lastOpenTag > lastCloseTag) {
-      return match // 在链接内，不处理
-    }
-
-    return `<a href="https://twitter.com/hashtag/${hashtag}" class="[&&]:color-[--primary-color] hover:underline" target="_blank" rel="noopener noreferrer">#${hashtag}</a>`
-  })
-  // 处理 # 话题标签（#hasToken），排除已经在 <a> 标签内的内容
-  const hasTokenRegex = /\$([a-zA-Z0-9_]+)/g
-  html = html.replace(hasTokenRegex, (match: string, hasToken: string, offset: number) => {
-    // 检查当前位置是否在 <a> 标签内
-    // 从字符串开头到当前位置
-    const beforeMatch = html.slice(0, offset)
-    const lastOpenTag = beforeMatch.lastIndexOf('<a')
-    const lastCloseTag = beforeMatch.lastIndexOf('</a>')
-
-    // 如果最后一个 <a> 标签在最后一个 </a> 之后，说明在链接内
-    if (lastOpenTag > lastCloseTag) {
-      return match // 在链接内，不处理
-    }
-    if(hasToken && !tokenList.includes(hasToken)){
-      tokenList.push(hasToken)
-    }
-    return `<a href="javascript:void(0)" class="[&&]:color-[--primary-color] hover:underline" target="_blank" rel="noopener noreferrer">$${hasToken}</a>`
-  })
-
-  return {
-    html,
-    tokenList
-  }
+interface Token {
+  address: string
+  chain: string
+  symbol: string
 }
+
+interface ParsedToken {
+  type: 'url' | 'email' | 'hashtag' | 'mention' | 'token'
+  text: string
+  href?: string
+  tag?: string
+  address?: string
+  chain?: string
+}
+
+interface TokenMatch {
+  start: number
+  end: number
+  text: string
+  capture?: string
+  type: 'url' | 'email' | 'hashtag' | 'mention' | 'token'
+  process: (text: string, capture?: string) => ParsedToken
+}
+
+/**
+ * Escape HTML to prevent XSS
+ */
+function escapeHtml(str: string): string {
+  const div = document.createElement('div')
+  div.textContent = str
+  return div.innerHTML
+}
+
+/**
+ * Parse tweet content and convert mentions, hashtags, URLs, emails and tokens to links
+ */
+export function processTwitterText(text: string | null | undefined, tokens?: Token[]): string {
+  if (!text || typeof text !== 'string') {
+    return ''
+  }
+
+  const linkClass = '[&&]:color-[--primary-color] hover:underline'
+
+  // Regex patterns array - order matters!
+  const patterns: Array<{
+    regex: RegExp
+    type: 'url' | 'email' | 'hashtag' | 'mention'
+    process: (match: string, capture?: string) => ParsedToken
+  }> = [
+    {
+      // URLs (http/https/www) - 优先级最高
+      regex: /(https?:\/\/[^\s<]+|www\.[^\s<]+)/g,
+      type: 'url',
+      process: (match: string): ParsedToken => {
+        let url = match
+        if (url.startsWith('www')) {
+          url = 'https://' + url
+        }
+        return {
+          type: 'url',
+          text: match,
+          href: url
+        }
+      }
+    },
+    {
+      // Emails
+      regex: /([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/g,
+      type: 'email',
+      process: (match: string): ParsedToken => ({
+        type: 'email',
+        text: match,
+        href: `mailto:${match}`
+      })
+    },
+    {
+      // Hashtags (#tag)
+      regex: /#([a-zA-Z0-9_]+)/g,
+      type: 'hashtag',
+      process: (match: string, capture?: string): ParsedToken => ({
+        type: 'hashtag',
+        text: match,
+        tag: capture
+      })
+    },
+    {
+      // Mentions (@username)
+      regex: /@([a-zA-Z0-9_]+)/g,
+      type: 'mention',
+      process: (match: string, capture?: string): ParsedToken => ({
+        type: 'mention',
+        text: match,
+        tag: capture
+      })
+    }
+  ]
+
+  // Find all matches with their positions
+  const matches: TokenMatch[] = []
+
+  patterns.forEach(pattern => {
+    let match
+    // 重置 regex 的 lastIndex
+    pattern.regex.lastIndex = 0
+    while ((match = pattern.regex.exec(text)) !== null) {
+      matches.push({
+        start: match.index,
+        end: match.index + match[0].length,
+        text: match[0],
+        capture: match[1],
+        type: pattern.type,
+        process: pattern.process
+      })
+    }
+  })
+
+  // Add token matches if tokens are provided - 优先级最低
+  if (tokens && tokens.length > 0) {
+    tokens.forEach(token => {
+      // 创建 token symbol 的正则表达式（不分大小写，词边界，可选的 $ 前缀）
+      const tokenRegex = new RegExp(`\\$?\\b${token.symbol.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'gi')
+      let match
+
+      while ((match = tokenRegex.exec(text)) !== null) {
+        matches.push({
+          start: match.index,
+          end: match.index + match[0].length,
+          text: match[0],
+          type: 'token',
+          process: (): ParsedToken => ({
+            type: 'token',
+            text: match[0],
+            address: token.address,
+            chain: token.chain
+          })
+        })
+      }
+    })
+  }
+
+  // Sort matches by position, then by length (longer first to avoid conflicts)
+  matches.sort((a, b) => {
+    if (a.start !== b.start) {
+      return a.start - b.start
+    }
+    return (b.end - b.start) - (a.end - a.start)
+  })
+
+  // Remove overlapping matches (keep first match)
+  const filteredMatches = matches.filter((match, index, arr) => {
+    return !arr.some((m, i) => {
+      if (i >= index) return false
+      // 检查重叠
+      return match.start < m.end && match.end > m.start
+    })
+  })
+
+  // Build the result
+  let result = ''
+  let currentIndex = 0
+
+  filteredMatches.forEach(match => {
+    // Add text before the match
+    if (currentIndex < match.start) {
+      result += escapeHtml(text.substring(currentIndex, match.start))
+    }
+
+    // Process the match
+    const processed = match.process(match.text, match.capture)
+
+    switch (processed.type) {
+      case 'url':
+        result += `<a href="${escapeHtml(processed.href as string)}" class="${linkClass}" target="_blank" rel="noopener noreferrer">${escapeHtml(processed.text)}</a>`
+        break
+      case 'email':
+        result += `<a href="${escapeHtml(processed.href as string)}" class="${linkClass}" target="_blank" rel="noopener noreferrer">${escapeHtml(processed.text)}</a>`
+        break
+      case 'hashtag':
+        result += `<a href="https://twitter.com/search?q=%23${encodeURIComponent(processed.tag as string)}" class="${linkClass}" target="_blank" rel="noopener noreferrer">${escapeHtml(processed.text)}</a>`
+        break
+      case 'mention':
+        result += `<a href="https://twitter.com/${encodeURIComponent(processed.tag as string)}" class="${linkClass}" target="_blank" rel="noopener noreferrer">${escapeHtml(processed.text)}</a>`
+        break
+      case 'token':
+        result += `<a href="/token/${escapeHtml(processed.address as string)}-${escapeHtml(processed.chain as string)}" class="${linkClass}">${escapeHtml(processed.text)}</a>`
+        break
+    }
+
+    currentIndex = match.end
+  })
+
+  // Add remaining text
+  if (currentIndex < text.length) {
+    result += escapeHtml(text.substring(currentIndex))
+  }
+
+  return result
+}
+
+/**
+ * Convert array of tweets to HTML
+ * For use with v-html in Vue 3
+ */
+export function convertTweetsToHtml(tweetsArray: (string | null | undefined)[], tokens?: Token[]): string {
+  return tweetsArray
+    .filter((tweet): tweet is string => tweet != null && typeof tweet === 'string')
+    .map(tweet => {
+      const parsedContent = parseTweetContent(tweet, tokens)
+      return `<div class="tweet-item">${parsedContent}</div>`
+    })
+    .join('')
+}
+
+// /**
+//  * 处理 Twitter 文本，将 @、# 和 http 链接转换为可点击的链接
+//  * @param text 原始文本
+//  * @returns 处理后的 HTML 字符串
+//  */
+// export function processTwitterText(text: string,token:string): string {
+//   if (!text) return ''
+  
+//   // 转义 HTML 特殊字符，防止 XSS
+//   let html = text
+//     .replace(/&/g, '&amp;')
+//     .replace(/</g, '&lt;')
+//     .replace(/>/g, '&gt;')
+//     .replace(/"/g, '&quot;')
+//     .replace(/'/g, '&#39;')
+
+//   // 先处理换行符
+//   html = html.replace(/\n/g, '<br>')
+
+//   // 使用更精确的正则表达式，按顺序处理不同类型的链接
+//   // 先处理 URL（http/https），避免与 @ 和 # 冲突
+//   const urlRegex = /(https?:\/\/[^\s<>"']+)/g
+//   html = html.replace(urlRegex, (url: string) => {
+//     return `<a href="${url}" class="[&&]:color-[--primary-color] hover:underline" target="_blank" rel="noopener noreferrer">${url}</a>`
+//   })
+
+//   // 处理 @ 提及（@username），排除已经在 <a> 标签内的内容
+//   if (html.includes('@')) {
+//     const mentionRegex = /@([a-zA-Z0-9_]+)/g
+//     html = html.replace(mentionRegex, (match: string, username: string, offset: number) => {
+//       // 检查当前位置是否在 <a> 标签内
+//       // 从字符串开头到当前位置
+//       const beforeMatch = html.slice(0, offset)
+//       const lastOpenTag = beforeMatch.lastIndexOf('<a')
+//       const lastCloseTag = beforeMatch.lastIndexOf('</a>')
+  
+//       // 如果最后一个 <a> 标签在最后一个 </a> 之后，说明在链接内
+//       if (lastOpenTag > lastCloseTag) {
+//         return match // 在链接内，不处理
+//       }
+  
+//       return `<a href="https://twitter.com/${username}" class="[&&]:color-[--primary-color] hover:underline" target="_blank" rel="noopener noreferrer">@${username}</a>`
+//     })
+//   }
+//     if(text==="What's your Web3 journey?\n\nThat's what we asked our DevRel @Gwenole_M, @Hui_Huangg from @yzilabs and @druid_wtf from @GeniusTerminal at our NYU leg of the US Dev Roadshow.\n\nSo we're curious to know what your journey is 👇"){
+//       console.log('hashtagRegex111',html)
+//     }
+//   // 处理 # 话题标签（#hashtag），排除已经在 <a> 标签内的内容
+//   if (html.includes('#')) {
+//     const hashtagRegex = /#([a-zA-Z0-9_]+(?:['&#39;][a-zA-Z0-9_]+)*)/g
+    
+//     html = html.replace(hashtagRegex, (match: string, hashtag: string, offset: number) => {
+//       // 检查当前位置是否在 <a> 标签内
+//       // 从字符串开头到当前位置
+//       const beforeMatch = html.slice(0, offset)
+//       const lastOpenTag = beforeMatch.lastIndexOf('<a')
+//       const lastCloseTag = beforeMatch.lastIndexOf('</a>')
+  
+//       // 如果最后一个 <a> 标签在最后一个 </a> 之后，说明在链接内
+//       if (lastOpenTag > lastCloseTag) {
+//         return match // 在链接内，不处理
+//       }
+//       if(text==="What's your Web3 journey?\n\nThat's what we asked our DevRel @Gwenole_M, @Hui_Huangg from @yzilabs and @druid_wtf from @GeniusTerminal at our NYU leg of the US Dev Roadshow.\n\nSo we're curious to know what your journey is 👇"){
+//         console.log('hashtagRegex',hashtag)
+//       }
+//       const hashtag2 = hashtag.replace(/&#39;|'/g, '')
+//       return `<a href="https://twitter.com/hashtag/${hashtag2}" class="[&&]:color-[--primary-color] hover:underline" target="_blank" rel="noopener noreferrer">#${hashtag2}</a>`
+//     })
+//   }
+//   if(token){
+//     // 处理 # 话题标签（#hasToken），排除已经在 <a> 标签内的内容
+//    const symbol=token?.symbol 
+//   //  const hasTokenRegex = /\$([a-zA-Z0-9_]+)/g
+//     // const hasTokenRegex = new RegExp(`\\$${symbol}\\b`, 'g')
+//     // 2. 转义函数 (防止变量名包含特殊字符)
+//     function escapeRegExp(string: string) {
+//       return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+//     }
+
+//     const escapedVarName = escapeRegExp(symbol)
+//     // 3. 构建正则
+//     // 关键点：第二个参数传入 'gi'
+//     // g = 全局匹配 (Global)
+//     // i = 忽略大小写 (Case-Insensitive)
+//     const hasTokenRegex = new RegExp(`\\${escapedVarName}\\b`, 'gi')
+//    html = html.replace(hasTokenRegex, (match: string, hasToken: string, offset: number) => {
+//      // 检查当前位置是否在 <a> 标签内
+//      // 从字符串开头到当前位置
+//      const beforeMatch = html.slice(0, offset)
+//      const lastOpenTag = beforeMatch.lastIndexOf('<a')
+//      const lastCloseTag = beforeMatch.lastIndexOf('</a>')
+ 
+//      // 如果最后一个 <a> 标签在最后一个 </a> 之后，说明在链接内
+//      if (lastOpenTag > lastCloseTag) {
+//        return match // 在链接内，不处理
+//      }
+//      return `<a href="javascript:void(0)" class="[&&]:color-[--primary-color] hover:underline" target="_blank" rel="noopener noreferrer">$${hasToken}</a>`
+//    })
+//   }
+//   if(text=="LATEST: ⚡ Aave has launched on OKX's Ethereum layer-2 X Layer, marking the DeFi protocol’s 21st blockchain integration."){
+//     console.log('hashtagRegex2',html)
+//   }
+//   return html
+// }
 
 export function formatSeconds(seconds: number) {
   const s = Math.floor(seconds)

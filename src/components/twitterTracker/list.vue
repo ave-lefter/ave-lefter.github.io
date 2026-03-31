@@ -32,6 +32,7 @@
       }">
         <div :ref="(el) => virtualizer.measureElement(el)" :data-index="virtualRow.index"
           class="border-b-1px border-b-solid border-b-[--border]">
+          {{ virtualRow.index }}
           <ListItem :item="getItem(virtualRow)" :index="virtualRow.index" @measureElement="virtualizer.measureElement(el)" />
           <div v-if="['2', '3', '4'].includes(getItem(virtualRow).type) && (getItem(virtualRow).retweeted_tweet || getItem(virtualRow).quoted_tweet || getItem(virtualRow).replied_tweet)"
             class="border-1px border-solid border-[--dialog-divider] rounded-8px px-12px pt-16px ml-40px mb-16px">

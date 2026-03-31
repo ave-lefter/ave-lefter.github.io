@@ -288,6 +288,8 @@ const twitterHandler = async (val) => {
         trackerStore.list.pop()
       }
     }
+
+    // console.log('trackerStore.list',trackerStore.list.map(el => el.content))
     const audioEl = isMine.value ? twitterAudio1.value : twitterAudio.value
     if (audioEl && globalStore.audioSettings.audio[isMine.value ? 'twitterForMe' : 'twitter']) {
       audioEl.play()
@@ -315,10 +317,10 @@ watch([() => isPaused.value, () => activeParentTab.value], ([val,val2]) => {
   }
 })
 
-watch(
-  () => v2WsStore.wsResult[WSEventV2Type.PUBLIC_TWITTER],
-  twitterHandler
-)
+// watch(
+//   () => v2WsStore.wsResult[WSEventV2Type.PUBLIC_TWITTER],
+//   twitterHandler
+// )
 
 watch(() => followAuthorIds.value, () => {
   if (isMine.value) {
