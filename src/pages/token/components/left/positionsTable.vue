@@ -711,6 +711,12 @@ function hideToken(row:any) {
   hideTokenVisible.value = true
   currentHideToken.value = row
 }
+
+// 组件销毁时清理订阅
+onBeforeUnmount(() => {
+  priceV2Store.setMultiPriceParams('positions', [])
+  priceV2Store.sendPriceWs()
+})
 </script>
 
 <template>
