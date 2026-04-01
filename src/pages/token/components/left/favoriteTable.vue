@@ -194,6 +194,11 @@ onMounted(() => {
     userFavoriteGroups.value=[]
   }
 })
+
+onBeforeUnmount(() => {
+  priceV2Store.setMultiPriceParams('favorite', [])
+  priceV2Store.sendPriceWs()
+})
 watch(
   () => walletAddress.value,
   (val) => {
