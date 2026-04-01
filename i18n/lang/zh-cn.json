@@ -2144,5 +2144,12 @@
   "actionDel": "删除了这条推文",
   "actionTop": "置顶了这条推文",
   "actionUnpin": "取消置顶了这条推文",
-  "customSetting": "自定义设置"
+  "customSetting": "自定义设置",
+  "twDisplaySettings": "显示设置",
+  "doubleQuotes": "双引号",
+  "doubleQuotesDesc": "高亮双引号内的文字（如“coin”“meme”）",
+  "customTokens": "自定义代币",
+  "symbol": "代币符号",
+  "symbolDesc": "高亮$SOL、$ETH等代币",
+  "tokenAddressDesc": "高亮代币CA"
 }

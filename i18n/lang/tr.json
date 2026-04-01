@@ -654,5 +654,12 @@
   "actionDel": "bu tweeti sildim",
   "actionTop": "bu tweeti sabitledim",
   "actionUnpin": "bu tweetin sabitlemesini kaldırdım",
-  "customSetting": "Özel Ayarlar"
+  "customSetting": "Özel Ayarlar",
+  "twDisplaySettings": "Ekran Ayarları",
+  "doubleQuotes": "Çift Tırnak",
+  "doubleQuotesDesc": "Çift tırnak içindeki metni vurgulayın (\"jeton\" \"meme\" gibi)",
+  "customTokens": "Özel Jeton",
+  "symbol": "Sembol",
+  "symbolDesc": "$SOL, $ETH ve diğer tokenleri vurgulayın",
+  "tokenAddressDesc": "Token CA'yı vurgulayın"
 }

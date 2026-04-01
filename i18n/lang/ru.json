@@ -511,7 +511,7 @@
   "addrGroup": "Адресная группа",
   "push": "Толкать",
   "copyTrade": "Копитрейдинг",
-    "reasonInvalid": "Причина недействительности",
+  "reasonInvalid": "Причина недействительности",
   "pauseMonitor": "Пауза мониторинг",
   "enableMonitor": "Включите мониторинг",
   "sniper": "Снайперы",
@@ -903,5 +903,12 @@
   "actionDel": "удалил этот твит",
   "actionTop": "закрепил этот твит",
   "actionUnpin": "открепил этот твит",
-  "customSetting": "Пользовательские настройки"
+  "customSetting": "Пользовательские настройки",
+  "twDisplaySettings": "Настройки дисплея",
+  "doubleQuotes": "Двойные кавычки",
+  "doubleQuotesDesc": "Выделите текст в двойных кавычках (например, «монета», «мем»).",
+  "customTokens": "Пользовательский токен",
+  "symbol": "Символ",
+  "symbolDesc": "Выделите $SOL, $ETH и другие токены",
+  "tokenAddressDesc": "Выделить токен CA"
 }

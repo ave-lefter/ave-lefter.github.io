@@ -658,5 +658,12 @@
   "actionDel": "excluí este tweet",
   "actionTop": "fixei este tweet",
   "actionUnpin": "desfixei este tweet",
-  "customSetting": "Configurações personalizadas"
+  "customSetting": "Configurações personalizadas",
+  "twDisplaySettings": "Configurações de exibição",
+  "doubleQuotes": "Citações Duplas",
+  "doubleQuotesDesc": "Destaque o texto entre aspas duplas (como \"moeda\" \"meme\")",
+  "customTokens": "Token personalizado",
+  "symbol": "Símbolo",
+  "symbolDesc": "Destaque $SOL, $ETH e outros tokens",
+  "tokenAddressDesc": "Destacar Token CA"
 }

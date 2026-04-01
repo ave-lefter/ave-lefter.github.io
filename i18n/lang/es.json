@@ -680,5 +680,12 @@
   "actionDel": "he eliminado este tweet",
   "actionTop": "he fijado este tweet",
   "actionUnpin": "he desanclado este tweet",
-  "customSetting": "Configuraciones personalizadas"
+  "customSetting": "Configuraciones personalizadas",
+  "twDisplaySettings": "Configuración de pantalla",
+  "doubleQuotes": "Comillas dobles",
+  "doubleQuotesDesc": "Resalte el texto entre comillas dobles (como \"moneda\", \"meme\")",
+  "customTokens": "Ficha personalizada",
+  "symbol": "Símbolo",
+  "symbolDesc": "Resalte $SOL, $ETH y otros tokens",
+  "tokenAddressDesc": "Resaltar token CA"
 }

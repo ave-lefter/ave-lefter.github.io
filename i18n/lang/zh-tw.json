@@ -2130,5 +2130,12 @@
   "actionDel": "刪除了這則推文",
   "actionTop": "置頂了這則推文",
   "actionUnpin": "取消置頂了這則推文",
-  "customSetting": "自訂設定"
+  "customSetting": "自訂設定",
+  "twDisplaySettings": "顯示設定",
+  "doubleQuotes": "雙引號",
+  "doubleQuotesDesc": "高亮雙引號內的文字（如“coin”“meme”）",
+  "customTokens": "自訂代幣",
+  "symbol": "代幣符號",
+  "symbolDesc": "高亮$SOL、$ETH等代幣",
+  "tokenAddressDesc": "高亮代幣CA"
 }

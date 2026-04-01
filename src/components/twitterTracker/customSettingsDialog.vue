@@ -6,7 +6,7 @@
       <div class="mx--16px h-1px bg-[--border] mb-20px" />
       <!-- 显示设置部分 -->
       <div class="settings-section">
-        <h3 class="section-title">显示设置</h3>
+        <h3 class="section-title">{{ $t('twDisplaySettings') }}</h3>
 
         <div class="setting-item flex gap-12px">
           <div class="setting-header flex gap-4px items-center">
@@ -20,11 +20,11 @@
           </div>
           <div class="flex gap-8px flex-col">
             <div class="flex gap-4px items-center">
-              <div class="setting-label">双引号</div>
+              <div class="setting-label">{{ $t('doubleQuotes') }}</div>
               <Icon name="mingcute:refresh-1-line"></Icon>
             </div>
             <div class="setting-description">
-              高亮双引号内的文字（如“coin”“meme”）
+              {{ $t('doubleQuotesDesc') }}
             </div>
           </div>
         </div>
@@ -32,7 +32,7 @@
 
       <!-- 自定义代币部分 -->
       <div class="settings-section mt-6">
-        <h3 class="section-title">自定义代币</h3>
+        <h3 class="section-title">{{ $t('customTokens') }}</h3>
 
         <div class="token-inputs grid grid-cols-2 gap-4">
           <!-- 代币符号 -->
@@ -48,11 +48,11 @@
             </div>
             <div class="flex gap-8px flex-col">
               <div class="flex gap-4px items-center">
-                <div class="setting-label">代币符号</div>
+                <div class="setting-label">{{ $t('symbol') }}</div>
                 <Icon name="mingcute:refresh-1-line"></Icon>
               </div>
               <div class="setting-description">
-                高亮$SOL、$ETH等代币
+                {{ $t('symbolDesc') }}
               </div>
             </div>
           </div>
@@ -69,11 +69,11 @@
             </div>
             <div class="flex gap-8px flex-col">
               <div class="flex gap-4px items-center">
-                <div class="setting-label">代币地址</div>
+                <div class="setting-label">{{ $t('tokenAddress') }}</div>
                 <Icon name="mingcute:refresh-1-line"></Icon>
               </div>
               <div class="setting-description">
-                高亮代币CA
+                {{ $t('tokenAddressDesc') }}
               </div>
             </div>
           </div>
@@ -84,8 +84,6 @@
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue'
-import { Close, QuestionFilled } from '@element-plus/icons-vue'
 import { useLocalStorage } from '@vueuse/core';
 
 defineProps<{

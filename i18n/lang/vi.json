@@ -511,7 +511,7 @@
   "addrGroup": "Nhóm địa chỉ",
   "push": "Xô",
   "copyTrade": "Copy giao dịch",
-    "reasonInvalid": "Lý do không hiệu lực",
+  "reasonInvalid": "Lý do không hiệu lực",
   "pauseMonitor": "Tạm dừng giám sát",
   "enableMonitor": "Bật giám sát",
   "sniper": "Người săn",
@@ -898,5 +898,12 @@
   "actionDel": "đã xóa tweet này",
   "actionTop": "đã ghim tweet này",
   "actionUnpin": "đã bỏ ghim tweet này",
-  "customSetting": "Cài đặt tùy chỉnh"
+  "customSetting": "Cài đặt tùy chỉnh",
+  "twDisplaySettings": "Cài đặt hiển thị",
+  "doubleQuotes": "Báo giá kép",
+  "doubleQuotesDesc": "Đánh dấu văn bản trong dấu ngoặc kép (chẳng hạn như \"coin\" \"meme\")",
+  "customTokens": "Mã thông báo tùy chỉnh",
+  "symbol": "Biểu tượng",
+  "symbolDesc": "Làm nổi bật $SOL, $ETH và các token khác",
+  "tokenAddressDesc": "Đánh dấu mã thông báo CA"
 }

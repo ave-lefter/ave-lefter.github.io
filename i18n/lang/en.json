@@ -2143,5 +2143,12 @@
   "actionDel": "have deleted this tweet",
   "actionTop": "have pinned this tweet",
   "actionUnpin": "have unpinned this tweet",
-  "customSetting": "Custom Settings"
+  "customSetting": "Custom Settings",
+  "twDisplaySettings": "Display Settings",
+  "doubleQuotes": "Double Quotes",
+  "doubleQuotesDesc": "Highlight text within double quotes (such as \"coin\" \"meme\")",
+  "customTokens": "Custom Token",
+  "symbol": "Symbol",
+  "symbolDesc": "Highlight $SOL, $ETH and other tokens",
+  "tokenAddressDesc": "Highlight Token CA"
 }
