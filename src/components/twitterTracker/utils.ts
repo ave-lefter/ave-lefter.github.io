@@ -10,13 +10,19 @@ interface Token {
   symbol: string
 }
 
+interface Colors {
+  quoteColor?: string
+  symbolColor?: string
+  tokenAddressColor?: string
+}
+
 interface ParsedToken {
-  type: 'url' | 'email' | 'hashtag' | 'mention' | 'token' |'quote'
+  type: 'url' | 'email' | 'hashtag' | 'mention' | 'token' | 'quote'
   text: string
   href?: string
   tag?: string
   address?: string
-  chain?: string  
+  chain?: string
 }
 
 /**
@@ -29,9 +35,17 @@ function escapeHtml(str: string): string {
 }
 
 /**
+ * Generate inline style for colors
+ */
+function getColorStyle(color?: string): string {
+  if (!color) return ''
+  return `style="color: ${escapeHtml(color)}"`
+}
+
+/**
  * Generate HTML link based on parsed token type
  */
-function generateLink(parsed: ParsedToken, linkClass: string): string {
+function generateLink(parsed: ParsedToken, linkClass: string, colors: Colors): string {
   switch (parsed.type) {
     case 'url':
       return `<a href="${escapeHtml(parsed.href as string)}" class="${linkClass}" target="_blank" rel="noopener noreferrer">${escapeHtml(parsed.text)}</a>`
@@ -42,11 +56,9 @@ function generateLink(parsed: ParsedToken, linkClass: string): string {
     case 'mention':
       return `<a href="https://twitter.com/${encodeURIComponent(parsed.tag as string)}" class="${linkClass}" target="_blank" rel="noopener noreferrer">${escapeHtml(parsed.text)}</a>`
     case 'token':
-      return `<a href="/token/${escapeHtml(parsed.address as string)}-${escapeHtml(parsed.chain as string)}" class="${linkClass}">${escapeHtml(parsed.text)}</a>`
-    // case 'token':
-    //    return  `<a href="#" @click="navigateTo(\`/token/${escapeHtml(parsed.address as string)}-${escapeHtml(parsed.chain as string)}\`)" class="${linkClass}">${escapeHtml(parsed.text)}</a>`
+      return `<a href="/token/${escapeHtml(parsed.address as string)}-${escapeHtml(parsed.chain as string)}" class="${linkClass}" ${getColorStyle(colors.symbolColor)}>${escapeHtml(parsed.text)}</a>`
     case 'quote':
-      return `<span>${escapeHtml(parsed.text)}</span>`
+      return `<span ${getColorStyle(colors.quoteColor)}>${escapeHtml(parsed.text)}</span>`
     default:
       return escapeHtml(parsed.text)
   }
@@ -56,22 +68,29 @@ function generateLink(parsed: ParsedToken, linkClass: string): string {
  * Process tweet content and convert it into clickable HTML
  * @param text Raw tweet text
  * @param tokens Optional array of tokens to match and process
+ * @param colors Optional colors configuration { quoteColor, symbolColor, tokenAddressColor }
  * @returns Processed HTML content with clickable links
  */
-export function processTwitterText(text: string | null | undefined, tokens?: Token[]): string {
+export function processTwitterText(
+  text: string | null | undefined,
+  tokens?: Token[],
+  colors?: Colors
+): string {
   if (!text || typeof text !== 'string') {
     return ''
   }
 
   const linkClass = '[&&]:color-[--primary-color] hover:underline'
+  const finalColors: Colors = colors || {}
 
   // Define regex patterns for various matches
   const patterns: Array<{
     regex: RegExp
-    type: 'url' | 'email' | 'hashtag' | 'mention'|'quote'
+    type: 'url' | 'email' | 'hashtag' | 'mention' | 'quote'
     process: (match: string, capture?: string) => ParsedToken
   }> = [
     {
+      // URLs (http/https/www)
       regex: /(https?:\/\/[^\s<]+|www\.[^\s<]+)/g,
       type: 'url',
       process: (match: string): ParsedToken => {
@@ -83,6 +102,7 @@ export function processTwitterText(text: string | null | undefined, tokens?: Tok
       }
     },
     {
+      // Emails
       regex: /([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/g,
       type: 'email',
       process: (match: string): ParsedToken => ({
@@ -92,14 +112,31 @@ export function processTwitterText(text: string | null | undefined, tokens?: Tok
       })
     },
     {
-      regex: /"([^"]*)"/g,
+      // Quotes - matches content within English double quotes "" or Chinese quotes ""
+      // This regex matches: "..." or "..." or "..."
+      regex: /["“”]([^"“”]*)["“”]/g,
       type: 'quote',
-      process: (match: string, capture?: string): ParsedToken => ({
-        type: 'quote',
-        text: capture || match
-      })
+      process: (match: string): ParsedToken => {
+        // Remove outer quotes
+        let innerContent = match
+        if (match.startsWith('"') && match.endsWith('"')) {
+          // English quotes
+          innerContent = match.slice(1, -1)
+        } else if (match.startsWith('"') && match.endsWith('"')) {
+          // Chinese left and right quotes
+          innerContent = match.slice(1, -1)
+        } else if (match.startsWith('"') && match.endsWith('"')) {
+          // Chinese quotes (alternate)
+          innerContent = match.slice(1, -1)
+        }
+        return {
+          type: 'quote',
+          text: innerContent
+        }
+      }
     },
     {
+      // Hashtags (#tag) - supports English and Chinese
       regex: /#([\w\u4e00-\u9fff]+)/g,
       type: 'hashtag',
       process: (match: string, capture?: string): ParsedToken => ({
@@ -109,6 +146,7 @@ export function processTwitterText(text: string | null | undefined, tokens?: Tok
       })
     },
     {
+      // Mentions (@username) - supports English and Chinese
       regex: /@([\w\u4e00-\u9fff]+)/g,
       type: 'mention',
       process: (match: string, capture?: string): ParsedToken => ({
@@ -137,7 +175,8 @@ export function processTwitterText(text: string | null | undefined, tokens?: Tok
   // Add token matches if tokens are provided
   if (tokens && tokens.length > 0) {
     for (const token of tokens) {
-      const tokenRegex = new RegExp(`\\$?\\b${token.symbol.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'gi')
+      const escapedSymbol = token.symbol.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+      const tokenRegex = new RegExp(`\\$?\\b${escapedSymbol}\\b|\\$?${escapedSymbol}`, 'gi')
       let match: RegExpExecArray | null
       tokenRegex.lastIndex = 0
       while ((match = tokenRegex.exec(text)) !== null) {
@@ -146,7 +185,7 @@ export function processTwitterText(text: string | null | undefined, tokens?: Tok
           end: match.index + match[0].length,
           parsed: {
             type: 'token',
-            text: match[0], // Keep original match (with optional `$` prefix)
+            text: match[0],
             address: token.address,
             chain: token.chain
           }
@@ -160,19 +199,24 @@ export function processTwitterText(text: string | null | undefined, tokens?: Tok
     if (a.start !== b.start) {
       return a.start - b.start
     }
-    return b.end - b.start - (a.end - a.start) // Longer matches first in case of overlap
+    return b.end - b.start - (a.end - a.start)
+  })
+
+  // Remove overlapping matches
+  const filteredMatches = matches.filter((match, index, arr) => {
+    return !arr.some((m, i) => i < index && match.start < m.end && match.end > m.start)
   })
 
   // Build the HTML content
   let result = ''
   let currentIndex = 0
-  for (const match of matches) {
+  for (const match of filteredMatches) {
     // Add text before the matched region
     if (currentIndex < match.start) {
       result += escapeHtml(text.substring(currentIndex, match.start))
     }
     // Add the matched region as a link
-    result += generateLink(match.parsed, linkClass)
+    result += generateLink(match.parsed, linkClass, finalColors)
     currentIndex = match.end
   }
   // Add remaining text after the last match
@@ -186,9 +230,13 @@ export function processTwitterText(text: string | null | undefined, tokens?: Tok
 /**
  * Convert an array of tweets into HTML
  */
-export function convertTweetsToHtml(tweetsArray: (string | null | undefined)[], tokens?: Token[]): string {
+export function convertTweetsToHtml(
+  tweetsArray: (string | null | undefined)[],
+  tokens?: Token[],
+  colors?: Colors
+): string {
   return tweetsArray
     .filter((tweet): tweet is string => tweet != null && typeof tweet === 'string')
-    .map(tweet => `<div class="tweet-item">${processTwitterText(tweet, tokens)}</div>`)
+    .map(tweet => `<div class="tweet-item">${processTwitterText(tweet, tokens, colors)}</div>`)
     .join('')
 }

@@ -2,7 +2,7 @@
     <div class="pb-16px">
         <div class="flex flex-col gap-8px flex-1 min-w-0">
             <!-- {{ item?.content }} -->
-            {{ item?.token?.symbol }}
+            <!-- {{ item?.token?.symbol }} -->
             <div v-if="(item.action&&item.action_at)&&((item.action!=='0')&&(item.action_at!=='0'))" class="flex  gap-8px items-center lh-none">
                 <div class="flex items-center p-5px rounded-4px text-12px"
                 :style="{background: map[item.action]?.bg, color: map[item.action]?.color}"
@@ -123,7 +123,7 @@
                     <div v-if="item?.token" class="mt-8px flex gap-4px items-center lh-none bg-[--up-bg] bg-[--down-bg] px-8px py-6px clickable" :class="getBgClass(item?.token?.price_change_24h)" @click="navigateTo(`/token/${item?.token?.address}-${item?.token?.chain}`)">
                         <!-- <Icon name="i-icon-park-solid:volume-notice" class="text-12px color-[--main-text1]"></Icon>{{ item?.token.kol_count }}{{ t('times') }} -->
                         <TokenImg :row="item?.token" class="w-24px h-24px mr-8px" />
-                        <div class="whitespace-nowrap text-ellipsis overflow-hidden max-w-90px mr-8px">{{ item?.token?.symbol }}</div>
+                        <div class="whitespace-nowrap text-ellipsis overflow-hidden max-w-100px mr-8px">{{ item?.token?.symbol }}</div>
                         <span class="ml-4px" :class="getColorClass(item?.token?.price_change_24h)">{{ addSign(item?.token?.price_change_24h) }}{{ formatNumber(Math.abs(item?.token?.price_change_24h), 2) }}%</span>
                     </div>
                 </div>
@@ -239,9 +239,9 @@ const processedContent = computed(() => {
     let key = `content`
     const content = props.item?.[key]
     return processTwitterText(content || props.item.content,props.item.token&&[props.item.token],{
-        quoteColor,
-        symbolColor,
-        tokenAddressColor
+        quoteColor:quoteColor.value,
+        symbolColor:symbolColor.value,
+        tokenAddressColor:tokenAddressColor.value
     })
 })
 
@@ -281,9 +281,9 @@ const processedContentZh = computed(() => {
     const key = lang.value.includes('zh') ? 'content_zh' : 'content_en'
     const content = props.item?.[key]
     return processTwitterText(content,props.item.token&&[props.item.token],{
-        quoteColor,
-        symbolColor,
-        tokenAddressColor
+        quoteColor:quoteColor.value,
+        symbolColor:symbolColor.value,
+        tokenAddressColor:tokenAddressColor.value
     })
 })
 const checkContentOverflow = () => {
