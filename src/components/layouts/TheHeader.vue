@@ -442,8 +442,10 @@ watch(()=>wsStore.wsResult[WSEventType.TGBOT],(subscribeResult:ITGBotResponse)=>
   }
 })
 
-async function showDialog() {
-  globalStore.dialogVisible_search = !globalStore.dialogVisible_search
+async function showDialog(isOpen = true) {
+  if(isOpen){
+    globalStore.dialogVisible_search = !globalStore.dialogVisible_search
+  }
   // 自动粘贴剪切板
   const clipboard = await navigator.clipboard.readText()
   const isValid = clipboard && ['eth', 'solana','tron','sui','ton','brc20'].some(i => isValidAddress(clipboard, i))
@@ -455,6 +457,13 @@ async function showDialog() {
     }
   }
 }
+
+watch(() => globalStore.dialogVisible_search, (val) => {
+  if (val) {
+    showDialog(false)
+  }
+})
+
 </script>
 <style lang="scss" scoped>
 header {

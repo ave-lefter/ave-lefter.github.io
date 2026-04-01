@@ -1,18 +1,16 @@
 <template>
     <div class="pb-16px">
         <div class="flex flex-col gap-8px flex-1 min-w-0">
-            <!-- {{ item?.content }} -->
-            <!-- {{ item?.token?.symbol }} -->
-            <div v-if="(item.action&&item.action_at)&&((item.action!=='0')&&(item.action_at!=='0'))" class="flex  gap-8px items-center lh-none">
+            <div v-if="[5,6].includes(Number(item.type))" class="flex  gap-8px items-center lh-none">
                 <div class="flex items-center p-5px rounded-4px text-12px"
-                :style="{background: map[item.action]?.bg, color: map[item.action]?.color}"
+                :style="{background: map[item.type]?.bg, color: map[item.type]?.color}"
                 >
-                    <Icon :name="`custom:twitter-${item.action}`" class="text-10px" />
+                    <Icon :name="`custom:twitter-${item.type}`" class="text-10px" />
                 </div>
-                <div class="font-500 text-14px mt--2px" :style="{color: map[item.action]?.color}">
-                    {{ map[item.action]?.label }}
+                <div class="font-500 text-14px mt--2px" :style="{color: map[item.type]?.color}">
+                    {{ map[item.type]?.label }}
                 </div>
-                <div class="font-400 text-12px text-[--d-666-l-959A9F]">@{{ item.author.username }}&nbsp;{{ map[item.action]?.action }}•
+                <div class="font-400 text-12px text-[--d-666-l-959A9F]">@{{ item.author.username }}&nbsp;{{ map[item.type]?.action }}•
                     <TimerCount
                         v-if="item.action_at && Number(formatTimeFromNow(item.action_at, true)) < 60"
                         :key="`${item.action_at}`"
@@ -74,10 +72,10 @@
                         <Icon :name="followIdArray.includes(item.author.author_id) ? 'custom:twitter-collect' : 'custom:twitter-uncollect'" class="text-12px" />
                     </div>
                     <div class="flex items-center gap-4px py-6px px-4px rounded-4px text-12px"
-                    :style="{background: map[item.type]?.bg, color: map[item.type]?.color}"
+                    :style="{background: map[item.original_type]?.bg, color: map[item.original_type]?.color}"
                     >
-                        <Icon :name="`custom:twitter-${item.type}`" class="text-13px" />
-                        {{ map[item.type]?.label }}
+                        <Icon :name="`custom:twitter-${item.original_type}`" class="text-13px" />
+                        {{ map[item.original_type]?.label }}
                     </div>
                 </div>
             </div>
@@ -85,8 +83,8 @@
                 <div ref="contentEl" :class="[
                     'text-14px lh-22px break-words',
                 ]">
-                    <div v-if="[2,3,4].includes(Number(item.type))&&(item?.quoted_tweet?.author?.username||item?.retweeted_tweet?.author?.username||item.type=='4')" class="text-14px lh-22px break-words flex">
-                        <span :style="{color: map[item.type]?.color}">{{ map[item.type]?.label }}</span>
+                    <div v-if="[2,3,4].includes(Number(item.original_type))&&(item?.quoted_tweet?.author?.username||item?.retweeted_tweet?.author?.username||item.original_type=='4')" class="text-14px lh-22px break-words flex">
+                        <span :style="{color: map[item.original_type]?.color}">{{ map[item.original_type]?.label }}</span>
                         <a v-if="item?.quoted_tweet?.author?.username||item?.retweeted_tweet?.author?.username" :href="`https://twitter.com/${item?.quoted_tweet?.author?.username||item?.retweeted_tweet?.author?.username}`" class="[&amp;&amp;]:color-[--primary-color] hover:underline" target="_blank" rel="noopener noreferrer">@{{ item?.quoted_tweet?.author?.username||item?.retweeted_tweet?.author?.username }}</a>
                     </div>
                     <!-- <div>{{ showTranslation}}</div>
@@ -96,10 +94,10 @@
                     <div :class="[
                     { 'line-11': !contentExpanded && isContentOverflow }
                 ]">
-                        <div v-if="+props.item.type!==typeEnum.retweet" class="cursor-pointer w-p-box" @click="handleContentClick" v-html="processedContent" />
+                        <div v-if="+props.item.original_type!==typeEnum.retweet" class="cursor-pointer w-p-box" @click="handleContentClick" v-html="processedContent" />
                     </div>
                   
-                    <div v-if="+props.item.type!==typeEnum.retweet" :class="index !== -1 ? 'ml-0px' : ''"
+                    <div v-if="+props.item.original_type!==typeEnum.retweet" :class="index !== -1 ? 'ml-0px' : ''"
                         class="justify-between items-center flex mt-8px text-[--d-666-l-959A9F]">
                         <div class="flex items-center gap-4px cursor-pointer text-12px" @click="translationVisible=!translationVisible">
                             <template v-if="props.item.content&&showTranslation">
@@ -120,11 +118,12 @@
                             </template>
                         </el-skeleton>
                     </template>
-                    <div v-if="item?.token" class="mt-8px flex gap-4px items-center lh-none bg-[--up-bg] bg-[--down-bg] px-8px py-6px clickable" :class="getBgClass(item?.token?.price_change_24h)" @click="navigateTo(`/token/${item?.token?.address}-${item?.token?.chain}`)">
-                        <!-- <Icon name="i-icon-park-solid:volume-notice" class="text-12px color-[--main-text1]"></Icon>{{ item?.token.kol_count }}{{ t('times') }} -->
-                        <TokenImg :row="item?.token" class="w-24px h-24px mr-8px" />
-                        <div class="whitespace-nowrap text-ellipsis overflow-hidden max-w-100px mr-8px">{{ item?.token?.symbol }}</div>
-                        <span class="ml-4px" :class="getColorClass(item?.token?.price_change_24h)">{{ addSign(item?.token?.price_change_24h) }}{{ formatNumber(Math.abs(item?.token?.price_change_24h), 2) }}%</span>
+                    
+                    <div v-for="token in item?.tokens" class="mt-8px flex gap-4px items-center lh-none bg-[--up-bg] bg-[--down-bg] px-8px py-6px clickable" :class="getBgClass(token?.price_change_24h)" @click="navigateTo(`/token/${token?.address}-${token?.chain}`)">
+                        <!-- <Icon name="i-icon-park-solid:volume-notice" class="text-12px color-[--main-text1]"></Icon>{{ token.kol_count }}{{ t('times') }} -->
+                        <TokenImg :row="token" class="w-24px h-24px mr-8px" />
+                        <div class="whitespace-nowrap text-ellipsis overflow-hidden max-w-100px mr-8px">{{ token?.symbol }}</div>
+                        <span class="ml-4px" :class="getColorClass(token?.price_change_24h)">{{ addSign(token?.price_change_24h) }}{{ formatNumber(Math.abs(token?.price_change_24h), 2) }}%</span>
                     </div>
                 </div>
                 <div ref="measureEl" class="text-14px lh-22px break-words absolute opacity-0 pointer-events-none"
@@ -230,15 +229,16 @@ const followIdArray = computed(() => {
 const showTranslation = computed(() => {
     // const {lang} = props.item || {}
     const key = lang.value.includes('zh') ? 'content_zh' : 'content_en'
-    return props.item?.[key] && 
-        (props.item?.[key] !== props.item.content)
+    return (props.item?.[key] !== props.item.content)
+    // return props.item?.[key] && 
+    //     (props.item?.[key] !== props.item.content)
 })
 // 处理后的内容，包含可点击的链接
 const processedContent = computed(() => {
     // const {lang} = props.item || {}
     let key = `content`
     const content = props.item?.[key]
-    return processTwitterText(content || props.item.content,props.item.token&&[props.item.token],{
+    return processTwitterText(content || props.item.content,props.item?.tokens?.length&&props?.item?.tokens,{
         quoteColor:quoteColor.value,
         symbolColor:symbolColor.value,
         tokenAddressColor:tokenAddressColor.value
@@ -280,7 +280,7 @@ const processedContentZh = computed(() => {
     // const {lang} = props.item || {}
     const key = lang.value.includes('zh') ? 'content_zh' : 'content_en'
     const content = props.item?.[key]
-    return processTwitterText(content,props.item.token&&[props.item.token],{
+    return processTwitterText(content,props.item?.tokens?.length&&props?.item?.tokens,{
         quoteColor:quoteColor.value,
         symbolColor:symbolColor.value,
         tokenAddressColor:tokenAddressColor.value
@@ -408,15 +408,32 @@ const updateTooltipPosition = (mediaIndex) => {
 const clickContent = (url) => {
     window.open(url)
 }
+const copyToClipboard = async (text) => {
+  try {
+    await navigator.clipboard.writeText(text)
+  } catch (err) {
+    console.error('copy failed:', err)
+  }
+}
 
 // 处理内容点击事件，如果点击的不是链接，则打开推文
-const handleContentClick = (e) => {
+const handleContentClick = async(e) => {
     const target = e.target
     // 如果点击的是链接，不阻止默认行为，让浏览器处理
     if (target.tagName === 'A') {
         return
     }
+    if (target.tagName === 'SPAN') {
+        if(target.innerText){
+            console.log('handleContentClick', target.innerText)
+            await copyToClipboard(target.innerText)
+            useGlobalStore().dialogVisible_search = !useGlobalStore().dialogVisible_search
+            return 
+        }
+    }
     // 如果点击的是内容区域但不是链接，打开推文
     clickContent(props.item.url)
-}
+}   
+
+
 </script>

@@ -24,26 +24,35 @@
             {{ el.label }}
           </span>
            <div class="flex items-center gap-8px color-[--secondary-text] ml--8px ">
-          <el-popover v-model:visible="filterVisible" placement="bottom-end" trigger="click" :width="164"
+          <el-popover v-model:visible="filterVisible" placement="bottom-end" trigger="click" :width="268"
             :persistent="false">
             <template #reference>
               <Icon name="custom:filter" class="text-12px cursor-pointer text-[--third-text]" />
             </template>
             <template #default>
-              <el-checkbox v-model="checkAll" :indeterminate="isIndeterminate" class="[--el-checkbox-height:16px] mb-12px"
-                @change="handleCheckAllChange">
-                {{ t('all') }}
-              </el-checkbox>
-              <el-checkbox-group v-model="query.types" class="flex flex-col [--el-checkbox-height:16px] gap-12px"
-                @change="handleCheckedChange">
-                <!--mb-16px border-b-solid border-b-1px border-b-[--dialog-divider] -->
-                <el-checkbox v-for="option in checkboxOptions" :key="option.value" :value="option.value">
-                  {{ option.label }}
+              <div class="flex w-full flex-wrap w-full w-typeFilter border-b-1px border-b-solid border-b-[--dialog-divider] pb-4px">
+                <el-checkbox v-model="checkAll" :indeterminate="isIndeterminate" class="[--el-checkbox-height:16px] mb-12px"
+                  @change="handleCheckAllChange">
+                  {{ t('all') }}
                 </el-checkbox>
-              </el-checkbox-group>
-              <!-- <el-checkbox-group
+                <el-checkbox-group v-model="query.types" class="flex [--el-checkbox-height:16px] w-full flex-wrap"
+                  @change="handleCheckedChange">
+                  <!--mb-16px border-b-solid border-b-1px border-b-[--dialog-divider] -->
+                  <el-checkbox v-for="option in checkboxOptions" :key="option.value" :value="option.value" class="w-50% mr-0! mb-12px">
+                    <div class="flex items-center gap-4px">
+                      <div class="flex items-center py-5px px-4px rounded-4px text-12px w-20px h-20px"
+                      :style="{background: map[option?.value]?.bg, color: map[option?.value]?.color}"
+                      >
+                        <Icon :name="`custom:twitter-${option?.value}`" class="text-13px" />
+                      </div>
+                      {{ map[option?.value]?.label }}
+                    </div>
+                  </el-checkbox>
+                </el-checkbox-group>
+              </div>
+              <el-checkbox-group
                 v-model="query.types"
-                class="flex flex-col [--el-checkbox-height:16px] gap-12px"
+                class="flex flex-col [--el-checkbox-height:16px] gap-12px mt-16px"
               >
                 <el-checkbox
                   v-for="option in fixedCheckboxOptions"
@@ -52,12 +61,12 @@
                 >
                   {{ option.label }}
                 </el-checkbox>
-              </el-checkbox-group> -->
-              <div class="pt-16px flex items-center">
-                <el-button class="min-w-0" @click="filterVisible = false">
+              </el-checkbox-group>
+              <div class="pt-16px flex items-center gap-10px">
+                <el-button class="flex-1" @click="filterVisible = false">
                   {{ t('cancel') }}
                 </el-button>
-                <el-button class="min-w-0" type="primary" @click="confirmQuery">
+                <el-button class="flex-1" type="primary" @click="confirmQuery">
                   {{ t('confirm') }}
                 </el-button>
               </div>
@@ -149,6 +158,7 @@ const emits = defineEmits(['setDrawerVisible'])
 const { t } = useI18n()
 const newsAudio = useTemplateRef('newsAudio')
 const { locales } = useI18n()
+const {map} = useTrackerTypes()
 const langStore = useLocaleStore()
 const trackerStore = useTwitterTrackerStore()
 const v2WsStore = useV2WSStore()
@@ -196,10 +206,9 @@ const {arr:checkboxOptions} = useTrackerTypes()
 const isMine = computed(() => {
   return activeTab.value === TAB_TYPE.MINE
 })
-// const fixedCheckboxOptions = computed(() => [
-//   { label: t('onlyCA'), value: 1 },
-//   { label: t('onlyAddress'), value: 2 },
-// ])
+const fixedCheckboxOptions = computed(() => [
+  { label: t('onlyCA'), value: -1 },
+])
 const checkAll = ref(query.value.types.length === checkboxOptions.value.length)
 const isIndeterminate = ref(false)
 const handleCheckAllChange = () => {
@@ -262,11 +271,13 @@ const getList = async () => {
   }
   if(trackerStore.loading || trackerStore.finished) return
   trackerStore.loading = true
+  const types=query.value.types.filter(el=>el>0).join(',')
   try {
     const res = await getTwitterList({
       ...query.value,
       follow_only: isMine.value,
-      types: query.value.types.join(','),
+      types,
+      must_contains_ca: query.value.types.includes(-1),
     })
     if (res && activeTab.value === _activeTab) {
       query.value.page_token = res.page_token || ''
@@ -342,10 +353,10 @@ watch([() => isPaused.value, () => activeParentTab.value], ([val,val2]) => {
   }
 })
 
-watch(
-  () => v2WsStore.wsResult[WSEventV2Type.PUBLIC_TWITTER],
-  twitterHandler
-)
+// watch(
+//   () => v2WsStore.wsResult[WSEventV2Type.PUBLIC_TWITTER],
+//   twitterHandler
+// )
 
 watch(() => followAuthorIds.value, () => {
   if (isMine.value) {
@@ -374,4 +385,10 @@ useVisibilityChange(() => {
 })
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.w-typeFilter{
+  :deep() .el-checkbox__label{
+    padding-left: 10px;
+  }
+}
+</style>

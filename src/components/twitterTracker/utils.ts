@@ -58,7 +58,7 @@ function generateLink(parsed: ParsedToken, linkClass: string, colors: Colors): s
     case 'token':
       return `<a href="/token/${escapeHtml(parsed.address as string)}-${escapeHtml(parsed.chain as string)}" class="${linkClass}" ${getColorStyle(colors.symbolColor)}>${escapeHtml(parsed.text)}</a>`
     case 'tokenAddress':
-      return `<span ${getColorStyle(colors.tokenAddressColor)}>${escapeHtml(parsed.text)}</span>`
+      return `<span ${getColorStyle(colors.tokenAddressColor)} onClick>${escapeHtml(parsed.text)}</span>`
     case 'quote':
       return `<span ${getColorStyle(colors.quoteColor)}>${escapeHtml(parsed.text)}</span>`
     default:
