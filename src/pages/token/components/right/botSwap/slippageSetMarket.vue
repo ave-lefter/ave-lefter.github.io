@@ -1,5 +1,5 @@
 <template>
-  <SlippageSet :key="chain" v-model:chain="activeChain" :canSetAuto="true" :showClipboardSet="showClipboardSet" :setting="botSettingStore.botSettings[activeChain]" @open="activeChain = chain">
+  <SlippageSet :key="chain" v-model:chain="activeChain" :canSetAuto="true" :isAutoSell="isAutoSell" :showClipboardSet="showClipboardSet" :uToken="uToken" :setting="botSettingStore.botSettings[activeChain]" :showQuickAmount="showQuickAmount" :showAutoSell="showAutoSell" @open="activeChain = chain">
     <template #icon>
       <slot name="icon"/>
     </template>
@@ -17,11 +17,27 @@ const props = defineProps({
   showClipboardSet: {
     type: Boolean,
     default: false
+  },
+  isAutoSell: {
+    type: Boolean,
+    default: true
+  },
+  showQuickAmount: {
+    type: Boolean,
+    default: true
+  },
+  showAutoSell: {
+    type: Boolean,
+    default: false
   }
 })
 const botSettingStore = useBotSettingStore()
 
 const activeChain = ref<BotChain>(props.chain || 'bsc')
+const tokenStore = useTokenStore()
+const uToken = computed(() => {
+  return tokenStore.swap.payToken?.address || ''
+})
 
 </script>
 

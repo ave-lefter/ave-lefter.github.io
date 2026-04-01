@@ -165,5 +165,17 @@ export function useSimilarTokenPopup() {
           filterList.splice(index, 1)
         }
       }
+      if (filterList.includes('lbtax') && filterList.includes('rbtax')) {
+        const index = filterList.indexOf('rbtax')
+        if (index !== -1) {
+          filterList.splice(index, 1)
+        }
+      }
+      if (filterList.includes('lstax') && filterList.includes('rstax')) {
+        const index = filterList.indexOf('rstax')
+        if (index !== -1) {
+          filterList.splice(index, 1)
+        }
+      }
       return filterList?.length || 0
   }

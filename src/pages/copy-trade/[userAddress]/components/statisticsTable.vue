@@ -48,7 +48,7 @@
 <script setup lang="ts">
 import BigNumber from 'bignumber.js'
 import TokenList from './tokenList.vue'
-import { _getFollowTokens, _getSuccessFollowTxs, _getFailFollowTxs } from '~/api/copyTrade'
+import { _getFollowTokens, _getSuccessFollowTxs, _getFailFollowTxs, _getFilteredFollowTxs } from '~/api/copyTrade'
 const { copyObj } = storeToRefs(useCopyTradeStore())
 const $t = getGlobalT()
 const props = defineProps({
@@ -103,7 +103,7 @@ const tabs = computed(() => {
     { title: $t('copyToken'), id: 'token' },
     { title: $t('copyCompleted'), id: 'success' },
     { title: $t('copyFailed'), id: 'failed' },
-    // { title: $t('invalidTransactions'), id: 'invalid' },
+    { title: $t('invalidTransactions'), id: 'invalid' },
   ]
   return commonTabs
 })
@@ -137,7 +137,7 @@ const switchTab = (item) => {
   } else if (activeTab.value == 'success') {
     getSuccessFollowTxs()
   } else if(activeTab.value == 'invalid') {
-    getFailFollowTxs()
+    getFilteredFollowTxs()
   } else {
     getFailFollowTxs()
   }
@@ -149,7 +149,7 @@ function onLoad() {
   } else if (activeTab.value == 'success') {
     getSuccessFollowTxs()
   } else if(activeTab.value == 'invalid') {
-    getFailFollowTxs()
+    getFilteredFollowTxs()
   } else {
     getFailFollowTxs()
   }
@@ -252,6 +252,51 @@ function getFailFollowTxs() {
     pageNo: tableData.value.pageNo,
   }
   _getFailFollowTxs(data)
+    .then((res) => {
+      if (tableData.value.pageNo === 0) {
+        tableData.value.failedList = []
+      }
+      const list = Array.isArray(res) ? res?.map(i => ({
+        ...i,
+        amount: new BigNumber(i.amount || 0).div(10 ** i?.decimals),
+          lastSwap:
+          i?.time !== '1970-01-01T00:00:00Z' && i?.lastSwap !== '0001-01-01T00:00:00Z'
+        ? (new Date(i?.time).getTime() / 1000)?.toFixed(0)
+        : '0',
+      })) : []
+      if (list?.length > 0) {
+        const a = [...tableData.value.failedList]
+        const b = list.filter((i) => a.every((j) => !(j.token === i.token && j.chain === i.chain)))
+        tableData.value.failedList = [...a, ...b]
+      }
+      tableData.value.finished = list?.length < tableData.value.pageSize
+      if (!tableData.value.finished) {
+        tableData.value.pageNo++
+      }
+    })
+    .catch(() => {
+      tableData.value.failedList = []
+      tableData.value.error = true
+    })
+    .finally(() => {
+      tableData.value.loading = false
+    })
+}
+
+function getFilteredFollowTxs() {
+  if (!props.orderId) {
+    return
+  }
+  tableData.value.loading = false
+  const data = {
+    walletAddress: props.address,
+    chain: props.chain,
+    id: Number(props.orderId),
+    swapType: swapType.value || 'all',
+    pageSize: tableData.value.pageSize,
+    pageNo: tableData.value.pageNo,
+  }
+  _getFilteredFollowTxs(data)
     .then((res) => {
       if (tableData.value.pageNo === 0) {
         tableData.value.failedList = []

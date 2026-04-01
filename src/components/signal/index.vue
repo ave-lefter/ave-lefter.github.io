@@ -348,7 +348,7 @@ function cancelHide() {
         />
       </div>
     </div>
-    <div id="drag-disabled">
+    <div id="drag-disabled" class="hide-scrollbar">
       <div
         v-if="!isLargeScreen"
         class="flex items-center justify-between mb-18px"

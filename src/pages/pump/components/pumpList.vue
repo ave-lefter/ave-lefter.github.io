@@ -279,7 +279,7 @@
                           props: { 'raw-content': true, 'popper-class': 'pump-tooltip' }
                         }"
                         class="rounded-100% cursor-pointer mr-8px"
-                        :src="getSymbolDefaultIcon({ ...(row.baseToken || {}), chain: row.chain})"
+                        :src="row.baseToken?.logo_url ? `${configStore.token_logo_url}${row.baseToken?.logo_url}` : qsImage"
                         alt=""
                         :width="12"
                         style="border-radius: 100%"
@@ -570,12 +570,12 @@
                   <div class="flex-start text-12px absolute bottom--2px z-1 mt-5px">
                     <div
                       v-show="pumpSetting?.define?.some((i) => i === 'top')"
-class="flex-start mr-8px bg-btn"
+                      class="flex-start mr-8px bg-btn"
                       :style="{
                           background:Number(formatNumber(row?.holders_top10_ratio || 0, 1))==0? '': (Number(row?.holders_top10_ratio) > 30 ? '#f6465d1a' : '#12b8861a'),
                           color:Number(formatNumber(row?.holders_top10_ratio || 0, 1))==0? 'var(--third-text1)': (Number(row?.holders_top10_ratio) > 30 ? '#F6465D' : '#12B886'),
                       }"
-@mouseover.stop="(e) => showBubbleTooltip(row, e)"
+                      @mouseover.stop="(e) => showBubbleTooltip(row, e)"
                     >
                       <Icon
                         class="iconfont icon-TOP text-10px mr-4px"
@@ -608,14 +608,7 @@ class="flex-start mr-8px bg-btn"
                           name="custom:dev-ds"
                         />
                         <span
-                          >{{
-                            formatNumber(
-                              Number(row?.dev_balance_ratio_cur) >= 0.1
-                                ? row?.dev_balance_ratio_cur || 0
-                                : (Number(row?.dev_balance_ratio_cur) == 0  ? '0':'<0.1'),
-                              1
-                            )
-                          }}%
+                          >{{ Number(row?.dev_balance_ratio_cur) >= 0.1 ? formatNumber(row?.dev_balance_ratio_cur ,1) : (Number(row?.dev_balance_ratio_cur) == 0  ? '0':'<0.1')}}%
                         </span>
                       </template>
                       <img
@@ -676,8 +669,7 @@ class="flex-start mr-8px bg-btn"
                         background: Number(formatNumber(row?.phishing_ratio || 0, 1))==0? '' : (Number(row?.phishing_ratio) > 5 ? '#f6465d1a' : '#12b8861a'),
                       }"
                     >
-                      <Icon class="iconfont icon-fish text-12px mr-4px" name="custom:fish"
-                    />
+                      <Icon class="iconfont icon-fish text-12px mr-4px" name="custom:fish"/>
                       <span>{{
                         formatNumber(
                           Number(row?.phishing_ratio) > 0.001 ? row?.phishing_ratio || 0 : 0,
@@ -694,8 +686,7 @@ class="flex-start mr-8px bg-btn"
                       }"
                       class="flex mr-8px bg-btn"
                     >
-                      <Icon class="iconfont icon-binding text-12px mr-4px" name="custom:binding"
-                    />
+                      <Icon class="iconfont icon-binding text-12px mr-4px" name="custom:binding"/>
                       <span>{{
                         formatNumber(
                           Number(row?.address_binding_ratio) > 0.001 ? row?.address_binding_ratio || 0 : 0,
@@ -711,8 +702,7 @@ class="flex-start mr-8px bg-btn"
                       }"
                       class="flex mr-8px bg-btn"
                     >
-                      <Icon class="iconfont icon-binding text-12px mr-4px" name="custom:cabal"
-                    />
+                      <Icon class="iconfont icon-binding text-12px mr-4px" name="custom:cabal"/>
                       <span>{{
                         formatNumber(
                           Number(row?.colluded_cluster_ratio) > 0.001 ? row?.colluded_cluster_ratio || 0 : 0,
@@ -736,7 +726,7 @@ class="flex-start mr-8px bg-btn"
                   class="flex-end text-12px pr-12px mb-10px bg-1"
                   :class="pumpSetting.fontSize_mc =='12px'? 'mb-1px' : 'mb-1px'"
                 >
-                  <div class="bg-1 flex-end py-2px" v-if="isSoon && row.progress >= 99.99">
+                  <div v-if="isSoon && row.progress >= 99.99" class="bg-1 flex-end py-2px">
                     <el-image
                       v-if="row.issue_platform"
                       v-tooltip="row.issue_platform"
@@ -923,6 +913,7 @@ import HolderRank from './holderRank/index.vue'
 import { useSimilarTokenPopup } from '../utils'
 import { windowEndpoint } from 'comlink'
 import AiPop from './aiPop/index.vue'
+import qsImage from '@/assets/images/pump/qs.svg'
 const props = defineProps({
   tableList: {
     type: Array<PumpObj>,
@@ -970,6 +961,7 @@ const emit = defineEmits(['clearFilter'])
 const handleClearFilter = () => {
   emit('clearFilter')
 }
+const configStore = useConfigStore()
 const { quickBuyValue, loading, isOut, isSoon , type} = toRefs(props)
 const tableList = shallowRef<PumpObj[]>(props.tableList || [])
 const hover = ref(false)

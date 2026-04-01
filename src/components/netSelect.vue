@@ -26,7 +26,7 @@ onMounted(() => {
     if(!selectedChains.value.length){
       selectedChains.value = botStore.evmAddress ? ['bsc', 'solana'] : ['bsc', 'base', 'eth']
     }
-    displayChains.value=selectedChains.value.slice(0, 2)
+    displayChains.value=selectedChains.value.slice(0, 3)
     selectedChainDisplay.value=displayChains.value
     displayLen.value=selectedChains.value.length
   })
@@ -48,7 +48,7 @@ function onConfirm() {
     emit('update:userIds', arr)
   }else{
     arr =selectedChainDisplay.value.map(i => walletStore.address + '-' + i)
-    displayChains.value=selectedChainDisplay.value.slice(0, 2)
+    displayChains.value=selectedChainDisplay.value.slice(0, 3)
     emit('update:userIds', arr)
   }
   selectedChains.value=selectedChainDisplay.value
@@ -89,6 +89,8 @@ function onCancel() {
         <div>
           <el-button
             size="small"
+            color="transparent"
+            text
             class="[&&]:px-3px [&&]:py-4px justify-between [--el-button-size:20px!important] [--el-button-font-weight: 400]"
           >
             <img

@@ -48,7 +48,7 @@
         <h2 class="title text-28px mb-24px">
           {{ latestNotice.title }}
         </h2>
-        <div class="my-0 lh-[1.5]" v-html="latestNotice.content" />
+        <div class="my-0 lh-[1.5] notice-content" v-html="latestNotice.content" />
       </template>
       <Swiper
         v-else

@@ -56,7 +56,7 @@
                 v-model="clipboardQuickInput[chain]"
                 class="input-swap input-number flex-auto! max-w-150px clipped-input rd-8px! ml-auto"
                 inputmode="decimal"
-                
+
                 placeholder="0.0"
                 @update:model-value="
                   (value) => {
@@ -100,11 +100,23 @@
               {{ $t('setTips') }}
             </div>
             <div v-if="showQuickAmount" class="mt-20px">
-              <div class="mb-10px" style="color: #12b886">{{ $t('setOneClickBuyAmount') }}</div>
+              <div class="mb-10px flex items-center">
+                <span class="color-#12b886">{{ $t('setOneClickBuyAmount') }}</span>
+                <div class="flex items-center gap-8px ml-10px">
+                  <button v-for="item in (botSwapStore?.botSwapBaseTokens?.[chain] || [])" :key="item.address + item.chain" class="w-20px h-20px flex items-center justify-center text-center bg-transparent border-none clickable op-50 rd-50%" :class="{ 'bg-[--tab-active-bg]! b-[--primary-color]! b-1px! b-solid! op-100!': (item.address + '-' + chain) === activeToken }" type="button" @click.stop="activeToken = item.address + '-' + chain">
+                    <img
+                      class="w-16px h-16px rd-50% inline-block"
+                      :src="`${configStore.token_logo_url}${item.logo_url}`"
+                      alt=""
+                      srcset=""
+                    >
+                  </button>
+                </div>
+              </div>
               <ul class="flex gap-10px flex-wrap">
-                <li v-for="(item, index) in botSetting.buy[selectedS].buyValueList" :key="index" class="w-[calc((100%-30px)/4)] click-setting">
+                <li v-for="(item, index) in botSetting.buy[selectedS].buyUList[activeToken]" :key="index" class="w-[calc((100%-30px)/4)] click-setting">
                   <el-input
-                    v-model="botSetting.buy[selectedB].buyValueList[index]"
+                    v-model="botSetting.buy[selectedB].buyUList[activeToken][index]"
                     class="input-number"
                     inputmode="decimal"
                     placeholder="0.0"
@@ -186,7 +198,7 @@
                       :disabled="isAutoB"
                       controls-position="right"
                       :controls="false"
-                      
+
                       :rules="[
                         { required: true, message: $t('enterSlippage') },
                         {
@@ -269,7 +281,7 @@
                 "
                 class="input-number"
                 inputmode="decimal"
-                
+
                 :placeholder="chain === 'solana' ? $t('customFee1') : $t('customEvmFee1')"
                 @update:model-value="watchCusTomPriorityFee($event, 'buy')"
                 @blur="handleBlurFee('buy')"
@@ -415,7 +427,7 @@
                       :disabled="isAutoS"
                       controls-position="right"
                       :controls="false"
-                      
+
                       :rules="[
                         { required: true, message: $t('enterSlippage') },
                         {
@@ -498,7 +510,7 @@
                 "
                 class="input-number"
                 inputmode="decimal"
-                
+
                 :placeholder="chain === 'solana' ? $t('customFee1') : $t('customEvmFee1')"
                 @update:model-value="watchCusTomPriorityFee($event, 'sell')"
                 @blur="handleBlurFee('sell')"
@@ -850,6 +862,7 @@ const props = defineProps({
   showClipboardSet: { type: Boolean, default: false },
   showAutoSell: { type: Boolean, default: false },
   initSwapType: { type: String as PropType<'buy' | 'sell'>, default: 'buy' },
+  uToken: { type: String, default: '' },
 })
 
 const emit = defineEmits(['update:slippage', 'onSubmit', 'open', 'update:chain'])
@@ -883,6 +896,20 @@ const selectedS = computed(() => botSetting.value?.sell?.selected)
 
 const settingTab = ref(0)
 const clipboardQuickInput = ref(cloneDeep(botSettingStore.clipboardQuickInput))
+const activeToken = ref((props.uToken || NATIVE_TOKEN) + '-' + props.chain)
+
+
+watch(() => props.chain, (val) => {
+  if (val) {
+    let nativeToken = NATIVE_TOKEN
+    if (val === 'solana') {
+      nativeToken = 'sol'
+    } else if (val === 'ton') {
+      nativeToken = 'TON'
+    }
+    activeToken.value = nativeToken + '-' + val
+  }
+})
 
 // const slippageValue = ref<number | undefined>()
 // const customSlippage = ref<number | undefined>()
@@ -891,6 +918,7 @@ watch(show, (val) => {
   if (val) {
     emit('open')
     swapType.value = props.initSwapType || swapType.value
+    activeToken.value = (props.uToken || NATIVE_TOKEN) + '-' + props.chain
     if (props.showAutoSell) {
       settingTab.value = 1
     }
@@ -904,7 +932,10 @@ watch(show, (val) => {
 
 watch(() => props.chain, (val) => {
   if (val) {
-   botSetting.value = cloneDeep(props.setting ?? {})
+    botSetting.value = cloneDeep(props.setting ?? {})
+    initSlippage('buy')
+    initSlippage('sell')
+    loadAutoSellConfigs()
   }
 })
 
@@ -1112,22 +1143,22 @@ function handleBlurFee(type: 'buy' | 'sell') {
 function handleBuyValue(value: string, index: number) {
   const v = value.replace(/-|[^\d.]/g, '')
   const selected = botSetting.value?.buy?.selected
-  botSetting.value.buy[selected].buyValueList[index] = v
+  botSetting.value.buy[selected].buyUList[activeToken.value][index] = v
 }
 
 function handleBlurBuyValue(index: number) {
   // 限制合法性，可添加逻辑
   const decimals = 4
   const selected = botSetting.value?.buy?.selected
-  const v = botSetting.value?.buy?.[selected]?.buyValueList?.[index]
+  const v = botSetting.value?.buy?.[selected]?.buyUList?.[activeToken.value]?.[index]
   const v1 = new BigNumber(v || 0)
     .toFixed()
     ?.match?.(new RegExp(`[0-9]*(\\.[0-9]{0,${decimals || 18}})?`))?.[0]
   if (String(v) !== String(v1)) {
     if (Number(v1) === 0) {
-      botSetting.value.buy[selected].buyValueList[index] = '0'
+      botSetting.value.buy[selected].buyUList[activeToken.value][index] = '0'
     } else {
-      botSetting.value.buy[selected].buyValueList[index] = v1
+      botSetting.value.buy[selected].buyUList[activeToken.value][index] = v1
     }
   }
 }

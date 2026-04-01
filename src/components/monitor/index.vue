@@ -693,6 +693,9 @@ function jumpToken({ e,rowData }: { e: Event; rowData: any }) {
     /* .el-table-v2__table{
       --el-table-border:1px solid;
     } */
+    .el-virtual-scrollbar{
+      display: none;
+    }
   }
 }
 .m-tabs{

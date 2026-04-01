@@ -329,12 +329,14 @@ onUnmounted(() => {
   wsStore.clearTokenRelatedResult?.()
   // 确保移除可能遗留的 WS 回调与可见性监听，防止内存泄漏
   wsStore.getWSInstance()?.offMessage(['tx_update_token', 'kline', 'price'])
-  wsStore.send({
-    jsonrpc: '2.0',
-    method: 'unsubscribe',
-    params: ['asset'],
-    id: 1,
-  })
+  if(!(walletStore.address || botStore.evmAddress)){
+    wsStore.send({
+      jsonrpc: '2.0',
+      method: 'unsubscribe',
+      params: ['asset'],
+      id: 1,
+    })
+  }
   wsStore.send({
     jsonrpc: '2.0',
     method: 'unsubscribe',

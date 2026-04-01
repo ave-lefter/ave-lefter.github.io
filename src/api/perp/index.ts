@@ -1,4 +1,4 @@
-import { perpApi as api } from './request'
+import { perpApi as api, perpApi1 as api1 } from './request'
 import type { Metadata } from '@edgex-fe/typescript-sdk'
 
 import localforage from 'localforage'
@@ -526,6 +526,23 @@ export async function getNormalWithdrawableAmount(address: string = useWalletSto
     query: {
       address: address,
     },
+  })
+}
+
+
+export async function getPerpReferral(): Promise<{ code: string; address: string } | null> {
+  return api1('/referral')
+}
+
+export async function getPerpEdgexAwardInviteLoginReg() {
+  const referral = await getPerpReferral()
+  return api1('/edgexaward/api/invite/loginreg', {
+    method: 'post',
+    body: {
+      // 这里不传参数，后端会根据登录状态获取用户信息
+      address: useWalletStore().address,
+      commendcode: referral?.code,
+    }
   })
 }
 

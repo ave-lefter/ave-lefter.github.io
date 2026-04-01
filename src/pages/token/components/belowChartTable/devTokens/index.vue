@@ -67,7 +67,7 @@
                 <span class="color-[--third-text] text-12px">{{ t('dev3') }}:</span>
                 {{ tokenObj.dev_address ? tokenObj.dev_address.slice(0, 4) + '...' + tokenObj.dev_address.slice(-4) :
                     '--'
-                }}({{formatNumber(balance.balance,4)}}{{balance.name}})
+                }}({{formatNumber(tokenBalance?.balance || 0, 4)}} {{tokenBalance.symbol || ''}})
                 <Icon v-copy="tokenObj.dev_address" name="bxs:copy"
                     class="text-12px ml-2px cursor-pointer color-[--secondary-text]" />
                 <Icon name="custom:search" class="text-[--third-text] text-16px cursor-pointer hover:text-[--main-text]"
@@ -104,16 +104,16 @@
                 </el-progress>
 
             </div>
-            <div class="text-16px lh-16px color-[--secondary-text] mb-8px">
+            <!-- <div class="text-16px lh-16px color-[--secondary-text] mb-8px">
                     {{ t('highestRecord') }}
-                </div>
+                </div> -->
                 <div class="flex gap-4px color-[--secondary-text] text-12px mb-8px">
-                    <span class="color-[--third-text] text-12px">{{ t('historyHighestMarketCap') }}:</span>
+                    <span class="color-[--third-text] text-12px">{{ $t('bestToken2') }} {{ t('historyHighestMarketCap') }}:</span>
                     ${{ formatNumber(tokenStore.bestToken?.all_time_high || 0, 2) }}
                 </div>
                 <div class="flex gap-4px color-[--secondary-text] text-12px mb-8px">
                     <span class="color-[--third-text] text-12px">{{ t('latestToken') }}:</span>
-                    <span v-tooltip="dayjs(tokenStore.bestToken?.created_at).format('YYYY-MM-DD HH:mm:ss')">{{ formatTimeFromNow(tokenStore.bestToken?.created_at) }} {{ t('ago') }}</span>
+                    <span v-tooltip="dayjs(latestDev?.created_at).format('YYYY-MM-DD HH:mm:ss')">{{ formatTimeFromNow(latestDev?.created_at || 0) }} {{ t('ago') }}</span>
                 </div>
         </div>
     </div>
@@ -124,7 +124,7 @@ import dayjs from 'dayjs'
 import AveEmpty from '@/components/aveEmpty.vue'
 import TokenColumn from '@/components/tokenColumn.vue'
 import { useStorage } from '@vueuse/core'
-import { bot_getTokenBalance } from '~/api/bot'
+import { getBalances } from '~/api/bot'
 
 const { t } = useI18n()
 
@@ -148,7 +148,7 @@ const conditions = useStorage('conditions_dev_tokens', {
     sort: 'created_at',
     sort_dir: 'desc',
 })
-const balance = ref({})
+const tokenBalance = ref<{balance?: number | string, symbol?: string}>({})
 let finishedTimer: NodeJS.Timeout | null = null
 
 const route = useRoute()
@@ -160,7 +160,7 @@ const tableHeight = computed(() => {
 const resetPageNOAndLoading = () => {
     tableList.value = []
     pageNO.value = 1
-    pageSize.value = 5
+    pageSize.value = 50
     loadingRun.value = false
     finished.value = false
     showFinished.value = false
@@ -172,6 +172,7 @@ watch(
             resetPageNOAndLoading()
             if (finishedTimer) clearTimeout(finishedTimer)
             getRugPullList()
+            getLatestDevList()
         }
     }
 )
@@ -239,16 +240,30 @@ async function getRugPullList() {
     }
 }
 
+const latestDev = ref<null | {created_at: string}>(null)
+async function getLatestDevList() {
+  const data = {
+    token_id: id.value,
+    pageNO: 1,
+    pageSize: 1,
+    sort: 'created_at',
+    sort_dir: 'desc'
+  }
+    _getDevList(data).then(res => {
+      latestDev.value = res?.infos?.[0] || null
+    })
+}
+
 async function _getBalance(dev_address: string) {
     const chain = tokenStore.token?.chain as string
-    const _balance = await bot_getTokenBalance({
+    const res = await getBalances({
         chain,
-        walletAddress: dev_address,
-        tokens: [getNativeToken(chain)]
+        creatorAddress: dev_address,
+        tokens: [NATIVE_TOKEN]
     })
-    balance.value = _balance[0] || {balance: 0}
+    tokenBalance.value = res?.tokens?.[0] || {balance: 0, symbol: getChainInfo(chain)?.main_name}
 }
-getRugPullList()
+
 
 function handleSearchDevAddress() {
     window.open(`https://x.com/search?q=${tokenObj.value.dev_address}`)
@@ -257,6 +272,11 @@ function handleSearchDevAddress() {
 function jumpBrowser() {
     window.open(formatExplorerUrl(token.value?.chain as string, tokenObj.value.dev_address || '', 'address'))
 }
+
+onMounted(() => {
+  getRugPullList()
+  getLatestDevList()
+})
 
 onUnmounted(() => {
     if (finishedTimer) clearTimeout(finishedTimer)

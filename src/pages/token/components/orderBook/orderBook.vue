@@ -369,7 +369,7 @@
         <span class="color-[--third-text]">~</span>
         <el-input
           v-model.trim.number="dialogFilter.maxVol"
-          
+
           type="text"
            class="text-12px"
            :placeholder="$t('max1')"
@@ -392,11 +392,11 @@
           size="default"
           class="flex-1 h-32px font-400 color-[--main-text1]"
           @click.stop="toggleClickMe();filterDialogVisible = false"
-        > 
+        >
           {{ $t('filterWallet') }}
         </el-button>
       </div>
-    
+
       <div class="mt-20px flex gap-8px">
         <el-button
           class="h-30px flex-1 color-[--main-text1]"
@@ -422,7 +422,7 @@ import { getSimpleTxs,type GetPairLiqResponse, type IGetSimpleTxsResponse, } fro
 import { useRoute } from 'vue-router'
 import { filterLanguage } from '~/pages/token/components/kLine/utils'
 import { WSEventType } from '~/utils/constants'
-import { useThrottleFn,useIntersectionObserver, useInfiniteScroll } from '@vueuse/core'
+import { useThrottleFn,useIntersectionObserver, useInfiniteScroll, useLocalStorage } from '@vueuse/core'
 import { UseVirtualList } from '@vueuse/components'
 import { useVirtualizer } from '@tanstack/vue-virtual'
 import UserRemark from '~/components/userRemark.vue'
@@ -540,12 +540,14 @@ const tableView = ref({
 // 只在交易历史接口更新之后更新，防止 route 地址更新导致列表数据更新异常
 const realAddress = shallowRef(getAddressAndChainFromId(route.params.id as string).address)
 const filterDialogVisible = shallowRef(false)
+const minVol = useLocalStorage<string>('txMinVol','')
+const maxVol = useLocalStorage<string>('txMaxVol','')
 const defaultDialogFilter = {
   markerAddress: '' as string,
   minVol:'' as string,
   maxVol:'' as string,
   timestamp:[] as string[]
-} 
+}
 const dialogFilter = ref(cloneDeep(defaultDialogFilter))
 const ignoreWs = computed(() => {
   return !['all'].includes(activeTab.value)
@@ -652,11 +654,15 @@ const {reset ,isLoading} = useInfiniteScroll(scroller, ()=>{
   ) })
 
 async function filterSubmit() {
-  console.log('filterSubmit')
+  console.log('filterSubmit',dialogFilter.value,tableFilter.value)
   listStatus.value.page_token = ''
   listStatus.value.loadingTxs = false
   listStatus.value.finished = false
   wsPairCache.value = []
+  tableFilter.value.minVol = dialogFilter.value.minVol
+  tableFilter.value.maxVol = dialogFilter.value.maxVol
+  minVol.value = dialogFilter.value.minVol
+  maxVol.value = dialogFilter.value.maxVol
   // tokenTxs.value=[]
   // reCreateChild()
   getTokenTxs()
@@ -682,10 +688,12 @@ const volColumns = [
 function onVolBlur(index: number) {
   const min = Number(dialogFilter.value.minVol)
   const max = Number(dialogFilter.value.maxVol)
-  const isMaxLessThanMin = max <= min
-  if (index === 0 && isMaxLessThanMin) {
+  console.log('onVolBlur',min,max)
+
+  const isMaxLessThanMin =(min&&max)? (max <= min):false
+  if ((index === 0 && isMaxLessThanMin) || min === 0) {
     dialogFilter.value.minVol = ''
-  } else if (index === 1 && isMaxLessThanMin) {
+  } else if ((index === 1 && isMaxLessThanMin) || max === 0) {
     dialogFilter.value.maxVol = ''
   }
 }
@@ -807,6 +815,8 @@ watch(() => props.modelValue, (isOpen) => {
   if (isOpen && pairAddress.value) {
     // orderBook 打开时，清空旧数据并获取新数据
     listStatus.value.loadingTxs1 = true
+    dialogFilter.value.minVol = minVol.value
+    dialogFilter.value.maxVol = maxVol.value
     resetCache()
     filterSubmit()
     subscribeToTxs()
@@ -1309,7 +1319,7 @@ function toggleClickFollowed() {
   if (isMeActive.value) {
     tableFilter.value.markerAddress = ''
     dialogFilter.value.markerAddress = ''
-  } 
+  }
   if(activeTab.value==='-100'){
     resetData('all')
   }else{
@@ -1323,7 +1333,7 @@ function toggleClickDEV() {
   // if (isDEVActive.value) {
   //   tableFilter.value.markerAddress = ''
   //   dialogFilter.value.markerAddress = ''
-  // } 
+  // }
   if(activeTab.value==='25'){
     resetData('all')
   }else{
@@ -1437,6 +1447,8 @@ onMounted(async() => {
   // onTxsLiqMessage()
   // 如果组件挂载时 orderBook 已经打开，则获取数据
   if (props.modelValue && pairAddress.value) {
+    dialogFilter.value.minVol = minVol.value
+    dialogFilter.value.maxVol = maxVol.value
     filterSubmit()
     subscribeToTxs()
   }
@@ -1635,10 +1647,12 @@ function resetMakerAddress() {
 }
 
 function resetDialogFilter() {
+  minVol.value=''
+  maxVol.value=''
   dialogFilter.value = {
     markerAddress: '' as string,
-    minVol:'' as string,
-    maxVol:'' as string,
+    minVol,
+    maxVol,
     timestamp:[] as string[]
   }
   console.log('resetDialogFilter',dialogFilter.value)

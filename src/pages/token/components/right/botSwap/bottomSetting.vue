@@ -37,12 +37,15 @@
         style="--el-switch-on-color: #3c6cf6;zoom: 0.9;height: 14px;"
       />
     </template>
+    <el-checkbox v-if="props.activeTab === 'buy'" v-model="isAutoSellConfig" class="auto-sell-checkbox ml-auto"><AutoSellSetting :chain="chain" :title="$t('advance')" class="p-0! b-none! text-11px! font-400 mr-0! color-[--third-text]! auto-sell-setting" /></el-checkbox>
+
     <slot name="default"/>
   </div>
 </template>
 
 <script setup lang='ts'>
 import BigNumber from 'bignumber.js'
+import { cloneDeep } from 'lodash-es'
 const props = defineProps({
   gasPrice: {
     type: Number,
@@ -67,6 +70,39 @@ const route = useRoute()
 const tokenStore = useTokenStore()
 
 const tokenInfo = computed(() => tokenStore.token)
+const { loadAutoSellConfigs, saveAutoSellConfigs } = useAutoSellConfig()
+const isAutoSellConfig = computed({
+  get() {
+    return (botSettingStore?.autoSellConfigs as any)?.['isAutoSellConfig'+botSettingStore.autoSellConfigs.autoSellConfigName]
+    // return botSettingStore?.autoSellConfigs?.isAutoSellConfig
+  },
+  set(val) {
+    const setting = cloneDeep(botSettingStore.autoSellConfigs) as any
+    if (setting) {
+      setting['isAutoSellConfig'+botSettingStore.autoSellConfigs.autoSellConfigName] = val as boolean
+      if (!setting['autoSellConfig'+botSettingStore.autoSellConfigs.autoSellConfigName]?.length && val) {
+        setting.autoSellConfig = [
+          {
+            open: true,
+            priceChange: 10000,
+            sellRatio: 5000,
+            type: 'default'
+          }
+        ]
+      }
+      // if(!val){
+      //   setting.selectedAutoSellConfig=[]
+      // }
+      botSettingStore.autoSellConfigs = {
+        ...setting
+      }
+      if(val){
+        loadAutoSellConfigs()
+        saveAutoSellConfigs()
+      }
+    }
+  }
+})
 
 const chain = computed(() => {
   const routeParams = getAddressAndChainFromId(route.params.id as string)
@@ -142,6 +178,25 @@ const selected = computed(() => {
 
 </script>
 
-<style>
-
+<style scoped lang="scss">
+.auto-sell-checkbox :deep() {
+  --el-checkbox-height: 20px;
+  .el-checkbox__label{
+    --el-checkbox-text-color:var(--third-text);
+    --el-checkbox-checked-text-color:var(--secondary-text)
+  }
+  .el-checkbox__input {
+    align-items: center;
+  }
+  .el-checkbox__label {
+    display: inline-flex;
+    align-items: center;
+    padding-left: 5px;
+  }
+}
+.auto-sell-setting :deep() {
+  > div {
+    margin-left: 2px;
+  }
+}
 </style>

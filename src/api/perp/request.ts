@@ -10,9 +10,9 @@ function getBestApiDomain () {
   // return 'https://pro.edgex.exchange'
 }
 
-
+export const PerpBasePath = '/perp/edgex'
 // export const PerpBaseUrl = 'https://testnet.edgex.exchange'
-export const PerpBaseUrl = getBestApiDomain() + '/perp/edgex'
+export const PerpBaseUrl = getBestApiDomain()
 
 // API响应类型
 interface EdgeXApiResponse<T = any> {
@@ -24,9 +24,9 @@ interface EdgeXApiResponse<T = any> {
 
 const xAuthList = ['onboardSite','getPositionTransactionPage','getAllOrdersPage','profit','ranking','info', 'getCrossWithdrawSignInfo', 'createCrossWithdraw','asset/detail','getActiveOrderPage','cancelOrderById','getHistoryOrderFillTransactionPage','getHistoryOrderPage','getAccountDeleverageLight','getPositionTermPage','updateLeverageSetting', 'getNormalWithdrawableAmount']
 const authorizationList = ['ranking','info','boxopen']
-function getApi() {
+function getApi(_PerpBaseUrl = PerpBasePath) {
   return $fetch.create({
-    baseURL: PerpBaseUrl,
+    baseURL: PerpBaseUrl + _PerpBaseUrl,
     headers: {
       'Content-Type': 'application/json',
     },
@@ -37,7 +37,7 @@ function getApi() {
       // } else {
       //   onRequest({ options, request })
       // }
-      const newBase = getBestApiDomain() + '/perp/edgex'
+      const newBase = getBestApiDomain() + _PerpBaseUrl
       if (newBase && options.baseURL !== newBase) {
         options.baseURL = newBase
       }
@@ -88,3 +88,5 @@ function getApi() {
 
 
 export const perpApi = getApi()
+
+export const perpApi1 = getApi('/perp')

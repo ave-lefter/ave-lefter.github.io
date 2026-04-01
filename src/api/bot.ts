@@ -711,6 +711,11 @@ export function bot_createSwapEvmTx(params: {
   //   params.autoSell = false
   //   params.autoSellConfig = []
   // }
+  const { getCanMev } = useBotSwapStore()
+  const isCanMev = getCanMev(params.chain)
+  if (!isCanMev) {
+    params.isPrivate = false
+  }
   return $api('/botapi/swap/createSwapEvmTxV2', {
     method: 'post',
     body: {
@@ -805,6 +810,11 @@ export function bot_createEvmLimitTx(params: {
 }) {
   const { $api } = useNuxtApp()
   const botStore = useBotStore()
+  const { getCanMev } = useBotSwapStore()
+  const isCanMev = getCanMev(params.chain)
+  if (!isCanMev) {
+    params.isPrivate = false
+  }
   return $api('/botapi/swap/createEvmLimitTx', {
     method: 'post',
     body: {
@@ -1064,7 +1074,7 @@ export function getAutoSlippage(query: {
   })
 }
 
-export function getBalances(body: {
+export const getBalances = createCacheRequest((body: {
   chain: string
   creatorAddress: string
   tokens: string[]
@@ -1094,14 +1104,58 @@ export function getBalances(body: {
             totalProfitRatio: string,
             averageNetPurchasePrice: string,
             netPurchaseAmount: string
+            lastUpdateTime: string
         },
         risk_level: number
         risk_score: number
     }[]
-}> {
+}>=> {
   const {$api} = useNuxtApp()
   return $api('/aveswap/v1/swap/getBalances', {
     method: 'post',
     body
   })
-}
+},2000)
+
+// export function getBalances(body: {
+//   chain: string
+//   creatorAddress: string
+//   tokens: string[]
+//   showZero?: boolean
+// }): Promise<{
+//     chain: string,
+//     creatorAddress: string,
+//     tokens: {
+//         token: string,
+//         balance: string,
+//         symbol: string,
+//         logoUrl: string,
+//         decimals: number,
+//         price: string,
+//         pnl: {
+//             buyAmount: string,
+//             buyValue: string,
+//             sellAmount: string,
+//             sellValue: string,
+//             avgBuyPrice: string,
+//             avgSellPrice: string,
+//             realizedProfit: string,
+//             unrealizedProfit: string,
+//             totalProfit: string,
+//             realizedProfitRatio: string,
+//             unrealizedProfitRatio: string,
+//             totalProfitRatio: string,
+//             averageNetPurchasePrice: string,
+//             netPurchaseAmount: string
+//             lastUpdateTime: string
+//         },
+//         risk_level: number
+//         risk_score: number
+//     }[]
+// }> {
+//   const {$api} = useNuxtApp()
+//   return $api('/aveswap/v1/swap/getBalances', {
+//     method: 'post',
+//     body
+//   })
+// }

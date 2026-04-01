@@ -441,7 +441,7 @@
       :activeFilterType="activeFilterType"
       :platformsList="platformsList"
       :deployerPlatforms="deployerPlatforms"
-      :baseTokens="baseTokenMap.values().toArray()"
+      :baseTokens="baseTokenMap?.values()?.toArray?.() || []"
       @update:filterData="handlerFilterConfirm"
     />
 
@@ -540,7 +540,7 @@ const listTab = computed(() => ([
   { name: '%', value: 'progress' },
   { name: 'MC', value: 'market_cap' }
 ]))
-const pumpConfig = useStorage<PumpConfig[]>('pumpConfig', [])
+const pumpConfig = useStorage<PumpConfig[]>('pumpConfigV2', [])
 // const isRotate = ref(false)
 const { pump_notice, pumpV3, pumpFilterDefault, pump_query} = storeToRefs(usePumpStore())
 const pumpAudio = useTemplateRef('pumpAudio')
@@ -708,7 +708,7 @@ const baseTokenMap = computed(() => {
   map.set('other', { symbol: t('other'), token: 'other', logo_url:'' })
   return map
 })
-const baseTokensAllStr = computed(() => baseTokenMap.value.values().toArray().map((i: any) => i.token).join(','))
+const baseTokensAllStr = computed(() => baseTokenMap.value?.values?.()?.toArray?.()?.map((i: any) => i.token)?.join?.(',') || '')
 const tabsList = computed(() => {
   return [
     {
@@ -1069,13 +1069,53 @@ watchTokenUpdatedUnwatch = watch(
   (val) => {
     if (!val?.token) return
     // 使用 toRaw 去除 Proxy，性能更好
+    if (!val?.token) return
     const rawVal = toRaw(val)
+    const currentChain = activeChain.value
+    ;['new', 'soon', 'graduated'].forEach(category => {
+      const list = fourmemeListObj[currentChain][category]
+      if (!list) return
+      const index = list.findIndex(item => item.target_token === rawVal.token)
+      if (index !== -1) {
+        const prev = list[index]
+        const merged = {
+          ...prev,
+          ...(rawVal.logo_url ? { logo_url: rawVal.logo_url } : {}),
+          ...(rawVal.buy_tax !== undefined ? { buy_tax: rawVal.buy_tax } : {}),
+          ...(rawVal.sell_tax !== undefined ? { sell_tax: rawVal.sell_tax } : {}),
+          ...(rawVal.name ? { name: rawVal.name } : {}),
+          ...(rawVal.symbol ? { symbol: rawVal.symbol } : {}),
+          ...(rawVal.appendix ? { medias: getMedias(rawVal.appendix), twitter_type: rawVal.twitter_type } : {}),
+          ...(rawVal.is_cloned !== undefined ? { is_cloned: rawVal.is_cloned } : {}),
+          ...(rawVal.deployer_platform ? { deployer_platform: rawVal.deployer_platform } : {}),
+          ...(rawVal.is_pump_agent !== undefined ? { is_pump_agent: rawVal.is_pump_agent } : {})
+        }
+        list[index] = merged
+      }
+    })
+    const index = wsTableList.value.findIndex(item => item.target_token === rawVal.token)
+    if (index !== -1) {
+      const prev = wsTableList.value[index]
+      const merged = {
+        ...prev,
+        ...(rawVal.logo_url ? { logo_url: rawVal.logo_url } : {}),
+        ...(rawVal.buy_tax !== undefined ? { buy_tax: rawVal.buy_tax } : {}),
+        ...(rawVal.sell_tax !== undefined ? { sell_tax: rawVal.sell_tax } : {}),
+        ...(rawVal.name ? { name: rawVal.name } : {}),
+        ...(rawVal.symbol ? { symbol: rawVal.symbol } : {}),
+        ...(rawVal.appendix ? { medias: getMedias(rawVal.appendix), twitter_type: rawVal.twitter_type } : {}),
+        ...(rawVal.is_cloned !== undefined ? { is_cloned: rawVal.is_cloned } : {}),
+        ...(rawVal.deployer_platform ? { deployer_platform: rawVal.deployer_platform } : {}),
+        ...(rawVal.is_pump_agent !== undefined ? { is_pump_agent: rawVal.is_pump_agent } : {})
+      }
+      wsTableList.value[index] = merged
+    }
     const prev = bufferLogoMap.get(rawVal.token)
     setLRU(
       bufferLogoMap,
       rawVal.token,
       prev ? mergeLogo(prev, rawVal) : rawVal,
-      300
+      600
     )
     logoThrottled()
   }
@@ -1736,12 +1776,29 @@ function getFilterData(list: PumpObj[], conditions: any) {
   return list?.filter((i) => {
     let pass = true
 
+    // if (conditions?.q) {
+    //   const arr = conditions?.q.split(',')
+    //   pass = pass && arr?.findIndex((y: string) => i.target_token == y || i.name?.includes?.(y) || i.symbol?.includes?.(y)) !== -1
+    // }
     if (conditions?.q) {
-      const arr = conditions?.q.split(',')
-      pass = pass && arr?.findIndex((y: string) => i.target_token == y || i.name?.includes?.(y) || i.symbol?.includes?.(y)) !== -1
+      const arr = conditions.q.toLowerCase().split(',')
+      pass =
+        pass &&
+        arr.some((y: string) => {
+          const target = String(i.target_token || '').toLowerCase()
+          const name = String(i.name || '').toLowerCase()
+          const symbol = String(i.symbol || '').toLowerCase()
+
+          return (
+            target === y ||
+            name.includes(y) ||
+            symbol.includes(y)
+          )
+        })
     }
     if (conditions?.dev_sale_out) {
-      const isSellOut = i.max_dev_ratio!==0 &&i.dev_balance_ratio_cur===0
+      // const isSellOut = i.max_dev_ratio!==0 &&i.dev_balance_ratio_cur===0
+      const isSellOut = i.dev_balance_ratio_cur===0
       if(conditions?.dev_sale_out === 1){
         pass = pass && isSellOut
       } else if(conditions?.dev_sale_out === 2){
@@ -1787,13 +1844,6 @@ function getFilterData(list: PumpObj[], conditions: any) {
       if (conditions?.rage) {
         pass = pass && pumpAgeMinutes <= Number(conditions.rage)
       }
-    }
-
-    if (conditions?.progress_min) {
-      pass = pass && i.progress >= Number(conditions.progress_min)
-    }
-    if (conditions?.progress_max) {
-      pass = pass && i.progress <= Number(conditions.progress_max)
     }
 
     if (conditions?.market_cap_min) {
@@ -1875,6 +1925,13 @@ function getFilterData(list: PumpObj[], conditions: any) {
     if(conditions?.rins) {
       pass = pass && i.insider_balance_ratio_cur <= Number(conditions.rins)
     }
+    if(conditions?.lkol) {
+      pass = pass && i.kol_tag_count >= Number(conditions.lkol)
+    }
+    if(conditions?.rkol) {
+      pass = pass && i.kol_tag_count <= Number(conditions.rkol)
+    }
+
     if(conditions?.sm_list?.length > 0){
       pass = pass && i.medias?.length > 0 && conditions.sm_list.some((y: string) => i.medias?.findIndex((m) => y.includes(m.icon) || y.toLowerCase() === m.name.toLowerCase()) !== -1)
     }
@@ -1897,48 +1954,60 @@ function getFilterData(list: PumpObj[], conditions: any) {
       pass = pass && i.dev_total_count >= Number(conditions.ldtc)
     }
     if(conditions?.rdtc) {
-      pass = pass && i.dev_total_count < Number(conditions.rdtc)
+      pass = pass && i.dev_total_count <= Number(conditions.rdtc)
     }
 
     if(conditions?.ldmc) {
       pass = pass && i.dev_migrated_count >= Number(conditions.ldmc)
     }
     if(conditions?.rdmc) {
-      pass = pass && i.dev_migrated_count < Number(conditions.rdmc)
+      pass = pass && i.dev_migrated_count <= Number(conditions.rdmc)
     }
 
     if(conditions?.ldmr) {
       pass = pass && i.dev_migrated_ratio >= Number(conditions.ldmr)
     }
     if(conditions?.rdmr) {
-      pass = pass && i.dev_migrated_ratio < Number(conditions.rdmr)
+      pass = pass && i.dev_migrated_ratio <= Number(conditions.rdmr)
     }
 
     if(conditions?.lbdr) {
       pass = pass && Number(i.address_binding_ratio || 0) >= Number(conditions.lbdr)
     }
     if(conditions?.rbdr) {
-      pass = pass && Number(i.address_binding_ratio|| 0) < Number(conditions.rbdr)
+      pass = pass && Number(i.address_binding_ratio|| 0) <= Number(conditions.rbdr)
     }
 
     if(conditions?.lfsr) {
       pass = pass && Number(i.phishing_ratio || 0) >= Number(conditions.lfsr)
     }
     if(conditions?.rfsr) {
-      pass = pass && Number(i.phishing_ratio|| 0) < Number(conditions.rfsr)
+      pass = pass && Number(i.phishing_ratio|| 0) <= Number(conditions.rfsr)
     }
 
     if(conditions?.lccr) {
       pass = pass && Number(i.colluded_cluster_ratio || 0) >= Number(conditions.lccr)
     }
     if(conditions?.rccr) {
-      pass = pass && Number(i.colluded_cluster_ratio|| 0) < Number(conditions.rccr)
+      pass = pass && Number(i.colluded_cluster_ratio|| 0) <= Number(conditions.rccr)
     }
     if(conditions?.lfans) {
       pass = pass && Number(i.followers || 0) >= Number(conditions.lfans)
     }
     if(conditions?.rfans) {
-      pass = pass && Number(i.followers|| 0) < Number(conditions.rfans)
+      pass = pass && Number(i.followers|| 0) <= Number(conditions.rfans)
+    }
+    if(conditions?.lbtax) {
+      pass = pass && Number(i.buy_tax || 0) >= Number(conditions.lbtax)
+    }
+    if(conditions?.rbtax) {
+      pass = pass && Number(i.buy_tax|| 0) <= Number(conditions.rbtax)
+    }
+    if(conditions?.lstax) {
+      pass = pass && Number(i.sell_tax || 0) >= Number(conditions.lstax)
+    }
+    if(conditions?.rstax) {
+      pass = pass && Number(i.sell_tax|| 0) <= Number(conditions.rstax)
     }
     return pass
   })
@@ -2245,7 +2314,7 @@ function mergeLogo(prev: any, next: any) {
 }
 function handleClearFilter(type: 'new' | 'soon' | 'graduated') {
   const platformsString = pumpConfig.value?.find(i => i.chain === activeChain.value)?.platforms?.map(i => i.platform)?.filter(i=>i!=='believe').join?.(',') || ''
-  const baseTokensString = baseTokenMap.value.values().toArray().map((i: any) => i.token).join(',') || ''
+  const baseTokensString = baseTokenMap.value?.values?.()?.toArray?.()?.map((i: any) => i.token)?.join(',') || ''
   pumpStore.pumpV3[activeChain.value][type].pumpFilter = {...pumpFilterDefault.value,platforms:platformsString,base_tokens:baseTokensString}
   getPumpList(true)
 }

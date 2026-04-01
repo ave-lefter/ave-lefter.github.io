@@ -14,7 +14,8 @@
         >{{ item.label }}</button>
         <!-- <button v-for="item in BotSettingsArr" :key="item.value" :class="{'active': item.value === botSettingStore?.botSettings?.[chain]?.selected}" type="button" @click.stop="onSelectBotSwapSet(item.value)">{{ item.label }}</button> -->
       </div>
-      <SlippageSet :canSetAuto="true" :isAutoSell="swapType === 'market'" :chain="(tokenStore.tokenInfo?.token?.chain as BotChain)" :setting="botSettingStore?.botSettings[chain]"/>
+      <!-- <SlippageSet :canSetAuto="true" :isAutoSell="swapType === 'market'" :chain="(tokenStore.tokenInfo?.token?.chain as BotChain)" :setting="botSettingStore?.botSettings[chain]"/> -->
+      <SlippageSetMarket class="ml-5px" :isAutoSell="swapType === 'market'" :chain="(tokenStore.tokenInfo?.token?.chain as BotChain)" />
       <BatchWallet :chain="chain" :boundary="boundary"/>
     </div>
     <div class="select-box">
@@ -104,7 +105,8 @@
 import {formatBotGasTips} from '@/utils/bot'
 import {isEvmChain, getRpcProvider} from '@/utils'
 import { NATIVE_TOKEN } from '@/utils/constants'
-import SlippageSet from './slippageSet.vue'
+// import SlippageSet from './slippageSet.vue'
+import SlippageSetMarket from './slippageSetMarket.vue'
 import Swap from './swap.vue'
 import BigNumber from 'bignumber.js'
 import { useBotSwap } from '~/composables/botSwap'
@@ -154,8 +156,10 @@ const tabs = computed<Array<{ value: 'buy' | 'sell', name: string }>>(() => {
 })
 
 const tabs1 = computed(() => {
+  const payToken = tokenStore.swap.payToken
+  const key = payToken?.address + '-' + chain.value
   const botSetting = (botSettingStore?.botSettings?.[chain.value]?.buy || {}) as typeof botSettingStore.botSettings.solana
-  const list = botSetting?.[botSetting.selected]?.buyValueList?.slice(0, 4) || ['0.01', '0.02', '0.5', '1']
+  const list = botSetting?.[botSetting.selected]?.buyUList?.[key]?.slice(0, 4) || ['0.01', '0.02', '0.5', '1']
   return list.map(i => {
     return {
       name: i,

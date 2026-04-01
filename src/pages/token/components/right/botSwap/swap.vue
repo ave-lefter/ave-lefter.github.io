@@ -11,7 +11,7 @@
             @visible-change="visible => show = visible">
             <div class="inline-flex items-center clickable">
               <img :src="`${configStore.token_logo_url}${tokenStore.swap.payToken?.logo_url}`" class="rd-50%" height="20"  alt="" srcset="" >
-              <Icon v-if="swapBaseTokens?.length > 1" class="arrow-up" :class="{ active: show === true }" name="solar:alt-arrow-down-bold" />
+              <Icon v-if="swapBaseTokens?.length > 0" class="arrow-up" :class="{ active: show === true }" name="solar:alt-arrow-down-bold" />
             </div>
             <template #dropdown>
               <el-dropdown-menu>
@@ -95,7 +95,7 @@ size="small"
           <el-dropdown placement="bottom" trigger="click" @visible-change="visible => show = visible">
             <div class="inline-flex items-center clickable text-12px ml-4px">
               <span>{{ tokenStore.swap.payToken?.symbol || getChainInfo(chain || '')?.main_name }}</span>
-              <Icon v-if="swapBaseTokens?.length > 1" class="arrow-up" :class="{ active: show === true }" name="solar:alt-arrow-down-bold" />
+              <Icon v-if="swapBaseTokens?.length > 0" class="arrow-up" :class="{ active: show === true }" name="solar:alt-arrow-down-bold" />
             </div>
             <template #dropdown>
               <el-dropdown-menu>
@@ -436,6 +436,17 @@ const swapBaseTokens = computed(() => {
   return (botSwapStore?.botSwapBaseTokens?.[chain.value || ''] || [])?.filter(item => item?.address !== tokenStore.swap.payToken?.address)
 })
 
+watch(() => tokenStore.swap.payToken, () => {
+  if (props.activeTab === 'buy') {
+    amountNative.value = ''
+    amountNativeOut.value = ''
+  } else {
+    amountToken.value = ''
+    amountTokenOut.value = ''
+    amountSellTokenPercent.value = ''
+  }
+})
+
 const totalSelectWalletBalance = computed(() => {
   const chain = getChain()
   const addresses = [...botSwapStore.botSwapSelectedWallets, (botStore.evmAddress || '')]
@@ -577,6 +588,7 @@ function setAmountToken() {
   }
   amountToken.value = String(Number(a) < 0 ? 0 : a)
 }
+
 
 const watchAmount = debounce((type: 'buy' | 'sell') => {
   watchAmount2(type)
@@ -863,7 +875,7 @@ async function submitBotSwap() {
     // let mev = this.botSettings?.solana?.mev
     const selected = botSettingStore?.botSettings?.[chain]?.[props.activeTab]?.selected || botSettingStore?.botSettings?.[chain]?.selected || 's1'
     const botSettings = botSettingStore.botSettings?.[chain]?.[props.activeTab]?.[selected]
-    const mev = botSettings?.mev
+    const mev = botSettings?.mev ?? false
 
     const { gasTip1List, gasTip2List } = formatBotGasTips(botSwapStore.gasTip, chain)
     const gasTips = mev ? gasTip1List : gasTip2List
@@ -998,7 +1010,7 @@ async function submitBotSwap() {
   } else if (isEvmChain(chain)) {
     const selected = botSettingStore.botSettings?.[chain as BotChain]?.[props.activeTab]?.selected || 's1'
     const botSettings = botSettingStore.botSettings?.[chain as BotChain]?.[props.activeTab]?.[selected]
-    const mev = botSettings?.mev
+    const mev = botSettings?.mev ?? false
     const slippage = botSettings?.slippage || 9
     const { gasTip1List, gasTip2List } = formatBotGasTips(botSwapStore.gasTip, chain)
     const gasTips = mev ? gasTip1List : gasTip2List
@@ -1161,7 +1173,7 @@ function submitBotLimit() {
     // let mev = this.botSettings?.solana?.mev
     const selected = botSettingStore?.botSettings?.[chain]?.[props.activeTab]?.selected || botSettingStore.botSettings?.[chain]?.selected || 's1'
     const botSettings = botSettingStore.botSettings?.[chain]?.[selected]
-    const mev = botSettings?.mev
+    const mev = botSettings?.mev ?? false
 
     const { gasTip1List, gasTip2List } = formatBotGasTips(botSwapStore.gasTip, chain)
     const gasTips = mev ? gasTip1List : gasTip2List
@@ -1553,7 +1565,10 @@ const editMode2 = ref(false)
 function handleEdit(value: Ref<Array<{value: string}>>,type: string) {
   editMode.value = !editMode.value
   const botSetting = (botSettingStore?.botSettings?.[chain.value]?.buy || {}) as typeof botSettingStore.botSettings.solana
-  botSettingStore.botSettings[chain.value][type][botSetting?.selected || 's1'].buyValueList = value.map(el=>el.value)
+  const payToken = tokenStore.swap.payToken
+  const key = payToken?.address + '-' + chain.value
+  const list = botSetting?.[botSetting.selected]?.buyUList?.[key]
+  botSettingStore.botSettings[chain.value][type][botSetting?.selected || 's1'].buyUList[key] = [...value.map(el=>el.value), ...list.slice(4)]
 }
 
 function handleEdit2(value: Ref<Array<{value: string}>>,type: string) {
@@ -1583,7 +1598,7 @@ const parser = (value: string) => {
   }
   const cleanValue = value.trim()
   const numValue = parseFloat(cleanValue)
-  
+
   if (isNaN(numValue)) {
     return ''
   }

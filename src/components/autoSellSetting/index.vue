@@ -20,8 +20,13 @@
       { active: isAutoSellConfig },
     ]"
     >
-    <span>{{ $t('autoSell') }}</span>
-    <SlippageSet
+    <span>{{ props.title || $t('autoSell') }}</span>
+    <SlippageSetMarket class="ml-5px" :chain="chain" :showQuickAmount="false" showAutoSell >
+      <template #icon>
+        <Icon name="fe:edit" class="text-12px" />
+      </template>
+    </SlippageSetMarket>
+    <!-- <SlippageSet
       class="ml-5px"
       :chain="chain"
       :setting="botSettingStore?.botSettings[chain]"
@@ -31,19 +36,21 @@
       <template #icon>
        <Icon name="fe:edit" class="text-12px" />
     </template>
-  </SlippageSet>
+  </SlippageSet> -->
 
   </button>
 </template>
 
 <script setup lang='ts'>
 import Content from './content.vue'
-import SlippageSet from '~/pages/token/components/right/botSwap/slippageSet.vue'
+// import SlippageSet from '~/pages/token/components/right/botSwap/slippageSet.vue'
+import SlippageSetMarket from '~/pages/token/components/right/botSwap/slippageSetMarket.vue'
 import { useAutoSellSettingContent } from './utils'
 
 const props = defineProps({
   chain: { type: String as PropType<BotChain>, default: '' },
-  rootClass: { type: String, default: '' }
+  rootClass: { type: String, default: '' },
+  title: { type: String, default: '' },
 })
 
 const walletStore = useWalletStore()

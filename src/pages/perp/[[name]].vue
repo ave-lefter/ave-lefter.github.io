@@ -87,7 +87,7 @@ definePageMeta({
   },
 })
 const tokenStore = useTokenStore()
-
+const walletStore = useWalletStore()
 const show1 = useStorage('perpShow1', true, sessionStorage)
 const show2 = useStorage('perpShow2', true, sessionStorage)
 const scrollbarHeight = computed(() => {
@@ -197,12 +197,14 @@ onBeforeMount(() => {
 
 onUnmounted(() => {
   tokenStore?.reset?.()
-  wsStore.send({
-    jsonrpc: '2.0',
-    method: 'unsubscribe',
-    params: ['asset'],
-    id: 1,
-  })
+  if(!(walletStore.address || botStore.evmAddress)){
+    wsStore.send({
+      jsonrpc: '2.0',
+      method: 'unsubscribe',
+      params: ['asset'],
+      id: 1,
+    })
+  }
   wsStore.send({
     jsonrpc: '2.0',
     method: 'unsubscribe',
