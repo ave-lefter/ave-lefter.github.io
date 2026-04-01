@@ -27,7 +27,7 @@
           <el-popover v-model:visible="filterVisible" placement="bottom-end" trigger="click" :width="164"
             :persistent="false">
             <template #reference>
-              <Icon name="custom:filter" class="text-12px cursor-pointer" />
+              <Icon name="custom:filter" class="text-12px cursor-pointer text-[--third-text]" />
             </template>
             <template #default>
               <el-checkbox v-model="checkAll" :indeterminate="isIndeterminate" class="[--el-checkbox-height:16px] mb-12px"
@@ -65,9 +65,31 @@
           </el-popover>
           <!-- <Icon class="cursor-pointer" :ref="!isMine ?'audioButtonRef':'audioButtonRef1'"
                 :name="(isMine ?globalStore.audioSettings.audio.twitterForMe : globalStore.audioSettings.audio.twitter) ? 'custom:ad' : 'custom:admute'" /> -->
-          <Icon v-if="!isMine" class="cursor-pointer" ref="audioButtonRef" :name="(globalStore.audioSettings.audio.twitter) ? 'custom:ad' : 'custom:admute'" ></Icon>
-          <Icon v-else class="cursor-pointer" ref="audioButtonRef1" :name="(globalStore.audioSettings.audio.twitterForMe) ? 'custom:ad' : 'custom:admute'" ></Icon>
-          <Icon name="material-symbols:30fps-sharp" @click="dialogVisible=true"></Icon>
+          <Icon v-if="!isMine" class="cursor-pointer text-[--third-text]" ref="audioButtonRef" :name="(globalStore.audioSettings.audio.twitter) ? 'custom:ad' : 'custom:admute'" ></Icon>
+          <Icon v-else class="cursor-pointer text-[--third-text]" ref="audioButtonRef1" :name="(globalStore.audioSettings.audio.twitterForMe) ? 'custom:ad' : 'custom:admute'" ></Icon>
+          <el-dropdown
+            :persistent="false"
+            trigger="click"
+            popper-class="dropdown-lang"
+            placement="bottom-end"
+            class="w-auto"
+            @command="langStore.setLanguage"
+          >
+            <Icon name="material-symbols:language" class="text-16px text-[--third-text] cursor-pointer "/>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item
+                  v-for="(item, $index) in locales"
+                  :key="$index"
+                  :command="item?.code"
+                  :class="{ active: langStore.locale == item.code }"
+                >
+                  {{ item?.name }}
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
+          <Icon name="custom:hashtag" class="text-[--third-text] cursor-pointer " @click="dialogVisible=true"></Icon>
           <Icon v-show="isPaused" name="custom:stop"/>
           <!-- <el-dropdown :persistent="false" trigger="click">
               <div class="w-24px h-24px bg-[--main-list-hover] flex items-center justify-center rounded-4px cursor-pointer"><Icon name="material-symbols:language"/></div>
@@ -126,8 +148,8 @@ import CustomSettingsDialog from './customSettingsDialog'
 const emits = defineEmits(['setDrawerVisible'])
 const { t } = useI18n()
 const newsAudio = useTemplateRef('newsAudio')
-
-
+const { locales } = useI18n()
+const langStore = useLocaleStore()
 const trackerStore = useTwitterTrackerStore()
 const v2WsStore = useV2WSStore()
 const globalStore = useGlobalStore()
@@ -320,10 +342,10 @@ watch([() => isPaused.value, () => activeParentTab.value], ([val,val2]) => {
   }
 })
 
-// watch(
-//   () => v2WsStore.wsResult[WSEventV2Type.PUBLIC_TWITTER],
-//   twitterHandler
-// )
+watch(
+  () => v2WsStore.wsResult[WSEventV2Type.PUBLIC_TWITTER],
+  twitterHandler
+)
 
 watch(() => followAuthorIds.value, () => {
   if (isMine.value) {

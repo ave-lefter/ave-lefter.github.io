@@ -17,7 +17,7 @@ interface Colors {
 }
 
 interface ParsedToken {
-  type: 'url' | 'email' | 'hashtag' | 'mention' | 'token' | 'quote'
+  type: 'url' | 'email' | 'hashtag' | 'mention' | 'token' | 'quote' | 'tokenAddress'
   text: string
   href?: string
   tag?: string
@@ -57,6 +57,8 @@ function generateLink(parsed: ParsedToken, linkClass: string, colors: Colors): s
       return `<a href="https://twitter.com/${encodeURIComponent(parsed.tag as string)}" class="${linkClass}" target="_blank" rel="noopener noreferrer">${escapeHtml(parsed.text)}</a>`
     case 'token':
       return `<a href="/token/${escapeHtml(parsed.address as string)}-${escapeHtml(parsed.chain as string)}" class="${linkClass}" ${getColorStyle(colors.symbolColor)}>${escapeHtml(parsed.text)}</a>`
+    case 'tokenAddress':
+      return `<span ${getColorStyle(colors.tokenAddressColor)}>${escapeHtml(parsed.text)}</span>`
     case 'quote':
       return `<span ${getColorStyle(colors.quoteColor)}>${escapeHtml(parsed.text)}</span>`
     default:
@@ -86,7 +88,7 @@ export function processTwitterText(
   // Define regex patterns for various matches
   const patterns: Array<{
     regex: RegExp
-    type: 'url' | 'email' | 'hashtag' | 'mention' | 'quote'
+    type: 'url' | 'email' | 'hashtag' | 'mention' | 'quote' |'tokenAddress'
     process: (match: string, capture?: string) => ParsedToken
   }> = [
     {
@@ -109,6 +111,21 @@ export function processTwitterText(
         type: 'email',
         text: match,
         href: `mailto:${match}`
+      })
+    },
+    {
+      // Blockchain Addresses (EVM, SOL, TON, SUI, TRON, BRC20)
+      // EVM: 0x + 40 hex chars
+      // SOL: 44 base58 chars
+      // TON: UQ or 0: format
+      // SUI: 0x + 64+ hex chars
+      // TRON: T + 33 base58 chars
+      // BRC20: 1/3 + 25-34 chars or bc1 format
+      regex: /(0x[a-fA-F0-9]{40}|[1-9A-HJ-NP-Z]{44}|(?:[0-1]:[a-zA-Z0-9_-]{48}|[UQ][a-zA-Z0-9_-]{46})|0x[a-fA-F0-9]{64,}|T[1-9A-HJ-NP-Z]{33}|[13][a-km-zA-HJ-NP-Z1-9]{25,34}|bc1[a-z0-9]{39,59})/g,
+      type: 'tokenAddress',
+      process: (match: string): ParsedToken => ({
+        type: 'tokenAddress',
+        text: match
       })
     },
     {
