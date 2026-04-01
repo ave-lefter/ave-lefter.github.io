@@ -180,6 +180,8 @@ export interface WalletTokenInfo {
   unrealized_ratio: string
   realized_profit: string
   realized_ratio: string
+  average_net_purchase_price?: string
+  net_purchase_amount?: string
   balance_amount: string
   balance_usd: string
   balance_ratio: string
