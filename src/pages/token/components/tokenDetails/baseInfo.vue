@@ -31,6 +31,7 @@ const listQuery = shallowRef({
 const attentionTriggerRef=ref()
 const checkedTrend = ref(['SWAP', 'ADD_LIQUIDITY/REMOVE_LIQUIDITY'])
 const trendList = shallowRef<GetTokenDetailsListResponse[]>([])
+const isMarket= shallowRef(false)
 const filteredTrendList = computed(() => {
   const {address} = getAddressAndChainFromId(route.params.id as string)
   return trendList.value.filter(
@@ -583,20 +584,23 @@ function copyTrade() {
         </ExcludeError>
       </div>
       <div class="flex-1 flex flex-col">
-        <span class="color-[--secondary-text] text-12px lh-16px mb-4px">{{ $t('averageMarketBuySell') }}</span>
+        <div class="flex items-center mb-4px">
+          <span class="color-[--secondary-text] text-12px lh-16px">{{ isMarket? $t('averageMarketBuySell') : $t('averagePriceBuySell')}}</span>
+          <Icon name="custom:exchange-horizontal" class="ml-4px color-[--secondary-text] text-10px clickable" @click.stop="isMarket = !isMarket"/>
+        </div>
         <div
           class="flex text-14px lh-20px items-center"
           :class="getColorClass(statistics.total_profit)"
         >
           <ExcludeError :model-value="statistics.average_purchase_price_usd">
             <span class="color-#12B886">
-              ${{ formatNumber(statistics.mcap_buy, {decimals: 2, l: 4, limit: 3}) }}
+              ${{ isMarket? formatNumber(statistics.mcap_buy, {decimals: 2, l: 4, limit: 3}): formatNumber(statistics.average_purchase_price_usd ||0,  { decimals: 4, limit: 6 }) }}
             </span>
           </ExcludeError>
           <span class="color-[--secondary-text]">/</span>
           <ExcludeError :model-value="statistics.average_sold_price_usd">
             <span class="color-#F6465D">
-              ${{ formatNumber(statistics.mcap_sold, {decimals: 2, l: 4, limit: 3}) }}
+              ${{ isMarket? formatNumber(statistics.mcap_sold, {decimals: 2, l: 4, limit: 3}): formatNumber(statistics.average_sold_price_usd || 0,  { decimals: 4, limit: 6 }) }}
             </span>
           </ExcludeError>
         </div>
