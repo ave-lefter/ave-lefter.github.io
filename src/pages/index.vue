@@ -1069,13 +1069,53 @@ watchTokenUpdatedUnwatch = watch(
   (val) => {
     if (!val?.token) return
     // 使用 toRaw 去除 Proxy，性能更好
+    if (!val?.token) return
     const rawVal = toRaw(val)
+    const currentChain = activeChain.value
+    ;['new', 'soon', 'graduated'].forEach(category => {
+      const list = fourmemeListObj[currentChain][category]
+      if (!list) return
+      const index = list.findIndex(item => item.target_token === rawVal.token)
+      if (index !== -1) {
+        const prev = list[index]
+        const merged = {
+          ...prev,
+          ...(rawVal.logo_url ? { logo_url: rawVal.logo_url } : {}),
+          ...(rawVal.buy_tax !== undefined ? { buy_tax: rawVal.buy_tax } : {}),
+          ...(rawVal.sell_tax !== undefined ? { sell_tax: rawVal.sell_tax } : {}),
+          ...(rawVal.name ? { name: rawVal.name } : {}),
+          ...(rawVal.symbol ? { symbol: rawVal.symbol } : {}),
+          ...(rawVal.appendix ? { medias: getMedias(rawVal.appendix), twitter_type: rawVal.twitter_type } : {}),
+          ...(rawVal.is_cloned !== undefined ? { is_cloned: rawVal.is_cloned } : {}),
+          ...(rawVal.deployer_platform ? { deployer_platform: rawVal.deployer_platform } : {}),
+          ...(rawVal.is_pump_agent !== undefined ? { is_pump_agent: rawVal.is_pump_agent } : {})
+        }
+        list[index] = merged
+      }
+    })
+    const index = wsTableList.value.findIndex(item => item.target_token === rawVal.token)
+    if (index !== -1) {
+      const prev = wsTableList.value[index]
+      const merged = {
+        ...prev,
+        ...(rawVal.logo_url ? { logo_url: rawVal.logo_url } : {}),
+        ...(rawVal.buy_tax !== undefined ? { buy_tax: rawVal.buy_tax } : {}),
+        ...(rawVal.sell_tax !== undefined ? { sell_tax: rawVal.sell_tax } : {}),
+        ...(rawVal.name ? { name: rawVal.name } : {}),
+        ...(rawVal.symbol ? { symbol: rawVal.symbol } : {}),
+        ...(rawVal.appendix ? { medias: getMedias(rawVal.appendix), twitter_type: rawVal.twitter_type } : {}),
+        ...(rawVal.is_cloned !== undefined ? { is_cloned: rawVal.is_cloned } : {}),
+        ...(rawVal.deployer_platform ? { deployer_platform: rawVal.deployer_platform } : {}),
+        ...(rawVal.is_pump_agent !== undefined ? { is_pump_agent: rawVal.is_pump_agent } : {})
+      }
+      wsTableList.value[index] = merged
+    }
     const prev = bufferLogoMap.get(rawVal.token)
     setLRU(
       bufferLogoMap,
       rawVal.token,
       prev ? mergeLogo(prev, rawVal) : rawVal,
-      300
+      600
     )
     logoThrottled()
   }
