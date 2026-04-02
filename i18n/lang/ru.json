@@ -898,7 +898,7 @@
   "removeTokenTips2": "Удалить выбранный мониторинг?",
   "monitor": "монитор",
   "position2": "Позиция",
-  "deletedTweets": "Удаленные твиты",
+  "deletedTweets": "",
   "unpin": "Открепить",
   "actionDel": "удалил этот твит",
   "actionTop": "закрепил этот твит",

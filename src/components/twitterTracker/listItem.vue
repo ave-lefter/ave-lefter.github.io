@@ -91,10 +91,10 @@
                         <!-- <span :style="{color: map[item.original_type]?.color}">{{ map[item.original_type]?.label }}</span> -->
                         <!-- <a v-if="item?.quoted_tweet?.author?.username||item?.retweeted_tweet?.author?.username" :href="`https://twitter.com/${item?.quoted_tweet?.author?.username||item?.retweeted_tweet?.author?.username}`" class="[&amp;&amp;]:color-[--primary-color] hover:underline" target="_blank" rel="noopener noreferrer">@{{ item?.quoted_tweet?.author?.username||item?.retweeted_tweet?.author?.username }}</a> -->
                     </div>
-                    <div :class="[
+                    <div v-if="+props.item.original_type!==typeEnum.retweet" :class="[
                     { 'line-11': !contentExpanded && isContentOverflow },'my-8px'
                 ]">
-                        <div v-if="+props.item.original_type!==typeEnum.retweet" class="cursor-pointer w-p-box text-[--main-text1]" @click="handleContentClick" v-html="processedContent" />
+                        <div class="cursor-pointer w-p-box text-[--main-text1]" @click="handleContentClick" v-html="processedContent" />
                     </div>
                   
                     <div v-if="+props.item.original_type!==typeEnum.retweet" :class="index !== -1 ? 'ml-0px' : ''"

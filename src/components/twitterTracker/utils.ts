@@ -43,6 +43,13 @@ function getColorStyle(color?: string): string {
 }
 
 /**
+ * Convert newlines to HTML <br> tags
+ */
+function convertNewlines(text: string): string {
+  return text.replace(/\\n/g, '<br>').replace(/\n/g, '<br>')
+}
+
+/**
  * Generate HTML link based on parsed token type
  */
 function generateLink(parsed: ParsedToken, linkClass: string, colors: Colors): string {
@@ -86,6 +93,9 @@ export function processTwitterText(
   const linkClass = '[&&]:color-[--primary-color] hover:underline clickable'
   const finalColors: Colors = colors || {}
 
+  // First, convert newlines to br tags (preserve them for later)
+  const hasNewlines = text.includes('\\n') || text.includes('\n')
+  let processedText = text
   // Define regex patterns for various matches
   const patterns: Array<{
     regex: RegExp
@@ -94,7 +104,7 @@ export function processTwitterText(
   }> = [
     {
       // URLs (http/https/www)
-      regex: /(https?:\/\/[^\s<]+|www\.[^\s<]+)/g,
+      regex: /https?:\/\/[A-Za-z0-9._~:/?#&=+%-]+/g,
       type: 'url',
       process: (match: string): ParsedToken => {
         let url = match
@@ -122,7 +132,7 @@ export function processTwitterText(
       // SUI: 0x + 64+ hex chars
       // TRON: T + 33 base58 chars
       // BRC20: 1/3 + 25-34 chars or bc1 format
-      regex: /(0x[a-fA-F0-9]{40}|[1-9A-HJ-NP-Z]{44}|(?:[0-1]:[a-zA-Z0-9_-]{48}|[UQ][a-zA-Z0-9_-]{46})|0x[a-fA-F0-9]{64,}|T[1-9A-HJ-NP-Z]{33}|[13][a-km-zA-HJ-NP-Z1-9]{25,34}|bc1[a-z0-9]{39,59})/g,
+     regex : /\b(?:0x[a-fA-F0-9]{40}|[1-9A-HJ-NP-Za-km-z]{32,44}|[01]:[a-zA-Z0-9_-]{48}|[UQ][a-zA-Z0-9_-]{46}|0x[a-fA-F0-9]{64,}|T[1-9A-HJ-NP-Za-km-z]{33}|[13][a-km-zA-HJ-NP-Z1-9]{25,34}|bc1[a-z0-9]{39,59})\b/g,
       type: 'tokenAddress',
       process: (match: string): ParsedToken => ({
         type: 'tokenAddress',
@@ -170,7 +180,7 @@ export function processTwitterText(
   for (const pattern of patterns) {
     let match: RegExpExecArray | null
     pattern.regex.lastIndex = 0
-    while ((match = pattern.regex.exec(text)) !== null) {
+    while ((match = pattern.regex.exec(processedText)) !== null) {
       matches.push({
         start: match.index,
         end: match.index + match[0].length,
@@ -186,7 +196,7 @@ export function processTwitterText(
       const tokenRegex = new RegExp(`\\$?\\b${escapedSymbol}\\b|\\$?${escapedSymbol}`, 'gi')
       let match: RegExpExecArray | null
       tokenRegex.lastIndex = 0
-      while ((match = tokenRegex.exec(text)) !== null) {
+      while ((match = tokenRegex.exec(processedText)) !== null) {
         matches.push({
           start: match.index,
           end: match.index + match[0].length,
@@ -220,15 +230,17 @@ export function processTwitterText(
   for (const match of filteredMatches) {
     // Add text before the matched region
     if (currentIndex < match.start) {
-      result += escapeHtml(text.substring(currentIndex, match.start))
+      const textBeforeMatch = processedText.substring(currentIndex, match.start)
+      result += convertNewlines(escapeHtml(textBeforeMatch))
     }
     // Add the matched region as a link
     result += generateLink(match.parsed, linkClass, finalColors)
     currentIndex = match.end
   }
   // Add remaining text after the last match
-  if (currentIndex < text.length) {
-    result += escapeHtml(text.substring(currentIndex))
+  if (currentIndex < processedText.length) {
+    const remainingText = processedText.substring(currentIndex)
+    result += convertNewlines(escapeHtml(remainingText))
   }
 
   return result
