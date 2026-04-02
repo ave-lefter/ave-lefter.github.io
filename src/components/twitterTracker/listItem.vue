@@ -71,20 +71,24 @@
                         @click="followIdArray.includes(item.author.author_id) ? _unfollowKol(item.author.author_id, index) : _followKol(item.author.author_id, index)">
                         <Icon :name="followIdArray.includes(item.author.author_id) ? 'custom:twitter-collect' : 'custom:twitter-uncollect'" class="text-12px" />
                     </div>
-                    <div class="flex items-center gap-4px py-6px px-4px rounded-4px text-12px"
-                    :style="{background: map[item.original_type]?.bg, color: map[item.original_type]?.color}"
-                    >
-                        <Icon :name="`custom:twitter-${item.original_type}`" class="text-13px" />
-                        {{ map[item.original_type]?.label }}
-                    </div>
+                    
                 </div>
             </div>
             <div class="relative" :class="index !== -1 ? 'ml-40px' : ''">
                 <div ref="contentEl" :class="[
                     'text-14px lh-22px break-words',
                 ]">
-                    <div v-if="[2,3,4].includes(Number(item.original_type))&&(item?.quoted_tweet?.author?.username||item?.retweeted_tweet?.author?.username||item.original_type=='4')" class="text-14px lh-22px break-words flex">
-                        <span :style="{color: map[item.original_type]?.color}">{{ map[item.original_type]?.label }}</span>
+                <!-- &&(item?.quoted_tweet?.author?.username||item?.retweeted_tweet?.author?.username||item.original_type=='4') -->
+                    <div v-if="[1,2,3,4].includes(Number(item.original_type))" class="text-14px lh-22px break-words flex">
+                        <div class="flex items-center gap-8px">
+                            <div class="flex items-center w-20px h-20px rounded-4px justify-center"
+                            :style="{background: map[item.original_type]?.bg, color: map[item.original_type]?.color}"
+                            >
+                                <Icon :name="`custom:twitter-${item.original_type}`" class="text-13px" />
+                            </div>
+                            <span class="font-400 text-14px lh-22px mt--2px" :style="{color: map[item.original_type]?.color}">{{ map[item.original_type]?.label }}</span>
+                        </div>
+                        <!-- <span :style="{color: map[item.original_type]?.color}">{{ map[item.original_type]?.label }}</span> -->
                         <!-- <a v-if="item?.quoted_tweet?.author?.username||item?.retweeted_tweet?.author?.username" :href="`https://twitter.com/${item?.quoted_tweet?.author?.username||item?.retweeted_tweet?.author?.username}`" class="[&amp;&amp;]:color-[--primary-color] hover:underline" target="_blank" rel="noopener noreferrer">@{{ item?.quoted_tweet?.author?.username||item?.retweeted_tweet?.author?.username }}</a> -->
                     </div>
                     <div :class="[
