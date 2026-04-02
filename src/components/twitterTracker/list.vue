@@ -17,7 +17,7 @@
       <span class="color-[--third-text] text-12px mb-20px mt-4px">{{ t('emptyNoData') }}</span>
     </AveEmpty>
   </div>
-  <div v-else ref="parentRef" class="affix-container overflow-y-auto scrollbar-hide" @scroll="onScroll" style="height:calc(100% - 75px)" @mouseenter="emits('stop',true)" @mouseleave="emits('stop',false)">
+  <div v-else ref="parentRef" class="affix-container overflow-y-auto scrollbar-hide" @scroll="onScroll" style="height:calc(100% - 75px)">
     <el-affix v-if="hasTop"  target=".affix-container" :offset="100">
       <div class="flex justify-center">
         <div class="flex items-center gap-0px py-6px px-4px rounded-4px bg-[--dialog-bg] text-[#37B270] text-12px clickable" @click="handleTop"><Icon name="custom:arrow-up"></Icon> {{ t('newMessage') }}</div>
@@ -91,19 +91,22 @@ const onScroll = useThrottleFn((e) => {
   //   // }
   //   console.log('onScroll',scrollTop)
   // // }
-  // console.log('onScroll',e.target?.scrollTop,trackerStore.unReader)
-  // if(((e.target?.scrollTop||0)> 30)){
-  //   if(trackerStore.unReader>0){
-  //     hasTop.value = true
-  //   }
-  //   emits('stop',true)
-  // }else{
-  //   hasTop.value = false
-  // }
+  console.log('onScroll',e.target?.scrollTop,trackerStore.unReader)
+  if(((e.target?.scrollTop||0)> 60)){
+    // if(trackerStore.unReader>0){
+    //   hasTop.value = true
+    // }
+    trackerStore.isPaused=true
+    // emits('stop',true)
+  }else{
+    trackerStore.isPaused=false
+    hasTop.value = false
+  }
 }, 100, true, false)
 
 watch(() => trackerStore.unReader, (val) => {
-  if (val > 0) {
+  console.log('unReader', val,trackerStore.isPaused)
+  if ((val > 0) && trackerStore.isPaused) {
     hasTop.value = true
     // emits('stop', true)
   } else {

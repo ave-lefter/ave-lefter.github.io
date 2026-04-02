@@ -99,7 +99,7 @@
             </template>
           </el-dropdown>
           <Icon name="custom:hashtag" class="text-[--third-text] cursor-pointer " @click="dialogVisible=true"></Icon>
-          <Icon v-show="isPaused" name="custom:stop"/>
+          <Icon v-show="trackerStore.isPaused" name="custom:stop"/>
           <!-- <el-dropdown :persistent="false" trigger="click">
               <div class="w-24px h-24px bg-[--main-list-hover] flex items-center justify-center rounded-4px cursor-pointer"><Icon name="material-symbols:language"/></div>
               <template #dropdown>
@@ -118,7 +118,7 @@
           </template>
         </el-input>
       </div>
-      <TwitterTrackerList :isMine="isMine" @stop="val => isPaused = val" @endReached="debouncedGetList" @startAttention="emits('setDrawerVisible', true)" />
+      <TwitterTrackerList :isMine="isMine"  @endReached="debouncedGetList" @startAttention="emits('setDrawerVisible', true)" />
     </template>
     <template v-else-if="activeParentTab===2">
       <div class="flex justify-between mb-12px items-center">
@@ -169,7 +169,7 @@ const activeTab = ref(1)
 const activeParentTab = ref(1)
 const filterVisible = ref(false)
 const audioVisible = ref(false)
-const isPaused = ref(false)
+// const isPaused = trackerStore.isPaused
 const isPaused2 = ref(false)
 const wsCacheArr = shallowRef([])
 const audioButtonRef = ref()
@@ -318,7 +318,7 @@ const twitterHandler = async (val) => {
       trackerStore.list[index] = val
       return
     }
-    if(isPaused.value || activeParentTab.value !== 1) {
+    if(trackerStore.isPaused || activeParentTab.value !== 1) {
       wsCacheArr.value.unshift(val)
       wsCacheArr.value = wsCacheArr.value.slice(0,100)
     } else {
@@ -353,7 +353,7 @@ function updateCache() {
   wsCacheArr.value = []
 }
 
-watch([() => isPaused.value, () => activeParentTab.value], ([val,val2]) => {
+watch([() => trackerStore.isPaused, () => activeParentTab.value], ([val,val2]) => {
   if (!val && val2 === 1) {
     updateCache()
   }
@@ -361,7 +361,7 @@ watch([() => isPaused.value, () => activeParentTab.value], ([val,val2]) => {
 
 watch(
   () => v2WsStore.wsResult[WSEventV2Type.PUBLIC_TWITTER],(val)=>{
-    if((activeParentTab.value===1)&&!isPaused.value){
+    if((activeParentTab.value===1)&&(trackerStore.isPaused||!trackerStore.visible)){
       if(isMine.value&&(activeParentTab.value===1)){
         if(followAuthorIds.value.includes(val.author.author_id)){
           trackerStore.unReader++

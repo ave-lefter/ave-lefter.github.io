@@ -14,6 +14,7 @@ export const useTwitterTrackerStore = defineStore('tracker', () => {
     const isRightFixed = useStorage('isTrackerRight', false)
     const fixedWidth = useStorage('trackerFixedWidth', 438)
     const translateStyle = shallowRef(0)
+    const isPaused = shallowRef(false)
     const query = useStorage('twitterQuery',{
       types:[1,2,3,4,5,6],
       token_keyword:''
@@ -107,6 +108,7 @@ export const useTwitterTrackerStore = defineStore('tracker', () => {
         query,
         loading,
         list,
+        isPaused,
         cursor,
         finished,
         showFooter,
