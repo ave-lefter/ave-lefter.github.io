@@ -106,7 +106,7 @@
           </div>
           <div class="flex flex-col justify-center">
             <a
-              href="https://apps.apple.com/us/app/ave-pro/id6741381461"
+              href="https://apps.apple.com/us/app/chainpulse/id6758416913"
               target="_blank"
               class="flex items-center no-underline mb-4 hover:opacity-100"
             >

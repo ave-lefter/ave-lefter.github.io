@@ -26,7 +26,7 @@
       </a>
     </div>
     <div v-if="walletName === 'AveWallet'" class="flex items-center justify-around">
-      <a class="text-center clickable" target="_blank" href="https://apps.apple.com/us/app/ave-pro/id6741381461?l=zh-Hans-CN">
+      <a class="text-center clickable" target="_blank" href="https://apps.apple.com/us/app/chainpulse/id6758416913?l=zh-Hans-CN">
         <div class="mb-5px">
           <Icon name="simple-icons:apple" class="text-20px" />
         </div>
