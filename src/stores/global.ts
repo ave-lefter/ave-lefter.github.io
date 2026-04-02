@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { useStorage, useLocalStorage } from '@vueuse/core'
+import { useStorage, useLocalStorage, useSessionStorage } from '@vueuse/core'
 import type { pumpBlack, pumpObjColor } from '@/api/types/pump'
 import { _getFollowsNum } from '@/api/follow'
 import type { MonitorChainType } from '~/utils/types'
@@ -12,8 +12,8 @@ export const useGlobalStore = defineStore('global', () => {
   const localeStore = useLocaleStore()
   const themeStore = useThemeStore()
   const configStore = useConfigStore()
-  const showLeft = shallowRef(false)
-  const showRight = shallowRef(true)
+  const showLeft = useSessionStorage('token_show_left', false)
+  const showRight = useSessionStorage('token_show_right', true)
   const isUSDT = useStorage('isUSDT', true)
   const footerTokensPrice = shallowRef([
     {
