@@ -2138,5 +2138,6 @@
   "buyOnce": "相同代币只买一次",
   "liquidityLimit": "池子大小限制",
   "twitterFollowers": "推特粉丝数",
-  "position2": "持仓"
+  "position2": "持仓",
+  "cashback": "返现币会将创作者手续费返还给交易者,而不是代币创建者"
 }
