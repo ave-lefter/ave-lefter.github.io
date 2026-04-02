@@ -254,6 +254,12 @@ const totalHolders = computed(() => [
     id: '31',
     name: 'KOL',
   },
+  { id: '-100',
+    name: t('myWatchlist'),
+  },
+  { id: '-101',
+    name: t('myRemark'),
+  },
 ])
 const linesChecked = useLocalStorage('tv_markLines1', {
   buy: {
@@ -1145,14 +1151,20 @@ async function initChart() {
       tokenStore.pair || {}
 
     let user_address = user.value
+    const getProfilingMarkId = (txTime: number, side: 'buy' | 'sell', type: string, walletAddress: string) => {
+      if (type === '-100' || type === '-101') {
+        return `${txTime}-${side}-${walletAddress}`
+      }
+      return `${txTime}-${side}-${type}`
+    }
     for (const [, markArr] of profilingMarksCache) {
       const flag = markArr.some(({type,holders})=>{
         return holders.some(hol=>{
-          if(hol.buy && markId === `${hol.buy.tx_time}-buy-${type}`){
+          if(hol.buy && markId === getProfilingMarkId(hol.buy.tx_time, 'buy', type, hol.wallet_address)){
             user_address = hol.wallet_address
             return true
           }
-          if(hol.sell && markId === `${hol.sell.tx_time}-sell-${type}`){
+          if(hol.sell && markId === getProfilingMarkId(hol.sell.tx_time, 'sell', type, hol.wallet_address)){
             user_address = hol.wallet_address
             return true
           }

@@ -519,6 +519,7 @@
   "unKnown": "Dump",
   "unKnown1": "Unknown",
   "mine": "Mine",
+  "myWatchlist": "My Watchlist",
   "bought": "Bought",
   "sold": "Sold",
   "seemsNoProblem": "Seems to be no problem",
@@ -2162,5 +2163,6 @@
   "tutorial": "Tutorial",
   "gridTip": "Please keep at least one category displayed",
   "emailCodeAuth": "Email Verification",
-  "googleAuth2": "Google Authenticator"
+  "googleAuth2": "Google Authenticator",
+  "myRemark": "My Remarks"
 }

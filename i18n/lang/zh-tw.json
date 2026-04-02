@@ -522,6 +522,7 @@
   "unKnown": "砸盤",
   "unKnown1": "未知",
   "mine": "我的",
+  "myWatchlist": "我的關注",
   "bought": "買入",
   "sold": "賣出",
   "seemsNoProblem": "看起來沒有問題",
@@ -2149,5 +2150,6 @@
   "followAuthor": "關注此博主",
   "unfollowAuthor": "取消追蹤此部落客",
   "emailCodeAuth": "信箱驗證碼",
-  "googleAuth2": "谷歌驗證器"
+  "googleAuth2": "谷歌驗證器",
+  "myRemark": "我的備註"
 }

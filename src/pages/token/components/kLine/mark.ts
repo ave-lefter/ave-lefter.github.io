@@ -5,6 +5,7 @@ import type { IChartingLibraryWidget, Mark } from '~/types/tradingview/charting_
 import { getUserKlineTxTags, getKlineProfilingTagsV2, type IGetKlineProfilingTagsV2Item,  type HolderBuy, type WalletLogo } from '@/api/token'
 import type { SimpleWSTx, WSTx } from './types'
 import { SupportTokenKlineLaunchpad, SupportTokenKlineChains } from '~/utils/constants'
+import { generateAvatarIcon1 as generateAvatarIcon } from '@/utils'
 
 type TradeSide = {
   amount: number
@@ -18,7 +19,57 @@ type TradeData = {
   sell?: TradeSide
 }
 
-type HolderBuyData = HolderBuy & {wallet_address:string,wallet_logo:WalletLogo}
+type HolderBuyData = HolderBuy & {wallet_address:string,wallet_logo:WalletLogo,remark?:string}
+
+// 地址缩写函数
+function formatAddress(address: string): string {
+  if (!address || address.length <= 10) return address
+  return `${address.slice(0, 4)}...${address.slice(-4)}`
+}
+
+// 获取地址后四位（前面加*）
+function getAddressLast4(address: string): string {
+  if (!address || address.length < 4) return address
+  return `*${address.slice(-4)}`
+}
+
+// 获取显示名称，优先显示备注，否则显示缩写地址
+function getDisplayName(remark?: string, walletName?: string, address?: string, chain?: string): string {
+  // 优先使用传入的remark
+  if (remark && remark.trim()) {
+    const trimmedRemark = remark.trim()
+    // 如果有地址，在备注后面加括号显示地址后四位
+    if (address) {
+      const last4 = getAddressLast4(address)
+      return `${trimmedRemark}(${last4})`
+    }
+    return trimmedRemark
+  }
+
+  // 尝试从本地存储获取备注
+  if (address && chain) {
+    try {
+      const remarksStore = useRemarksStore()
+      const localRemark = remarksStore.getRemarkByAddress({ address, chain })
+      if (localRemark && localRemark.trim()) {
+        const trimmedLocalRemark = localRemark.trim()
+        // 在本地存储的备注后面加括号显示地址后四位
+        const last4 = getAddressLast4(address)
+        return `${trimmedLocalRemark}(${last4})`
+      }
+    } catch (error) {
+      // 静默处理错误，不影响其他显示逻辑
+    }
+  }
+
+  // 使用钱包名称
+  if (walletName && walletName.trim()) return walletName.trim()
+
+  // 最后使用缩写地址
+  if (address) return formatAddress(address)
+
+  return ''
+}
 
 type TFormatTxsParams = {
   urlPrefix:string
@@ -40,6 +91,11 @@ export function useKlineMarks() {
   // 创建打点数据
   const marksTabs = computed(() => {
     const arr = (botStore?.evmAddress || walletStore?.address) ? [{ id: 'trade', name: t('mine') }] : []
+    // 添加我的关注 tab
+    if (botStore?.evmAddress || walletStore?.address) {
+      arr.push({ id: '-100', name: t('myWatchlist') })
+      arr.push({ id: '-101', name: t('myRemark') })
+    }
     return arr.concat(tokenStore.totalHolders?.filter?.(i => (i?.total_address || 0) > 0 && ['16','19','25','30','31']?.includes(i.type))?.map?.((i) => ({
       id: i.type,
       name: i?.[filterLanguage(localeStore.locale)]
@@ -50,6 +106,8 @@ export function useKlineMarks() {
   const markTabsVisible = useLocalStorage('tv_markTabsVisible',true)
   const markTabsChecked: RemovableRef<{ [key: string]: boolean }> = useLocalStorage('tv_markTabsChecked', {
     trade: true,
+    '-100': true,
+    '-101': false,
     16: false,
     19: false,
     25: true,
@@ -122,6 +180,32 @@ export function useKlineMarks() {
         } else {
           markTabsChecked.value[i.id] = true
           b1.style.color = '#3F80F7'
+          // 如果是我的关注标签，清除相关缓存以确保获取最新数据
+          if (i.id === '-100') {
+            const token = tokenStore?.token?.token
+            const chain = tokenStore?.token?.chain
+            const pair = tokenStore?.pairAddress
+            const user = botStore?.evmAddress || walletStore?.address
+            // 清除所有相关的缓存
+            profilingMarksCache.forEach((value, key) => {
+              if (key.startsWith(`${pair}-${chain}-${user}`) && key.includes(`-100-`)) {
+                profilingMarksCache.delete(key)
+              }
+            })
+          }
+          // 如果是我的关注标签，清除相关缓存以确保获取最新数据
+          if (i.id === '-101') {
+            const token = tokenStore?.token?.token
+            const chain = tokenStore?.token?.chain
+            const pair = tokenStore?.pairAddress
+            const user = botStore?.evmAddress || walletStore?.address
+            // 清除所有相关的缓存
+            marksMap.forEach((value, key) => {
+              if (key.startsWith(`${pair}-${chain}-${user}`) && key.includes(`-101-`)) {
+                marksMap.delete(key)
+              }
+            })
+          }
         }
         _widget?.activeChart?.()?.refreshMarks?.()
       }
@@ -166,6 +250,96 @@ export function useKlineMarks() {
       mcap: number
   }
 
+  const getProfilingCacheKey = ({
+    pair,
+    chain,
+    user,
+    interval,
+    type,
+    from,
+    to
+  }: {
+    pair: string
+    chain: string
+    user: string
+    interval: string
+    type: string
+    from: number
+    to: number
+  }) => `${pair}-${chain}-${user}-${interval}-${type}-${from}-${to}`
+
+  const loadProfilingMarksData = async ({
+    from,
+    to,
+    interval,
+    pair,
+    chain,
+    token,
+    user,
+    type,
+    isTokenKline
+  }: {
+    from: number
+    to: number
+    interval: string
+    pair: string
+    chain: string
+    token: string
+    user: string
+    type: string
+    isTokenKline: boolean
+  }) => {
+    const id = getProfilingCacheKey({ pair, chain, user, interval, type, from, to })
+
+    if (profilingMarksCache.has(id)) {
+      const res = touchCache(profilingMarksCache, id) || []
+      if (res.length > 0) return res as IGetKlineProfilingTagsV2Item[]
+      profilingMarksCache.delete(id)
+    }
+
+    const data = {
+      from,
+      to,
+      interval,
+      type,
+      ...(!isTokenKline && {
+        pair_id: pair + '-' + chain,
+      }),
+      ...(isTokenKline && {
+        token_id: token,
+      }),
+      ...((type === '-100' || type === '-101') && {
+        self_address: botStore?.evmAddress || walletStore?.address
+      }),
+    }
+    const res = await getKlineProfilingTagsV2(data)
+    const cacheArr = Array.isArray(res)
+      ? res.map(el => ({
+        ...el,
+        type
+      }))
+      : []
+    setCache(profilingMarksCache, id, cacheArr)
+    return cacheArr as IGetKlineProfilingTagsV2Item[]
+  }
+
+  const getProfilingMarkDedupKey = (mark: { tx_time: number; user_address: string; id: string }) => {
+    const side = mark.id.includes('-buy-') ? 'buy' : 'sell'
+    return `${mark.tx_time}-${side}-${mark.user_address}`
+  }
+
+  const dedupeProfilingMarks = (marks: (Mark & { tx_time: number; user_address: string })[]) => {
+    const seen = new Set<string>()
+    return marks.filter((mark) => {
+      const key = getProfilingMarkDedupKey(mark)
+      if (seen.has(key)) return false
+      seen.add(key)
+      return true
+    })
+  }
+
+  const pickMarkTabName = (id: string) => marksTabs.value.find(tab => tab.id === id)?.name || ''
+
   function getMarks({from, to, interval, onDataCallback, pair, chain, token, user, migrated}: {
     from: number
     to: number
@@ -184,7 +358,26 @@ export function useKlineMarks() {
       getMigrated(onDataCallback, migrated, Number(interval))
     }
     if (!markTabsVisible.value) return
+    const isMyWatchlistChecked = !!markTabsChecked.value?.['-100']
+    const isMyRemarkChecked = !!markTabsChecked.value?.['-101']
+    if (isMyWatchlistChecked || isMyRemarkChecked) {
+      Promise.all([
+        isMyWatchlistChecked
+          ? loadProfilingMarksData({ from, to, interval, pair, chain, token, user, type: '-100', isTokenKline })
+          : Promise.resolve([]),
+        isMyRemarkChecked
+          ? loadProfilingMarksData({ from, to, interval, pair, chain, token, user, type: '-101', isTokenKline })
+          : Promise.resolve([]),
+      ]).then(([watchlistRes, remarkRes]) => {
+        const mergedMarks = dedupeProfilingMarks([
+          ...formatProfilingToMarks(remarkRes || [], interval, '-101', pickMarkTabName('-101')),
+          ...formatProfilingToMarks(watchlistRes || [], interval, '-100', pickMarkTabName('-100')),
+        ])
+        onDataCallback(mergedMarks)
+      })
+    }
     marksTabs.value.forEach((v) => {
+      if (v.id === '-100' || v.id === '-101') return
       const id = pair + '-' + chain + '-' + user + '-' + interval + '-' + v.id + '-' + from + '-' + to
       if (marksMap.has(id) && markTabsChecked.value?.[v.id]) {
         const res = touchCache(marksMap, id)
@@ -192,7 +385,19 @@ export function useKlineMarks() {
         onDataCallback(marks || [])
         return
       }
+      // 如果缓存存在但数据为空，强制重新请求
       if(profilingMarksCache.has(id) && markTabsChecked.value?.[v.id]) {
+        const res = touchCache(profilingMarksCache, id) || []
+        // 如果缓存数据为空，清除缓存并重新请求
+        if(res.length === 0) {
+          profilingMarksCache.delete(id)
+        } else {
+          const marks = formatProfilingToMarks(res, interval, v.id, v.name)
+          onDataCallback(marks)
+          return
+        }
+      }
+      if(profilingMarksCache.has(id) && markTabsChecked.value?.[v.id] && v.id !== '-100' && v.id !== '-101') {
         const res = touchCache(profilingMarksCache, id) || []
         const marks = formatProfilingToMarks(res, interval, v.id, v.name)
         onDataCallback(marks)
@@ -223,6 +428,10 @@ export function useKlineMarks() {
           }),
           ...(isTokenKline && {
             token_id: token,
+          }),
+          // 添加 self_address 参数用于我的关注
+          ...((v.id === '-100' || v.id === '-101') && {
+            self_address: botStore?.evmAddress || walletStore?.address
           }),
         }
         getKlineProfilingTagsV2(data).then((res) => {
@@ -279,10 +488,10 @@ export function useKlineMarks() {
     for(const item of data){
       const bucketTime = Math.floor(item.time / interval1) * interval1
       for(const holder of item.holders){
-        const {wallet_address,wallet_logo} = holder
+        const {wallet_address,wallet_logo,remark} = holder
         if(holder.buy){
           result.push(formatTxsObj({
-            el:{...holder.buy,wallet_address,wallet_logo},
+            el:{...holder.buy,wallet_address,wallet_logo,remark},
             side:'buy',
             type,
             name,
@@ -292,7 +501,7 @@ export function useKlineMarks() {
         }
         if(holder.sell){
           result.push(formatTxsObj({
-            el:{...holder.sell,wallet_address,wallet_logo},
+            el:{...holder.sell,wallet_address,wallet_logo,remark},
             side:'sell',
             type,
             name,
@@ -315,15 +524,20 @@ export function useKlineMarks() {
   }:TFormatTxsParams) {
       const isBuy = side === 'buy'
       const isKOL = type === '31'
+      const isMyWatchlist = type === '-100'
+      const isMyRemark = type === '-101'
       let imageUrl = isBuy
       ? `${urlPrefix}signals/marks/mark-buy-${type}.png`
       : `${urlPrefix}signals/marks/mark-sell-${type}.png`
       if(el.wallet_logo?.logo && ['.png', '.jpg', '.jpeg', '.gif', '.webp'].some((ext) => el.wallet_logo.logo.includes(ext))){
         imageUrl = el.wallet_logo.logo
+      } else if((isMyWatchlist || isMyRemark) && !el.wallet_logo?.logo) {
+        // 对于我的关注，如果 logo 不存在，使用 generateAvatarIcon
+        imageUrl = generateAvatarIcon(el.remark || el.wallet_address || '')
       }
       let borderColor = 'transparent'
       let borderWidth = 0
-      if(isKOL){
+      if(isKOL || isMyWatchlist || isMyRemark){
         borderWidth = 2
         if(isBuy){
           borderColor = '#12B886'
@@ -332,8 +546,12 @@ export function useKlineMarks() {
         }
       }
 
+      const markId = (isMyWatchlist || isMyRemark)
+        ? `${el.tx_time}-${side}-${el.wallet_address}`
+        : `${el.tx_time}-${side}-${type}`
+
       return {
-        id: `${el.tx_time}-${side}-${type}`,
+        id: markId,
         time: bucketTime,
         color: { background: 'transparent', border: borderColor },
         imageUrl,
@@ -352,19 +570,24 @@ export function useKlineMarks() {
   function getTooltipTxt(name:string, type:number|string, el:HolderBuyData,isBuy:boolean,bucketTime:number) {
     const swapType = isBuy ? t('bought') : t('sold')
     const formatedName = name?.replace(/\(.*\)$/, '')
+    // 获取当前链信息
+    const chain = tokenStore?.token?.chain
+    // 获取显示名称，优先显示备注，否则显示缩写地址
+    const displayName = getDisplayName(el.remark, el.wallet_logo?.name, el.wallet_address, chain)
+
     // 处理聪明钱
     if(Number(type) === 30) {
       const swapType = isBuy ? t('netInflow') : t('netOutflow')
       const flowText = isBuy ? t('inflow') : t('outflow')
       const AvgTxt = isBuy ? t('campaignBuyAvg') : t('campaignSellAvg')
-      return `${formatedName} ${swapType}
+      return `${displayName || formatedName} ${swapType}
         ${flowText}: ${formatNumber(el.volume, 2)}(${formatNumber(el.txns, 0)})
         ${AvgTxt}: $${formatNumber(Number(el.volume) / (Number(el.amount) || 1), 4)}
         ${swapType}: ${formatNumber(el.volume, 2)}
         ${formatDate(el.tx_time, 'YYYY-MM-DD HH:mm')}
       `
     }
-    return `${el.wallet_logo?.name || `${formatedName}`} ${swapType}
+    return `${displayName || formatedName} ${swapType}
         ${t('amountB')}: ${formatNumber(el.amount, 2)}
         ${t('amountU')}: $${formatNumber(el.volume, 2)}
         ${t('price')}: $${formatNumber(Number(el.volume) / (Number(el.amount) || 1), 4)}
@@ -606,4 +829,3 @@ const priorityOrder = ['25','31','30','19','16']
     wsPublicPortraitUpdateMarks
   }
 }
-
