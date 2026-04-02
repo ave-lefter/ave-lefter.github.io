@@ -812,7 +812,7 @@ function hideToken(row:any) {
                       name="custom:danger"
                       class="font-14 ml-2px color-#F72121"/>
                   </div>
-                  <div v-if="row.token!==NATIVE_TOKEN" class="mt-2px color-[--third-text1] text-11px lh-14px">
+                  <div v-if="row.token!==NATIVE_TOKEN"  v-tooltip="formatDate(row?.last_txn_time||0)" class="mt-2px color-[--third-text1] text-11px lh-14px">
                     <!-- <template v-if="row.balance === 0">$0</template>
                     <template v-else-if="row.balance === '--'">--</template>
                     <template v-else>
