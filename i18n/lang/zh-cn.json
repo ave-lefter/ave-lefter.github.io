@@ -2138,5 +2138,8 @@
   "buyOnce": "相同代币只买一次",
   "liquidityLimit": "池子大小限制",
   "twitterFollowers": "推特粉丝数",
-  "position2": "持仓"
+  "position2": "持仓",
+  "internalTransfer": "内嵌交易转入/转出",
+  "internalTransferIn": "内嵌转入",
+  "internalTransferOut": "内嵌转出"
 }
