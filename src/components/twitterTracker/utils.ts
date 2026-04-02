@@ -135,21 +135,10 @@ export function processTwitterText(
       regex: /["“”]([^"“”]*)["“”]/g,
       type: 'quote',
       process: (match: string): ParsedToken => {
-        // Remove outer quotes
-        let innerContent = match
-        if (match.startsWith('"') && match.endsWith('"')) {
-          // English quotes
-          innerContent = match.slice(1, -1)
-        } else if (match.startsWith('"') && match.endsWith('"')) {
-          // Chinese left and right quotes
-          innerContent = match.slice(1, -1)
-        } else if (match.startsWith('"') && match.endsWith('"')) {
-          // Chinese quotes (alternate)
-          innerContent = match.slice(1, -1)
-        }
+        // Keep the original match with quotes
         return {
           type: 'quote',
-          text: innerContent
+          text: match
         }
       }
     },

@@ -74,7 +74,7 @@
                     
                 </div>
             </div>
-            <div class="relative" :class="index !== -1 ? 'ml-40px' : ''">
+            <div class="relative" :class="index !== -1 ? 'ml-0px' : ''">
                 <div ref="contentEl" :class="[
                     'text-14px lh-22px break-words',
                 ]">
@@ -92,16 +92,16 @@
                         <!-- <a v-if="item?.quoted_tweet?.author?.username||item?.retweeted_tweet?.author?.username" :href="`https://twitter.com/${item?.quoted_tweet?.author?.username||item?.retweeted_tweet?.author?.username}`" class="[&amp;&amp;]:color-[--primary-color] hover:underline" target="_blank" rel="noopener noreferrer">@{{ item?.quoted_tweet?.author?.username||item?.retweeted_tweet?.author?.username }}</a> -->
                     </div>
                     <div :class="[
-                    { 'line-11': !contentExpanded && isContentOverflow }
+                    { 'line-11': !contentExpanded && isContentOverflow },'my-8px'
                 ]">
-                        <div v-if="+props.item.original_type!==typeEnum.retweet" class="cursor-pointer w-p-box" @click="handleContentClick" v-html="processedContent" />
+                        <div v-if="+props.item.original_type!==typeEnum.retweet" class="cursor-pointer w-p-box text-[--main-text1]" @click="handleContentClick" v-html="processedContent" />
                     </div>
                   
                     <div v-if="+props.item.original_type!==typeEnum.retweet" :class="index !== -1 ? 'ml-0px' : ''"
-                        class="justify-between items-center flex mt-8px text-[--d-666-l-959A9F]">
-                        <div class="flex items-center gap-4px cursor-pointer text-12px" @click="translationVisible=!translationVisible">
+                        class="justify-between items-center flex">
+                        <div class="flex items-center gap-4px cursor-pointer text-12px color-[--third-text]" @click="translationVisible=!translationVisible">
                             <template v-if="props.item.content&&showTranslation">
-                                <Icon name="custom:translation" />{{ t(translationVisible ? 'viewOrigin':'viewTranslation') }}
+                                <Icon name="custom:translation" class="text-14px"/>{{ t(translationVisible ? 'viewOrigin':'viewTranslation') }}
                             </template>
                         </div>
                         <span v-if="isContentOverflow" class="flex items-center gap-4px cursor-pointer color-[--primary-color] text-12px"
@@ -111,7 +111,7 @@
                         </span>
                     </div>
                     <template v-if="(+props.item.original_type!==typeEnum.retweet)&&translationVisible&&showTranslation">
-                        <div v-if="processedContentZh" class="mt-8px bg-[--d-15171C-l-F6F6F6] px-12px py-6px" v-html="processedContentZh" @click="handleContentClick"></div>
+                        <div v-if="processedContentZh" class="mt-8px bg-[--main-list-hover] px-12px py-6px rounded-4px text-[--main-text1]" v-html="processedContentZh" @click="handleContentClick"></div>
                         <el-skeleton v-else animated class="mt-8px">
                             <template #template>
                                 <el-skeleton-item variant="p" style="width: 100%" />
@@ -119,7 +119,7 @@
                         </el-skeleton>
                     </template>
                     
-                    <div v-for="token in item?.tokens" class="mt-8px flex gap-4px items-center lh-none bg-[--up-bg] bg-[--down-bg] px-8px py-6px clickable" :class="getBgClass(token?.price_change_24h)" @click="navigateTo(`/token/${token?.address}-${token?.chain}`)">
+                    <div v-for="token in item?.tokens" class="mt-8px flex gap-4px items-center lh-none bg-[--up-bg] bg-[--down-bg] px-8px py-6px clickable rounded-4px" :class="getBgClass(token?.price_change_24h)" @click="navigateTo(`/token/${token?.address}-${token?.chain}`)">
                         <!-- <Icon name="i-icon-park-solid:volume-notice" class="text-12px color-[--main-text1]"></Icon>{{ token.kol_count }}{{ t('times') }} -->
                         <TokenImg :row="token" class="w-24px h-24px mr-8px" />
                         <div class="whitespace-nowrap text-ellipsis overflow-hidden max-w-100px mr-8px">{{ token?.symbol }}</div>
@@ -130,7 +130,7 @@
                     style="width: 100%; top: 0; left: 0; z-index: -1;" v-html="processedContent" />
             </div>
             <div v-for="(media, mediaIndex) in item.medias?.slice?.(0, 1)" :key="mediaIndex"
-                :class="index !== -1 ? 'ml-40px' : ''" class="relative">
+                :class="index !== -1 ? 'ml-0px' : ''" class="relative">
                 <!-- <img :src="media.media_url_https" alt="" class="max-w-full rounded-8px cursor-pointer"> -->
                 <el-tooltip v-if="media.type !== 'video'" :ref="el => { if (el) tooltipRefs[`${mediaIndex}`] = el }"
                     popper-class="tooltip-pd-0" :show-arrow="false" placement="right"
@@ -291,7 +291,7 @@ const checkContentOverflow = () => {
         const el = measureEl.value || contentEl.value
         if (!el) return
         const lineHeight = parseFloat(getComputedStyle(el).lineHeight) || 22
-        const maxHeight = lineHeight *11
+        const maxHeight = lineHeight * 11
         isContentOverflow.value = el.scrollHeight > maxHeight + 1
     })
 }
