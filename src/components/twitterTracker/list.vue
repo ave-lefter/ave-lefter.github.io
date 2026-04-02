@@ -84,20 +84,9 @@ useInfiniteScroll(parentRef, ()=>{
 }, { distance: 100 })
 
 const onScroll = useThrottleFn((e) => {
-  // if (scrollbar.value) {
-  //   const scrollElement = scrollbar.value.wrapRef
-  //   // if (scrollElement && scrollElement.scrollHeight - scrollTop< 30) {
-  //   //   endReached('bottom')
-  //   // }
-  //   console.log('onScroll',scrollTop)
-  // // }
   console.log('onScroll',e.target?.scrollTop,trackerStore.unReader)
   if(((e.target?.scrollTop||0)> 60)){
-    // if(trackerStore.unReader>0){
-    //   hasTop.value = true
-    // }
     trackerStore.isPaused=true
-    // emits('stop',true)
   }else{
     trackerStore.isPaused=false
     hasTop.value = false
@@ -108,24 +97,15 @@ watch(() => trackerStore.unReader, (val) => {
   console.log('unReader', val,trackerStore.isPaused)
   if ((val > 0) && trackerStore.isPaused) {
     hasTop.value = true
-    // emits('stop', true)
   } else {
-    // emits('stop', false)
     hasTop.value = false
   }
 })
 
 
 function handleTop() {
-  // parentRef.value.scrollTo({
-  //   top: 0,
-  // })
   virtualizer.value.scrollToIndex(0)
   trackerStore.unReader=0
-  emits('stop', false)
-  setTimeout(() => {
-    emits('stop', true)
-  }, 100)
 }
 </script>
 <style scoped lang="scss">
