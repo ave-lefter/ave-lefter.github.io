@@ -2151,5 +2151,6 @@
   "customTokens": "自定义代币",
   "symbol": "代币符号",
   "symbolDesc": "高亮$SOL、$ETH等代币",
-  "tokenAddressDesc": "高亮代币CA"
+  "tokenAddressDesc": "高亮代币CA",
+  "newMessage": "新消息"
 }

@@ -212,8 +212,11 @@ const fixedCheckboxOptions = computed(() => [
 const checkAll = ref(query.value.types.length === checkboxOptions.value.length)
 const isIndeterminate = ref(false)
 const handleCheckAllChange = () => {
-  query.value.types = checkAll.value ? checkboxOptions.value.map(i => i.value) : []
-  isIndeterminate.value = query.value.types.length > 0 && query.value.types.length < checkboxOptions.value.length
+  const types=query.value.types.filter(el=>el>0)
+  const must_contains_ca= query.value.types.includes(-1)
+  query.value.types = checkAll.value ? [...checkboxOptions.value.map(i => i.value),...(must_contains_ca?[-1]:[])] : (must_contains_ca?[-1]:[])
+
+  isIndeterminate.value = types.length > 0 && types.length < checkboxOptions.value.length
 }
 const handleCheckedChange = (val) => {
   const checkedCount = val.length
@@ -249,7 +252,7 @@ if (botStore.accessToken) {
 }
 
 const confirmQuery = () => {
-  if(query.value.types.length === 0) {
+  if(query.value.types.filter(el=>el>0).length === 0) {
     ElMessage.error(t('trackerTypeRequired'))
     return 
   }
@@ -333,30 +336,54 @@ const twitterHandler = async (val) => {
   }
 }
 
+function updateCache() {
+  const map = new Map();
+  
+  wsCacheArr.value.forEach(item => {
+    // 只有当 Map 中还没有这个 tweet_id 时，才设置
+    // 如果已经有了，什么都不做（从而保留了前面的值）
+    if (!map.has(item.tweet_id)) {
+      map.set(item.tweet_id, item);
+    }
+  });
+  
+  const result = Array.from(map.values());
+  trackerStore.list.unshift(...result)
+  trackerStore.list = trackerStore.list.slice(0,100)
+  wsCacheArr.value = []
+}
+
 watch([() => isPaused.value, () => activeParentTab.value], ([val,val2]) => {
   if (!val && val2 === 1) {
-
-    const map = new Map();
-
-    wsCacheArr.value.forEach(item => {
-      // 只有当 Map 中还没有这个 tweet_id 时，才设置
-      // 如果已经有了，什么都不做（从而保留了前面的值）
-      if (!map.has(item.tweet_id)) {
-        map.set(item.tweet_id, item);
-      }
-    });
-
-    const result = Array.from(map.values());
-    trackerStore.list.unshift(...result)
-    trackerStore.list = trackerStore.list.slice(0,100)
-    wsCacheArr.value = []
+    updateCache()
   }
 })
 
-// watch(
-//   () => v2WsStore.wsResult[WSEventV2Type.PUBLIC_TWITTER],
-//   twitterHandler
-// )
+watch(
+  () => v2WsStore.wsResult[WSEventV2Type.PUBLIC_TWITTER],(val)=>{
+    if((activeParentTab.value===1)&&!isPaused.value){
+      if(isMine.value&&(activeParentTab.value===1)){
+        if(followAuthorIds.value.includes(val.author.author_id)){
+          trackerStore.unReader++
+        }
+      }else{
+        trackerStore.unReader++
+      }
+    }
+    if(!trackerStore.visible){
+    }
+    twitterHandler(val)
+  }
+)
+
+watch(
+  () => trackerStore.visible,(val)=>{
+    if(val){
+      updateCache()
+    }
+    trackerStore.unReader=0
+  }
+)
 
 watch(() => followAuthorIds.value, () => {
   if (isMine.value) {

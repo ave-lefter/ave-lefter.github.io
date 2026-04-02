@@ -17,7 +17,7 @@ interface Colors {
 }
 
 interface ParsedToken {
-  type: 'url' | 'email' | 'hashtag' | 'mention' | 'token' | 'quote' | 'tokenAddress'
+  type: 'url' | 'email' | 'hashtag' | 'mention' | 'symbol' | 'quote' | 'tokenAddress'
   text: string
   href?: string
   tag?: string
@@ -55,15 +55,16 @@ function generateLink(parsed: ParsedToken, linkClass: string, colors: Colors): s
       return `<a href="https://twitter.com/hashtag/${encodeURIComponent(parsed.tag as string)}" class="${linkClass}" target="_blank" rel="noopener noreferrer">${escapeHtml(parsed.text)}</a>`
     case 'mention':
       return `<a href="https://twitter.com/${encodeURIComponent(parsed.tag as string)}" class="${linkClass}" target="_blank" rel="noopener noreferrer">${escapeHtml(parsed.text)}</a>`
-    case 'token':
-      return `<a href="/token/${escapeHtml(parsed.address as string)}-${escapeHtml(parsed.chain as string)}" class="${linkClass}" ${getColorStyle(colors.symbolColor)}>${escapeHtml(parsed.text)}</a>`
+    case 'symbol':
+      // return `<a href="/token/${escapeHtml(parsed.address as string)}-${escapeHtml(parsed.chain as string)}" class="${linkClass}" ${getColorStyle(colors.symbolColor)}>${escapeHtml(parsed.text)}</a>`
+      return `<span class="${linkClass} tw-symbol" data-value="${parsed.address}-${parsed.chain}" ${getColorStyle(colors.symbolColor)}>${escapeHtml(parsed.text)}</span>`
     case 'tokenAddress':
-      return `<span ${getColorStyle(colors.tokenAddressColor)} onClick>${escapeHtml(parsed.text)}</span>`
+      return `<span class="${linkClass} tw-tokenAddress"  ${getColorStyle(colors.tokenAddressColor)}>${escapeHtml(parsed.text)}</span>`
     case 'quote':
-      return `<span ${getColorStyle(colors.quoteColor)}>${escapeHtml(parsed.text)}</span>`
+      return `<span class="${linkClass} tw-quote" ${getColorStyle(colors.quoteColor)}>${escapeHtml(parsed.text)}</span>`
     default:
       return escapeHtml(parsed.text)
-  }
+  } 
 }
 
 /**
@@ -82,13 +83,13 @@ export function processTwitterText(
     return ''
   }
 
-  const linkClass = '[&&]:color-[--primary-color] hover:underline'
+  const linkClass = '[&&]:color-[--primary-color] hover:underline clickable'
   const finalColors: Colors = colors || {}
 
   // Define regex patterns for various matches
   const patterns: Array<{
     regex: RegExp
-    type: 'url' | 'email' | 'hashtag' | 'mention' | 'quote' |'tokenAddress'
+    type: 'url' | 'email' | 'hashtag' | 'mention' | 'quote' |'tokenAddress' | 'symbol'
     process: (match: string, capture?: string) => ParsedToken
   }> = [
     {
@@ -201,7 +202,7 @@ export function processTwitterText(
           start: match.index,
           end: match.index + match[0].length,
           parsed: {
-            type: 'token',
+            type: 'symbol',
             text: match[0],
             address: token.address,
             chain: token.chain

@@ -905,5 +905,6 @@
   "customTokens": "Mã thông báo tùy chỉnh",
   "symbol": "Biểu tượng",
   "symbolDesc": "Làm nổi bật $SOL, $ETH và các token khác",
-  "tokenAddressDesc": "Đánh dấu mã thông báo CA"
+  "tokenAddressDesc": "Đánh dấu mã thông báo CA",
+  "newMessage": "Tin nhắn mới"
 }

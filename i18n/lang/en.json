@@ -2150,5 +2150,6 @@
   "customTokens": "Custom Token",
   "symbol": "Symbol",
   "symbolDesc": "Highlight $SOL, $ETH and other tokens",
-  "tokenAddressDesc": "Highlight Token CA"
+  "tokenAddressDesc": "Highlight Token CA",
+  "newMessage": "New Message"
 }

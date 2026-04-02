@@ -18,6 +18,7 @@ export const useTwitterTrackerStore = defineStore('tracker', () => {
       types:[1,2,3,4,5,6],
       token_keyword:''
     })
+    const unReader = ref(0)
     const loading = ref(false)
     const finished = ref(false)
     const list = ref([])
@@ -111,5 +112,6 @@ export const useTwitterTrackerStore = defineStore('tracker', () => {
         showFooter,
         loading2,
         finished2,
+        unReader
     }
 })

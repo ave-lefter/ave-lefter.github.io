@@ -687,5 +687,6 @@
   "customTokens": "Ficha personalizada",
   "symbol": "Símbolo",
   "symbolDesc": "Resalte $SOL, $ETH y otros tokens",
-  "tokenAddressDesc": "Resaltar token CA"
+  "tokenAddressDesc": "Resaltar token CA",
+  "newMessage": "Nuevo mensaje"
 }

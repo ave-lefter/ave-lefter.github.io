@@ -661,5 +661,6 @@
   "customTokens": "Özel Jeton",
   "symbol": "Sembol",
   "symbolDesc": "$SOL, $ETH ve diğer tokenleri vurgulayın",
-  "tokenAddressDesc": "Token CA'yı vurgulayın"
+  "tokenAddressDesc": "Token CA'yı vurgulayın",
+  "newMessage": "Yeni Mesaj"
 }

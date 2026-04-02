@@ -19,9 +19,9 @@
             </el-tooltip>
           </div>
           <div class="flex gap-8px flex-col">
-            <div class="flex gap-4px items-center">
+            <div class="flex gap-4px items-center cursor-pointer"  @click="reset('quoteColor')">
               <div class="setting-label">{{ $t('doubleQuotes') }}</div>
-              <Icon name="mingcute:refresh-1-line"></Icon>
+              <Icon name="mingcute:refresh-1-line" class="mt-2px" :class="{ 'active': isRotatingQuote }"></Icon>
             </div>
             <div class="setting-description">
               {{ $t('doubleQuotesDesc') }}
@@ -47,9 +47,9 @@
               </el-tooltip>
             </div>
             <div class="flex gap-8px flex-col">
-              <div class="flex gap-4px items-center">
+              <div class="flex gap-4px items-center cursor-pointer"  @click="reset('symbolColor')">
                 <div class="setting-label">{{ $t('symbol') }}</div>
-                <Icon name="mingcute:refresh-1-line"></Icon>
+                <Icon name="mingcute:refresh-1-line" class="mt-2px" :class="{ 'active': isRotatingSymbol }"></Icon>
               </div>
               <div class="setting-description">
                 {{ $t('symbolDesc') }}
@@ -68,9 +68,9 @@
               </el-tooltip>
             </div>
             <div class="flex gap-8px flex-col">
-              <div class="flex gap-4px items-center">
+              <div class="flex gap-4px items-center cursor-pointer"  @click="reset('tokenAddressColor')">
                 <div class="setting-label">{{ $t('tokenAddress') }}</div>
-                <Icon name="mingcute:refresh-1-line"></Icon>
+                <Icon name="mingcute:refresh-1-line" class="mt-2px" :class="{ 'active': isRotatingTokenAddress }"></Icon>
               </div>
               <div class="setting-description">
                 {{ $t('tokenAddressDesc') }}
@@ -97,6 +97,59 @@ defineEmits<{
 const quoteColor = useLocalStorage('tw-quoteColor', '#3F80F7')
 const symbolColor = useLocalStorage('tw-symbolColor', '#FFA622')
 const tokenAddressColor = useLocalStorage('tw-tokenAddressColor', '#3F80F7')
+
+const isRotatingQuote = ref(false);
+const isRotatingSymbol = ref(false);
+const isRotatingTokenAddress = ref(false);
+
+const colorMap = {
+  quoteColor,
+  symbolColor,
+  tokenAddressColor
+};
+
+const rotatingRefMap = {
+  quoteColor: isRotatingQuote,
+  symbolColor: isRotatingSymbol,
+  tokenAddressColor: isRotatingTokenAddress
+};
+
+function reset(key: 'quoteColor' | 'symbolColor' | 'tokenAddressColor') {
+  const defaultColor = {
+    quoteColor: '#3F80F7',
+    symbolColor: '#FFA622',
+    tokenAddressColor: '#3F80F7'
+  };
+  colorMap[key].value = defaultColor[key];
+  rotatingRefMap[key].value = true;
+  setTimeout(() => {
+    rotatingRefMap[key].value = false;
+  }, 500);
+}
+// function reset(key: 'quoteColor' | 'symbolColor' | 'tokenAddressColor') {
+//   const resetValues = {
+//     quoteColor: '#3F80F7',
+//     symbolColor: '#FFA622',
+//     tokenAddressColor: '#3F80F7',
+//   }
+
+//   const resetFlags = {
+//     quoteColor: 'isRotatingQuote',
+//     symbolColor: 'isRotatingSymbol',
+//     tokenAddressColor: 'isRotatingTokenAddress',
+//   }
+
+//   const targetValue = resetValues[key]
+//   const targetFlag = resetFlags[key]
+
+//   if (typeof targetValue !== 'undefined') {
+//     (window as any)[key].value = targetValue
+//     (window as any)[targetFlag].value = true
+//     setTimeout(() => {
+//       (window as any)[targetFlag].value = false
+//     }, 200)
+//   }
+// }
 </script>
 
 <style lang="scss" scoped>
@@ -141,5 +194,19 @@ const tokenAddressColor = useLocalStorage('tw-tokenAddressColor', '#3F80F7')
   background: var(--border);
   padding: 12px 16px;
   border-radius: 8px;
+}
+
+/* 定义旋转动画 */
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.active {
+  animation: rotate 0.5s linear;
 }
 </style>

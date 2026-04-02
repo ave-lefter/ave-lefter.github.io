@@ -17,7 +17,12 @@
       <span class="color-[--third-text] text-12px mb-20px mt-4px">{{ t('emptyNoData') }}</span>
     </AveEmpty>
   </div>
-  <div v-else ref="parentRef" class="overflow-y-auto scrollbar-hide" style="height:calc(100% - 75px)" @mouseenter="emits('stop',true)" @mouseleave="emits('stop',false)">
+  <div v-else ref="parentRef" class="affix-container overflow-y-auto scrollbar-hide" @scroll="onScroll" style="height:calc(100% - 75px)" @mouseenter="emits('stop',true)" @mouseleave="emits('stop',false)">
+    <el-affix v-if="hasTop"  target=".affix-container" :offset="100">
+      <div class="flex justify-center">
+        <div class="flex items-center gap-0px py-6px px-4px rounded-4px bg-[--dialog-bg] text-[#37B270] text-12px clickable" @click="handleTop"><Icon name="custom:arrow-up"></Icon> {{ t('newMessage') }}</div>
+      </div>
+    </el-affix>
     <div :style="{
       height: `${totalSize}px`,
       width: '100%',
@@ -45,8 +50,7 @@
 <script setup name="twitterTackerList">
 import ListItem from './listItem.vue'
 import { useVirtualizer } from '@tanstack/vue-virtual'
-import { useInfiniteScroll } from '@vueuse/core'
-
+import { useInfiniteScroll,useThrottleFn } from '@vueuse/core'
 const parentRef = ref(null)
 const { t } = useI18n()
 const emits = defineEmits(['startAttention', 'endReached','stop'])
@@ -57,7 +61,7 @@ const props = defineProps({
 })
 const botStore = useBotStore()
 const trackerStore = useTwitterTrackerStore()
-
+const hasTop=shallowRef(false)
 const virtualizer = useVirtualizer(
   computed(() => ({
     count: trackerStore.list.length,
@@ -79,6 +83,47 @@ useInfiniteScroll(parentRef, ()=>{
   emits('endReached')
 }, { distance: 100 })
 
+const onScroll = useThrottleFn((e) => {
+  // if (scrollbar.value) {
+  //   const scrollElement = scrollbar.value.wrapRef
+  //   // if (scrollElement && scrollElement.scrollHeight - scrollTop< 30) {
+  //   //   endReached('bottom')
+  //   // }
+  //   console.log('onScroll',scrollTop)
+  // // }
+  // console.log('onScroll',e.target?.scrollTop,trackerStore.unReader)
+  // if(((e.target?.scrollTop||0)> 30)){
+  //   if(trackerStore.unReader>0){
+  //     hasTop.value = true
+  //   }
+  //   emits('stop',true)
+  // }else{
+  //   hasTop.value = false
+  // }
+}, 100, true, false)
+
+watch(() => trackerStore.unReader, (val) => {
+  if (val > 0) {
+    hasTop.value = true
+    // emits('stop', true)
+  } else {
+    // emits('stop', false)
+    hasTop.value = false
+  }
+})
+
+
+function handleTop() {
+  // parentRef.value.scrollTo({
+  //   top: 0,
+  // })
+  virtualizer.value.scrollToIndex(0)
+  trackerStore.unReader=0
+  emits('stop', false)
+  setTimeout(() => {
+    emits('stop', true)
+  }, 100)
+}
 </script>
 <style scoped lang="scss">
 :deep(.el-scrollbar__thumb) {

@@ -1513,5 +1513,6 @@
   "customTokens": "カスタムトークン",
   "symbol": "シンボル",
   "symbolDesc": "$SOL、$ETH、その他のトークンを強調表示します",
-  "tokenAddressDesc": "トークン CA を強調表示する"
+  "tokenAddressDesc": "トークン CA を強調表示する",
+  "newMessage": "新しいメッセージ"
 }

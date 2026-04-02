@@ -910,5 +910,6 @@
   "customTokens": "Пользовательский токен",
   "symbol": "Символ",
   "symbolDesc": "Выделите $SOL, $ETH и другие токены",
-  "tokenAddressDesc": "Выделить токен CA"
+  "tokenAddressDesc": "Выделить токен CA",
+  "newMessage": "Новое сообщение"
 }

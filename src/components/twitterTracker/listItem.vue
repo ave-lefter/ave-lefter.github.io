@@ -85,12 +85,8 @@
                 ]">
                     <div v-if="[2,3,4].includes(Number(item.original_type))&&(item?.quoted_tweet?.author?.username||item?.retweeted_tweet?.author?.username||item.original_type=='4')" class="text-14px lh-22px break-words flex">
                         <span :style="{color: map[item.original_type]?.color}">{{ map[item.original_type]?.label }}</span>
-                        <a v-if="item?.quoted_tweet?.author?.username||item?.retweeted_tweet?.author?.username" :href="`https://twitter.com/${item?.quoted_tweet?.author?.username||item?.retweeted_tweet?.author?.username}`" class="[&amp;&amp;]:color-[--primary-color] hover:underline" target="_blank" rel="noopener noreferrer">@{{ item?.quoted_tweet?.author?.username||item?.retweeted_tweet?.author?.username }}</a>
+                        <!-- <a v-if="item?.quoted_tweet?.author?.username||item?.retweeted_tweet?.author?.username" :href="`https://twitter.com/${item?.quoted_tweet?.author?.username||item?.retweeted_tweet?.author?.username}`" class="[&amp;&amp;]:color-[--primary-color] hover:underline" target="_blank" rel="noopener noreferrer">@{{ item?.quoted_tweet?.author?.username||item?.retweeted_tweet?.author?.username }}</a> -->
                     </div>
-                    <!-- <div>{{ showTranslation}}</div>
-                    <div>{{ lang.includes('zh') ? 'content_zh' : 'content_en'}}</div>
-                    <div>content_zh:{{item?.content_zh}}</div>
-                    <div>content:{{item?.content}}</div> -->
                     <div :class="[
                     { 'line-11': !contentExpanded && isContentOverflow }
                 ]">
@@ -110,8 +106,8 @@
                             {{ !contentExpanded ? t('Expand') : t('Collapse') }}
                         </span>
                     </div>
-                    <template v-if="translationVisible&&showTranslation">
-                        <div v-if="processedContentZh" class="mt-8px bg-[--d-15171C-l-F6F6F6] px-12px py-6px" v-html="processedContentZh"></div>
+                    <template v-if="(+props.item.original_type!==typeEnum.retweet)&&translationVisible&&showTranslation">
+                        <div v-if="processedContentZh" class="mt-8px bg-[--d-15171C-l-F6F6F6] px-12px py-6px" v-html="processedContentZh" @click="handleContentClick"></div>
                         <el-skeleton v-else animated class="mt-8px">
                             <template #template>
                                 <el-skeleton-item variant="p" style="width: 100%" />
@@ -425,10 +421,17 @@ const handleContentClick = async(e) => {
     }
     if (target.tagName === 'SPAN') {
         if(target.innerText){
-            console.log('handleContentClick', target.innerText)
-            await copyToClipboard(target.innerText)
-            useGlobalStore().dialogVisible_search = !useGlobalStore().dialogVisible_search
-            return 
+            if(target.className.includes('tw-symbol')){
+                navigateTo(`/token/${target.dataset.value}`)
+                return 
+            }else if(target.className.includes('tw-tokenAddress')){
+                console.log('handleContentClick', target.innerText)
+                await copyToClipboard(target.innerText)
+                useGlobalStore().dialogVisible_search = !useGlobalStore().dialogVisible_search
+                return 
+            }else{
+                return
+            }
         }
     }
     // 如果点击的是内容区域但不是链接，打开推文

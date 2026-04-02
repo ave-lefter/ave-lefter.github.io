@@ -665,5 +665,6 @@
   "customTokens": "Token personalizado",
   "symbol": "Símbolo",
   "symbolDesc": "Destaque $SOL, $ETH e outros tokens",
-  "tokenAddressDesc": "Destacar Token CA"
+  "tokenAddressDesc": "Destacar Token CA",
+  "newMessage": "Nova mensagem"
 }

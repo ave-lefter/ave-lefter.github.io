@@ -1513,5 +1513,6 @@
   "customTokens": "커스텀 토큰",
   "symbol": "상징",
   "symbolDesc": "$SOL, $ETH 및 기타 토큰 강조 표시",
-  "tokenAddressDesc": "하이라이트 토큰 CA"
+  "tokenAddressDesc": "하이라이트 토큰 CA",
+  "newMessage": "새 메시지"
 }
