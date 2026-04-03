@@ -66,7 +66,7 @@ function generateLink(parsed: ParsedToken, linkClass: string, colors: Colors): s
           return `<span class="${linkClass}">***</span>`
         }
       }else{
-        return `<span class="${linkClass}">***</span>`
+        return `<a href="${escapeHtml(parsed.href as string)}" class="${linkClass}" target="_blank" rel="noopener noreferrer">${escapeHtml(parsed.text)}</a>`
       }
     case 'email':
       return `<a href="${escapeHtml(parsed.href as string)}" class="${linkClass}" target="_blank" rel="noopener noreferrer">${escapeHtml(parsed.text)}</a>`
