@@ -94,7 +94,7 @@ defineEmits<{
   'update:modelValue': [value: boolean]
 }>()
 
-const quoteColor = useLocalStorage('tw-quoteColor', '#3F80F7')
+const quoteColor = useLocalStorage('tw-quoteColor', '#19d92f')
 const symbolColor = useLocalStorage('tw-symbolColor', '#FFA622')
 const tokenAddressColor = useLocalStorage('tw-tokenAddressColor', '#3F80F7')
 
@@ -116,7 +116,7 @@ const rotatingRefMap = {
 
 function reset(key: 'quoteColor' | 'symbolColor' | 'tokenAddressColor') {
   const defaultColor = {
-    quoteColor: '#3F80F7',
+    quoteColor: '#19d92f',
     symbolColor: '#FFA622',
     tokenAddressColor: '#3F80F7'
   };

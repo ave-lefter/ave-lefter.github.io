@@ -2151,5 +2151,8 @@
   "symbol": "Symbol",
   "symbolDesc": "Highlight $SOL, $ETH and other tokens",
   "tokenAddressDesc": "Highlight Token CA",
-  "newMessage": "New Message"
+  "newMessage": "New Message",
+  "languageSetting": "Language Settings",
+  "followAuthor": "Follow this blogger",
+  "unfollowAuthor": "Unfollow this blogger"
 }

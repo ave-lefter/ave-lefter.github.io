@@ -27,7 +27,7 @@
           <el-popover v-model:visible="filterVisible" placement="bottom-end" trigger="click" :width="268"
             :persistent="false">
             <template #reference>
-              <Icon name="custom:filter" class="text-12px cursor-pointer text-[--third-text]" />
+              <Icon name="custom:filter" class="text-12px cursor-pointer text-[--primary-color]" />
             </template>
             <template #default>
               <div class="flex w-full flex-wrap w-full w-typeFilter border-b-1px border-b-solid border-b-[--dialog-divider] pb-4px">
@@ -84,7 +84,7 @@
             class="w-auto"
             @command="langStore.setLanguage"
           >
-            <Icon name="material-symbols:language" class="text-16px text-[--third-text] cursor-pointer "/>
+            <Icon name="material-symbols:language" class="text-16px text-[--third-text] cursor-pointer " v-tooltip="$t('languageSetting')"/>
             <template #dropdown>
               <el-dropdown-menu>
                 <el-dropdown-item
@@ -98,7 +98,7 @@
               </el-dropdown-menu>
             </template>
           </el-dropdown>
-          <Icon name="custom:hashtag" class="text-[--third-text] cursor-pointer " @click="dialogVisible=true"></Icon>
+          <Icon name="custom:hashtag" class="text-[--third-text] cursor-pointer " @click="dialogVisible=true" v-tooltip="$t('custom')"></Icon>
           <Icon v-show="trackerStore.isPaused" name="custom:stop"/>
           <!-- <el-dropdown :persistent="false" trigger="click">
               <div class="w-24px h-24px bg-[--main-list-hover] flex items-center justify-center rounded-4px cursor-pointer"><Icon name="material-symbols:language"/></div>
@@ -209,7 +209,7 @@ const isMine = computed(() => {
 const fixedCheckboxOptions = computed(() => [
   { label: t('onlyCA'), value: -1 },
 ])
-const checkAll = ref(query.value.types.length === checkboxOptions.value.length)
+const checkAll = ref(query.value.types.filter(el=>el>0).length === checkboxOptions.value.length)
 const isIndeterminate = ref(false)
 const handleCheckAllChange = () => {
   const types=query.value.types.filter(el=>el>0)
@@ -219,7 +219,7 @@ const handleCheckAllChange = () => {
   isIndeterminate.value = types.length > 0 && types.length < checkboxOptions.value.length
 }
 const handleCheckedChange = (val) => {
-  const checkedCount = val.length
+  const checkedCount = val.filter(el=>el>0).length
   checkAll.value = checkedCount === checkboxOptions.value.length
   isIndeterminate.value = checkedCount > 0 && checkedCount < checkboxOptions.value.length
 }
@@ -311,6 +311,9 @@ const twitterHandler = async (val) => {
     if (isMine.value && !followAuthorIds.value.includes(val.author?.author_id)) {
       return
     }
+    if((query.value.types.includes(-1)&&!val?.tokens?.length)){
+      return 
+    }
     // 判断是否已经存在该推特
     const index = trackerStore.list.findIndex(el => el.tweet_id === val.tweet_id)
     val.follow_status = followAuthorIds.value.includes(val.author?.author_id) ? 1 : 0
@@ -318,7 +321,8 @@ const twitterHandler = async (val) => {
       trackerStore.list[index] = val
       return
     }
-    if(trackerStore.isPaused || activeParentTab.value !== 1) {
+    if(trackerStore.isPaused || ((activeParentTab.value !== 1) || (!trackerStore.visible&&activeParentTab.value===1))) {
+      trackerStore.unReader++
       wsCacheArr.value.unshift(val)
       wsCacheArr.value = wsCacheArr.value.slice(0,100)
     } else {
@@ -333,6 +337,8 @@ const twitterHandler = async (val) => {
     if (audioEl && globalStore.audioSettings.audio[isMine.value ? 'twitterForMe' : 'twitter']) {
       audioEl.play()
     }
+  }
+  if((query.value.types.includes(8)&&val?.tokens&&val?.tokens?.length>0)||!query.value.types.includes(8)) {
   }
 }
 
@@ -361,17 +367,17 @@ watch([() => trackerStore.isPaused, () => activeParentTab.value], ([val,val2]) =
 
 watch(
   () => v2WsStore.wsResult[WSEventV2Type.PUBLIC_TWITTER],(val)=>{
-    if((activeParentTab.value===1)&&(trackerStore.isPaused||!trackerStore.visible)){
-      if(isMine.value&&(activeParentTab.value===1)){
-        if(followAuthorIds.value.includes(val.author.author_id)){
-          trackerStore.unReader++
-        }
-      }else{
-        trackerStore.unReader++
-      }
-    }
-    if(!trackerStore.visible){
-    }
+    // if((activeParentTab.value===1)&&(trackerStore.isPaused||!trackerStore.visible)){
+    //   if(isMine.value&&(activeParentTab.value===1)){
+    //     if(followAuthorIds.value.includes(val.author.author_id)){
+    //       trackerStore.unReader++
+    //     }
+    //   }else{
+    //     trackerStore.unReader++
+    //   }
+    // }
+    // if(!trackerStore.visible){
+    // }
     twitterHandler(val)
   }
 )
@@ -380,6 +386,8 @@ watch(
   () => trackerStore.visible,(val)=>{
     if(val){
       updateCache()
+    }else{
+      trackerStore.isPaused=true
     }
     trackerStore.unReader=0
   }

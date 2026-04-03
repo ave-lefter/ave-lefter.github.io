@@ -67,11 +67,10 @@
                     </div>
                 </div>
                 <div v-if="index !== -1" class="gap-8px flex items-center">
-                    <div class="w-24px h-24px bg-[--main-list-hover] rounded-4px flex items-center justify-center cursor-pointer"
+                    <div class="w-24px h-24px bg-[--main-list-hover] rounded-4px flex items-center justify-center cursor-pointer" v-tooltip="followIdArray.includes(item.author.author_id) ? t('unfollowAuthor') : t('followAuthor')"
                         @click="followIdArray.includes(item.author.author_id) ? _unfollowKol(item.author.author_id, index) : _followKol(item.author.author_id, index)">
                         <Icon :name="followIdArray.includes(item.author.author_id) ? 'custom:twitter-collect' : 'custom:twitter-uncollect'" class="text-12px" />
                     </div>
-                    
                 </div>
             </div>
             <div class="relative" :class="index !== -1 ? 'ml-0px' : ''">
@@ -119,11 +118,13 @@
                         </el-skeleton>
                     </template>
                     
-                    <div v-for="token in item?.tokens" class="mt-8px flex gap-4px items-center lh-none bg-[--up-bg] bg-[--down-bg] px-8px py-6px clickable rounded-4px" :class="getBgClass(token?.price_change_24h)" @click="navigateTo(`/token/${token?.address}-${token?.chain}`)">
-                        <!-- <Icon name="i-icon-park-solid:volume-notice" class="text-12px color-[--main-text1]"></Icon>{{ token.kol_count }}{{ t('times') }} -->
-                        <TokenImg :row="token" class="w-24px h-24px mr-8px" />
-                        <div class="whitespace-nowrap text-ellipsis overflow-hidden max-w-100px mr-8px">{{ token?.symbol }}</div>
-                        <span class="ml-4px" :class="getColorClass(token?.price_change_24h)">{{ addSign(token?.price_change_24h) }}{{ formatNumber(Math.abs(token?.price_change_24h), 2) }}%</span>
+                    <div v-if="item?.tokens?.filter(item=>item?.price_change_24h)?.length" class="flex flex-wrap justify-between">
+                        <div v-for="token in item?.tokens?.filter(item=>item?.price_change_24h)" class="w-[calc(50%-4px)] mt-8px flex gap-4px items-center lh-none bg-[--up-bg] bg-[--down-bg] px-8px py-6px clickable rounded-4px" :class="[getBgClass(token?.price_change_24h)]" @click="navigateTo(`/token/${token?.address}-${token?.chain}`)">
+                            <!-- <Icon name="i-icon-park-solid:volume-notice" class="text-12px color-[--main-text1]"></Icon>{{ token.kol_count }}{{ t('times') }} -->
+                            <TokenImg :row="token" class="mr-4px" tokenClass="w-16px h-16px" chainClass="w-8px h-8px"/>
+                            <div class="whitespace-nowrap text-ellipsis overflow-hidden max-w-100px mr-4px">{{ token?.symbol }}</div>
+                            <span class="ml-0px" :class="getColorClass(token?.price_change_24h)">{{ addSign(token?.price_change_24h) }}{{ formatNumber(Math.abs(token?.price_change_24h), 2) }}%</span>
+                        </div>
                     </div>
                 </div>
                 <div ref="measureEl" class="text-14px lh-22px break-words absolute opacity-0 pointer-events-none"
@@ -200,7 +201,7 @@ const {map} = useTrackerTypes()
 const { lang } = storeToRefs(useGlobalStore())
 const { t } = useI18n()
 const botStore = useBotStore()
-
+const pumpStore = usePumpStore()
 const props = defineProps({
     item: {
         type: Object,
@@ -426,7 +427,8 @@ const handleContentClick = async(e) => {
     if (target.tagName === 'SPAN') {
         if(target.innerText){
             if(target.className.includes('tw-symbol')){
-                navigateTo(`/token/${target.dataset.value}`)
+                pumpStore.pumpV3[localStorage.getItem('pump_activeChain2')||'bsc'].new.pumpFilter.q = target.innerText.replace('$', '')
+                navigateTo(`/`)
                 return 
             }else if(target.className.includes('tw-tokenAddress')){
                 console.log('handleContentClick', target.innerText)

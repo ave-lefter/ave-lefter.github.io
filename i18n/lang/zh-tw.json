@@ -2138,5 +2138,8 @@
   "symbol": "代幣符號",
   "symbolDesc": "高亮$SOL、$ETH等代幣",
   "tokenAddressDesc": "高亮代幣CA",
-  "newMessage": "新消息"
+  "newMessage": "新消息",
+  "languageSetting": "語言設定",
+  "followAuthor": "關注此博主",
+  "unfollowAuthor": "取消追蹤此部落客"
 }
