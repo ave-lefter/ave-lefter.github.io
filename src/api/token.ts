@@ -3,7 +3,7 @@ import { getAddressAndChainFromId, getChainInfo } from '@/utils'
 import { NATIVE_TOKEN } from '@/utils/constants'
 import { createCacheRequest } from '#imports'
 import { getTonTokenList } from '~/utils/wallet/ton'
-import { getTokenPnl } from './bot'
+import { getTokenPnl, getBalances } from './bot'
 import { getUserTokenBalanceList } from './swap'
 
 // const testDomain = 'https://api.test.phaetd8l.com'
@@ -1024,71 +1024,87 @@ export const bot_getUserWalletTxInfo = createCacheRequest(async function(query: 
       }).then(async res => {
         return [{
           token: query.user_token,
-          chain: query.chain,
+          chain: query.chain as BotChain,
           logo_url: item?.logo_url || '',
           symbol: item?.symbol || '',
+          risk_level: 0,
+          risk_score: 0,
+          main_pair_tvl: 0,
+          is_little_pool: 0,
+          last_txn_time: '',
           total_profit: res?.profit || '0',
+          total_profit_ratio: res?.profitRatio || '0',
           unrealized_profit: res?.profitUnrealized || '0',
+          unrealized_ratio: res?.unrealizedRatio || '0',
           realized_profit: res?.profitRealized || '0',
+          realized_ratio: res?.realizeRatio || '0',
           balance_amount: item?.balance || '0',
           balance_usd: item?.balance_usd || '0',
-          total_profit_ratio: res?.profitRatio || '0',
-          unrealized_ratio: res?.unrealizedRatio || '0',
-          realized_ratio: res?.realizeRatio || '0',
-          total_purchase_usd: res?.totalBuyUsd || '0',
-          total_sold_usd: res?.totalSellUsd || '0',
           balance_ratio: res?.balanceRatio || '0',
-          average_purchase_price_usd: res?.avgBuyPrice || '0',
-          average_sold_price_usd: res?.avgSellPrice || '0',
-          total_purchase: res?.totalBuyAmount || '0',
-          bought: res?.totalBuyAmount || '0',
-          total_sold: res?.totalSellAmount || '0',
-          sold: res?.totalSellAmount || '0',
-        }]
-      })
-    })
-  } else if (query.chain === 'polygon') {
-    return getUserTokenBalanceList(query.user_address, query.chain).then(async res => {
-      const item = res?.find(i => i.token === query.user_token)
-      return getTokenPnl({
-        chain: query.chain,
-        token: query.user_token,
-        walletAddress: query.user_address,
-        balance: item?.value || '0',
-        days: 30
-      }).then(async res => {
-        return [{
-          ...item,
-          token: query.user_token,
-          chain: query.chain,
-          logo_url: item?.logo_url || '',
-          symbol: item?.symbol || '',
-          total_profit: res?.profit || '0',
-          unrealized_profit: res?.profitUnrealized || '0',
-          realized_profit: res?.profitRealized || '0',
-          balance_amount: item?.balance || '0',
-          balance_usd: item?.balance_usd || '0',
-          total_profit_ratio: res?.profitRatio || '0',
-          unrealized_ratio: res?.unrealizedRatio || '0',
-          realized_ratio: res?.realizeRatio || '0',
           total_purchase_usd: res?.totalBuyUsd || '0',
-          total_sold_usd: res?.totalSellUsd || '0',
-          balance_ratio: res?.balanceRatio || '0',
           average_purchase_price_usd: res?.avgBuyPrice || '0',
+          total_sold_usd: res?.totalSellUsd || '0',
           average_sold_price_usd: res?.avgSellPrice || '0',
+          total_transfer_in_amount: '',
+          total_transfer_out_amount: '',
           total_purchase: res?.totalBuyAmount || '0',
-          bought: res?.totalBuyAmount || '0',
           total_sold: res?.totalSellAmount || '0',
+          main_token_price: '',
+          main_token_symbol: '',
+          current_price_usd: '',
+          bought: res?.totalBuyAmount || '0',
           sold: res?.totalSellAmount || '0',
+          _price: '',
         }]
       })
     })
   }
-  const { $api } = useNuxtApp()
-  return $api('/v2api/walletinfo/v1/usertx', {
-    method: 'get',
-    query,
+  // Use getBalances instead of the old API
+  return getBalances({
+    chain: query.chain,
+    creatorAddress: query.user_address,
+    tokens: [query.user_token]
+  }).then(res => {
+    return res.tokens.map(item => ({
+      token: item.token,
+      chain: query.chain as BotChain,
+      logo_url: item.logoUrl,
+      symbol: item.symbol,
+      risk_level: item.risk_level,
+      risk_score: item.risk_score,
+      main_pair_tvl: 0,
+      is_little_pool: 0,
+      last_txn_time: '',
+      total_profit: item.pnl.totalProfit,
+      total_profit_ratio: item.pnl.totalProfitRatio,
+      unrealized_profit: item.pnl.unrealizedProfit,
+      unrealized_ratio: item.pnl.unrealizedProfitRatio,
+      realized_profit: item.pnl.realizedProfit,
+      realized_ratio: item.pnl.realizedProfitRatio,
+      balance_amount: item.balance,
+      balance_usd: (parseFloat(item.balance) * parseFloat(item.price)).toString(),
+      balance_ratio: '0',
+      total_purchase_usd: item.pnl.buyValue,
+      average_purchase_price_usd: item.pnl.avgBuyPrice,
+      total_sold_usd: item.pnl.sellValue,
+      average_sold_price_usd: item.pnl.avgSellPrice,
+      total_transfer_in_amount: '',
+      total_transfer_out_amount: '',
+      total_purchase: item.pnl.buyAmount,
+      total_sold: item.pnl.sellAmount,
+      main_token_price: '',
+      main_token_symbol: '',
+      current_price_usd: item.price,
+      bought: item.pnl.buyAmount,
+      sold: item.pnl.sellAmount,
+      _price: item.price,
+    }))
   })
+  // const { $api } = useNuxtApp()
+  // return $api('/v2api/walletinfo/v1/usertx', {
+  //   method: 'get',
+  //   query,
+  // })
 }, 2000)
 
 export const bot_getUserTxHistory1 = createCacheRequest(async function (query: {
