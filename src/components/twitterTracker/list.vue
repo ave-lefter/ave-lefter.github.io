@@ -94,7 +94,7 @@ const onScroll = useThrottleFn((e) => {
 }, 100, true, false)
 
 watch(() => trackerStore.unReader, (val) => {
-  console.log('unReader', val,trackerStore.isPaused)
+  // console.log('unReader', val,trackerStore.isPaused)
   if ((val > 0) && trackerStore.isPaused) {
     hasTop.value = true
   } else {
