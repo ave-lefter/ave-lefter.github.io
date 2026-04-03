@@ -30,8 +30,7 @@
           {{ $t('walletMonitor') }}
         </div>
       </el-badge>
-
-      <el-badge :is-dot="isTwitterDotted" class="mr-12px">
+      <el-badge :value="(!trackerStore.visible&&trackerStore.unReader)||undefined" :max="99" class="mr-12px">
         <div
           class="flex items-center gap-4px cursor-pointer hover:color-[--main-text]"
           :class="trackerStore.visible ? 'color-[--main-text]' : 'color-[--secondary-text]'"

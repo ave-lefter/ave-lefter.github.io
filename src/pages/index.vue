@@ -155,7 +155,7 @@
               :placeholder="$t('keywordsPlaceholder')"
               @input="(val) => {
                 pumpV3Pointer[activeChain].new.pumpFilter.q = val.replace(/\s/g, '')
-                debouncedFetch('new')
+                // debouncedFetch('new')
               }"
             >
               <template #prefix>
@@ -899,6 +899,11 @@ const playGraduatedAudio = useThrottleFn((val) => {
     pumpAudio.value.play().catch(() => {})
   }
 }, 300)
+
+watch(()=>pumpV3Pointer.value[activeChain.value].new.pumpFilter.q,(val)=>{
+  debouncedFetch('new')
+})
+
 const stopWatchList1 = watch(
   () => list1.value?.[0]?.target_token,
   (newValue, oldValue)=>{

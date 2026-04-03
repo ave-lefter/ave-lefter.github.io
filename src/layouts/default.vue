@@ -28,8 +28,8 @@
     </div>
     <SignalDraggable v-if="!signalStore.shouldHide" />
     <MonitorDragger v-show="monitorStore.visible" />
-    <PositionDragger v-show="positionStore.visible" />
-    <FavTokenDragger v-show="favTokenStore.visible" />
+    <PositionDragger v-if="positionStore.visible" />
+    <FavTokenDragger v-if="favTokenStore.visible" />
     <!-- <DragPump v-show="dragPumpStore.visible && !dragPumpStore.shouldHide" /> -->
     <TrackerDragger/>
     <FavAddressPop
