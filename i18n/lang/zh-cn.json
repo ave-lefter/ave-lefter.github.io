@@ -2141,5 +2141,6 @@
   "position2": "持仓",
   "internalTransfer": "内嵌交易转入/转出",
   "internalTransferIn": "内嵌转入",
-  "internalTransferOut": "内嵌转出"
+  "internalTransferOut": "内嵌转出",
+  "tutorial": "教程"
 }

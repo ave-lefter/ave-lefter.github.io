@@ -149,6 +149,19 @@
               target="_blank"
               :href="
                 lang?.includes?.('zh')
+                  ? 'https://doc.ave.ai/cn'
+                  : 'https://doc.ave.ai'
+              "
+            >
+              {{ $t('tutorial') }}
+            </a>
+          </li>
+          <li class="color-[--secondary-text] hover:color-[--main-text]">
+            <a
+              class="hover:decoration-underline"
+              target="_blank"
+              :href="
+                lang?.includes?.('zh')
                   ? 'https://doc.ave.ai/cn/mian-ze-shen-ming'
                   : 'https://doc.ave.ai/disclaimers'
               "

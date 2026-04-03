@@ -2140,5 +2140,6 @@
   "position2": "Position",
   "internalTransfer": "Internal Transfer In/Out",
   "internalTransferIn": "Internal In",
-  "internalTransferOut": "Internal Out"
+  "internalTransferOut": "Internal Out",
+  "tutorial": "Tutorial"
 }

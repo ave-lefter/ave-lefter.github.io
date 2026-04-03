@@ -181,7 +181,7 @@ export function useKlineMarks() {
     const isTokenKline = tokenStore?.selectedToken
     // console.log('----------migrate_uprice-2----------', migrated, tokenStore?.selectedToken)
     if (migrated?.migrate_time && isTokenKline) {
-      getMigrated(onDataCallback, migrated)
+      getMigrated(onDataCallback, migrated, Number(interval))
     }
     marksTabs.value.forEach((v) => {
       const id = pair + '-' + chain + '-' + user + '-' + interval + '-' + v.id + '-' + from + '-' + to
@@ -240,13 +240,15 @@ export function useKlineMarks() {
       }
     })
   }
-  function getMigrated(onDataCallback: (marks: any[]) => void, migrated: MigratedType) {
+  function getMigrated(onDataCallback: (marks: any[]) => void, migrated: MigratedType, interval: number) {
     let result: Mark[] = []
     const urlPrefix = useConfigStore().globalConfig?.token_logo_url || 'https://www.iconaves.com/'
+    const tick = Math.max(1, interval)
+    const markTime = Math.floor(migrated.migrate_time / tick) * tick // 按当前周期对齐到本根柱子
     result = [
       {
         id: `${migrated.migrate_time}-${migrated.migrate_uprice}-migrated`,
-        time: migrated.migrate_time,
+        time: markTime,
         color: { background: 'transparent', border: 'transparent' },
         imageUrl: `${urlPrefix}signals/marks/mark-m.png`,
         label: 'M',
@@ -358,7 +360,7 @@ export function useKlineMarks() {
         ${flowText}: ${formatNumber(el.volume, 2)}(${formatNumber(el.txns, 0)})
         ${AvgTxt}: $${formatNumber(Number(el.volume) / (Number(el.amount) || 1), 4)}
         ${swapType}: ${formatNumber(el.volume, 2)}
-        ${formatDate(bucketTime, 'YYYY-MM-DD HH:mm')}
+        ${formatDate(el.tx_time, 'YYYY-MM-DD HH:mm')}
       `
     }
     return `${el.wallet_logo?.name || `${formatedName}`} ${swapType}
@@ -366,7 +368,7 @@ export function useKlineMarks() {
         ${t('amountU')}: $${formatNumber(el.volume, 2)}
         ${t('price')}: $${formatNumber(Number(el.volume) / (Number(el.amount) || 1), 4)}
         ${t('Txs')}: ${formatNumber(el.txns)}
-        ${formatDate(bucketTime, 'YYYY-MM-DD HH:mm')}
+        ${formatDate(el.tx_time, 'YYYY-MM-DD HH:mm')}
         `
   }
 
