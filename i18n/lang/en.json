@@ -2137,5 +2137,6 @@
   "batchFav": "Batch Follow",
   "removeTokenTips2": "Delete the selected monitoring?",
   "twitterFollowers": "Twitter Followers",
-  "position2": "Position"
+  "position2": "Position",
+  "tutorial": "Tutorial"
 }
