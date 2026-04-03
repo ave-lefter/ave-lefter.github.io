@@ -40,7 +40,8 @@ const list = computed(() => {
       id: 'ADD_LIQUIDITY/REMOVE_LIQUIDITY',
       name: t('ADD_LIQUIDITY') + '/' + t('REMOVE_LIQUIDITY')
     },
-    {id: 'TRANSFER', name: t('wallet_detail_transfer_in_out')},
+    { id: 'TRANSFER', name: t('wallet_detail_transfer_in_out') },
+    {id: 'INTERNAL_TRANSFER', name: t('internalTransfer')},
     {id: 'BURN', name: t('BURN')},
     {id: 'MINT', name: t('mint1')}
   ]
@@ -95,6 +96,14 @@ function filterType(type: 'swap_buy' | 'swap_sell' | 'AUTHORITY' | 'ADD_LIQUIDIT
       name: t('transfer_out'),
       class: 'color-#F6465D bg-#F6465D bg-op-10'
     },
+    internal_transfer_in: {
+      name: t('internalTransferIn'),
+      class: 'color-#12B886 bg-#12B886 bg-op-10'
+    },
+    internal_transfer_out: {
+      name: t('internalTransferOut'),
+      class: 'color-#F6465D bg-#F6465D bg-op-10'
+    },
     BURN: {
       name: t('BURN'),
       class: 'color-#F6465D bg-#F6465D bg-op-10'
@@ -143,7 +152,7 @@ function goToExplorer() {
           @click.self="isShowDate=!isShowDate"
         />
       </div>
-      <div class="flex items-center w-70px text-right gap-3px">
+      <div class="flex items-center w-100px text-right gap-3px">
         <span>{{ $t('type') }}</span>
         <el-popover
 v-model:visible="visible"
@@ -233,7 +242,7 @@ v-model:visible="visible"
           }}
           </span>
       </div>
-      <div class="flex items-center w-70px">
+      <div class="flex items-center w-100px">
          <span :class="filterType(row.event_type)?.class" class="px-8px h-20px flex items-center rounded-4px">
             {{ filterType(row.event_type)?.name }}
           </span>

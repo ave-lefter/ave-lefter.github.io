@@ -2138,5 +2138,8 @@
   "removeTokenTips2": "Delete the selected monitoring?",
   "twitterFollowers": "Twitter Followers",
   "position2": "Position",
+  "internalTransfer": "Internal Transfer In/Out",
+  "internalTransferIn": "Internal In",
+  "internalTransferOut": "Internal Out",
   "tutorial": "Tutorial"
 }

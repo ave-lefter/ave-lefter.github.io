@@ -2125,5 +2125,8 @@
   "favRemarksTips": "是否關注所選備註地址?",
   "twitterFollowers": "推特粉丝数",
   "position2": "持倉",
+  "internalTransfer": "內嵌交易轉入/轉出",
+  "internalTransferIn": "內嵌轉入",
+  "internalTransferOut": "內嵌轉出",
   "tutorial": "教學"
 }
