@@ -23,7 +23,7 @@
       {{ $t('chainToken') }}
       <el-switch v-model="markTabsVisible" class="[&&]:h-20px" />
     </div>
-    <div v-show="markTabsVisible" class="flex flex-wrap gap-row-16px">
+    <div class="flex flex-wrap gap-row-16px">
       <el-checkbox
         key="all"
         class="flex-basis-1/3 [&&]:mr-0 [&&]:[--el-checkbox-height:16px]"
@@ -434,7 +434,7 @@ function switchTokenKline() {
       _rafTickId = null
     }
     _pendingBars = []
-    
+
     resetLimitPriceLineId()
     // resetAvgPriceLineId()
     resetTop100AvgPriceLineId()
