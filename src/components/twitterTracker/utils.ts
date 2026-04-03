@@ -56,17 +56,18 @@ function generateLink(parsed: ParsedToken, linkClass: string, colors: Colors): s
   let processUrlObj,url
   switch (parsed.type) {
     case 'url':
+     
       processUrlObj = processUrlWithToken(parsed.href||'')
       url = processUrlObj?.value||''
-      console.log('processUrlObj',parsed.href,processUrlObj)
-      if(!processUrlObj?.isUrl){
-        return `<span class="${linkClass} tw-tokenAddress url"  ${getColorStyle(colors.tokenAddressColor)}>${escapeHtml(url)}</span>`
-      }else if(url){
-        return `<a href="${escapeHtml(parsed.href as string)}" class="${linkClass}" target="_blank" rel="noopener noreferrer">${escapeHtml(parsed.text)}</a>`
+      if(processUrlObj?.isBlacklisted){
+        if(url){
+          return `<span class="${linkClass} tw-tokenAddress url"  ${getColorStyle(colors.tokenAddressColor)}>${escapeHtml(url)}</span>`
+        }else{
+          return `<span class="${linkClass}">***</span>`
+        }
       }else{
         return `<span class="${linkClass}">***</span>`
       }
-      console.log('processUrlObj',url)
     case 'email':
       return `<a href="${escapeHtml(parsed.href as string)}" class="${linkClass}" target="_blank" rel="noopener noreferrer">${escapeHtml(parsed.text)}</a>`
     case 'hashtag':
@@ -86,50 +87,39 @@ function generateLink(parsed: ParsedToken, linkClass: string, colors: Colors): s
 }
 
 // 🔒 黑名单配置（使用 as const 获得字面量联合类型推断）
-export const BLACKLIST_DOMAINS = ['axiom', 'gmgn', 'debot', 'binance', 'okx'] as const
+export const BLACKLIST_KEYWORDS = ['axiom', 'gmgn', 'debot', 'binance', 'okx'] as const
 
 // 🧩 加密货币哈希/地址正则
 // 移除 /g 避免 lastIndex 状态污染，match() 无需全局标志即可安全提取首个匹配
 const CRYPTO_HASH_REGEX = /(?:0x[a-fA-F0-9]{40,64}|[1-9A-HJ-NP-Za-km-z]{32,44}|[UQ][a-zA-Z0-9_-]{46}|T[1-9A-HJ-NP-Za-km-z]{33}|[13][a-km-zA-HJ-NP-Z1-9]{25,34}|bc1[a-z0-9]{39,59})(?=[\/?&#\s<]|$)/g
 
-/**
- * 校验域名是否命中黑名单（精确边界匹配，防误杀子域名混淆）
- */
-const isDomainBlacklisted = (hostname: string): boolean =>
-  BLACKLIST_DOMAINS.some(kw => 
-    new RegExp(`(?:^|\\.)${kw}\\b`, 'i').test(hostname)
-  )
-
+// ⚡ 预编译正则：匹配任意黑名单词，且前后不为字母/数字（防 mybinance 误杀）
+const BLACKLIST_URL_REGEX = new RegExp(
+  `(?<![a-z0-9])(?:${BLACKLIST_KEYWORDS.join('|')})(?![a-z0-9])`,
+  'i'
+)
 /**
  * 处理 URL：
  * - 命中黑名单域名 且 提取到 Token → 返回 `/${token}`
  * - 未命中 或 无 Token → 原样返回
  */
-export function processUrlWithToken(url: string): {isUrl: boolean, value: string}|null {
+export function processUrlWithToken(url: string): {isBlacklisted: boolean, value: string}|null {
   if (!url || typeof url !== 'string') return null
 
-  // 1️⃣ 安全提取域名（兼容带/不带协议头、相对路径等异常格式）
-  let hostname = ''
-  try {
-    hostname = new URL(url.startsWith('http') ? url : `https://${url}`).hostname.toLowerCase()
-  } catch {
-    // 降级方案：正则剥离协议与端口
-    const match = url.match(/^(?:https?:\/\/)?([^\/\s?#]+)/i)
-    hostname = match?.[1]?.toLowerCase() ?? ''
-  }
 
   // 2️⃣ 提取首个加密货币哈希/地址
   const token = url.match(CRYPTO_HASH_REGEX)?.[0]
-
+    // 1️⃣ 直接校验完整 URL（无需 new URL() 解析，性能更高）
+  const isBlacklisted = BLACKLIST_URL_REGEX.test(url)
   // 3️⃣ 路由重写逻辑
-  if(isDomainBlacklisted(hostname)){
+  if(isBlacklisted){
     return {
-      isUrl: false,
+      isBlacklisted,
       value: token||''
     }
   }else{
     return {
-      isUrl: true,
+      isBlacklisted,
       value: url
     }
   }
