@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import type {CheckboxValueType} from 'element-plus'
 import dayjs from 'dayjs'
-import type {GetTokenDetailsListResponse} from '~/api/token'
+import type { GetTokenDetailsListResponse } from '~/api/token'
+import { getAddressAndChainFromId, isEvmChain } from '@/utils/index'
 
 const {t} = useI18n()
 const tokenDetailsStore = useTokenDetailsStore()
@@ -22,6 +23,7 @@ const tokenStore = useTokenStore()
 const isShowDate = ref(false)
 const isPrice = ref(true)
 const visible = ref(false)
+const route = useRoute()
 const checkedTrend = computed({
   get() {
     return props.modelValue
@@ -32,6 +34,11 @@ const checkedTrend = computed({
 })
 const checkAll = ref(false)
 const isIndeterminate = ref(false)
+const id = computed(() => route.params.id as string)
+const chain = computed(() => {
+  const { chain } = getAddressAndChainFromId(id.value, 0)
+  return chain
+})
 
 const list = computed(() => {
   return [
@@ -41,7 +48,14 @@ const list = computed(() => {
       name: t('ADD_LIQUIDITY') + '/' + t('REMOVE_LIQUIDITY')
     },
     { id: 'TRANSFER', name: t('wallet_detail_transfer_in_out') },
-    {id: 'INTERNAL_TRANSFER', name: t('internalTransfer')},
+    ...(isEvmChain(chain.value)
+      ? [
+          {
+            id: 'INTERNAL_TRANSFER',
+            name: t('internalTransfer'),
+          },
+        ]
+      : []),
     {id: 'BURN', name: t('BURN')},
     {id: 'MINT', name: t('mint1')}
   ]
