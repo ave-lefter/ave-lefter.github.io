@@ -2155,5 +2155,9 @@
   "newMessage": "新消息",
   "languageSetting": "语言设置",
   "followAuthor": "关注此博主",
-  "unfollowAuthor": "取消关注此博主"
+  "unfollowAuthor": "取消关注此博主",
+  "internalTransfer": "内嵌交易转入/转出",
+  "internalTransferIn": "内嵌转入",
+  "internalTransferOut": "内嵌转出",
+  "tutorial": "教程"
 }

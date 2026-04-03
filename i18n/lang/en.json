@@ -2154,5 +2154,9 @@
   "newMessage": "New Message",
   "languageSetting": "Language Settings",
   "followAuthor": "Follow this blogger",
-  "unfollowAuthor": "Unfollow this blogger"
+  "unfollowAuthor": "Unfollow this blogger",
+  "internalTransfer": "Internal Transfer In/Out",
+  "internalTransferIn": "Internal In",
+  "internalTransferOut": "Internal Out",
+  "tutorial": "Tutorial"
 }

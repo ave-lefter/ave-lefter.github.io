@@ -288,9 +288,9 @@ function clearIntervalAll() {
         <div class="stat-value table-field-text text-[--secondary-text]">${{ formatNumber(balance, 2) }}</div>
         <div class="stat-change table-field-text text-[--secondary-text]">
           {{ formatNumber(walletTxData?.balance_amount || 0, 4) }} {{ tokenSymbol }}
-          <span :style="{ color: changePercentage >= 0 ? '#12B886' : '#ff646d' }">
+          <!-- <span :style="{ color: changePercentage >= 0 ? '#12B886' : '#ff646d' }">
             ({{ changePercentage >= 0 ? '+' : '' }}{{ formatNumber(changePercentage, 2) }}%)
-          </span>
+          </span> -->
         </div>
       </div>
       <div class="stat-item">

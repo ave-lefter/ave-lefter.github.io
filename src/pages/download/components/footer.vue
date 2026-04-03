@@ -16,7 +16,7 @@
         <div class="w-[15%]">
           <h3 class="text-sm mb-2">iOS</h3>
           <a
-            href="https://apps.apple.com/us/app/ave-pro/id6741381461?l=zh-Hans-CN"
+            href="https://apps.apple.com/us/app/chainpulse/id6758416913?l=zh-Hans-CN"
             target="_blank"
             class="download-btn bg-[#161926] mb-8 text-white flex items-center justify-center py-3 px-6 rounded-lg hover:bg-opacity-80 transition duration-300"
             @click.stop.prevent="trackRefDownload('IOS AppStore', $event)"
