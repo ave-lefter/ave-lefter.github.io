@@ -5,6 +5,7 @@ import { _getFollowsNum } from '@/api/follow'
 import type { MonitorChainType } from '~/utils/types'
 import type{ GetHotTokensResponse } from '@/api/token'
 import type { ILatestNotice } from '~/api/user'
+import { ElMessage } from 'element-plus'
 import { getUserFavoriteGroups, type GetUserFavoriteGroupsResponse } from '~/api/fav'
 export const useGlobalStore = defineStore('global', () => {
   const t = getGlobalT()
@@ -417,7 +418,20 @@ export const useGlobalStore = defineStore('global', () => {
       userFavoriteGroups.value = (res || []).filter((el) => !!el.name)
     })
   }
-
+  function toggleGrid(category: string) {
+    // 确保至少有一个分类为 true
+    if (pumpSetting.value.grid[category].show) {
+      const categories = ['new', 'soon', 'graduated']
+      const otherCategories = categories.filter((c) => c !== category)
+      const hasOtherTrue = otherCategories.some((c) => pumpSetting.value.grid[c]?.show)
+      // 如果没有其他分类为 true，则不能隐藏当前分类
+      if (!hasOtherTrue) {
+        ElMessage.error(t('gridTip'))
+        return
+      }
+    }
+    pumpSetting.value.grid[category].show = !pumpSetting.value.grid[category].show
+  }
   return {
     lang: computed(() => localeStore.locale),
     token_logo_url: computed(() => configStore.token_logo_url),
@@ -464,5 +478,6 @@ export const useGlobalStore = defineStore('global', () => {
     clickHolderCount,
     popVisible,
     tagsRatio,
+    toggleGrid
   }
 })

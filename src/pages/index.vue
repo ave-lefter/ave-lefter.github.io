@@ -21,6 +21,20 @@
           <!-- <span>{{ item.chain_show || '' }}</span> -->
         </div>
       </div>
+      <div v-if="width > 1024" class="bg-[--main-input-button-bg] rounded-4px mr-8px text-12px px-10px py-7px flex items-center justify-center gap-6px">
+        <div
+          class="flex items-center justify-center cursor-pointer"
+          v-for="item in tabsList"
+          :key="item.id"
+          v-tooltip="item.name"
+          @click.stop="globalStore.toggleGrid(item.id)">
+          <span :class="pumpSetting.grid[item.id].show ? 'color-[--main-text1]' : 'color-[--third-text1]'">{{ item.name }}</span>
+          <Icon
+            :name="`custom:key-${pumpSetting.grid[item.id].show ? 'visible' : 'invisible'}`"
+            class="text-10px color-[--third-text1] ml-4px"
+          />
+        </div>
+      </div>
       <!-- <el-popover
         v-model:visible="visible_platforms"
         placement="bottom-start"
@@ -84,6 +98,7 @@
           </template>
         </template>
       </el-popover> -->
+
       <div class="flex-1" />
       <Setting :chain="(activeChain as BotChain)" :pumpConfig="pumpConfig"/>
       <BlackList />
@@ -108,6 +123,11 @@
                 alt=""
               > -->
               <span class="color-[--d-F5F5F5-l-333] text-14px">{{ $t('new1') }}</span>
+              <Icon
+                :name="`custom:key-${pumpSetting.grid['new'].show ? 'visible' : 'invisible'}`"
+                class="text-10px color-[--third-text1] ml-4px cursor-pointer"
+                @click.stop="globalStore.toggleGrid('new')"
+              />
             </template>
             <div v-else class="tabs single" >
               <button
@@ -118,33 +138,9 @@
                 type="button"
                 @click.stop="activeTab = item.id"
               >
-                <!-- <img
-                  v-if="item.id == 'new'"
-                  class="mr-5px"
-                  src="@/assets/images/pump/new.svg"
-                  width="24"
-                  alt=""
-                >
-                <img
-                  v-if="item.id == 'soon'"
-                  class="mr-5px"
-                  src="@/assets/images/pump/soon.svg"
-                  width="24"
-                  alt=""
-                >
-                <img
-                  v-if="item.id == 'graduated'"
-                  class="mr-5px"
-                  src="@/assets/images/pump/graduated.svg"
-                  width="24"
-                  alt=""
-                > -->
                 <span>{{ item.name || '' }}</span>
               </button>
             </div>
-            <span  v-show="isPausedObj?.new" class=" mr-auto bg-#FFA6221A px-4px py-4px rounded-4px ml-8px flex items-center justify-center w-26px h-26px">
-              <Icon name="custom:stop" class="color-#FFA622 text-16px"/>
-            </span>
             <span class="flex-1" />
             <el-input
               v-if="pumpSetting?.show_search"
@@ -180,7 +176,11 @@
               class="mr-8px"
             />
             <AudioSelect activeTab="new" :chain="activeChain"/>
+            <span  v-if="isPausedObj?.new" class=" mr-auto bg-#FFA6221A px-4px py-4px rounded-4px ml-8px flex items-center justify-center w-26px h-26px">
+              <Icon name="custom:stop" class="color-#FFA622 text-16px"/>
+            </span>
             <PumpFilterButton
+              v-else
               :key="`pumpFilterButton_${activeChain}_new`"
               :filterNumber="getFilterNumber(pumpV3Pointer[activeChain].new.pumpFilter || {},platforms,baseTokensAllStr)"
               :visible="filterVisible && activeFilterType === 'new'"
@@ -215,6 +215,11 @@
                 alt=""
               > -->
               <span class="color-[--d-F5F5F5-l-333] text-14px">{{ $t('soon') }}</span>
+              <Icon
+                :name="`custom:key-${pumpSetting.grid['soon'].show ? 'visible' : 'invisible'}`"
+                class="text-10px color-[--third-text1] ml-4px cursor-pointer"
+                @click.stop="globalStore.toggleGrid('soon')"
+              />
             </template>
             <div v-else class="tabs single" >
               <button
@@ -225,33 +230,9 @@
                 type="button"
                 @click.stop="activeTab = item.id"
               >
-                <!-- <img
-                  v-if="item.id == 'new'"
-                  class="mr-5px"
-                  src="@/assets/images/pump/new.svg"
-                  width="24"
-                  alt=""
-                >
-                <img
-                  v-if="item.id == 'soon'"
-                  class="mr-5px"
-                  src="@/assets/images/pump/soon.svg"
-                  width="24"
-                  alt=""
-                >
-                <img
-                  v-if="item.id == 'graduated'"
-                  class="mr-5px"
-                  src="@/assets/images/pump/graduated.svg"
-                  width="24"
-                  alt=""
-                > -->
                 <span>{{ item.name || '' }}</span>
               </button>
             </div>
-            <span  v-show="isPausedObj?.soon" class=" mr-auto bg-#FFA6221A px-4px py-4px rounded-4px ml-8px flex items-center justify-center w-26px h-26px">
-              <Icon name="custom:stop" class="color-#FFA622 text-16px"/>
-            </span>
             <span class="flex-1" />
             <div class="flex items-center justify-between p-1px rounded-4px text-12px h-28px bg-[--main-input-button-bg] px-2px py-2px mr-8px">
               <button
@@ -300,9 +281,13 @@
               class="mr-8px"
             />
             <AudioSelect activeTab="soon" :chain="activeChain"/>
+            <span  v-if="isPausedObj?.soon" class=" mr-auto bg-#FFA6221A px-4px py-4px rounded-4px ml-8px flex items-center justify-center w-26px h-26px">
+              <Icon name="custom:stop" class="color-#FFA622 text-16px"/>
+            </span>
             <PumpFilterButton
+              v-else
               :key="`pumpFilterButton_${activeChain}_soon`"
-               :filterNumber="getFilterNumber(pumpV3Pointer[activeChain].soon.pumpFilter || {},platforms,baseTokensAllStr)"
+              :filterNumber="getFilterNumber(pumpV3Pointer[activeChain].soon.pumpFilter || {},platforms,baseTokensAllStr)"
               :visible="filterVisible && activeFilterType === 'soon'"
               @update:visible="(val) => handleFilterVisibleChange(val, 'soon')"
             />
@@ -335,6 +320,11 @@
                 alt=""
               > -->
               <span class="color-[--d-F5F5F5-l-333] text-14px">{{ $t('graduated') }}</span>
+              <Icon
+                :name="`custom:key-${pumpSetting.grid['graduated'].show ? 'visible' : 'invisible'}`"
+                class="text-10px color-[--third-text1] ml-4px cursor-pointer"
+                @click.stop="globalStore.toggleGrid('graduated')"
+              />
             </template>
             <div v-else class="tabs single" >
               <button
@@ -369,10 +359,6 @@
                 <span>{{ item.name || '' }}</span>
               </button>
             </div>
-
-            <span  v-show="isPausedObj?.graduated" class=" mr-auto bg-#FFA6221A px-4px py-4px rounded-4px ml-8px flex items-center justify-center w-26px h-26px">
-              <Icon name="custom:stop" class="color-#FFA622 text-16px"/>
-            </span>
             <span class="flex-1" />
             <el-input
               v-if="pumpSetting?.show_search"
@@ -408,9 +394,13 @@
               class="mr-8px"
             />
             <AudioSelect activeTab="graduated" :chain="activeChain"/>
+            <span  v-if="isPausedObj?.graduated" class=" mr-auto bg-#FFA6221A px-4px py-4px rounded-4px ml-8px flex items-center justify-center w-26px h-26px">
+              <Icon name="custom:stop" class="color-#FFA622 text-16px"/>
+            </span>
             <PumpFilterButton
+              v-else
               :key="`pumpFilterButton_${activeChain}_graduated`"
-               :filterNumber="getFilterNumber(pumpV3Pointer[activeChain].graduated.pumpFilter || {},platforms,baseTokensAllStr)"
+              :filterNumber="getFilterNumber(pumpV3Pointer[activeChain].graduated.pumpFilter || {},platforms,baseTokensAllStr)"
               :visible="filterVisible && activeFilterType === 'graduated'"
               @update:visible="(val) => handleFilterVisibleChange(val, 'graduated')"
             />
@@ -2419,6 +2409,7 @@ function hitBlacklist(item:PumpObj, black: pumpBlack) {
   .el-input__wrapper {
     background-color: transparent;
     box-shadow: none;
+    padding: 2px 7px;
     &:hover {
       box-shadow: 0 0 0 1px #3F80F7 inset;
     }

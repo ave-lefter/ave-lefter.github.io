@@ -2141,5 +2141,6 @@
   "internalTransfer": "Internal Transfer In/Out",
   "internalTransferIn": "Internal In",
   "internalTransferOut": "Internal Out",
-  "tutorial": "Tutorial"
+  "tutorial": "Tutorial",
+  "gridTip": "Please keep at least one category displayed"
 }
