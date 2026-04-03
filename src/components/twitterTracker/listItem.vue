@@ -119,7 +119,7 @@
                     </template>
                     
                     <div v-if="item?.tokens?.filter(item=>item?.price_change_24h)?.length" class="flex flex-wrap justify-between">
-                        <div v-for="token in item?.tokens?.filter(item=>item?.price_change_24h)" class="w-[calc(50%-4px)] mt-8px flex gap-4px items-center lh-none bg-[--up-bg] bg-[--down-bg] px-8px py-6px clickable rounded-4px" :class="[getBgClass(token?.price_change_24h)]" @click="navigateTo(`/token/${token?.address}-${token?.chain}`)">
+                        <div v-for="token in item?.tokens?.filter(item=>item?.price_change_24h)" :class="[getBgClass(token?.price_change_24h),'w-[calc(50%-4px)] mt-8px flex gap-4px items-center lh-none px-8px py-6px clickable rounded-4px']"   @click="navigateTo(`/token/${token?.address}-${token?.chain}`)">
                             <!-- <Icon name="i-icon-park-solid:volume-notice" class="text-12px color-[--main-text1]"></Icon>{{ token.kol_count }}{{ t('times') }} -->
                             <TokenImg :row="token" class="mr-4px" tokenClass="w-16px h-16px" chainClass="w-8px h-8px"/>
                             <div class="whitespace-nowrap text-ellipsis overflow-hidden max-w-100px mr-4px">{{ token?.symbol }}</div>
