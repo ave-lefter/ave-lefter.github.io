@@ -222,7 +222,7 @@
             </template>
           </el-dropdown>
           <el-dropdown
-  :persistent="false"
+            :persistent="false"
             trigger="click"
             placement="bottom-end"
             popper-class="dropdown-lang"
