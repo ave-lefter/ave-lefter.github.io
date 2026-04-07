@@ -532,9 +532,9 @@ const makerTooltip = ref()
 const currentRow = shallowRef<ExtendedTxResponse>({} as any)
 
 // 表格视图状态
-const tableView = ref({
+const tableView = useLocalStorage('txTableView', {
   // isVolUSDT: true,
-  isAmount: false,
+  isAmount: false
 })
 
 // 只在交易历史接口更新之后更新，防止 route 地址更新导致列表数据更新异常
