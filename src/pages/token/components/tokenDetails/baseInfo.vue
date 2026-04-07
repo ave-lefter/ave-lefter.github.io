@@ -161,7 +161,7 @@ function _getTokenDetailsList() {
   }
   if (checkedTrend.value.length === 0) {
     data.event_type = ''
-  } else if (checkedTrend.value.length > 0 && checkedTrend.value.length <= 5) {
+  } else if (checkedTrend.value.length > 0 && checkedTrend.value.length <= 6) {
     let event_type = checkedTrend.value?.filter?.(i => i !== 'all')
     event_type = event_type?.map(i => i.replace('/', ','))
     data.event_type = event_type?.toString()
@@ -538,7 +538,7 @@ function copyTrade() {
         >
           <span class="mr-8px">{{ formatNumber(statistics?.balance_amount_ratio || 0, 2) }}%</span>
           <el-progress
-            :percentage="statistics?.balance_amount_ratio"
+            :percentage="statistics?.balance_amount_ratio || 0"
             :stroke-width="4"
             color="#1CC982"
             :show-text="false"
