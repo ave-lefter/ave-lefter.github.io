@@ -22,7 +22,7 @@
           v-model="query.q"
           class="!text-12px"
           :placeholder="t('searchContractORName')"
-          
+
           @clear="getBlackList"
           @keyup.enter="getBlackList"
         >
@@ -118,8 +118,14 @@ const s3BaseUrl = configStore.token_logo_url
 
 // Props
 const props = defineProps({
-  chain: String,
-  address: String,
+  chain: {
+    type: String,
+    default: '',
+  },
+  address: {
+    type: String,
+    default: '',
+  },
 })
 
 // Emits

@@ -13,7 +13,7 @@
           v-model="query.q"
           class="!text-12px"
           :placeholder="t('searchContractORName')"
-          
+
           @clear="getBlackList"
           @keyup.enter="getBlackList"
         >
@@ -102,8 +102,9 @@
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { useThrottleFn } from '@vueuse/core'
+import { useThrottleFn, useEventBus } from '@vueuse/core'
 import { getTokenFilterList, setUserTokenStatus } from '@/api/wallet'
+import { BusEventType } from '@/utils/constants'
 
 const { t } = useI18n()
 
@@ -114,6 +115,7 @@ const walletStore = useWalletStore()
 const { mode } = useGlobalStore()
 const configStore = useConfigStore()
 const s3BaseUrl = configStore.token_logo_url
+const blacklistEvent = useEventBus(BusEventType.TOKEN_BLACKLIST_CHANGE)
 
 // Props
 const props = defineProps({
@@ -201,6 +203,7 @@ const addWhiteList = async ({ token, chain }) => {
     emit('addWhite')
     updateHolderNum.value++
     ElMessage.success(t('success'))
+    blacklistEvent.emit({ token, chain, action: 'whitelist' })
   } catch (error) {
     console.error('Error adding to whitelist:', error)
     ElMessage.error(t('error'))

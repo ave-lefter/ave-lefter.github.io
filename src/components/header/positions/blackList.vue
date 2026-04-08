@@ -5,8 +5,7 @@
       class="flex items-center text-14px cursor-pointer color-[--main-text]"
       @click="showBlackList"
     >
-      <Icon name="custom:black2" class="mr-4px text-12px text-[--third-text]" />
-      <!-- {{ t('BlackList') }} -->
+      <Icon name="custom:black2" :class="iconClass" />
     </span>
     <el-dialog
       v-model="visible"
@@ -23,7 +22,7 @@
           class="!text-12px [&&]:[--el-input-bg-color:--border]"
           :placeholder="t('searchContractORName')"
           size="large"
-          
+
           @clear="getBlackList"
           @keyup.enter="getBlackList"
         >
@@ -105,8 +104,9 @@
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { useThrottleFn } from '@vueuse/core'
+import { useThrottleFn, useEventBus } from '@vueuse/core'
 import { getTokenFilterList2, setUserTokenStatus } from '@/api/wallet'
+import { BusEventType } from '@/utils/constants'
 
 const { t } = useI18n()
 const botStore = useBotStore()
@@ -117,12 +117,17 @@ const route = useRoute()
 const {mode} = useGlobalStore()
 const configStore = useConfigStore()
 const s3BaseUrl = configStore.token_logo_url
+const blacklistEvent = useEventBus(BusEventType.TOKEN_BLACKLIST_CHANGE)
 
 // Props
 const props = defineProps({
   userIds: {
     type: Array,
     default: () => []
+  },
+  iconClass: {
+    type: String,
+    default: 'mr-4px text-12px text-[--third-text]',
   }
 })
 
@@ -210,6 +215,7 @@ const addWhiteList = async ({ token, chain }) => {
     emit('addWhite')
     updateHolderNum.value++
     ElMessage.success(t('success'))
+    blacklistEvent.emit({ token, chain, action: 'whitelist' })
   } catch (error) {
     console.error('Error adding to whitelist:', error)
     ElMessage.error(String(error))

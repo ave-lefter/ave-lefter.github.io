@@ -2172,5 +2172,7 @@
   "openSortMode": "Disable sorting",
   "autoTranslationOn": "ON Auto-Translation",
   "autoTranslationOFF": "OFF Auto-Translation",
-  "transferTime": "Transfer Time"
+  "transferTime": "Transfer Time",
+  "myPositions": "My Position",
+  "quickSellMsg": "You are about to sell {a} {s}"
 }

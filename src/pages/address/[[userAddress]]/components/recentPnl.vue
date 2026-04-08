@@ -227,7 +227,7 @@
       </el-table-column>
       <el-table-column :label="$t('share')" align="right">
         <template #default="{ row }">
-          <Share :statistics="row" :type="'topHolder'" :address="row.token" :chain="row.chain" />
+          <Share :statistics="row" :type="'topHolder'" :address="row.token" :chain="row.chain" :symbol="row.symbol" :logo_url="row.logo_url || ''" />
         </template>
       </el-table-column>
     </el-table>
