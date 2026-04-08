@@ -185,7 +185,7 @@
                         @mouseover.stop="onEnter($event, row, props.type,getDataColor, true)"
                         @click.stop
                         class="rounded-100% mr-5px cursor-pointer"
-                        :src="formatIconTag(row?.deployer_platform)"
+                        :src="formatIconTag('j7tracker.com')"
                         alt=""
                         :width="12"
                       >

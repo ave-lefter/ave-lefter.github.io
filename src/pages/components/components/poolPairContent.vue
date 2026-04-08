@@ -36,6 +36,14 @@ function getLogoUrl(row) {
 
 const globalStore = useGlobalStore()
 const { lang } = storeToRefs(globalStore)
+const showOriginalSymbol = ref(false)
+const shouldShowAlternateSymbol = computed(() => {
+  const isZh = lang.value === 'zh-cn' || lang.value === 'zh-tw'
+  if (isZh) {
+    return (props.row.symbol_zh || props.row.name_zh) && props.row.symbol_zh !== getSymbol(props.row)
+  }
+  return (props.row.symbol_en || props.row.name_en) && props.row.symbol_en !== getSymbol(props.row)
+})
 function inBlackList(row) {
   return (
     globalStore.pumpBlackList.findIndex(
@@ -196,9 +204,34 @@ function addTokenFavorite(row, newGroupId: number) {
         </template>
       </el-tooltip>
       <div class="flex flex-col gap-6px">
-        <div class="flex items-center lh-20px">
-          <span class="text-16px color-[--main-text] max-w-88px truncate"> {{ getSymbol(row) }}</span
-          ><span class="text-10px">/{{ getSymbol(row, true) }} </span>
+        <div class="flex items-center lh-20px" @mouseleave="showOriginalSymbol = false">
+          <span
+            class="flex items-center lh-12px whitespace-nowrap overflow-hidden"
+            v-if="(lang === 'zh-cn' || lang === 'zh-tw') && (row.symbol_zh || row.name_zh) && row.symbol_zh !== getSymbol(row) || (!(lang === 'zh-cn' || lang === 'zh-tw')) && (row.symbol_en || row.name_en) && row.symbol_en !== getSymbol(row)"
+          >
+            <Icon
+              name="custom:lang"
+              class="text-10px mr-4px"
+            />
+            <div class="flex items-center lh-20px" v-if="shouldShowAlternateSymbol && !showOriginalSymbol" @mouseenter="showOriginalSymbol = true">
+              <template v-if="lang === 'zh-cn' || lang === 'zh-tw'">
+                <span class="text-16px color-[--main-text] max-w-88px truncate"> {{ row.symbol_zh }}</span>
+                <span class="text-10px">/{{ row.name_zh  }} </span>
+              </template>
+              <template v-else>
+                <span class="text-16px color-[--main-text] max-w-88px truncate"> {{ row.symbol_en }}</span>
+                <span class="text-10px">/{{ row.name_en  }} </span>
+              </template>
+            </div>
+            <div class="flex items-center lh-20px" v-else @mouseleave="showOriginalSymbol = false">
+              <span class="text-16px color-[--main-text] max-w-88px truncate"> {{ getSymbol(row) }}</span>
+              <span class="text-10px">/{{ getSymbol(row, true) }} </span>
+            </div>
+          </span>
+          <template v-else>
+            <span class="text-16px color-[--main-text] max-w-88px truncate"> {{ getSymbol(row) }}</span>
+            <span class="text-10px">/{{ getSymbol(row, true) }} </span>
+          </template>
           <Icon
             v-copy="row.target_token"
             name="bxs:copy"
@@ -217,7 +250,7 @@ function addTokenFavorite(row, newGroupId: number) {
             v-if="row?.is_cloned"
             v-tooltip="$t('deployerPlatform', {tool: row?.deployer_platform})"
             class="rounded-100% ml-4px cursor-pointer"
-            :src="formatIconTag(row?.deployer_platform)"
+            :src="formatIconTag('j7tracker.com')"
             alt=""
             :width="12"
           >
@@ -297,14 +330,14 @@ function addTokenFavorite(row, newGroupId: number) {
           /> -->
           <Icon v-if="row.headline" v-tooltip="row.headline" class="ml-4px" name="custom:ai"/>
         </div>
-        <div v-if="(lang === 'zh-cn' || lang === 'zh-tw') && (row.symbol_zh || row.name_zh) && row.symbol_zh !== getSymbol(row) || (!(lang === 'zh-cn' || lang === 'zh-tw')) && (row.symbol_en || row.name_en) && row.symbol_en !== getSymbol(row)" class="flex items-center lh-12px color-[--yellow] whitespace-nowrap overflow-hidden">
+        <!-- <div v-if="(lang === 'zh-cn' || lang === 'zh-tw') && (row.symbol_zh || row.name_zh) && row.symbol_zh !== getSymbol(row) || (!(lang === 'zh-cn' || lang === 'zh-tw')) && (row.symbol_en || row.name_en) && row.symbol_en !== getSymbol(row)" class="flex items-center lh-12px color-[--yellow] whitespace-nowrap overflow-hidden">
           <template v-if="lang === 'zh-cn' || lang === 'zh-tw'">
             {{ row.symbol_zh || '' }}&nbsp;&nbsp;{{ row.name_zh || '' }}
           </template>
           <template v-else>
             {{ row.symbol_en || '' }}&nbsp;&nbsp;{{ row.name_en || '' }}
           </template>
-        </div>
+        </div> -->
         <div class="flex items-center lh-12px">
           <div
             v-tooltip="formatDate(row.created_at, 'YYYY/MM/DD HH:mm:ss')"
