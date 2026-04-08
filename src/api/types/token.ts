@@ -162,6 +162,9 @@ export interface TokenInfoExtra {
   is_pump_agent: number
   t_price_change_24h: number
   t_price_change_1d: number
+  commission_sum: string
+  priority_fee_sum: string
+  fee_sum: string
 }
 
 

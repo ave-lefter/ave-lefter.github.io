@@ -23,6 +23,7 @@ export interface PumpConfig {
 }
 
 export interface PumpObj {
+  remark: string
   deployer_platform: string
   is_cloned: any
   colluded_cluster_ratio: any
@@ -130,6 +131,9 @@ export interface PumpObj {
   }
   is_pump_agent: number
   favorite_holder_count: number
+  commission_sum: string
+  priority_fee_sum: string
+  fee_sum: string
 }
 
 interface Pair {

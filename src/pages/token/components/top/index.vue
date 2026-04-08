@@ -138,8 +138,8 @@
               class="icon-token-container relative"
             >
             <el-image
-                class="token-icon rounded-100%"
-                :src="getSymbolDefaultIcon(token)"
+                class="token-icon rounded-8px"
+                :src="getSymbolDefaultIcon(token,'rect')"
                 lazy
               >
                 <template #error>
@@ -875,8 +875,16 @@
           formatNumber(token?.holders || 0, { limit: 10 })
         }}</span>
       </div>
-      <div v-if="(tokenInfoExtra?.buy_tax??0) > 0 || (tokenInfoExtra?.sell_tax??0) > 0" class="item ml-24px">
+      <div v-if="Number(tokenInfoExtra?.commission_sum ?? 0) + Number(tokenInfoExtra?.priority_fee_sum ?? 0) + Number(tokenInfoExtra?.fee_sum ?? 0) >0" class="item ml-24px">
         <span>{{ $t('totalTax') }}</span>
+        <div class="block mt-8px color-[--main-text1]">
+          <span>
+            {{ formatNumber((Number(tokenInfoExtra?.commission_sum ?? 0) + Number(tokenInfoExtra?.priority_fee_sum ?? 0) + Number(tokenInfoExtra?.fee_sum ?? 0)), 2) }}%
+          </span>
+        </div>
+      </div>
+      <div v-if="(tokenInfoExtra?.buy_tax??0) > 0 || (tokenInfoExtra?.sell_tax??0) > 0" class="item ml-24px">
+        <span>{{ $t('tokenTax') }}</span>
         <div class="block mt-8px color-[--third-text]">
           <span
             v-if="(tokenInfoExtra?.buy_tax??0) > 0"
@@ -892,7 +900,6 @@
             {{ formatNumber(tokenInfoExtra?.sell_tax ||0, 1) }}%
           </span>
         </div>
-
       </div>
       <!-- <div class="item ml-24px">
         <span>DEV</span>

@@ -13,6 +13,9 @@ import type { IPriceV2Response } from '~/api/types/ws'
 import { useEventBus, useLocalStorage, useStorage } from '@vueuse/core'
 import { BusEventType, type IFavDialogEventArgs } from '~/utils/constants'
 import type { ScrollbarInstance } from 'element-plus'
+const favTokenStore = useFavTokenStore()
+const pumpRemarkEditEvent = useEventBus<IFavDialogEventArgs>(BusEventType.PUMP_REMARK_EDIT)
+pumpRemarkEditEvent.on(handleFavDialogEvent)
 const topEventBus = useEventBus(BusEventType.TOP_FAV_CHANGE)
 topEventBus.on(refresh)
 const favDialogEvent = useEventBus<IFavDialogEventArgs>(BusEventType.FAV_DIALOG)
@@ -27,6 +30,7 @@ onUnmounted(() => {
   topEventBus.off(refresh)
   favDialogEvent.off(refresh)
   topAddGroupEvent.off(refresh)
+  pumpRemarkEditEvent.off(handleFavDialogEvent)
 })
 
 function refresh(data:any) {
@@ -230,7 +234,7 @@ watch(
     if(val.sortBy==="price_change" || val.sortBy==="price_change_v2"){
         sortParam.sort_dir=['asc', '', 'desc'][(val.activeSort||0)+1]
         sortParam.sort=val.sortBy
-       
+
     }else{
       sortParam.sort_dir=''
       sortParam.sort=''
@@ -378,6 +382,12 @@ function toggleMode(mode: string) {
     favoriteCondition.value.currentMode = 'mcap'
   }
   console.log('toggleMode', mode)
+}
+function handleFavDialogEvent({ type }: IFavDialogEventArgs) {
+  if (type === 'pump_remark_edit' && favTokenStore.visible) {
+    resetListStatus()
+    loadMoreFavorites()
+  }
 }
 </script>
 

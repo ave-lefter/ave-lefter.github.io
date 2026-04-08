@@ -122,7 +122,7 @@ export const NATIVE_TOKENS = [
 ]
 
 export interface IFavDialogEventArgs {
-  type: 'confirmSwitchGroup' | 'remark' | 'order' | 'changeFavoriteGroupName'|'removeFavoriteGroup' |'delete',
+  type: 'confirmSwitchGroup' | 'remark' | 'order' | 'changeFavoriteGroupName'|'removeFavoriteGroup' |'delete' | 'pump_remark_edit',
   tokenId?: string,
   groupId?: string,
 }
@@ -133,6 +133,7 @@ export const BusEventType = {
   SCROLL_TO_TOP: 'scroll-to-top',
   TOP_ADD_GROUP: 'top-add-group',
   DEV_TOKENS_TAB: 'dev-tokens-tab',
+  PUMP_REMARK_EDIT: 'pump_remark_edit',
 }
 
 export const ProvideType = {

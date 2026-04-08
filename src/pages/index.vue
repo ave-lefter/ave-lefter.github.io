@@ -121,7 +121,7 @@
               class="text-10px color-[--third-text1] ml-4px cursor-pointer"
               @click.stop="globalStore.toggleGrid('new')"
             />
-            <div class="flex-end absolute z-1 right-0 top--5px bg-[--d-0E0F10-l-FFF]">
+            <div class="flex-end absolute z-1 right-12px top--5px bg-[--d-0E0F10-l-FFF]">
               <el-input
                 v-if="pumpSetting?.show_search"
                 ref="inputSearch"
@@ -156,7 +156,7 @@
                 class="mr-8px"
               />
               <AudioSelect activeTab="new" :chain="activeChain"/>
-              <span  v-if="isPausedObj?.new" class=" mr-auto bg-#FFA6221A px-4px py-4px rounded-4px ml-8px flex items-center justify-center w-26px h-26px">
+              <span v-if="isPausedObj?.new" class="bg-#FFA6221A px-4px py-5px rounded-4px flex items-center justify-center w-26px h-28px">
                 <Icon name="custom:stop" class="color-#FFA622 text-16px"/>
               </span>
               <PumpFilterButton
@@ -193,7 +193,7 @@
               class="text-10px color-[--third-text1] ml-4px cursor-pointer"
               @click.stop="globalStore.toggleGrid('soon')"
             />
-            <div class="flex-end absolute z-1 right-0 top--5px bg-[--d-0E0F10-l-FFF]">
+            <div class="flex-end absolute z-1 right-12px top--5px bg-[--d-0E0F10-l-FFF]">
               <div class="flex items-center justify-between p-1px rounded-4px text-12px h-28px bg-[--main-input-button-bg] px-2px py-2px mr-8px">
                 <button
                   v-for="item in listTab"
@@ -241,7 +241,7 @@
                 class="mr-8px"
               />
               <AudioSelect activeTab="soon" :chain="activeChain"/>
-              <span  v-if="isPausedObj?.soon" class=" mr-auto bg-#FFA6221A px-4px py-4px rounded-4px ml-8px flex items-center justify-center w-26px h-26px">
+              <span  v-if="isPausedObj?.soon" class="bg-#FFA6221A px-4px py-5px rounded-4px flex items-center justify-center w-26px h-28px">
                 <Icon name="custom:stop" class="color-#FFA622 text-16px"/>
               </span>
               <PumpFilterButton
@@ -279,7 +279,7 @@
               class="text-10px color-[--third-text1] ml-4px cursor-pointer"
               @click.stop="globalStore.toggleGrid('graduated')"
             />
-            <div class="flex-end absolute z-1 right-0 top--5px bg-[--d-0E0F10-l-FFF]">
+            <div class="flex-end absolute z-1 right-12px top--5px bg-[--d-0E0F10-l-FFF]">
               <el-input
                 v-if="pumpSetting?.show_search"
                 ref="inputSearch"
@@ -314,7 +314,7 @@
                 class="mr-8px"
               />
               <AudioSelect activeTab="graduated" :chain="activeChain"/>
-              <span  v-if="isPausedObj?.graduated" class=" mr-auto bg-#FFA6221A px-4px py-4px rounded-4px ml-8px flex items-center justify-center w-26px h-26px">
+              <span  v-if="isPausedObj?.graduated" class="bg-#FFA6221A px-4px py-5px rounded-4px flex items-center justify-center w-26px h-28px">
                 <Icon name="custom:stop" class="color-#FFA622 text-16px"/>
               </span>
               <PumpFilterButton
@@ -390,9 +390,20 @@ import { getFilterNumber } from './pump/utils'
 
 import SlippageSetMarket from './token/components/right/botSwap/slippageSetMarket.vue'
 import QuickSwapSetCustom from '@/components/quickSwap/quickSwapSetCustom.vue'
+import { BusEventType, type IFavDialogEventArgs } from '@/utils/constants'
+import { useEventBus } from '@vueuse/core'
 defineOptions({
   name: 'pump' // 显式命名
 })
+
+const favDialogEvent = useEventBus<IFavDialogEventArgs>(BusEventType.FAV_DIALOG)
+favDialogEvent.on(handleFavDialogEvent)
+
+function handleFavDialogEvent({ type }: IFavDialogEventArgs) {
+  if (type === 'remark' && route.name === 'index') {
+    getPumpList()
+  }
+}
 let timerAutoFresh: number | null = null
 type TimeoutReturnType = ReturnType<typeof setTimeout> | number | null
 const Timer: {
@@ -591,6 +602,9 @@ type StatisticsItem = {
   following: number
   summary_score: number
   colluded_cluster_ratio: number
+  commission_sum: string
+  priority_fee_sum: string
+  fee_sum: string
 }
 let portraitTimer: ReturnType<typeof setTimeout> | null = null
 let isPortraitSubscribed = false
@@ -1168,6 +1182,7 @@ onBeforeMount(() => {
 })
 
 onUnmounted(() => {
+  favDialogEvent.off(handleFavDialogEvent)
   if (timerAutoFresh) {
     clearInterval(timerAutoFresh)
     timerAutoFresh = null
@@ -2043,7 +2058,11 @@ const DIRECT_MAP: [keyof StatisticsItem, keyof PumpObj][] = [
   ['headline_en', 'headline_en'],
   ['summary_score', 'summary_score'],
   ['followers', 'followers'],
-  ['following', 'following']
+  ['following', 'following'],
+  ['commission_sum', 'commission_sum'],
+  ['priority_fee_sum', 'priority_fee_sum'],
+  ['fee_sum', 'fee_sum'],
+
 ]
 const NUMBER_MAP: [keyof StatisticsItem, keyof PumpObj][] = [
   ['holder_count', 'holders'],//dev_holder_count
@@ -2179,7 +2198,10 @@ const MERGE_KEYS = [
   'followers',
   'following',
   'summary_score',
-  'colluded_cluster_ratio'
+  'colluded_cluster_ratio',
+  'commission_sum',
+  'priority_fee_sum',
+  'fee_sum'
 ] as const
 
 function mergeStatistics(prev: any, next: any) {
