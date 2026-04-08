@@ -33,7 +33,7 @@ function handleClick() {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 5px 8px;
+  padding: 5px 7px;
   cursor: pointer;
   color: var(--third-text);
   background: var(--main-input-button-bg);
@@ -43,7 +43,7 @@ function handleClick() {
   letter-spacing: 0;
   font-weight: 500;
   box-sizing: border-box;
-  height: 26px;
+  height: 28px;
   position: relative;
 
   &.hight {

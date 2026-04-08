@@ -121,7 +121,7 @@
               class="text-10px color-[--third-text1] ml-4px cursor-pointer"
               @click.stop="globalStore.toggleGrid('new')"
             />
-            <div class="flex-end absolute z-1 right-0 top--5px bg-[--d-0E0F10-l-FFF]">
+            <div class="flex-end absolute z-1 right-12px top--5px bg-[--d-0E0F10-l-FFF]">
               <el-input
                 v-if="pumpSetting?.show_search"
                 ref="inputSearch"
@@ -156,7 +156,7 @@
                 class="mr-8px"
               />
               <AudioSelect activeTab="new" :chain="activeChain"/>
-              <span  v-if="isPausedObj?.new" class=" mr-auto bg-#FFA6221A px-4px py-4px rounded-4px ml-8px flex items-center justify-center w-26px h-26px">
+              <span v-if="isPausedObj?.new" class="bg-#FFA6221A px-4px py-5px rounded-4px flex items-center justify-center w-26px h-28px">
                 <Icon name="custom:stop" class="color-#FFA622 text-16px"/>
               </span>
               <PumpFilterButton
@@ -193,7 +193,7 @@
               class="text-10px color-[--third-text1] ml-4px cursor-pointer"
               @click.stop="globalStore.toggleGrid('soon')"
             />
-            <div class="flex-end absolute z-1 right-0 top--5px bg-[--d-0E0F10-l-FFF]">
+            <div class="flex-end absolute z-1 right-12px top--5px bg-[--d-0E0F10-l-FFF]">
               <div class="flex items-center justify-between p-1px rounded-4px text-12px h-28px bg-[--main-input-button-bg] px-2px py-2px mr-8px">
                 <button
                   v-for="item in listTab"
@@ -241,7 +241,7 @@
                 class="mr-8px"
               />
               <AudioSelect activeTab="soon" :chain="activeChain"/>
-              <span  v-if="isPausedObj?.soon" class=" mr-auto bg-#FFA6221A px-4px py-4px rounded-4px ml-8px flex items-center justify-center w-26px h-26px">
+              <span  v-if="isPausedObj?.soon" class="bg-#FFA6221A px-4px py-5px rounded-4px flex items-center justify-center w-26px h-28px">
                 <Icon name="custom:stop" class="color-#FFA622 text-16px"/>
               </span>
               <PumpFilterButton
@@ -279,7 +279,7 @@
               class="text-10px color-[--third-text1] ml-4px cursor-pointer"
               @click.stop="globalStore.toggleGrid('graduated')"
             />
-            <div class="flex-end absolute z-1 right-0 top--5px bg-[--d-0E0F10-l-FFF]">
+            <div class="flex-end absolute z-1 right-12px top--5px bg-[--d-0E0F10-l-FFF]">
               <el-input
                 v-if="pumpSetting?.show_search"
                 ref="inputSearch"
@@ -314,7 +314,7 @@
                 class="mr-8px"
               />
               <AudioSelect activeTab="graduated" :chain="activeChain"/>
-              <span  v-if="isPausedObj?.graduated" class=" mr-auto bg-#FFA6221A px-4px py-4px rounded-4px ml-8px flex items-center justify-center w-26px h-26px">
+              <span  v-if="isPausedObj?.graduated" class="bg-#FFA6221A px-4px py-5px rounded-4px flex items-center justify-center w-26px h-28px">
                 <Icon name="custom:stop" class="color-#FFA622 text-16px"/>
               </span>
               <PumpFilterButton
