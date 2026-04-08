@@ -540,6 +540,11 @@ const logoList = shallowRef<{
   sell_tax: number,
   deployer_platform: string
   is_cloned: number,
+  is_cashback: number
+  name_en: string
+  name_zh: string
+  symbol_en: string
+  symbol_zh: string
 }[]>([])
 
 type PumpWorkerAPI = {
@@ -680,8 +685,13 @@ const syncCategory = (category: 'new' | 'soon' | 'graduated') => {
         ...(obj.sell_tax ? { sell_tax: obj.sell_tax } : {}),
         ...(obj.name ? { name: obj.name } : {}),
         ...(obj.symbol ? { symbol: obj.symbol } : {}),
+        ...(obj.name_en ? { name_en: obj.name_en } : {}),
+        ...(obj.symbol_en ? { symbol_en: obj.symbol_en } : {}),
+        ...(obj.name_zh ? { name_zh: obj.name_zh } : {}),
+        ...(obj.symbol_zh ? { symbol_zh: obj.symbol_zh } : {}),
         ...(obj.appendix ? { medias: getMedias(obj.appendix), twitter_type: obj.twitter_type } : {}),
         ...(obj.is_cloned ? { is_cloned: obj.is_cloned } : {}),
+        ...(obj.is_cashback ? { is_cashback: obj.is_cashback } : {}),
         ...(obj.deployer_platform ? { deployer_platform: obj.deployer_platform } : {}),
         ...(obj.is_pump_agent ? { is_pump_agent: obj.is_pump_agent } : {})
       }
@@ -1001,31 +1011,19 @@ watchTokenUpdatedUnwatch = watch(
           ...(rawVal.sell_tax !== undefined ? { sell_tax: rawVal.sell_tax } : {}),
           ...(rawVal.name ? { name: rawVal.name } : {}),
           ...(rawVal.symbol ? { symbol: rawVal.symbol } : {}),
+          ...(rawVal.name_en ? { name_en: rawVal.name_en } : {}),
+          ...(rawVal.symbol_en ? { symbol_en: rawVal.symbol_en } : {}),
+          ...(rawVal.name_zh ? { name_zh: rawVal.name_zh } : {}),
+          ...(rawVal.symbol_zh ? { symbol_zh: rawVal.symbol_zh } : {}),
           ...(rawVal.appendix ? { medias: getMedias(rawVal.appendix), twitter_type: rawVal.twitter_type } : {}),
           ...(rawVal.is_cloned !== undefined ? { is_cloned: rawVal.is_cloned } : {}),
+          ...(rawVal.is_cashback !== undefined ? { is_cashback: rawVal.is_cashback } : {}),
           ...(rawVal.deployer_platform ? { deployer_platform: rawVal.deployer_platform } : {}),
           ...(rawVal.is_pump_agent !== undefined ? { is_pump_agent: rawVal.is_pump_agent } : {})
         }
         list[index] = merged
       }
     })
-    const index = wsTableList.value.findIndex(item => item.target_token === rawVal.token)
-    if (index !== -1) {
-      const prev = wsTableList.value[index]
-      const merged = {
-        ...prev,
-        ...(rawVal.logo_url ? { logo_url: rawVal.logo_url } : {}),
-        ...(rawVal.buy_tax !== undefined ? { buy_tax: rawVal.buy_tax } : {}),
-        ...(rawVal.sell_tax !== undefined ? { sell_tax: rawVal.sell_tax } : {}),
-        ...(rawVal.name ? { name: rawVal.name } : {}),
-        ...(rawVal.symbol ? { symbol: rawVal.symbol } : {}),
-        ...(rawVal.appendix ? { medias: getMedias(rawVal.appendix), twitter_type: rawVal.twitter_type } : {}),
-        ...(rawVal.is_cloned !== undefined ? { is_cloned: rawVal.is_cloned } : {}),
-        ...(rawVal.deployer_platform ? { deployer_platform: rawVal.deployer_platform } : {}),
-        ...(rawVal.is_pump_agent !== undefined ? { is_pump_agent: rawVal.is_pump_agent } : {})
-      }
-      wsTableList.value[index] = merged
-    }
     const prev = bufferLogoMap.get(rawVal.token)
     setLRU(
       bufferLogoMap,

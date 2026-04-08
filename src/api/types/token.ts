@@ -161,6 +161,11 @@ export interface TokenInfoExtra {
   deployer_platform: string
   is_pump_agent: number
   t_price_change_24h: number
+  is_cashback: number
+  symbol_zh: string
+  symbol_en: string
+  name_zh: string
+  name_en: string
   t_price_change_1d: number
 }
 
