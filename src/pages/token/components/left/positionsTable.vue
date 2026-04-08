@@ -337,10 +337,7 @@ const userIds = computed(() => {
   }
 })
 
-watch(() => userIds.value, (old,val) => {
-  if(JSON.stringify(old) === JSON.stringify(val)) return
-  tableFilter.value.user_ids = userIds.value
-})
+
 
 const tableFilter = ref({
   hide_risk,
@@ -419,7 +416,7 @@ const filterListData = computed(() => {
 let timer: ReturnType<typeof setTimeout> | null = null
 
 const checkCondition = () => {
-  if (botStore.userInfo || walletStore.address) {
+  if (tableFilter.value.user_ids.length) {
     // 1. 清除可能存在的定时器（防止重复）
     if (timer) {
       clearTimeout(timer)
@@ -447,6 +444,14 @@ onUnmounted(() => {
     timer = null
   }
 })
+
+
+watch(() => userIds.value, (old,val) => {
+  if(JSON.stringify(old) === JSON.stringify(val)) return
+  console.log('userIds changed',old,val,userIds.value)
+  tableFilter.value.user_ids = userIds.value
+})
+
 watch(() => [
   backendSort.value,
   tableFilter.value.hide_risk,
@@ -456,8 +461,12 @@ watch(() => [
   () => walletStore.walletSignature[walletStore.address]
 ], () => {
   resetStatus()
-  _getUserBalance()
+  // _getUserBalance()
   // getMainTokenPrice()
+  if(!selectedChains.value.length){
+    selectedChains.value = botStore.evmAddress ? ['bsc', 'solana'] : ['bsc', 'base', 'eth']
+  }
+  checkCondition()
 })
 
 const mainTokenPrices = ref({} as any)

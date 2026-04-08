@@ -632,11 +632,11 @@ export function getColorClass(val: string | number) {
 }
 export function getBgClass(val: string | number) {
   if (Number(val) > 0) {
-    return 'bg-[--up-bg]!'
+    return 'bg-#12B8861A'
   } else if (Number(val) < 0) {
-    return 'bg-[--down-bg]!'
+    return 'bg-#F6465D1A'
   } else {
-    return 'bg-[--up-bg]!'
+    return 'bg-#12B8861A'
   }
 }
 export function desensitizeEmail(email: string) {
