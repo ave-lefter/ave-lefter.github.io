@@ -31,6 +31,10 @@ export interface GetUserBalanceResponse {
   risk_level: number
   risk_score: number
   last_txn_time: string
+  unrealized_profit: string
+  realized_profit: string
+  average_net_purchase_price: string
+  net_purchase_amount: string
 }
 export type GetUserBalanceResponseResult = { data: GetUserBalanceResponse[] ; total: number ;pageNo: number; pageSize: number }
 

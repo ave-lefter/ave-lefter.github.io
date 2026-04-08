@@ -29,7 +29,7 @@ const listQuery = shallowRef({
   event_type: ''
 })
 const attentionTriggerRef=ref()
-const checkedTrend = ref(['SWAP', 'ADD_LIQUIDITY/REMOVE_LIQUIDITY'])
+const checkedTrend = ref(['SWAP', 'ADD_LIQUIDITY/REMOVE_LIQUIDITY', 'TRANSFER'])
 const trendList = shallowRef<GetTokenDetailsListResponse[]>([])
 const isMarket= shallowRef(false)
 const filteredTrendList = computed(() => {

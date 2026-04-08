@@ -183,6 +183,7 @@ export function useKlineMarks() {
     if (migrated?.migrate_time && isTokenKline) {
       getMigrated(onDataCallback, migrated, Number(interval))
     }
+    if (!markTabsVisible.value) return
     marksTabs.value.forEach((v) => {
       const id = pair + '-' + chain + '-' + user + '-' + interval + '-' + v.id + '-' + from + '-' + to
       if (marksMap.has(id) && markTabsChecked.value?.[v.id]) {

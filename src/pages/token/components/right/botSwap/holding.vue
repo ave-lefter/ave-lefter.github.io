@@ -83,7 +83,7 @@ watch([userAddress, token], (val) => {
   if (val) {
     avgPrice.value = 0
     getWalletTxData()
-    _bot_getAddressAllBalances()
+    // _bot_getAddressAllBalances()
   }
 })
 
@@ -196,12 +196,12 @@ watch(() => route.params.id, () => {
   isShow.value = false
   avgPrice.value = 0
   getWalletTxData()
-  _bot_getAddressAllBalances()
+  // _bot_getAddressAllBalances()
 })
 
 watch(() => tokenStore.placeOrderSuccess, async () => {
   isShow.value = true
-  _bot_getAddressAllBalances()
+  // _bot_getAddressAllBalances()
   if (pollTimer) {
     clearTimeout(pollTimer)
     pollTimer = null
@@ -227,7 +227,7 @@ function getWalletTxDataPoll() {
     return
   }
   getWalletTxData()
-  _bot_getAddressAllBalances()
+  // _bot_getAddressAllBalances()
   time++
   pollTimer = setTimeout(getWalletTxDataPoll, 5000)
 }
@@ -255,7 +255,7 @@ onUnmounted(() => {
 
 onMounted(() => {
   getWalletTxData()
-  _bot_getAddressAllBalances()
+  // _bot_getAddressAllBalances()
 })
 
 </script>

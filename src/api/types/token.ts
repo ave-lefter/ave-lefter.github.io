@@ -161,6 +161,7 @@ export interface TokenInfoExtra {
   deployer_platform: string
   is_pump_agent: number
   t_price_change_24h: number
+  t_price_change_1d: number
 }
 
 
@@ -180,6 +181,8 @@ export interface WalletTokenInfo {
   unrealized_ratio: string
   realized_profit: string
   realized_ratio: string
+  average_net_purchase_price?: string
+  net_purchase_amount?: string
   balance_amount: string
   balance_usd: string
   balance_ratio: string
