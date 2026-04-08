@@ -740,8 +740,8 @@ function monitorToast(val: IMonitorWsResponse[]) {
           )}
         </div>
       ),
-      duration: 0,
-      // duration: (globalStore.audioSettings.notice.time || 0) * 1000,
+      // duration: 0,
+      duration: (globalStore.audioSettings.notice.time || 0) * 1000,
     })
     messageQueue.add(msg)
   })
