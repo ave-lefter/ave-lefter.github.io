@@ -62,7 +62,7 @@
           </div>
         </div>
       </div>
-      <div class="text-center mt-116px flex-between">
+      <div class="text-center mt-32px flex-between">
         <el-button class="h-48px! flex-1" size="large"  v-copy="mnemonic?.join(' ')" @click.stop.prevent> {{ $t('copyMnemonic') }} </el-button>
         <el-button class="h-48px! flex-1" size="large"  type="primary" @click.stop.prevent="goOn"> {{ $t('startSwap') }} </el-button>
       </div>

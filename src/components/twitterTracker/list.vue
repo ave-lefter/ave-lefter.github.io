@@ -104,8 +104,10 @@ watch(() => trackerStore.unReader, (val) => {
 
 
 function handleTop() {
-  virtualizer.value.scrollToIndex(0)
-  trackerStore.unReader=0
+  nextTick(() => {
+    virtualizer.value.scrollToIndex(0)
+    trackerStore.unReader=0
+  })
 }
 </script>
 <style scoped lang="scss">
