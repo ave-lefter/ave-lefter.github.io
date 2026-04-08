@@ -23,13 +23,13 @@
               name="custom:key-visible"
               class="color-[--icon-color] text-8px cursor-pointer font-bold absolute right-[4px] top-[4px]"
               v-if="pumpSetting.grid[element.id].show"
-              @click.stop.prevent="pumpSetting.grid[element.id].show = false"
+              @click.stop.prevent="globalStore.toggleGrid(element.id)"
             />
             <Icon
               name="custom:key-invisible"
               class="color-[--icon-color] text-8px cursor-pointer font-bold absolute right-[4px] top-[4px]"
               v-else
-              @click.stop.prevent="pumpSetting.grid[element.id].show = true"
+              @click.stop.prevent="globalStore.toggleGrid(element.id)"
             />
             <span
               :style="{ color: pumpSetting.grid[element.id].show ? '#3F80F7' : 'var(--third-text)' }"

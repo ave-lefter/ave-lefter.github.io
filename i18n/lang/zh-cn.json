@@ -2159,5 +2159,6 @@
   "internalTransfer": "内嵌交易转入/转出",
   "internalTransferIn": "内嵌转入",
   "internalTransferOut": "内嵌转出",
-  "tutorial": "教程"
+  "tutorial": "教程",
+  "gridTip": "至少保留一个分类显示"
 }
