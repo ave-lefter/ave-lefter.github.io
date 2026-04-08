@@ -30,8 +30,7 @@
           {{ $t('walletMonitor') }}
         </div>
       </el-badge>
-
-      <el-badge :is-dot="isTwitterDotted" class="mr-12px">
+      <el-badge :value="(!trackerStore.visible&&trackerStore.unReader)||undefined" :max="99" class="mr-12px">
         <div
           class="flex items-center gap-4px cursor-pointer hover:color-[--main-text]"
           :class="trackerStore.visible ? 'color-[--main-text]' : 'color-[--secondary-text]'"
@@ -143,6 +142,19 @@
           <Icon name="custom:set-up" class="text-12px ml-2px color-[--main-text]" />
         </template>
         <ul class="flex items-start justify-center flex-col text-12px gap-16px font-500">
+          <li class="color-[--secondary-text] hover:color-[--main-text]">
+            <a
+              class="hover:decoration-underline"
+              target="_blank"
+              :href="
+                lang?.includes?.('zh')
+                  ? 'https://doc.ave.ai/cn'
+                  : 'https://doc.ave.ai'
+              "
+            >
+              {{ $t('tutorial') }}
+            </a>
+          </li>
           <li class="color-[--secondary-text] hover:color-[--main-text]">
             <a
               class="hover:decoration-underline"

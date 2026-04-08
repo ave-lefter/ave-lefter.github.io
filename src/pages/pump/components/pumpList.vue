@@ -969,16 +969,25 @@ const props = defineProps({
 // const selected = ref<PumpObj | null>(null)
 // const btnRefs = ref<Record<string, HTMLElement | null>>({})
 // const currentBtnRef = ref<HTMLElement | null>(null)
+const { monitorList2:dataSourceCache } = storeToRefs(useMonitorStore()) //获取钱包监控数据,为了处理favorite_holder_count
 const emit = defineEmits(['clearFilter'])
 const handleClearFilter = () => {
   emit('clearFilter')
 }
 const configStore = useConfigStore()
-const { quickBuyValue, loading, isOut, isSoon , type} = toRefs(props)
+const { quickBuyValue, loading, isOut, isSoon, type } = toRefs(props)
 const tableList = shallowRef<PumpObj[]>(props.tableList || [])
 const hover = ref(false)
 // 只监听数组引用变化，不深度监听对象
 watch(() => props.tableList, (newList) => {
+  if (dataSourceCache.value?.length > 0) {
+    dataSourceCache.value?.forEach(item => {
+      const index = newList.findIndex((i: PumpObj) => i.target_token === item.target_address && i.chain === item.chain)
+      if (index !== -1) {
+        newList[index].favorite_holder_count = 1
+      }
+    })
+  }
   tableList.value = newList
 })
 const router = useRouter()

@@ -1296,9 +1296,16 @@ const tokenAllPair = computed(() => {
   return tokenStore.tokenAllPair
 })
 const priceChange = computed(() => {
+  const is24H = globalStore?.zone == '24h'
   if (tokenStore.selectedToken && tokenAllPair.value) {
+    if (!is24H) {
+      return tokenStore.tokenInfoExtra?.t_price_change_1d || 0
+    }
     return tokenStore.tokenInfoExtra?.t_price_change_24h || 0
   } else {
+    if (!is24H) {
+      return tokenStore.priceChange || 0
+    }
     return tokenStore.priceChangeV2 || 0
   }
 })
@@ -1391,11 +1398,11 @@ watch(() => wsStore.wsResult[WSEventType.PRICEV2], (val) => {
     if (Array.isArray(val.prices) && val.prices?.length > 0 && tokenStore.tokenInfoExtra) {
       const find = val.prices?.find(i => i.target_token == address.value)
       if (find) {
-        tokenStore.tokenInfoExtra.t_price_change_24h = find.tprice_change_24h
         if (!tokenStore.tokenInfoExtra) return
         tokenStore.tokenInfoExtra = {
           ...tokenStore.tokenInfoExtra,
-          t_price_change_24h: find.tprice_change_24h
+          t_price_change_24h: find.tprice_change_24h,
+          t_price_change_1d: find.tprice_change_1d,
         }
       }
     }

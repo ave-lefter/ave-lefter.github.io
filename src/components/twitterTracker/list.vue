@@ -17,7 +17,12 @@
       <span class="color-[--third-text] text-12px mb-20px mt-4px">{{ t('emptyNoData') }}</span>
     </AveEmpty>
   </div>
-  <div v-else ref="parentRef" class="overflow-y-auto scrollbar-hide" style="height:calc(100% - 75px)" @mouseenter="emits('stop',true)" @mouseleave="emits('stop',false)">
+  <div v-else ref="parentRef" class="affix-container overflow-y-auto scrollbar-hide" @scroll="onScroll" style="height:calc(100% - 75px)">
+    <el-affix v-if="hasTop"  target=".affix-container" :offset="100">
+      <div class="flex justify-center">
+        <div class="flex items-center gap-0px py-6px px-4px rounded-4px bg-[--dialog-bg] text-[#37B270] text-12px clickable" @click="handleTop"><Icon name="custom:arrow-up"></Icon> {{ t('newMessage') }}</div>
+      </div>
+    </el-affix>
     <div :style="{
       height: `${totalSize}px`,
       width: '100%',
@@ -34,7 +39,7 @@
           class="border-b-1px border-b-solid border-b-[--border]">
           <ListItem :item="getItem(virtualRow)" :index="virtualRow.index" @measureElement="virtualizer.measureElement(el)" />
           <div v-if="['2', '3', '4'].includes(getItem(virtualRow).type) && (getItem(virtualRow).retweeted_tweet || getItem(virtualRow).quoted_tweet || getItem(virtualRow).replied_tweet)"
-            class="border-1px border-solid border-[--dialog-divider] rounded-8px px-12px pt-16px ml-40px mb-16px">
+            class="border-1px border-solid border-[--dialog-divider] rounded-8px px-12px pt-16px ml-0px mb-16px">
             <ListItem :item="getItem(virtualRow).retweeted_tweet || getItem(virtualRow).quoted_tweet || getItem(virtualRow).replied_tweet" :index="-1" @measureElement="virtualizer.measureElement(el)" />
           </div>
         </div>
@@ -45,8 +50,7 @@
 <script setup name="twitterTackerList">
 import ListItem from './listItem.vue'
 import { useVirtualizer } from '@tanstack/vue-virtual'
-import { useInfiniteScroll } from '@vueuse/core'
-
+import { useInfiniteScroll,useThrottleFn } from '@vueuse/core'
 const parentRef = ref(null)
 const { t } = useI18n()
 const emits = defineEmits(['startAttention', 'endReached','stop'])
@@ -57,12 +61,12 @@ const props = defineProps({
 })
 const botStore = useBotStore()
 const trackerStore = useTwitterTrackerStore()
-
+const hasTop=shallowRef(false)
 const virtualizer = useVirtualizer(
   computed(() => ({
     count: trackerStore.list.length,
     getScrollElement: () => parentRef.value,
-    estimateSize: () => 200,
+    estimateSize: () => 240,
     overscan: 5,
     gap: 16
   }))
@@ -79,6 +83,32 @@ useInfiniteScroll(parentRef, ()=>{
   emits('endReached')
 }, { distance: 100 })
 
+const onScroll = useThrottleFn((e) => {
+  console.log('onScroll',e.target?.scrollTop,trackerStore.unReader)
+  if(((e.target?.scrollTop||0)> 60)){
+    trackerStore.isPaused=true
+  }else{
+    trackerStore.isPaused=false
+    hasTop.value = false
+  }
+}, 100, true, false)
+
+watch(() => trackerStore.unReader, (val) => {
+  // console.log('unReader', val,trackerStore.isPaused)
+  if ((val > 0) && trackerStore.isPaused) {
+    hasTop.value = true
+  } else {
+    hasTop.value = false
+  }
+})
+
+
+function handleTop() {
+  nextTick(() => {
+    virtualizer.value.scrollToIndex(0)
+    trackerStore.unReader=0
+  })
+}
 </script>
 <style scoped lang="scss">
 :deep(.el-scrollbar__thumb) {

@@ -25,7 +25,7 @@ const walletStore = useWalletStore()
 const tokenStore = useTokenStore()
 const {hide_risk, hide_small} = storeToRefs(useGlobalStore())
 const {currentAddress} = storeToRefs(useFollowStore())
-const selectedChains = useLocalStorage<string[]>('positionsSelectedChains', [])
+const selectedChains = useLocalStorage<string[]>('positionsSelectedChains', ['bsc', 'solana'])
 const AmountU = useLocalStorage<boolean>('positionsAmountU', true)
 const { mode, token_logo_url, isDark } = storeToRefs(useGlobalStore())
 
@@ -38,13 +38,14 @@ watch(() => wsStore.wsResult[WSEventType.PRICEV2], (val: IPriceV2Response) => {
     const current = idToPriceMap[el.index]
     if (current && current.uprice > 0) {
       const noProfit = el.total_profit === '--' || Number(el.total_profit) === 0
+      const price = new BigNumber(current.uprice || 0)
       const balance_usd = new BigNumber(el.balance || 0).times(current.uprice || 0)
       if (!noProfit) {
-        const total_purchase_usd = new BigNumber(el.balance_usd || 0).minus(el.total_profit || 0)
-        const total_profit = balance_usd.minus(total_purchase_usd)
-        const total_profit_ratio = new BigNumber(current.uprice || 0)
-          .minus(el.average_purchase_price_usd || 0).div(el.average_purchase_price_usd)
-        if (total_profit_ratio.toNumber() < -1 || Number(el.average_purchase_price_usd) < 0) {
+        const unrealized_profit = price.minus(el.average_net_purchase_price || 0).times(BigNumber.max(el.net_purchase_amount || 0, el.balance || 0))
+        // const total_purchase_usd = new BigNumber(el.balance_usd || 0).minus(el.total_profit || 0)
+        const total_profit = unrealized_profit.plus(el.realized_profit || 0)
+        const total_profit_ratio = new BigNumber(current.uprice || 0).minus(el.average_net_purchase_price || 0).div(el.average_net_purchase_price)
+        if (total_profit_ratio.toNumber() < -1 || Number(el.average_net_purchase_price) < 0) {
           return el
         } else {
           return {
@@ -52,7 +53,9 @@ watch(() => wsStore.wsResult[WSEventType.PRICEV2], (val: IPriceV2Response) => {
             current_price_usd: current.uprice,
             balance_usd: balance_usd.toNumber(),
             total_profit: total_profit.toFixed(),
-            total_profit_ratio: total_profit_ratio.toFixed()
+            total_profit_ratio: total_profit_ratio.toFixed(),
+            unrealized_profit: unrealized_profit.toFixed(),
+            realized_profit: el.realized_profit || 0
           }
         }
       } else {
@@ -115,6 +118,11 @@ watch(()=>updateHolderNum.value, () => {
 //   },20000)
 // })
 
+  // unrealized_profit: string
+  // realized_profit: string
+  // average_net_purchase_price: string
+  // net_purchase_amount: string
+
 const getTokenBalance = useThrottleFn(function (token: string, chain: string) {
   const creatorAddress = botStore.getWalletAddress(chain)
   if (creatorAddress) {
@@ -145,10 +153,10 @@ const getTokenBalance = useThrottleFn(function (token: string, chain: string) {
                 listData.value.splice(index, 1)
                 triggerRef(listData)
               }
-              return 
+              return
             }
             if(balance_usd.lt(1)&&hide_small.value){
-              return 
+              return
             }
             if((newToken.risk_score > 55 || newToken.risk_level < 0) && hide_risk.value){
               return
@@ -158,10 +166,15 @@ const getTokenBalance = useThrottleFn(function (token: string, chain: string) {
               listData.value[index].balance_usd = new BigNumber(newToken?.balance || 0)
                 .times(newToken?.price || 0).toNumber()
               listData.value[index].current_price_usd = Number(newToken?.price||0)
+
               listData.value[index].total_profit = Number(newToken?.pnl?.totalProfit||0)?.toFixed(6)||'--'
               listData.value[index].total_profit_ratio =Number(newToken?.pnl?.totalProfitRatio||0)?.toFixed(6)||'--'
+              listData.value[index].unrealized_profit = newToken?.pnl?.unrealizedProfit || '0'
+              listData.value[index].realized_profit = newToken?.pnl?.realizedProfit || '0'
+              listData.value[index].average_net_purchase_price = newToken?.pnl?.averageNetPurchasePrice || '0'
+              listData.value[index].net_purchase_amount = newToken?.pnl?.netPurchaseAmount || '0'
               listData.value[index].last_txn_time=newToken?.pnl?.lastUpdateTime?new Date(newToken?.pnl?.lastUpdateTime+'').getTime().toString().slice(0, -3):new Date().getTime().toString().slice(0, -3)
-             
+
               nextTick(() => {
                 triggerRef(listData)
               })
@@ -180,6 +193,10 @@ const getTokenBalance = useThrottleFn(function (token: string, chain: string) {
                   .times(newToken?.price || 0).toNumber(),
                 total_profit:  Number(newToken?.pnl?.totalProfit||0)?.toFixed(6)||'--',
                 total_profit_ratio:Number(newToken?.pnl?.totalProfitRatio||0)?.toFixed(6)||'--',
+                unrealized_profit: newToken?.pnl?.unrealizedProfit || '0',
+                realized_profit: newToken?.pnl?.realizedProfit || '0',
+                average_net_purchase_price: newToken?.pnl?.averageNetPurchasePrice || '0',
+                net_purchase_amount: newToken?.pnl?.netPurchaseAmount || '0',
                 average_purchase_price_usd: new BigNumber(newToken?.pnl?.averageNetPurchasePrice||0).toString(),
                 current_price_usd: Number(newToken?.price||0),
                 price_change: 0,
@@ -224,13 +241,11 @@ watch(() => wsStore.wsResult[WSEventType.ASSET], (val: IAssetResponse) => {
       ? NATIVE_TOKEN : val.swap.token
     const chain = val.swap.chain
     if (token && chain) {
-      if(["bsc", "eth", "base", "xlayer", "solana","polygon", "arbitrum", "optimism", "monad"].includes(chain)){
+      if(['bsc', 'eth', 'base', 'xlayer', 'solana','polygon', 'arbitrum', 'optimism', 'monad'].includes(chain)){
         getTokenBalance(token,chain)
-        if(["solana"].includes(chain)){
-          setTimeout(()=>{
-             getTokenBalance(token,chain)
-          },3000)
-        }
+        setTimeout(()=>{
+          getTokenBalance(token,chain)
+        },3000)
       }else{
         setTimeout(()=>{
           resetStatus()
@@ -244,9 +259,9 @@ watch(() => wsStore.wsResult[WSEventType.ASSET], (val: IAssetResponse) => {
     const chain = val.transfer.chain
     const token = val.transfer.token
     const type = val.transfer.type
-    if( ["bsc", "eth", "base", "xlayer", "solana","polygon", "arbitrum", "optimism", "monad"].includes(chain)){
+    if( ['bsc', 'eth', 'base', 'xlayer', 'solana','polygon', 'arbitrum', 'optimism', 'monad'].includes(chain)){
       getTokenBalance(token,chain)
-      if(["solana"].includes(chain)){
+      if(['solana'].includes(chain)){
         setTimeout(()=>{
             getTokenBalance(token,chain)
         },3000)
@@ -309,10 +324,6 @@ const isEvmChainWallet = computed(() => {
   return getChainInfo(walletStore.chain)?.vm_type === 'evm'
 })
 const userIds = computed(() => {
-  if(!selectedChains.value.length){
-    console.log('selectedChains.value.length',botStore.evmAddress)
-    selectedChains.value = botStore.evmAddress ? ['bsc', 'solana'] : ['bsc', 'base', 'eth']
-  }
   // const selectedChains = botStore.evmAddress ? ['bsc', 'solana'] : ['bsc', 'base', 'eth']
   if (botStore.userInfo) {
     return botStore.userInfo.addresses.filter(({chain})=> selectedChains.value.includes(chain)).map(({address, chain}) => address + '-' + chain)
@@ -326,10 +337,7 @@ const userIds = computed(() => {
   }
 })
 
-watch(() => userIds.value, (old,val) => {
-  if(JSON.stringify(old) === JSON.stringify(val)) return
-  tableFilter.value.user_ids = userIds.value
-})
+
 
 const tableFilter = ref({
   hide_risk,
@@ -374,7 +382,7 @@ const backendSort = computed(() => {
 })
 const columns = computed(() => {
   return [{
-    label: ``,
+    label: '',
     value: 'last_txn_time',
     flex: 'flex-[1.3]',
     sort: true
@@ -405,10 +413,10 @@ const filterListData = computed(() => {
   return [...listData.value.filter(i => i.token===NATIVE_TOKEN).toSorted((a, b) => a.symbol.localeCompare(b.symbol)),...listData.value.filter(i => i.token!==NATIVE_TOKEN).toSorted((a, b) => sort_dir ==='asc' ? a?.[sort] - b?.[sort] : b?.[sort] - a?.[sort])]
 })
 
-let timer: ReturnType<typeof setTimeout> | null = null;
+let timer: ReturnType<typeof setTimeout> | null = null
 
 const checkCondition = () => {
-  if (botStore.userInfo || walletStore.address) {
+  if (tableFilter.value.user_ids.length) {
     // 1. 清除可能存在的定时器（防止重复）
     if (timer) {
       clearTimeout(timer)
@@ -425,14 +433,25 @@ const checkCondition = () => {
 
 
 onMounted(() => {
- checkCondition()
+  if(!selectedChains.value.length){
+    selectedChains.value = botStore.evmAddress ? ['bsc', 'solana'] : ['bsc', 'base', 'eth']
+  }
+  checkCondition()
 })
 onUnmounted(() => {
   if(timer){
-    timer = null
     clearTimeout(timer)
+    timer = null
   }
 })
+
+
+watch(() => userIds.value, (old,val) => {
+  if(JSON.stringify(old) === JSON.stringify(val)) return
+  console.log('userIds changed',old,val,userIds.value)
+  tableFilter.value.user_ids = userIds.value
+})
+
 watch(() => [
   backendSort.value,
   tableFilter.value.hide_risk,
@@ -442,8 +461,12 @@ watch(() => [
   () => walletStore.walletSignature[walletStore.address]
 ], () => {
   resetStatus()
-  _getUserBalance()
+  // _getUserBalance()
   // getMainTokenPrice()
+  if(!selectedChains.value.length){
+    selectedChains.value = botStore.evmAddress ? ['bsc', 'solana'] : ['bsc', 'base', 'eth']
+  }
+  checkCondition()
 })
 
 const mainTokenPrices = ref({} as any)
@@ -711,6 +734,12 @@ function hideToken(row:any) {
   hideTokenVisible.value = true
   currentHideToken.value = row
 }
+
+// 组件销毁时清理订阅
+onBeforeUnmount(() => {
+  priceV2Store.setMultiPriceParams('positions', [])
+  priceV2Store.sendPriceWs()
+})
 </script>
 
 <template>
@@ -841,7 +870,7 @@ function hideToken(row:any) {
                   </div>
                 </div>
                 <div v-if="(walletStore.walletName!=='WatchWallet')&&(row.token!==NATIVE_TOKEN)" class="bg-[--d-000-l-FFF] absolute top-0 left-0 z-auto flex flex-center w-12px h-12px invisible group-hover:visible">
-                  <Icon 
+                  <Icon
                     v-tooltip="$t('BlackListToken')"
                     name="custom:key-invisible"
                     class="cursor-pointer color-[--third-text1] text-8px hover:color-[--down-color]!"
@@ -868,7 +897,7 @@ function hideToken(row:any) {
                     }}
                   </template>
                 </div>
-             
+
               </div>
               <div class="flex-[0.8] flex justify-end items-center">
                 <el-button

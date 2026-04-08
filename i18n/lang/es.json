@@ -674,5 +674,19 @@
   "batchFav": "Seguimiento por lotes",
   "removeTokenTips2": "¿Eliminar el seguimiento seleccionado?",
   "monitor": "Monitor",
-  "position2": "Posición"
+  "position2": "Posición",
+  "deletedTweets": "",
+  "unpin": "Desprender",
+  "actionDel": "he eliminado este tweet",
+  "actionTop": "he fijado este tweet",
+  "actionUnpin": "he desanclado este tweet",
+  "customSetting": "Configuraciones personalizadas",
+  "twDisplaySettings": "Configuración de pantalla",
+  "doubleQuotes": "Comillas dobles",
+  "doubleQuotesDesc": "Resalte el texto entre comillas dobles (como \"moneda\", \"meme\")",
+  "customTokens": "Ficha personalizada",
+  "symbol": "Símbolo",
+  "symbolDesc": "Resalte $SOL, $ETH y otros tokens",
+  "tokenAddressDesc": "Resaltar token CA",
+  "newMessage": "Nuevo mensaje"
 }

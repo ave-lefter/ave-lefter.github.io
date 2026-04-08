@@ -652,5 +652,19 @@
   "batchFav": "Acompanhamento em lote",
   "removeTokenTips2": "Excluir o monitoramento selecionado?",
   "monitor": "monitor",
-  "position2": "Posição"
+  "position2": "Posição",
+  "deletedTweets": "",
+  "unpin": "Liberar",
+  "actionDel": "excluí este tweet",
+  "actionTop": "fixei este tweet",
+  "actionUnpin": "desfixei este tweet",
+  "customSetting": "Configurações personalizadas",
+  "twDisplaySettings": "Configurações de exibição",
+  "doubleQuotes": "Citações Duplas",
+  "doubleQuotesDesc": "Destaque o texto entre aspas duplas (como \"moeda\" \"meme\")",
+  "customTokens": "Token personalizado",
+  "symbol": "Símbolo",
+  "symbolDesc": "Destaque $SOL, $ETH e outros tokens",
+  "tokenAddressDesc": "Destacar Token CA",
+  "newMessage": "Nova mensagem"
 }

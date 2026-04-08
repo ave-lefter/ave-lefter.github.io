@@ -29,7 +29,7 @@ const listQuery = shallowRef({
   event_type: ''
 })
 const attentionTriggerRef=ref()
-const checkedTrend = ref(['SWAP', 'ADD_LIQUIDITY/REMOVE_LIQUIDITY'])
+const checkedTrend = ref(['SWAP', 'ADD_LIQUIDITY/REMOVE_LIQUIDITY', 'TRANSFER'])
 const trendList = shallowRef<GetTokenDetailsListResponse[]>([])
 const isMarket= shallowRef(false)
 const filteredTrendList = computed(() => {
@@ -183,6 +183,12 @@ function _getTokenDetailsList() {
         }
         if (i.event_type === 'TRANSFER' && i.flow_type == 1) {
           event_type = 'transfer_out'
+        }
+        if (i.event_type === 'INTERNAL_TRANSFER' && i.flow_type == 0) {
+          event_type = 'internal_transfer_in'
+        }
+        if (i.event_type === 'INTERNAL_TRANSFER' && i.flow_type == 1) {
+          event_type = 'internal_transfer_out'
         }
         return {
           ...i,

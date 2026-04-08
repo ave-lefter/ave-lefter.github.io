@@ -16,7 +16,7 @@ import { createCacheRequest } from '@/utils/cacheRequest'
 import { tgLogin } from '@/utils/bot'
 import { useBotSettingStore } from './botSetting'
 import { deepMerge, evm_utils as utils ,getChainInfo } from '@/utils'
-import { NATIVE_TOKEN } from '@/utils/constants'
+import { NATIVE_TOKEN, getNativeToken } from '@/utils/constants'
 import { debounce } from 'lodash-es'
 
 type AddressItem = { chain: string; address: string; price?: number; balance?: string; decimals?: number; logo_url?: string; tokenBalances?: {
@@ -35,7 +35,7 @@ export const useBotStore = defineStore('bot', () => {
   const walletStore = useWalletStore()
   const configStore = useConfigStore()
   const tokenStore = useTokenStore()
-  const isSupportChains = ['bsc', 'solana','eth', 'base', 'xlayer', 'polygon', 'ton'] as const
+  const isSupportChains = ['bsc', 'solana', 'eth', 'base', 'xlayer', 'polygon', 'ton'] as const
   const isSupportEvmChains = computed(() => {
     const chainConfig = configStore.chainConfig
     const isEvmChainWallet = getChainInfo(walletStore.chain)?.vm_type === 'evm'
@@ -127,8 +127,8 @@ export const useBotStore = defineStore('bot', () => {
         token = token === 'TON' ? NATIVE_TOKEN : token
         return {
           ...i,
-          initBalance: balance,
-          balance: decimals == 0 ? balance : utils.formatUnits(balance.toString(), decimals),
+          initBalance: utils.parseUnits(balance.toString(), decimals),
+          balance: balance, // Only format native tokens
           chain: i.chain,
           token
         }
