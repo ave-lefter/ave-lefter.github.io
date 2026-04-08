@@ -1431,3 +1431,10 @@ export async function withCache<T>(
 
   return res
 }
+
+
+export function format4Str4(val: string) {
+  if(typeof val !== 'string') return val
+  if(val.length <= 8) return val
+  return val.slice(0, 4) + '...' + val.slice(-4)
+}

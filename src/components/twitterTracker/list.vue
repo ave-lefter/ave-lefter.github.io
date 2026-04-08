@@ -104,9 +104,11 @@ watch(() => trackerStore.unReader, (val) => {
 
 
 function handleTop() {
+  trackerStore.isPaused=true
+  virtualizer.value.scrollToIndex(0)
+  trackerStore.unReader=0
   nextTick(() => {
-    virtualizer.value.scrollToIndex(0)
-    trackerStore.unReader=0
+    trackerStore.isPaused=false
   })
 }
 </script>
