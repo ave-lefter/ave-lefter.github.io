@@ -25,7 +25,13 @@ const tabCom = computed(() => {
   }
   return connectWalletTab in comments ? comments[connectWalletTab] : null
 })
-
+watch(() => botStore.connectVisible, (val) => {
+  if (!val) {
+    botStore.showBotMnemonicPhrase = false
+    botStore.mnemonic = ''
+  }
+  // getTonWallets()
+})
 
 </script>
 
