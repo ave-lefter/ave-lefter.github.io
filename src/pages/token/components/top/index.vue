@@ -267,8 +267,8 @@
                   </template>
                 </div>
               </div>
-              <div class="bg-btn">
-                <Icon v-if="tokenStore.tokenInfoExtra?.is_cashback" name="custom:cashback" class="text-12px cursor-pointer color-[--yellow] hover:!color-[--primary-color]" v-tooltip="$t('cashback')"/>
+              <div v-if="tokenStore.tokenInfoExtra?.is_cashback" class="bg-btn">
+                <Icon name="custom:cashback" class="text-12px cursor-pointer color-[--yellow] hover:!color-[--primary-color]" v-tooltip="$t('cashback')"/>
               </div>
               <PumpLive v-if="token?.is_streaming" :tokenId="(route.params.id as string)" />
               <el-popover popper-class="[--el-popover-bg-color:--border]" :persistent="false">
@@ -726,7 +726,7 @@
             >
               <img
                 class="rounded-100%"
-                :src="formatIconTag(tokenStore.tokenInfoExtra?.deployer_platform)"
+                :src="formatIconTag('j7tracker.com')"
                 alt=""
                 :width="12"
               >
