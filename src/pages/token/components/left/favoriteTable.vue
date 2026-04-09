@@ -485,7 +485,6 @@ function toggleMode(mode: string) {
           :disabled="sort.activeSort !== 0 || !!sort.sortBy"
           @start="handleDragStart"
           :force-fallback="true"
-          @change="handleDragUpdate"
           @end="handleDragEnd"
         >
           <NuxtLink
