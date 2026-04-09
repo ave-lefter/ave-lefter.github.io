@@ -28,10 +28,12 @@ interface ParsedToken {
 /**
  * Escape HTML special characters to prevent XSS attacks
  */
+// 模块级缓存，仅创建一次
+const TEMP_DIV = document.createElement('div')
+
 function escapeHtml(str: string): string {
-  const div = document.createElement('div')
-  div.textContent = str
-  return div.innerHTML
+  TEMP_DIV.textContent = str
+  return TEMP_DIV.innerHTML
 }
 
 /**
