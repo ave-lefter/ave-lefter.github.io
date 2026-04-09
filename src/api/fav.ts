@@ -86,6 +86,19 @@ function changeFavoritesIndex(token1: string, token2: string, group = 0, address
   })
 }
 
+// change user favorite tokens batch
+function batchChangeFavoritesIndex(address: string, group: number, moves: Array<{token_id: string, new_index: number}>) {
+  const { $api } = useNuxtApp()
+  return $api('/v1api/v3/tokens/favorite/changeIndex/batch', {
+    method: 'post',
+    body: {
+      address: address,
+      group,
+      moves
+    }
+  })
+}
+
 // set top favorite token
 function changeFavoritesTop(token: string, group = 0, address: string) {
   const { $api } = useNuxtApp()
@@ -275,5 +288,6 @@ export {
   getGroupChangeIndex,
   batchDeleteFavorite,
   batchFavRemarks,
+  batchChangeFavoritesIndex
 }
 export type { GetUserFavoriteGroupsResponse, GetFavListResponse }
