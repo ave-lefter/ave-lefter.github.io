@@ -16,7 +16,7 @@
           >
             <div class="w-full relative" :class="getAnimClass(row)">
               <div class="flex-start items-start relative">
-                <div class="mr-12px relative">
+                <div class="mr-12px relative top-4px">
                   <!-- <div class="flex items-center px-4px py-2px bg-[--secondary-bg] absolute z-2 right--2px top--7px !rounded-4px border border-1 border-solid border-[--border] color-[--secondary-text] text-9px">
                       <Icon class="text-9px mr-2px" name="ix:image" />44
                   </div> -->
@@ -66,7 +66,7 @@
                       />
                     </span>
                     <span
-                      v-if="row?.medias?.filter?.(i => i.icon === 'twitter')?.length > 0 && row?.medias?.filter?.(i => i.icon === 'twitter')?.[0] && formatXUser(row?.medias?.filter?.(i => i.icon === 'twitter')?.[0]?.url)"
+                      v-if="hasTwitterXUser(row?.medias)"
                       v-tooltip="pumpBlackList?.findIndex(i => i.address == row.token && i.type == 'twitter') !== -1 ? $t('cancel') + $t('BlackListTwitter') : $t('BlackListTwitter')"
                       class="bg-[--d-000-l-FFF] cursor-pointer px-2px py-2px color-[--third-text1] block rounded-2px mt-4px hover:color-[--primary-color] w-16px h-16px flex items-center justify-center"
                     >
@@ -165,11 +165,11 @@
                   <div
                     class="color-[--third-text1] text-12px hover:color-[--main-text1]"
                     @click.stop="clickToken(row.token, row.chain)"
-                    :class="pumpSetting.Progress_isCircle == 'horizontal' ? 'mt-20px' : 'mt-10px'">
+                    :class="pumpSetting.Progress_isCircle == 'horizontal' ? 'mt-25px' : 'mt-15px'">
                     {{row.token?.slice(0, 4) + '...' + row.token?.slice(-4)}}
                   </div>
                 </div>
-                <div class="flex flex-col self-stretch relative">
+                <div class="flex flex-col self-stretch relative h-98px">
                   <div class="flex-start">
                     <span v-tooltip="row.symbol" v-copy="row.token" class="text-16px font-500 mr-5px symbol-ellipsis ellipsis-auto block color-[--d-F2F2F2-l-000]">{{
                       row.symbol
@@ -238,7 +238,15 @@
                       S {{ formatNumber(row?.sell_tax || 0, 2) }}%
                     </span>
                   </div>
-                  <div class="flex-start text-12px mt-5px">
+                  <div v-if="(lang === 'zh-cn' || lang === 'zh-tw') && (row.symbol_zh || row.name_zh) && row.symbol_zh !== row.symbol || (!(lang === 'zh-cn' || lang === 'zh-tw')) && (row.symbol_en || row.name_en) && row.symbol_en !== row.symbol" class="flex-start text-11px line-height-14px mt-2px color-[--yellow] whitespace-nowrap overflow-hidden">
+                    <template v-if="lang === 'zh-cn' || lang === 'zh-tw'">
+                      {{ row.symbol_zh || '' }}&nbsp;&nbsp;{{ row.name_zh || '' }}
+                    </template>
+                    <template v-else>
+                      {{ row.symbol_en || '' }}&nbsp;&nbsp;{{ row.name_en || '' }}
+                    </template>
+                  </div>
+                  <div class="flex-start text-12px mt-2px">
                       <div
                         v-tooltip="formatDate(row?.created_at || row?.time)"
                         class="time mr-8px"
@@ -387,6 +395,7 @@
                         </template>
                       </div>
                     </div>
+                  <Icon v-if="row.is_cashback" name="custom:cashback" class="text-12px color-[--yellow] clickable mr-5px hover:!color-[--primary-color]" v-tooltip="$t('cashback')"/>
                   <PumpLive v-if="row?.is_streaming" class="mr-4px" :tokenId="(row.token + '-' + row.chain)" />
 
                     <a
@@ -540,7 +549,7 @@
                         </div>
                     </HolderRank> -->
                   </div>
-                  <div class="mt-5px text-11px"  v-if="row?.medias?.some(i=> i.icon === 'twitter') && route.name === 'index'">
+                  <div class="mt-2px text-11px"  v-if="row?.medias?.some(i=> i.icon === 'twitter') && route.name === 'index'">
                     <div class="flex-start items-center" v-for="(item, index) in row?.medias?.filter(i => i.icon === 'twitter')" :key="index">
                       <PumpPop
                           v-if="row?.medias?.some(i=> i.icon === 'twitter') && route.name === 'index'"
@@ -567,7 +576,9 @@
                       </template>
                     </div>
                   </div>
-                  <div class="flex-start text-12px absolute bottom--2px z-1 mt-5px">
+                  <div class="flex-start text-12px absolute bottom-0"
+                  :class=" ((lang === 'zh-cn' || lang === 'zh-tw') && (row.symbol_zh || row.name_zh) && row.symbol_zh !== row.symbol || (!(lang === 'zh-cn' || lang === 'zh-tw')) && (row.symbol_en || row.name_en) && row.symbol_en !== row.symbol) && hasTwitterXUser(row.medias)? '' : 'absolute bottom-0px'"
+                  >
                     <div
                       v-show="pumpSetting?.define?.some((i) => i === 'top')"
                       class="flex-start mr-8px bg-btn"
@@ -717,14 +728,15 @@
               <div class="pump-right">
                 <div
                  v-show="(pumpSetting.border && pumpSetting.size_swap === '16px') || pumpSetting.bgList?.includes(row.platform)"
-                 class="h-102px w-160px absolute z-2 top--12px right--8px border border-solid rounded-8px" :style="{ background:  pumpSetting.bgList?.includes(row.platform)? pumpSetting?.bg?.[row.platform]?.bg : ( pumpSetting.border &&  pumpSetting.size_swap ==='16px'? '#12B88614': ''), 'border-color': pumpSetting.border &&  pumpSetting.size_swap ==='16px'? (pumpSetting.border =='border_hight' ? '#12B886': 'var(--border)') : 'transparent' ,'box-shadow': pumpSetting.border &&  pumpSetting.size_swap ==='16px'? (pumpSetting.border =='border_hight' ? '0px 0px 10px 0px #12B88699': '0px 2px 10px 0px var(--border)') : ''}">
+                 class="w-160px h-120px absolute z-2 top--12px right--8px border border-solid rounded-8px" :style="{background:  pumpSetting.bgList?.includes(row.platform)? pumpSetting?.bg?.[row.platform]?.bg : ( pumpSetting.border &&  pumpSetting.size_swap ==='16px'? '#12B88614': ''), 'border-color': pumpSetting.border &&  pumpSetting.size_swap ==='16px'? (pumpSetting.border =='border_hight' ? '#12B886': 'var(--border)') : 'transparent' ,'box-shadow': pumpSetting.border &&  pumpSetting.size_swap ==='16px'? (pumpSetting.border =='border_hight' ? '0px 0px 10px 0px #12B88699': '0px 2px 10px 0px var(--border)') : ''}"
+                 >
                 </div>
                 <div
                   v-if="
                     (isSoon && row.progress > 99) || pumpSetting?.define?.some((i) => i === 'mcap')
                   "
-                  class="flex-end text-12px pr-12px mb-10px bg-1"
-                  :class="pumpSetting.fontSize_mc =='12px'? 'mb-1px' : 'mb-1px'"
+                  class="flex-end text-12px pr-12px bg-1"
+                  :class="pumpSetting.fontSize_mc =='12px'? 'mb-2px' : 'mb-0px'"
                 >
                   <div v-if="isSoon && row.progress >= 99.99" class="bg-1 flex-end py-2px">
                     <el-image
@@ -957,16 +969,25 @@ const props = defineProps({
 // const selected = ref<PumpObj | null>(null)
 // const btnRefs = ref<Record<string, HTMLElement | null>>({})
 // const currentBtnRef = ref<HTMLElement | null>(null)
+const { monitorList2:dataSourceCache } = storeToRefs(useMonitorStore()) //获取钱包监控数据,为了处理favorite_holder_count
 const emit = defineEmits(['clearFilter'])
 const handleClearFilter = () => {
   emit('clearFilter')
 }
 const configStore = useConfigStore()
-const { quickBuyValue, loading, isOut, isSoon , type} = toRefs(props)
+const { quickBuyValue, loading, isOut, isSoon, type } = toRefs(props)
 const tableList = shallowRef<PumpObj[]>(props.tableList || [])
 const hover = ref(false)
 // 只监听数组引用变化，不深度监听对象
 watch(() => props.tableList, (newList) => {
+  if (dataSourceCache.value?.length > 0) {
+    dataSourceCache.value?.forEach(item => {
+      const index = newList.findIndex((i: PumpObj) => i.target_token === item.target_address && i.chain === item.chain)
+      if (index !== -1) {
+        newList[index].favorite_holder_count = 1
+      }
+    })
+  }
   tableList.value = newList
 })
 const router = useRouter()
@@ -1121,6 +1142,9 @@ function summaryList(summary: string): string[] {
     return matches.map(i => i.trim())
   }
   return [summary.trim()]
+}
+function hasTwitterXUser(medias?: Array<{ icon?: string; url?: string }>) {
+  return medias?.some((item) => item.icon === 'twitter' && !!formatXUser(item?.url)) ?? false
 }
 function buildTooltipContent(summary: string, summary_score?: number): string {
   const items = summaryList(summary)
@@ -1310,7 +1334,7 @@ defineExpose({
     cursor: pointer;
     display: flex;
     align-items: center;
-    padding: 15px 10px 11px 12px;
+    padding: 12px;
     border-top: 1px solid var(--main-input-button-bg);
     border-radius: 4px;
     .bg-1{
@@ -1346,13 +1370,15 @@ defineExpose({
       right: 0;
       top: 0;
       z-index: 10;
+      height: 100%;
       // border: 1px solid;
 
       .btns-swap{
         // background-color: var(--secondary-bg);
-        position: relative;
+        position: absolute;
         z-index:20;
-        bottom: -18px;
+        bottom: 0px;
+        right:-12px;
       }
     }
     .black-container {

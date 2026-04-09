@@ -21,6 +21,20 @@
           <!-- <span>{{ item.chain_show || '' }}</span> -->
         </div>
       </div>
+      <div class="bg-[--main-input-button-bg] rounded-4px mr-8px text-12px px-10px py-7px flex items-center justify-center gap-6px">
+        <div
+          class="flex items-center justify-center cursor-pointer"
+          v-for="item in tabsList"
+          :key="item.id"
+          v-tooltip="item.name"
+          @click.stop="globalStore.toggleGrid(item.id)">
+          <span :class="pumpSetting.grid[item.id].show ? 'color-[--main-text1]' : 'color-[--third-text1]'">{{ item.name }}</span>
+          <Icon
+            :name="`custom:key-${pumpSetting.grid[item.id].show ? 'visible' : 'invisible'}`"
+            class="text-10px color-[--third-text1] ml-4px"
+          />
+        </div>
+      </div>
       <!-- <el-popover
         v-model:visible="visible_platforms"
         placement="bottom-start"
@@ -84,6 +98,7 @@
           </template>
         </template>
       </el-popover> -->
+
       <div class="flex-1" />
       <Setting :chain="(activeChain as BotChain)" :pumpConfig="pumpConfig"/>
       <BlackList />
@@ -97,97 +112,62 @@
       <AutoSellSetting :chain="(activeChain as BotChain)" root-class="mr-0"/>
     </div>
     <el-row type="flex" :gutter="pumpSetting.isGutter ? 10 : 2" class="w-full pl-16px" :class="pumpSetting.isGutter? 'pr-6px': 'pr-14px'">
-      <el-col v-show="single('new') && pumpSetting.grid['new']?.show" :span="getSpan()" :style="{order: orderNew}">
-        <div class="pump-item  rounded-4px pt-10px">
-          <div class="pump-item_header flex-start px-12px rounded-4px">
-            <template v-if="width > 1024">
-              <!-- <img
-                class="mr-5px"
-                src="@/assets/images/pump/new.svg"
-                width="24"
-                alt=""
-              > -->
-              <span class="color-[--d-F5F5F5-l-333] text-14px">{{ $t('new1') }}</span>
-            </template>
-            <div v-else class="tabs single" >
-              <button
-                v-for="item in tabsList"
-                :key="item.id"
-                :class="{ active: item.id === activeTab}"
-                class="flex-start"
-                type="button"
-                @click.stop="activeTab = item.id"
+      <el-col v-show="pumpSetting.grid['new']?.show" :span="getSpan()" :style="{order: orderNew}">
+        <div class="pump-item  rounded-4px pt-15px">
+          <div class="pump-item_header px-12px rounded-4px relative">
+            <span class="color-[--d-F5F5F5-l-333] text-14px">{{ $t('new1') }}</span>
+            <Icon
+              :name="`custom:key-${pumpSetting.grid['new'].show ? 'visible' : 'invisible'}`"
+              class="text-10px color-[--third-text1] ml-4px cursor-pointer"
+              @click.stop="globalStore.toggleGrid('new')"
+            />
+            <div class="flex-end absolute z-1 right-12px top--5px bg-[--d-0E0F10-l-FFF]">
+              <el-input
+                v-if="pumpSetting?.show_search"
+                ref="inputSearch"
+                v-model.trim="pumpV3Pointer[activeChain].new.pumpFilter.q"
+                class="search-input1 px-20px mr-8px"
+                size="small"
+                :placeholder="$t('keywordsPlaceholder')"
+                @input="(val) => {
+                  pumpV3Pointer[activeChain].new.pumpFilter.q = val.replace(/\s/g, '')
+                  debouncedFetch('new')
+                }"
               >
-                <!-- <img
-                  v-if="item.id == 'new'"
-                  class="mr-5px"
-                  src="@/assets/images/pump/new.svg"
-                  width="24"
-                  alt=""
-                >
-                <img
-                  v-if="item.id == 'soon'"
-                  class="mr-5px"
-                  src="@/assets/images/pump/soon.svg"
-                  width="24"
-                  alt=""
-                >
-                <img
-                  v-if="item.id == 'graduated'"
-                  class="mr-5px"
-                  src="@/assets/images/pump/graduated.svg"
-                  width="24"
-                  alt=""
-                > -->
-                <span>{{ item.name || '' }}</span>
-              </button>
+                <template #prefix>
+                  <Icon
+                    class="text-12px text-[var(--third-text)]"
+                    name="custom:search"
+                  />
+                </template>
+                <template #suffix>
+                  <Icon
+                    v-if="pumpV3Pointer[activeChain].new.pumpFilter.q"
+                    name="pajamas:clear"
+                    class="color-[--third-text9] text-12px hover:opacity-70% cursor-pointer mr-10px"
+                    @click="pumpV3Pointer[activeChain].new.pumpFilter.q = ''; debouncedFetch('new')"
+                  />
+                </template>
+              </el-input>
+              <QuickSwapSetCustom
+                v-model:quickBuyValue="quickBuyValue1"
+                v-model:customSelected="swapSetSelected1"
+                :chain="(activeChain as BotChain)"
+                class="mr-8px"
+              />
+              <AudioSelect activeTab="new" :chain="activeChain"/>
+              <span v-if="isPausedObj?.new" class="bg-#FFA6221A px-4px py-5px rounded-4px flex items-center justify-center w-26px h-28px">
+                <Icon name="custom:stop" class="color-#FFA622 text-16px"/>
+              </span>
+              <PumpFilterButton
+                v-else
+                :key="`pumpFilterButton_${activeChain}_new`"
+                :filterNumber="getFilterNumber(pumpV3Pointer[activeChain].new.pumpFilter || {},platforms,baseTokensAllStr)"
+                :visible="filterVisible && activeFilterType === 'new'"
+                @update:visible="(val) => handleFilterVisibleChange(val, 'new')"
+              />
             </div>
-            <span  v-show="isPausedObj?.new" class=" mr-auto bg-#FFA6221A px-4px py-4px rounded-4px ml-8px flex items-center justify-center w-26px h-26px">
-              <Icon name="custom:stop" class="color-#FFA622 text-16px"/>
-            </span>
-            <span class="flex-1" />
-            <el-input
-              v-if="pumpSetting?.show_search"
-              ref="inputSearch"
-              v-model.trim="pumpV3Pointer[activeChain].new.pumpFilter.q"
-              class="search-input1 px-20px mr-8px"
-              size="small"
-              :placeholder="$t('keywordsPlaceholder')"
-              @input="(val) => {
-                pumpV3Pointer[activeChain].new.pumpFilter.q = val.replace(/\s/g, '')
-                // debouncedFetch('new')
-              }"
-            >
-              <template #prefix>
-                <Icon
-                  class="text-12px text-[var(--third-text)]"
-                  name="custom:search"
-                />
-              </template>
-              <template #suffix>
-                <Icon
-                  v-if="pumpV3Pointer[activeChain].new.pumpFilter.q"
-                  name="pajamas:clear"
-                  class="color-[--third-text9] text-12px hover:opacity-70% cursor-pointer mr-10px"
-                  @click="pumpV3Pointer[activeChain].new.pumpFilter.q = ''; debouncedFetch('new')"
-                />
-              </template>
-            </el-input>
-            <QuickSwapSetCustom
-              v-model:quickBuyValue="quickBuyValue1"
-              v-model:customSelected="swapSetSelected1"
-              :chain="(activeChain as BotChain)"
-              class="mr-8px"
-            />
-            <AudioSelect activeTab="new" :chain="activeChain"/>
-            <PumpFilterButton
-              :key="`pumpFilterButton_${activeChain}_new`"
-              :filterNumber="getFilterNumber(pumpV3Pointer[activeChain].new.pumpFilter || {},platforms,baseTokensAllStr)"
-              :visible="filterVisible && activeFilterType === 'new'"
-              @update:visible="(val) => handleFilterVisibleChange(val, 'new')"
-            />
           </div>
-
           <PumpList
             ref="pumpListRefNew"
             class="pump-item_list-new"
@@ -204,108 +184,74 @@
           />
         </div>
       </el-col>
-      <el-col v-show="single('soon') && pumpSetting.grid['soon'].show" :span="getSpan()" :style="{order: orderSoon}">
-        <div class="pump-item pt-10px">
-          <div class="pump-item_header flex-start px-12px rounded-4px">
-            <template v-if="width > 1024">
-              <!-- <img
-                class="mr-5px"
-                src="@/assets/images/pump/soon.svg"
-                width="24"
-                alt=""
-              > -->
-              <span class="color-[--d-F5F5F5-l-333] text-14px">{{ $t('soon') }}</span>
-            </template>
-            <div v-else class="tabs single" >
-              <button
-                v-for="item in tabsList"
-                :key="item.id"
-                :class="{ active: item.id === activeTab}"
-                class="flex-start"
-                type="button"
-                @click.stop="activeTab = item.id"
-              >
-                <!-- <img
-                  v-if="item.id == 'new'"
-                  class="mr-5px"
-                  src="@/assets/images/pump/new.svg"
-                  width="24"
-                  alt=""
-                >
-                <img
-                  v-if="item.id == 'soon'"
-                  class="mr-5px"
-                  src="@/assets/images/pump/soon.svg"
-                  width="24"
-                  alt=""
-                >
-                <img
-                  v-if="item.id == 'graduated'"
-                  class="mr-5px"
-                  src="@/assets/images/pump/graduated.svg"
-                  width="24"
-                  alt=""
-                > -->
-                <span>{{ item.name || '' }}</span>
-              </button>
-            </div>
-            <span  v-show="isPausedObj?.soon" class=" mr-auto bg-#FFA6221A px-4px py-4px rounded-4px ml-8px flex items-center justify-center w-26px h-26px">
-              <Icon name="custom:stop" class="color-#FFA622 text-16px"/>
-            </span>
-            <span class="flex-1" />
-            <div class="flex items-center justify-between p-1px rounded-4px text-12px h-28px bg-[--main-input-button-bg] px-2px py-2px mr-8px">
-              <button
-                v-for="item in listTab"
-                :id="item.value"
-                :key="item.value"
-                class="cursor-pointer border-none font-400 rounded-4px min-w-24px py-5px px-5px text-center"
-                :class="`${item.value === pumpV3Pointer[activeChain].soon?.pumpFilter?.sort?'color-[--main-text1] bg-[--tab-active-bg]':'color-[--secondary-text] bg-transparent'}`"
-                type="button"
-                @click.stop.prevent = "switchTab(item)"
-              >
-                {{ item.name }}
-              </button>
-            </div>
-            <el-input
-              v-if="pumpSetting?.show_search"
-              ref="inputSearch"
-              v-model.trim="pumpV3Pointer[activeChain].soon.pumpFilter.q"
-              class="search-input1 px-20px mr-8px"
-              size="small"
-              :placeholder="$t('keywordsPlaceholder')"
-              @input="(val) => {
-                pumpV3Pointer[activeChain].soon.pumpFilter.q = val.replace(/\s/g, '')
-                debouncedFetch('soon')
-              }"
-            >
-              <template #prefix>
-                <Icon
-                  class="text-12px text-[var(--third-text)]"
-                  name="custom:search"
-                />
-              </template>
-              <template #suffix>
-                <Icon
-                  v-if="pumpV3Pointer[activeChain].soon.pumpFilter.q"
-                  name="pajamas:clear"
-                  class="color-[--third-text9] text-12px hover:opacity-70% cursor-pointer mr-10px"
-                  @click="pumpV3Pointer[activeChain].soon.pumpFilter.q = ''; debouncedFetch('soon')"
-                />
-              </template>
-            </el-input>
-            <QuickSwapSetCustom
-              v-model:quickBuyValue="quickBuyValue2"
-              v-model:customSelected="swapSetSelected2"
-              :chain="(activeChain as BotChain)"
-              class="mr-8px"
+      <el-col v-show="pumpSetting.grid['soon'].show" :span="getSpan()" :style="{order: orderSoon}">
+        <div class="pump-item pt-15px">
+          <div class="pump-item_header px-12px rounded-4px relative">
+            <span class="color-[--d-F5F5F5-l-333] text-14px">{{ $t('soon') }}</span>
+            <Icon
+              :name="`custom:key-${pumpSetting.grid['soon'].show ? 'visible' : 'invisible'}`"
+              class="text-10px color-[--third-text1] ml-4px cursor-pointer"
+              @click.stop="globalStore.toggleGrid('soon')"
             />
-            <AudioSelect activeTab="soon" :chain="activeChain"/>
-            <PumpFilterButton
-              :key="`pumpFilterButton_${activeChain}_soon`"
-               :filterNumber="getFilterNumber(pumpV3Pointer[activeChain].soon.pumpFilter || {},platforms,baseTokensAllStr)"
-              :visible="filterVisible && activeFilterType === 'soon'"
-              @update:visible="(val) => handleFilterVisibleChange(val, 'soon')"
-            />
+            <div class="flex-end absolute z-1 right-12px top--5px bg-[--d-0E0F10-l-FFF]">
+              <div class="flex items-center justify-between p-1px rounded-4px text-12px h-28px bg-[--main-input-button-bg] px-2px py-2px mr-8px">
+                <button
+                  v-for="item in listTab"
+                  :id="item.value"
+                  :key="item.value"
+                  class="cursor-pointer border-none font-400 rounded-4px min-w-24px py-5px px-5px text-center"
+                  :class="`${item.value === pumpV3Pointer[activeChain].soon?.pumpFilter?.sort?'color-[--main-text1] bg-[--tab-active-bg]':'color-[--secondary-text] bg-transparent'}`"
+                  type="button"
+                  @click.stop.prevent = "switchTab(item)"
+                >
+                  {{ item.name }}
+                </button>
+              </div>
+              <el-input
+                v-if="pumpSetting?.show_search"
+                ref="inputSearch"
+                v-model.trim="pumpV3Pointer[activeChain].soon.pumpFilter.q"
+                class="search-input1 px-20px mr-8px"
+                size="small"
+                :placeholder="$t('keywordsPlaceholder')"
+                @input="(val) => {
+                  pumpV3Pointer[activeChain].soon.pumpFilter.q = val.replace(/\s/g, '')
+                  debouncedFetch('soon')
+                }"
+              >
+                <template #prefix>
+                  <Icon
+                    class="text-12px text-[var(--third-text)]"
+                    name="custom:search"
+                  />
+                </template>
+                <template #suffix>
+                  <Icon
+                    v-if="pumpV3Pointer[activeChain].soon.pumpFilter.q"
+                    name="pajamas:clear"
+                    class="color-[--third-text9] text-12px hover:opacity-70% cursor-pointer mr-10px"
+                    @click="pumpV3Pointer[activeChain].soon.pumpFilter.q = ''; debouncedFetch('soon')"
+                  />
+                </template>
+              </el-input>
+              <QuickSwapSetCustom
+                v-model:quickBuyValue="quickBuyValue2"
+                v-model:customSelected="swapSetSelected2"
+                :chain="(activeChain as BotChain)"
+                class="mr-8px"
+              />
+              <AudioSelect activeTab="soon" :chain="activeChain"/>
+              <span  v-if="isPausedObj?.soon" class="bg-#FFA6221A px-4px py-5px rounded-4px flex items-center justify-center w-26px h-28px">
+                <Icon name="custom:stop" class="color-#FFA622 text-16px"/>
+              </span>
+              <PumpFilterButton
+                v-else
+                :key="`pumpFilterButton_${activeChain}_soon`"
+                :filterNumber="getFilterNumber(pumpV3Pointer[activeChain].soon.pumpFilter || {},platforms,baseTokensAllStr)"
+                :visible="filterVisible && activeFilterType === 'soon'"
+                @update:visible="(val) => handleFilterVisibleChange(val, 'soon')"
+              />
+            </div>
           </div>
           <PumpList
             ref="pumpListRefSoon"
@@ -324,96 +270,61 @@
           />
         </div>
       </el-col>
-      <el-col v-show="single('graduated') && pumpSetting.grid['graduated'].show" :span="getSpan()" :style="{order: orderGraduated}">
-        <div class="pump-item pt-10px">
-          <div class="pump-item_header flex-start px-12px rounded-4px">
-            <template v-if="width > 1024">
-              <!-- <img
-                class="mr-5px"
-                src="@/assets/images/pump/graduated.svg"
-                width="24"
-                alt=""
-              > -->
-              <span class="color-[--d-F5F5F5-l-333] text-14px">{{ $t('graduated') }}</span>
-            </template>
-            <div v-else class="tabs single" >
-              <button
-                v-for="item in tabsList"
-                :key="item.id"
-                :class="{ active: item.id === activeTab}"
-                class="flex-start"
-                type="button"
-                @click.stop="activeTab = item.id"
+      <el-col v-show="pumpSetting.grid['graduated'].show" :span="getSpan()" :style="{order: orderGraduated}">
+        <div class="pump-item pt-15px">
+          <div class="pump-item_header px-12px rounded-4px relative">
+            <span class="color-[--d-F5F5F5-l-333] text-14px">{{ $t('graduated') }}</span>
+            <Icon
+              :name="`custom:key-${pumpSetting.grid['graduated'].show ? 'visible' : 'invisible'}`"
+              class="text-10px color-[--third-text1] ml-4px cursor-pointer"
+              @click.stop="globalStore.toggleGrid('graduated')"
+            />
+            <div class="flex-end absolute z-1 right-12px top--5px bg-[--d-0E0F10-l-FFF]">
+              <el-input
+                v-if="pumpSetting?.show_search"
+                ref="inputSearch"
+                v-model.trim="pumpV3Pointer[activeChain].graduated.pumpFilter.q"
+                class="search-input1 px-20px mr-8px"
+                size="small"
+                :placeholder="$t('keywordsPlaceholder')"
+                @input="(val) => {
+                  pumpV3Pointer[activeChain].graduated.pumpFilter.q = val.replace(/\s/g, '')
+                  debouncedFetch('graduated')
+                }"
               >
-                <!-- <img
-                  v-if="item.id == 'new'"
-                  class="mr-5px"
-                  src="@/assets/images/pump/new.svg"
-                  width="24"
-                  alt=""
-                >
-                <img
-                  v-if="item.id == 'soon'"
-                  class="mr-5px"
-                  src="@/assets/images/pump/soon.svg"
-                  width="24"
-                  alt=""
-                >
-                <img
-                  v-if="item.id == 'graduated'"
-                  class="mr-5px"
-                  src="@/assets/images/pump/graduated.svg"
-                  width="24"
-                  alt=""
-                > -->
-                <span>{{ item.name || '' }}</span>
-              </button>
+                <template #prefix>
+                  <Icon
+                    class="text-12px text-[var(--third-text)]"
+                    name="custom:search"
+                  />
+                </template>
+                <template #suffix>
+                  <Icon
+                    v-if="pumpV3Pointer[activeChain].graduated.pumpFilter.q"
+                    name="pajamas:clear"
+                    class="color-[--third-text] text-12px hover:opacity-70% cursor-pointer mr-10px"
+                    @click="pumpV3Pointer[activeChain].graduated.pumpFilter.q = ''; debouncedFetch('graduated')"
+                  />
+                </template>
+              </el-input>
+              <QuickSwapSetCustom
+                v-model:quickBuyValue="quickBuyValue3"
+                v-model:customSelected="swapSetSelected3"
+                :chain="(activeChain as BotChain)"
+                class="mr-8px"
+              />
+              <AudioSelect activeTab="graduated" :chain="activeChain"/>
+              <span  v-if="isPausedObj?.graduated" class="bg-#FFA6221A px-4px py-5px rounded-4px flex items-center justify-center w-26px h-28px">
+                <Icon name="custom:stop" class="color-#FFA622 text-16px"/>
+              </span>
+              <PumpFilterButton
+                v-else
+                :key="`pumpFilterButton_${activeChain}_graduated`"
+                :filterNumber="getFilterNumber(pumpV3Pointer[activeChain].graduated.pumpFilter || {},platforms,baseTokensAllStr)"
+                :visible="filterVisible && activeFilterType === 'graduated'"
+                @update:visible="(val) => handleFilterVisibleChange(val, 'graduated')"
+              />
             </div>
-
-            <span  v-show="isPausedObj?.graduated" class=" mr-auto bg-#FFA6221A px-4px py-4px rounded-4px ml-8px flex items-center justify-center w-26px h-26px">
-              <Icon name="custom:stop" class="color-#FFA622 text-16px"/>
-            </span>
-            <span class="flex-1" />
-            <el-input
-              v-if="pumpSetting?.show_search"
-              ref="inputSearch"
-              v-model.trim="pumpV3Pointer[activeChain].graduated.pumpFilter.q"
-              class="search-input1 px-20px mr-8px"
-              size="small"
-              :placeholder="$t('keywordsPlaceholder')"
-              @input="(val) => {
-                pumpV3Pointer[activeChain].graduated.pumpFilter.q = val.replace(/\s/g, '')
-                debouncedFetch('graduated')
-              }"
-            >
-              <template #prefix>
-                <Icon
-                  class="text-12px text-[var(--third-text)]"
-                  name="custom:search"
-                />
-              </template>
-              <template #suffix>
-                <Icon
-                  v-if="pumpV3Pointer[activeChain].graduated.pumpFilter.q"
-                  name="pajamas:clear"
-                  class="color-[--third-text] text-12px hover:opacity-70% cursor-pointer mr-10px"
-                  @click="pumpV3Pointer[activeChain].graduated.pumpFilter.q = ''; debouncedFetch('graduated')"
-                />
-              </template>
-            </el-input>
-            <QuickSwapSetCustom
-              v-model:quickBuyValue="quickBuyValue3"
-              v-model:customSelected="swapSetSelected3"
-              :chain="(activeChain as BotChain)"
-              class="mr-8px"
-            />
-            <AudioSelect activeTab="graduated" :chain="activeChain"/>
-            <PumpFilterButton
-              :key="`pumpFilterButton_${activeChain}_graduated`"
-               :filterNumber="getFilterNumber(pumpV3Pointer[activeChain].graduated.pumpFilter || {},platforms,baseTokensAllStr)"
-              :visible="filterVisible && activeFilterType === 'graduated'"
-              @update:visible="(val) => handleFilterVisibleChange(val, 'graduated')"
-            />
           </div>
           <PumpList
           ref="pumpListRefGraduated"
@@ -629,6 +540,11 @@ const logoList = shallowRef<{
   sell_tax: number,
   deployer_platform: string
   is_cloned: number,
+  is_cashback: number
+  name_en: string
+  name_zh: string
+  symbol_en: string
+  symbol_zh: string
 }[]>([])
 
 type PumpWorkerAPI = {
@@ -769,8 +685,13 @@ const syncCategory = (category: 'new' | 'soon' | 'graduated') => {
         ...(obj.sell_tax ? { sell_tax: obj.sell_tax } : {}),
         ...(obj.name ? { name: obj.name } : {}),
         ...(obj.symbol ? { symbol: obj.symbol } : {}),
+        ...(obj.name_en ? { name_en: obj.name_en } : {}),
+        ...(obj.symbol_en ? { symbol_en: obj.symbol_en } : {}),
+        ...(obj.name_zh ? { name_zh: obj.name_zh } : {}),
+        ...(obj.symbol_zh ? { symbol_zh: obj.symbol_zh } : {}),
         ...(obj.appendix ? { medias: getMedias(obj.appendix), twitter_type: obj.twitter_type } : {}),
         ...(obj.is_cloned ? { is_cloned: obj.is_cloned } : {}),
+        ...(obj.is_cashback ? { is_cashback: obj.is_cashback } : {}),
         ...(obj.deployer_platform ? { deployer_platform: obj.deployer_platform } : {}),
         ...(obj.is_pump_agent ? { is_pump_agent: obj.is_pump_agent } : {})
       }
@@ -1090,31 +1011,19 @@ watchTokenUpdatedUnwatch = watch(
           ...(rawVal.sell_tax !== undefined ? { sell_tax: rawVal.sell_tax } : {}),
           ...(rawVal.name ? { name: rawVal.name } : {}),
           ...(rawVal.symbol ? { symbol: rawVal.symbol } : {}),
+          ...(rawVal.name_en ? { name_en: rawVal.name_en } : {}),
+          ...(rawVal.symbol_en ? { symbol_en: rawVal.symbol_en } : {}),
+          ...(rawVal.name_zh ? { name_zh: rawVal.name_zh } : {}),
+          ...(rawVal.symbol_zh ? { symbol_zh: rawVal.symbol_zh } : {}),
           ...(rawVal.appendix ? { medias: getMedias(rawVal.appendix), twitter_type: rawVal.twitter_type } : {}),
           ...(rawVal.is_cloned !== undefined ? { is_cloned: rawVal.is_cloned } : {}),
+          ...(rawVal.is_cashback !== undefined ? { is_cashback: rawVal.is_cashback } : {}),
           ...(rawVal.deployer_platform ? { deployer_platform: rawVal.deployer_platform } : {}),
           ...(rawVal.is_pump_agent !== undefined ? { is_pump_agent: rawVal.is_pump_agent } : {})
         }
         list[index] = merged
       }
     })
-    const index = wsTableList.value.findIndex(item => item.target_token === rawVal.token)
-    if (index !== -1) {
-      const prev = wsTableList.value[index]
-      const merged = {
-        ...prev,
-        ...(rawVal.logo_url ? { logo_url: rawVal.logo_url } : {}),
-        ...(rawVal.buy_tax !== undefined ? { buy_tax: rawVal.buy_tax } : {}),
-        ...(rawVal.sell_tax !== undefined ? { sell_tax: rawVal.sell_tax } : {}),
-        ...(rawVal.name ? { name: rawVal.name } : {}),
-        ...(rawVal.symbol ? { symbol: rawVal.symbol } : {}),
-        ...(rawVal.appendix ? { medias: getMedias(rawVal.appendix), twitter_type: rawVal.twitter_type } : {}),
-        ...(rawVal.is_cloned !== undefined ? { is_cloned: rawVal.is_cloned } : {}),
-        ...(rawVal.deployer_platform ? { deployer_platform: rawVal.deployer_platform } : {}),
-        ...(rawVal.is_pump_agent !== undefined ? { is_pump_agent: rawVal.is_pump_agent } : {})
-      }
-      wsTableList.value[index] = merged
-    }
     const prev = bufferLogoMap.get(rawVal.token)
     setLRU(
       bufferLogoMap,
@@ -1583,17 +1492,6 @@ function handlerFilterConfirm(
 }
 
 
-function single(type: string) {
-  if (width.value < 1024) {
-    if (type == activeTab.value) {
-      return true
-    } else {
-      return false
-    }
-  } else {
-    return true
-  }
-}
 function getPumpList(isFilter = false) {
   const new1 = pumpStore.pumpV3[activeChain.value].new.pumpFilter || {}
   const soon = pumpStore.pumpV3[activeChain.value].soon.pumpFilter || {}
@@ -2019,7 +1917,7 @@ function getFilterData(list: PumpObj[], conditions: any) {
 }
 function getSpan() {
   const visibleList = Object.values(pumpSetting?.value.grid || {}).filter(i => i.show) || []
-  if (width.value > 1024) {
+  // if (width.value > 1024) {
     if(visibleList?.length ==1){
       return 24
     }
@@ -2029,9 +1927,9 @@ function getSpan() {
     if(visibleList?.length ==3){
       return 8
     }
-  } else {
-    return 24
-  }
+  // } else {
+  //   return 24
+  // }
 }
 function switchChain(item: { chain: ChainKey }) {
   activeChain.value = item.chain
@@ -2352,38 +2250,6 @@ function hitBlacklist(item:PumpObj, black: pumpBlack) {
   font-size: 12px;
   height: 28px;
   gap:8px;
-  &.single {
-    background: transparent;
-    border-radius: 0px;
-    button {
-    border: none;
-
-    // font-size: 14px;
-    color: var(--third-text);
-    letter-spacing: 0;
-    font-weight: 400;
-    cursor: pointer;
-    border-radius: 4px;
-    border: none;
-    background: transparent;
-    min-width: 36px;
-    padding: 5px 10px;
-    text-align: center;
-    opacity: 0.7;
-    font-weight: 500;
-    font-style: Medium;
-    font-size: 18px;
-    line-height: 28px;
-    letter-spacing: 0px;
-
-    &.active {
-      color: var(--main-text1);
-      background: var(--tab-active-bg);
-      opacity: 1;
-    }
-  }
-  }
-
   button {
     border: none;
     color: var(--third-text);
@@ -2424,6 +2290,7 @@ function hitBlacklist(item:PumpObj, black: pumpBlack) {
   .el-input__wrapper {
     background-color: transparent;
     box-shadow: none;
+    padding: 2px 7px;
     &:hover {
       box-shadow: 0 0 0 1px #3F80F7 inset;
     }

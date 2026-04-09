@@ -2138,6 +2138,7 @@
   "removeTokenTips2": "Delete the selected monitoring?",
   "twitterFollowers": "Twitter Followers",
   "position2": "Position",
+  "cashback": "Cashback coins return the creator fee to traders instead of the coin creator",
   "deletedTweets": "Deleted",
   "unpin": "Unpin",
   "actionDel": "have deleted this tweet",
@@ -2158,5 +2159,6 @@
   "internalTransfer": "Internal Transfer In/Out",
   "internalTransferIn": "Internal In",
   "internalTransferOut": "Internal Out",
-  "tutorial": "Tutorial"
+  "tutorial": "Tutorial",
+  "gridTip": "Please keep at least one category displayed"
 }

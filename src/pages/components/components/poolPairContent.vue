@@ -35,6 +35,7 @@ function getLogoUrl(row) {
 }
 
 const globalStore = useGlobalStore()
+const { lang } = storeToRefs(globalStore)
 function inBlackList(row) {
   return (
     globalStore.pumpBlackList.findIndex(
@@ -296,6 +297,14 @@ function addTokenFavorite(row, newGroupId: number) {
           /> -->
           <Icon v-if="row.headline" v-tooltip="row.headline" class="ml-4px" name="custom:ai"/>
         </div>
+        <div v-if="(lang === 'zh-cn' || lang === 'zh-tw') && (row.symbol_zh || row.name_zh) && row.symbol_zh !== getSymbol(row) || (!(lang === 'zh-cn' || lang === 'zh-tw')) && (row.symbol_en || row.name_en) && row.symbol_en !== getSymbol(row)" class="flex items-center lh-12px color-[--yellow] whitespace-nowrap overflow-hidden">
+          <template v-if="lang === 'zh-cn' || lang === 'zh-tw'">
+            {{ row.symbol_zh || '' }}&nbsp;&nbsp;{{ row.name_zh || '' }}
+          </template>
+          <template v-else>
+            {{ row.symbol_en || '' }}&nbsp;&nbsp;{{ row.name_en || '' }}
+          </template>
+        </div>
         <div class="flex items-center lh-12px">
           <div
             v-tooltip="formatDate(row.created_at, 'YYYY/MM/DD HH:mm:ss')"
@@ -342,6 +351,7 @@ function addTokenFavorite(row, newGroupId: number) {
               </div>
             </template>
           </div>
+          <Icon v-if="row?.is_cashback" name="custom:cashback" class="text-12px color-[--yellow] clickable ml-4px hover:!color-[--primary-color]" v-tooltip="$t('cashback')"/>
           <PumpLive v-if="row?.is_streaming" :class="{'ml-4px': row?.medias?.length > 0}" class="mr-0!" :tokenId="((row.token + '-' + row.chain) as string)" />
           <template v-if="row.signal_arr?.length > 0">
             <div
