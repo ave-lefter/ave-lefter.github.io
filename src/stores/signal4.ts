@@ -19,6 +19,7 @@ export const useFavTokenStore = defineStore('favToken', () => {
       translateStyle.value =
           x + favTokenBoundingRect.value.width >= winWidth.value ? -12 : 0
     }
+    console.log('onDrag', translateStyle.value)
   }, 100, false, true)
   function onDragStop(x: number, y: number) {
     console.log('onDragStop', x, y)
