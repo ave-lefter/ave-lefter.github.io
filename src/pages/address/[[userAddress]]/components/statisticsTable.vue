@@ -121,6 +121,7 @@
           :handleSortChange="handleSortChange"
           :tableData="filterTableList"
           :trendQuery="trendQuery"
+          :chain="chain"
           @refreshWhaleTrendList="refreshWhaleTrendList"
         />
         <DeployedTokenList
@@ -191,7 +192,7 @@ const trendQuery = ref({
   hideNative: 1,
   checkAll: false,
   isIndeterminate: true,
-  checkedTrend: ['SWAP', 'ADD_LIQUIDITY/REMOVE_LIQUIDITY'],
+  checkedTrend: ['SWAP', 'ADD_LIQUIDITY/REMOVE_LIQUIDITY', 'TRANSFER'],
   sort_dir: 'desc',
   sort: 'block_time',
 })
@@ -413,7 +414,7 @@ const getWhaleTrendParams = () => {
   }
 
   const trendLen = trendQuery.value.checkedTrend?.length
-  if (trendLen > 0 && trendLen <= 5) {
+  if (trendLen > 0 && trendLen <= 6) {
     const event_type = trendQuery.value.checkedTrend
       .filter((i) => i !== 'all')
       .map((i) => i.replace('/', ','))
@@ -447,6 +448,8 @@ const _getWhaleTrendList = async () => {
         event_type = i.flow_type === 0 ? 'swap_buy' : 'swap_sell'
       } else if (i.event_type === 'TRANSFER') {
         event_type = i.flow_type === 0 ? 'transfer_in' : 'transfer_out'
+      } else if (i.event_type === 'INTERNAL_TRANSFER') {
+        event_type = i.flow_type === 0 ? 'internal_transfer_in' : 'internal_transfer_out'
       }
       return { ...i, event_type }
     })
