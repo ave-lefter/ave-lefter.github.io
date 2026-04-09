@@ -2161,5 +2161,7 @@
   "internalTransferIn": "内嵌转入",
   "internalTransferOut": "内嵌转出",
   "tutorial": "教程",
-  "gridTip": "至少保留一个分类显示"
+  "gridTip": "至少保留一个分类显示",
+  "emailCodeAuth": "邮箱验证码",
+  "googleAuth2": "谷歌验证器"
 }

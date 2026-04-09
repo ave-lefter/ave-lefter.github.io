@@ -2147,5 +2147,7 @@
   "newMessage": "新消息",
   "languageSetting": "語言設定",
   "followAuthor": "關注此博主",
-  "unfollowAuthor": "取消追蹤此部落客"
+  "unfollowAuthor": "取消追蹤此部落客",
+  "emailCodeAuth": "信箱驗證碼",
+  "googleAuth2": "谷歌驗證器"
 }

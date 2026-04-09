@@ -2160,5 +2160,7 @@
   "internalTransferIn": "Internal In",
   "internalTransferOut": "Internal Out",
   "tutorial": "Tutorial",
-  "gridTip": "Please keep at least one category displayed"
+  "gridTip": "Please keep at least one category displayed",
+  "emailCodeAuth": "Email Verification",
+  "googleAuth2": "Google Authenticator"
 }
