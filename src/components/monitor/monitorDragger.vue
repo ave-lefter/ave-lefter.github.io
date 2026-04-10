@@ -32,7 +32,6 @@ const {
   boundingRect: computed(() => monitorStore.monitorBoundingRect),
   fixedWidth: monitorStore.fixedWidth,
   winHeight: monitorStore.winHeight,
-  lang,
   visible: computed(() => monitorStore.visible),
   isLeftFixed: computed(() => monitorStore.isLeftFixed),
   isRightFixed: computed(() => monitorStore.isRightFixed),
@@ -45,6 +44,9 @@ const {
   loadComponent: () => import('./index.vue'),
   panelKey: 'monitor',
   scrollHeightCenterOffset: 45,
-  isLargeWidthThreshold: 720
+  scrollHeightSideOffset: 140,
+  isLargeWidthThreshold: 720,
+  minWidth: lang.value.indexOf('zh') > -1 ? 310 : 360,
+  maxWidth: 388,
 })
 </script>

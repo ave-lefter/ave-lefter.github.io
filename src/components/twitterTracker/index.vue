@@ -41,7 +41,6 @@ const {
   boundingRect: computed(() => trackerStore.boundingRect),
   fixedWidth: trackerStore.fixedWidth,
   winHeight: trackerStore.winHeight,
-  lang: computed(() => lang.value),
   visible: computed(() => trackerStore.visible),
   isLeftFixed: computed(() => trackerStore.isLeftFixed),
   isRightFixed: computed(() => trackerStore.isRightFixed),
@@ -53,9 +52,9 @@ const {
   onDrag: trackerStore.onDrag.bind(trackerStore),
   loadComponent: () => import('./trackerPop.vue'),
   panelKey: 'twitter',
-  scrollHeightCenterOffset: 140,
   isLargeWidthThreshold: 720,
-  maxWidth: 438
+  minWidth: 360,
+  maxWidth: 438,
 })
 
 // Override childProps for twitter tracker's specific needs

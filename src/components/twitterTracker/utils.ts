@@ -37,6 +37,32 @@ function escapeHtml(str: string): string {
 }
 
 /**
+ * Precompiled token regex patterns to avoid repeated compilation
+ */
+const COMPILED_TOKEN_PATTERNS = new Map<string, RegExp>()
+
+/**
+ * Get or create compiled regex for token symbol matching
+ */
+function getTokenRegex(symbol: string): RegExp {
+  if (!COMPILED_TOKEN_PATTERNS.has(symbol)) {
+    const escaped = symbol.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    COMPILED_TOKEN_PATTERNS.set(
+      symbol, 
+      new RegExp(`\\$?\\b${escaped}\\b|\\$?${escaped}`, 'gi')
+    )
+  }
+  const regex = COMPILED_TOKEN_PATTERNS.get(symbol)!
+  regex.lastIndex = 0 // Reset state for reuse
+  return regex
+}
+
+/**
+ * Fast check for plain text that doesn't need processing
+ */
+const PLAIN_TEXT_REGEX = /^[^#@$"'"'"'"'"'"'https:@[\]]+$/
+
+/**
  * Generate inline style for colors
  */
 function getColorStyle(color?: string): string {
@@ -93,7 +119,7 @@ export const BLACKLIST_KEYWORDS = ['axiom', 'gmgn', 'debot', 'binance', 'okx'] a
 
 // 🧩 加密货币哈希/地址正则
 // 移除 /g 避免 lastIndex 状态污染，match() 无需全局标志即可安全提取首个匹配
-const CRYPTO_HASH_REGEX = /(?:0x[a-fA-F0-9]{40,64}|[1-9A-HJ-NP-Za-km-z]{32,44}|[UQ][a-zA-Z0-9_-]{46}|T[1-9A-HJ-NP-Za-km-z]{33}|[13][a-km-zA-HJ-NP-Z1-9]{25,34}|bc1[a-z0-9]{39,59})(?=[\/?&#\s<]|$)/g
+const CRYPTO_HASH_REGEX = /(?:0x[a-fA-F0-9]{40,64}|[1-9A-HJ-NP-Za-km-z]{32,44}|[UQ][a-zA-Z0-9_-]{46}|T[1-9A-HJ-NP-Za-km-z]{33}|[13][a-km-zA-HJ-NP-Z1-9]{25,34}|bc1[a-z0-9]{39,59})(?=[/?&#\s<]|$)/g
 
 // ⚡ 预编译正则：匹配任意黑名单词，且前后不为字母/数字（防 mybinance 误杀）
 const BLACKLIST_URL_REGEX = new RegExp(
@@ -143,6 +169,11 @@ export function processTwitterText(
 ): string {
   if (!text || typeof text !== 'string') {
     return ''
+  }
+
+  // Performance optimization: Fast path for plain text without special characters
+  if ((!tokens || tokens.length === 0) && PLAIN_TEXT_REGEX.test(text)) {
+    return escapeHtml(text)
   }
 
   const linkClass = '[&&]:color-[--primary-color] hover:underline clickable'
@@ -247,10 +278,9 @@ export function processTwitterText(
   // Add token matches if tokens are provided
   if (tokens && tokens.length > 0) {
     for (const token of tokens) {
-      const escapedSymbol = token.symbol.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-      const tokenRegex = new RegExp(`\\$?\\b${escapedSymbol}\\b|\\$?${escapedSymbol}`, 'gi')
+      // Performance optimization: Use precompiled regex pattern
+      const tokenRegex = getTokenRegex(token.symbol)
       let match: RegExpExecArray | null
-      tokenRegex.lastIndex = 0
       while ((match = tokenRegex.exec(processedText)) !== null) {
         matches.push({
           start: match.index,

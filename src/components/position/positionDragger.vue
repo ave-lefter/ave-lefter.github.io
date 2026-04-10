@@ -32,7 +32,6 @@ const {
   boundingRect: computed(() => positionStore.positionBoundingRect),
   fixedWidth: positionStore.fixedWidth,
   winHeight: positionStore.winHeight,
-  lang,
   visible: computed(() => positionStore.visible),
   isLeftFixed: computed(() => positionStore.isLeftFixed),
   isRightFixed: computed(() => positionStore.isRightFixed),
@@ -45,6 +44,9 @@ const {
   loadComponent: () => import('./index.vue'),
   panelKey: 'position',
   scrollHeightCenterOffset: 15,
-  isLargeWidthThreshold: 720
+  scrollHeightSideOffset: 90,
+  isLargeWidthThreshold: 720,
+  minWidth: lang.value.indexOf('zh') > -1 ? 290 : 300,
+  maxWidth: 388,
 })
 </script>

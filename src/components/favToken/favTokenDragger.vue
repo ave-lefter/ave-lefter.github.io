@@ -32,7 +32,6 @@ const {
   boundingRect: computed(() => favTokenStore.favTokenBoundingRect),
   fixedWidth: favTokenStore.fixedWidth,
   winHeight: favTokenStore.winHeight,
-  lang,
   visible: computed(() => favTokenStore.visible),
   isLeftFixed: computed(() => favTokenStore.isLeftFixed),
   isRightFixed: computed(() => favTokenStore.isRightFixed),
@@ -45,6 +44,9 @@ const {
   loadComponent: () => import('./index.vue'),
   panelKey: 'favToken',
   scrollHeightCenterOffset: 15,
-  isLargeWidthThreshold: 720
+  scrollHeightSideOffset: 98,
+  isLargeWidthThreshold: 720,
+  maxWidth: 388,
+  minWidth: lang.value.indexOf('zh') > -1 ? 281 : 280,
 })
 </script>

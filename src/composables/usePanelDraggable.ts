@@ -1,9 +1,3 @@
-/*
- * @Date: 2026-04-10 02:11:23
- * @LastEditors: Lewis
- * @FilePath: /ave_web/src/composables/usePanelDraggable.ts
- * @Description: In User Settings Edit
- */
 import { useWindowSize } from '@vueuse/core'
 import type { Ref } from 'vue'
 
@@ -61,7 +55,6 @@ export interface UsePanelDraggableOptions {
   boundingRect: Ref<PanelBoundingRect>
   fixedWidth: number
   winHeight: number
-  lang: Ref<string>
   visible: Ref<boolean>
   isLeftFixed: Ref<boolean>
   isRightFixed: Ref<boolean>
@@ -74,8 +67,10 @@ export interface UsePanelDraggableOptions {
   loadComponent: () => Promise<any>
   panelKey: 'monitor' | 'position' | 'signal' | 'favToken' | 'pump' | 'twitter'
   scrollHeightCenterOffset?: number
+  scrollHeightSideOffset?: number
   isLargeWidthThreshold?: number
   maxWidth?: number
+  minWidth?: number
 }
 
 export function usePanelDraggable(options: UsePanelDraggableOptions) {
@@ -161,7 +156,7 @@ export function usePanelDraggable(options: UsePanelDraggableOptions) {
         style: `left:${dragStore.leftWidth[getPanelKey()] || 0}px`,
         axis: 'x',
         x: 0,
-        minWidth: options.lang.value.indexOf('zh') > -1 ? 290 : 300,
+        minWidth: options.minWidth || 388,
         maxWidth: options.maxWidth || 388,
         initialWidth: options.fixedWidth,
         initialHeight: options.winHeight - 95,
@@ -175,7 +170,7 @@ export function usePanelDraggable(options: UsePanelDraggableOptions) {
         axis: 'x',
         x: dragStore.rightWidth[getPanelKey()] || 0,
         y: 0,
-        minWidth: options.lang.value.indexOf('zh') > -1 ? 290 : 300,
+        minWidth: options.minWidth || 388,
         maxWidth: options.maxWidth || 388,
         initialWidth: options.fixedWidth,
         initialHeight: options.winHeight - 95,
@@ -191,17 +186,18 @@ export function usePanelDraggable(options: UsePanelDraggableOptions) {
   // Compute props for child component
   const childProps = computed(() => {
     const placement = options.placement.value
-    const offset = options.scrollHeightCenterOffset || 45
+    const centerOffset = options.scrollHeightCenterOffset || 0
+    const sideOffset = options.scrollHeightSideOffset || 0
 
     if (placement === 'center') {
       return {
         class: 'border-1px border-solid border-[--d-1A1A1A-l-F2F2F2] shadow-[0_5px_10px_0_var(--d-FFFFFF14-l-00000014)]',
-        scrollHeight: options.boundingRect.value.height - offset,
+        scrollHeight: options.boundingRect.value.height - centerOffset,
         isLarge: options.boundingRect.value.width > (options.isLargeWidthThreshold || 720)
       }
     } else {
       return {
-        scrollHeight: options.winHeight - 90
+        scrollHeight: options.winHeight - sideOffset
       }
     }
   })
