@@ -5,6 +5,7 @@ import {
   type GetFavListResponse,
   getFavoriteList,
   getUserFavoriteGroups,
+  batchChangeFavoritesIndex,
 } from '~/api/fav'
 import TokenImg from '~/components/tokenImg.vue'
 import { formatNumber } from '~/utils/formatNumber'
@@ -13,6 +14,7 @@ import type { IPriceV2Response } from '~/api/types/ws'
 import { useEventBus, useLocalStorage, useStorage } from '@vueuse/core'
 import { BusEventType, type IFavDialogEventArgs } from '~/utils/constants'
 import type { ScrollbarInstance } from 'element-plus'
+import { VueDraggable } from 'vue-draggable-plus'
 const topEventBus = useEventBus(BusEventType.TOP_FAV_CHANGE)
 topEventBus.on(refresh)
 const favDialogEvent = useEventBus<IFavDialogEventArgs>(BusEventType.FAV_DIALOG)
@@ -22,6 +24,7 @@ topAddGroupEvent.on(_getUserFavoriteGroups)
 
 const otherListArea = ref<ScrollbarInstance>()
 const {updateNum11,delTokenGroup} = storeToRefs(useFollowStore())
+const isDragging = ref(false)
 
 onUnmounted(() => {
   topEventBus.off(refresh)
@@ -172,8 +175,10 @@ const sortedFavList = computed(() => {
   }
   if(sort.value.sortBy === 'symbol'){
     return favoritesList.value.toSorted((a: any, b: any) => {
-      const codeB = b.symbol[0].toLowerCase().charCodeAt(0) || 0
-      const codeA = a.symbol[0].toLowerCase().charCodeAt(0) || 0
+      const symbolB = b.symbol?.[0]?.toLowerCase() || ''
+      const symbolA = a.symbol?.[0]?.toLowerCase() || ''
+      const codeB = symbolB.charCodeAt(0) || 0
+      const codeA = symbolA.charCodeAt(0) || 0
       return (codeB - codeA) * sort.value.activeSort
     })
   }
@@ -235,6 +240,12 @@ watch(
       sortParam.sort_dir=''
       sortParam.sort=''
     }
+    
+    // 当 activeSort 为 0 时，重置 sortBy 以启用拖拽
+    if (val.activeSort === 0) {
+      sort.value.sortBy = null
+    }
+    
     resetListStatus()
     loadMoreFavorites()
   }
@@ -371,6 +382,40 @@ function resetListStatus() {
   listStatus.value.finished = false
   listStatus.value.pageNo = 1
 }
+
+async function handleDragEnd(evt: any) {
+  isDragging.value = false
+  
+  // 获取被拖拽的 item 信息
+  const draggedItem = favoritesList.value[evt.newIndex]
+  if (!draggedItem) return
+  
+  const moves = [{
+    token_id: draggedItem.token + '-' + draggedItem.chain,
+    new_index: evt.newIndex + 1  // API 使用 1-based index
+  }]
+  
+  // 更新排序
+  try {
+    await batchChangeFavoritesIndex(walletAddress.value, activeTab.value, moves)
+    
+    ElMessage.success(t('success'))
+    favDialogEvent.emit({
+      type: 'order',
+    })
+  } catch (e) {
+    console.log('=>(favoriteTable.vue) drag error', e)
+    ElMessage.error(t('fail'))
+    // 出错时重新加载列表以恢复原顺序
+    resetListStatus()
+    loadMoreFavorites()
+  }
+}
+
+function handleDragStart() {
+  isDragging.value = true
+}
+
 function toggleMode(mode: string) {
   if (favoriteCondition.value.currentMode === 'mcap') {
     favoriteCondition.value.currentMode = 'price'
@@ -429,19 +474,31 @@ function toggleMode(mode: string) {
     <el-scrollbar ref="otherListArea" :height="scrollbarHeight">
       <div
         v-infinite-scroll="loadMoreFavorites"
-        :infinite-scroll-disabled="listStatus.loading || listStatus.finished"
+        :infinite-scroll-disabled="listStatus.loading || listStatus.finished || isDragging"
         infinite-scroll-distance="200"
         :infinite-scroll-delay="10"
         :infinite-scroll-immediate="false"
       >
-        <div class="pb-0px" >
+        <VueDraggable
+          v-model="favoritesList"
+          :animation="300"
+          :disabled="sort.activeSort !== 0 || !!sort.sortBy"
+          @start="handleDragStart"
+          :force-fallback="true"
+          @end="handleDragEnd"
+        >
           <NuxtLink
-            v-for="(row, $index) in sortedFavList"
+            v-for="(row, $index) in (sort.activeSort === 0 && !sort.sortBy) ? favoritesList : sortedFavList"
             :key="`${row.token}-${row.chain}`"
-            class="px-10px flex items-center h-40px cursor-pointer hover:bg-[--dialog-bg]"
+            class="px-10px flex items-center h-40px cursor-pointer hover:bg-[--dialog-bg] group"
             :to="`/token/${row.token}-${row.chain}`"
           >
-            <div class="flex items-center flex-1">
+              <div class="flex items-center flex-1">
+                <Icon 
+                  v-if="sort.activeSort === 0 && !sort.sortBy"
+                  name="material-symbols:dehaze" 
+                  class="text-14px text-[--third-text] cursor-move drag-handle3 w-0 group-hover:w-14px mr-0 group-hover:mr-6px transition-all duration-200 overflow-hidden"
+                />
               <TokenImg class="mr-8px" :row="{...row,issue_platform:''}" v-tooltip="{
                 content:{
                   is:TokenImg,
@@ -494,8 +551,8 @@ function toggleMode(mode: string) {
               </div>
             </div>
           </NuxtLink>
-          <AveEmpty v-if="sortedFavList.length === 0 && !listStatus.loading" />
-        </div>
+          <AveEmpty v-if="((sort.activeSort === 0 && !sort.sortBy) ? favoritesList.length : sortedFavList.length) === 0 && !listStatus.loading" />
+        </VueDraggable>
         <div
           v-if="listStatus.loading && listStatus.pageNo > 1"
           class="color-#959a9f text-12px text-center"
@@ -513,4 +570,12 @@ function toggleMode(mode: string) {
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+:deep(.sortable-ghost) {
+  opacity: 0.4;
+}
+
+:deep(.sortable-drag) {
+  cursor: move;
+}
+</style>

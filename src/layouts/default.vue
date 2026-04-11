@@ -19,7 +19,7 @@
         ]"
         :style="{
           ..._style,
-          transform: `translateX(${signalStore.translateStyle || monitorStore.translateStyle || dragPumpStore.translateStyle || trackerStore.translateStyle}px)`,
+          transform: `translateX(${signalStore.translateStyle || monitorStore.translateStyle || dragPumpStore.translateStyle || trackerStore.translateStyle || favTokenStore.translateStyle || positionStore.translateStyle}px)`,
         }"
       >
         <slot />
