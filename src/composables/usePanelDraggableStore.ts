@@ -98,12 +98,12 @@ export function createPanelDraggableState(options: UsePanelDraggableStoreOptions
   }
 
   function onLeftDragStop(x: number, y: number) {
-    const nearLeft = x <= 12
+    const nearLeft = x <= 1
     
     // 计算左侧模式下能拖到的最大距离，容差 80px
     // 当 x 接近这个最大值时，说明用户已经把面板拖到了最右边
     const maxDraggableX = winWidth.value - boundingRect.value.width - 80
-    const nearRight = x >= maxDraggableX || x + boundingRect.value.width >= winWidth.value - 12
+    const nearRight = x >= maxDraggableX || x + boundingRect.value.width >= winWidth.value - 1
     
     if (nearLeft) {
       // 吸附到左侧
@@ -128,12 +128,12 @@ export function createPanelDraggableState(options: UsePanelDraggableStoreOptions
   }
 
   function onRightDragStop(x: number, y: number) {
-    const nearRight = x + boundingRect.value.width >= winWidth.value - 12
+    const nearRight = x + boundingRect.value.width >= winWidth.value - 1
     
     // 计算右侧模式下能拖到的最小距离，容差 80px
     // 当 x 接近这个最小值时，说明用户已经把面板拖到了最左边
     const minDraggableX = 80
-    const nearLeft = x <= 12 || x <= minDraggableX
+    const nearLeft = x <= 1 || x <= minDraggableX
     
     if (nearRight) {
       // 吸附到右侧
