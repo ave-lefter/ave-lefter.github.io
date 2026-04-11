@@ -434,6 +434,8 @@ function switchTokenKline() {
   if (isReady.value && route.name === 'token-id') {
     lastBar = null
     lastPairPrice = 0
+    resetMarkRefreshState()
+    clearMarkCaches()
     // 清空待处理的 bars 和取消 rAF
     if (_rafTickId !== null) {
       cancelAnimationFrame(_rafTickId)
@@ -669,9 +671,16 @@ const {
   markTabsChecked,
   wsTxUpdateMarks,
   profilingMarksCache,
+  profilingLiveCache,
   createDisplayButton,
   markTabsVisible,
-  wsPublicPortraitUpdateMarks
+  wsPublicPortraitUpdateMarks,
+  scheduleMyPortraitRefresh,
+  allowImmediateMyPortraitFetch,
+  schedulePortraitCacheRefresh,
+  clearMarkCaches,
+  cancelMyPortraitRefresh,
+  resetMarkRefreshState
 } = useKlineMarks()
 
 watch(marksTabs, () => {
@@ -1114,6 +1123,8 @@ async function initChart() {
           localStorage.setItem('tv_resolution', interval)
           lastBar = null
           lastPairPrice = 0
+          cancelMyPortraitRefresh()
+          clearMarkCaches()
           // 清空待处理的 bars 和取消 rAF
           if (_rafTickId !== null) {
             cancelAnimationFrame(_rafTickId)
@@ -1151,27 +1162,31 @@ async function initChart() {
       tokenStore.pair || {}
 
     let user_address = user.value
-    const getProfilingMarkId = (txTime: number, side: 'buy' | 'sell', type: string, walletAddress: string) => {
+    const getProfilingMarkId = (txTime: number, side: 'buy' | 'sell', type: string, walletAddress: string, txid?: string) => {
+      if (txid) {
+        return `${txTime}-${side}-${type}-${txid}`
+      }
       if (type === '-100' || type === '-101') {
         return `${txTime}-${side}-${walletAddress}`
       }
       return `${txTime}-${side}-${type}`
     }
-    for (const [, markArr] of profilingMarksCache) {
+    const allProfilingCaches = [...profilingMarksCache, ...profilingLiveCache]
+    for (const [, markArr] of allProfilingCaches) {
       const flag = markArr.some(({type,holders})=>{
         return holders.some(hol=>{
-          if(hol.buy && markId === getProfilingMarkId(hol.buy.tx_time, 'buy', type, hol.wallet_address)){
+          if(hol.buy && markId === getProfilingMarkId(hol.buy.tx_time, 'buy', type, hol.wallet_address, hol.buy.txid)){
             user_address = hol.wallet_address
             return true
           }
-          if(hol.sell && markId === getProfilingMarkId(hol.sell.tx_time, 'sell', type, hol.wallet_address)){
+          if(hol.sell && markId === getProfilingMarkId(hol.sell.tx_time, 'sell', type, hol.wallet_address, hol.sell.txid)){
             user_address = hol.wallet_address
             return true
           }
         })
       })
       if(flag){
-        break;
+        break
       }
     }
 
@@ -1321,11 +1336,28 @@ function onWsKline(
         },
         _widget
       )
-      scheduleRefreshMarks()
+      scheduleMyPortraitRefresh({
+        pair: pair.value,
+        chain: chain.value || '',
+        user: user.value,
+        widget: _widget,
+      })
     } else if (event === WSEventType.PUBLIC_PORTRAIT) {
       const marksTabsIds = marksTabs.value.map((v) => v.id)
+      const remarksStore = useRemarksStore()
+      const matchPortraitType = (item: { maker_type?: string; remark?: string; wallet_address?: string }, typeId: string) => {
+        const makerTypes = String(item?.maker_type || '').split(',').filter(Boolean)
+        if (typeId === '-101') {
+          const chain = tokenStore?.token?.chain || ''
+          return !!(item?.remark?.trim() || (item?.wallet_address && chain && remarksStore.getRemarkByAddress({ address: item.wallet_address, chain })))
+        }
+        if (typeId === '-100') {
+          return makerTypes.includes('-100')
+        }
+        return makerTypes.includes(typeId)
+      }
       const msgArr = (data?.msg || [])?.filter?.(el=>{
-        return marksTabsIds.some(id=> el.maker_type.includes(id))
+        return marksTabsIds.some(id => matchPortraitType(el, id))
       })
       if(msgArr.length === 0){
         return
@@ -1335,7 +1367,7 @@ function onWsKline(
         interval: Number(interval),
         user: user.value
       })
-      scheduleRefreshMarks()
+      schedulePortraitCacheRefresh(_widget)
     }
   }, 'kline')
 }
@@ -1448,6 +1480,8 @@ const clickHandler = () => {
   globalStore.klineSettingPop.visible = false
 }
 onMounted(() => {
+  resetMarkRefreshState()
+  clearMarkCaches()
   initChart()
   useVisibilityChange(() => {
     _widget?.resetCache?.()
@@ -1485,6 +1519,7 @@ function refresh() {
 }
 
 const onMarkChanged = (val: boolean) => {
+  allowImmediateMyPortraitFetch()
   if (!val) {
     _widget?.activeChart?.()?.clearMarks?.()
   }
