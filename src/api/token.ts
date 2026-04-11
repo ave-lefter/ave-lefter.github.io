@@ -337,6 +337,7 @@ export function getKlineProfilingTagsV2(data:{
   type: string
   pair_id?: string
   token_id?: string
+  self_address?: string
 }):Promise<IGetKlineProfilingTagsV2Item[]>{
   // if (!data?.pair_id) {
   //   return Promise.resolve([])

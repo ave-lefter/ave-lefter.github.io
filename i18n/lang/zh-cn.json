@@ -522,6 +522,7 @@
   "unKnown": "砸盘",
   "unKnown1": "未知",
   "mine": "我的",
+  "myWatchlist": "我的关注",
   "bought": "买入",
   "sold": "卖出",
   "seemsNoProblem": "看起来没有问题",
@@ -1970,7 +1971,7 @@
   "botWallet": "Bot 钱包",
   "createWithdrawIncomeOrder": "提现请求已提交",
   "inviteYourFriends": "邀请好友在Ave参与交易",
-  "shareAndEarn": "享至高<span class=\"color-#27BDFD\">60%</span>手续费返佣",
+  "shareAndEarn": "享至高<span class=\"color-#27BDFD\">42%</span>手续费返佣",
   "loginForInvite": "登录邀请好友",
   "inviteActivity": "邀请活动",
   "inviteYourFriendsToRegister": "邀请好友注册Ave账号，享交易返佣",
@@ -2163,5 +2164,6 @@
   "tutorial": "教程",
   "gridTip": "至少保留一个分类显示",
   "emailCodeAuth": "邮箱验证码",
-  "googleAuth2": "谷歌验证器"
+  "googleAuth2": "谷歌验证器",
+  "myRemark": "我的备注"
 }

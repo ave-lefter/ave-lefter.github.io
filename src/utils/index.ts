@@ -317,6 +317,67 @@ export function generateAvatarIcon(string: string) {
   // return canvas.toDataURL('image/png')
 }
 
+// 根据字符串生成头像
+export function generateAvatarIcon1(string: string) {
+  const hashBuffer = sha1(string)
+  const hash = hashBuffer.toString()
+  const width = 80
+  const height = 80
+  const pixelSize = 10
+  const canvas = document.createElement('canvas')
+  canvas.width = width
+  canvas.height = height
+  const ctx = canvas.getContext('2d')
+
+  // 辅助函数：降低颜色亮度
+  const darkenColor = (hexColor: string, factor = 1) => {
+    const r = parseInt(hexColor.slice(0, 2), 16)
+    const g = parseInt(hexColor.slice(2, 4), 16)
+    const b = parseInt(hexColor.slice(4, 6), 16)
+    const newR = Math.floor(r * factor)
+    const newG = Math.floor(g * factor)
+    const newB = Math.floor(b * factor)
+    return ((newR << 16) | (newG << 8) | newB).toString(16).padStart(6, '0')
+  }
+
+  // 从哈希中提取更分散的颜色值
+  const color1 = '#' + darkenColor(hash.slice(0, 6), 0.2)
+  const color2 = '#' + darkenColor(hash.slice(10, 16), 1)  // 跳过中间部分
+  const color3 = '#' + darkenColor(hash.slice(20, 26), 0.6)  // 使用后面的部分
+  const columns = Math.floor(width / pixelSize)
+  const rows = Math.floor(height / pixelSize)
+  const halfColumns = Math.floor((columns + 1) / 2)
+  for (let row = 0; row < rows; row++) {
+    for (let column = 0; column < halfColumns; column++) {
+      const xPos = column * pixelSize
+      const yPos = row * pixelSize
+      const colorChoice = (row * halfColumns + column) % 3
+      let color
+      switch (colorChoice) {
+        case 0:
+          color = color1
+          break
+        case 1:
+          color = color2
+          break
+        case 2:
+          color = color3
+          break
+        default:
+          color = color1
+          break
+      }
+      if (ctx) {
+        ctx.fillStyle = color
+        ctx.fillRect(xPos, yPos, pixelSize, pixelSize)
+        ctx.fillRect(width - xPos - pixelSize, yPos, pixelSize, pixelSize)
+      }
+    }
+  }
+  return canvas.toDataURL('image/png')
+}
+
+
 export function isValidAddress(address: string, chain = 'eth') {
   if (chain === 'solana') {
     try {
