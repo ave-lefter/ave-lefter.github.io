@@ -55,21 +55,51 @@ export const useTwitterTrackerStore = defineStore('tracker', () => {
       }
     
       function onLeftDragStop(x: number, y: number) {
-        isLeftFixed.value = Math.abs(x) < 1
-        if (!isLeftFixed.value) {
-          boundingRect.value.x = x
-          boundingRect.value.y = y
+        const nearLeft = x <= 12
+        
+        // 容差设置为 80，匹配实际的最大可拖拽距离
+        const maxDraggableX = winWidth.value - boundingRect.value.width - 80
+        const nearRight = x >= maxDraggableX || x + boundingRect.value.width >= winWidth.value - 12
+        
+        if (nearLeft) {
+          isLeftFixed.value = true
+          isRightFixed.value = false
+          return
+        }
+        
+        boundingRect.value.x = x
+        boundingRect.value.y = y
+        
+        if (nearRight) {
+          isRightFixed.value = true
+          isLeftFixed.value = false
+        } else {
+          isRightFixed.value = false
+          isLeftFixed.value = false
         }
       }
     
       function onRightDragStop(x: number, y: number) {
-        console.log('onRightDragStop', x, y)
-        isRightFixed.value = Math.abs(x) < 1
-        const _x = winWidth.value - fixedWidth.value + x
-        if (!isRightFixed.value) {
-          // boundingRect.value.x = _x
-          boundingRect.value.x = x
-          boundingRect.value.y = y
+        const nearRight = x + boundingRect.value.width >= winWidth.value - 12
+        
+        const minDraggableX = 80
+        const nearLeft = x <= 12 || x <= minDraggableX
+        
+        if (nearRight) {
+          isRightFixed.value = true
+          isLeftFixed.value = false
+          return
+        }
+        
+        boundingRect.value.x = x
+        boundingRect.value.y = y
+        
+        if (nearLeft) {
+          isLeftFixed.value = true
+          isRightFixed.value = false
+        } else {
+          isLeftFixed.value = false
+          isRightFixed.value = false
         }
       }
     

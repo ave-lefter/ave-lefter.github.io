@@ -215,12 +215,19 @@ export function usePanelDraggable(options: UsePanelDraggableOptions) {
     }
 
     const placement = options.placement.value
+    
+    let absoluteX = x
     if (placement === 'left') {
-      options.onLeftDragStop(x, y)
+      const leftOffset = dragStore.leftWidth[getPanelKey()] || 0
+      absoluteX = leftOffset + x
+    }
+    
+    if (placement === 'left') {
+      options.onLeftDragStop(absoluteX, y)
     } else if (placement === 'right') {
-      options.onRightDragStop(x, y)
+      options.onRightDragStop(absoluteX, y)
     } else {
-      options.onDragStop(x, y)
+      options.onDragStop(absoluteX, y)
     }
   }
 
