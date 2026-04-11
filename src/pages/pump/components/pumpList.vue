@@ -198,10 +198,10 @@
                         :width="12"
                       >
                     <span
-                      v-if="row.buy_tax && row.sell_tax"
+                      v-if="Number(row.buy_tax) && Number(row.sell_tax)"
                     >
                       <span
-                        v-if="row.buy_tax == row.sell_tax"
+                        v-if="Number(row.buy_tax) == Number(row.sell_tax)"
                         class="bg-[--d-1E2025-l-E8F1FF] rounded-4px px-2px text-10px"
                         :style="{
                               color:(Number(row?.sell_tax) > 5 ? '#F6465D' : 'var(--secondary-text1)'),
@@ -220,7 +220,7 @@
                       </span>
                     </span>
                     <span
-                      v-else-if="row.buy_tax"
+                      v-else-if="Number(row.buy_tax)"
                       class="bg-[--d-1E2025-l-E8F1FF] rounded-4px px-2px text-10px"
                       :style="{
                             color:(Number(row?.buy_tax) > 5 ? '#F6465D' : 'var(--secondary-text1)'),
@@ -229,7 +229,7 @@
                       B {{ formatNumber(row?.buy_tax || 0, 2) }}%
                     </span>
                     <span
-                      v-else-if="row.sell_tax"
+                      v-else-if="Number(row.sell_tax)"
                       class="bg-[--d-1E2025-l-E8F1FF] rounded-4px text-10px"
                         :style="{
                             color:(Number(row?.sell_tax) > 5 ? '#F6465D' : 'var(--secondary-text1)'),

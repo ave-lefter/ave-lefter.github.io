@@ -443,21 +443,21 @@ export function openBrowser(url: string, type: 'token' | 'address' | 'tx', chain
 
 export function getChainDefaultIconColor(chain?: string) {
   const theme = useThemeStore().theme
-  const defaultColor = theme === 'dark' ? '#333333' : '#999999'
-  if (!chain) {
-    return defaultColor
-  }
-  const colors: Record<string, string> = {
-    solana: '#C931F7',
-    eth: '#627EEA',
-    bsc: '#F0B90A',
-    tron: '#C53027',
-    sui: '#6FBCF0',
-    ton: '#0099E9',
-    base: '#0152FF',
-  }
+  const defaultColor = theme === 'dark' ? '#1E2025' : '#E8F1FF'
+  // if (!chain) {
+  //   return defaultColor
+  // }
+  // const colors: Record<string, string> = {
+  //   solana: '#C931F7',
+  //   eth: '#627EEA',
+  //   bsc: '#F0B90A',
+  //   tron: '#C53027',
+  //   sui: '#6FBCF0',
+  //   ton: '#0099E9',
+  //   base: '#0152FF',
+  // }
 
-  return colors?.[chain] || defaultColor
+  return defaultColor
 }
 
 export function getChainDefaultIcon(chain?: string, text = '', type?: string) {
@@ -473,10 +473,12 @@ export function getChainDefaultIcon(chain?: string, text = '', type?: string) {
       firstChar = [...text][0] || ''
     }
     const char = firstChar.toUpperCase()
+    const theme = useThemeStore().theme
+    const textColor = theme === 'dark' ? '#f5f5f580' : '#11111180'
 
-    const circle = `<?xml version="1.0" standalone="no"?><svg width="32" height="32" version="1.1" xmlns="http://www.w3.org/2000/svg"><circle cx="50%" cy="50%" r="16" fill="${color}"/><text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" font-size="16" fill="#fff" font-family="sans-serif">${char}</text></svg>`
+    const circle = `<?xml version="1.0" standalone="no"?><svg width="32" height="32" version="1.1" xmlns="http://www.w3.org/2000/svg"><circle cx="50%" cy="50%" r="16" fill="${color}"/><text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" font-size="16" fill="${textColor}" font-family="sans-serif">${char}</text></svg>`
 
-    const rect = `<?xml version="1.0" standalone="no"?><svg width="32" height="32" version="1.1" xmlns="http://www.w3.org/2000/svg"><rect width="32" height="32" fill="${color}"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="16" fill="#fff" font-family="sans-serif">${char}</text></svg>`
+    const rect = `<?xml version="1.0" standalone="no"?><svg width="32" height="32" version="1.1" xmlns="http://www.w3.org/2000/svg"><rect width="32" height="32" fill="${color}"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="16" fill="${textColor}" font-family="sans-serif">${char}</text></svg>`
 
     const defaultSvg = type === 'rect' ? rect : circle
 
