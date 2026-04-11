@@ -53,7 +53,7 @@ export interface PanelBoundingRect {
 export interface UsePanelDraggableOptions {
   placement: Ref<'center' | 'left' | 'right'>
   boundingRect: Ref<PanelBoundingRect>
-  fixedWidth: number
+  fixedWidth: Ref<number>
   winHeight: number
   visible: Ref<boolean>
   isLeftFixed: Ref<boolean>
@@ -109,7 +109,7 @@ export function usePanelDraggable(options: UsePanelDraggableOptions) {
   watch(() => options.placement.value, () => {
     reload()
     reCreateChild()
-  })
+  }, { flush: 'post' })
 
   // Auto load component on mount or visibility change
   onMounted(() => {
@@ -158,7 +158,7 @@ export function usePanelDraggable(options: UsePanelDraggableOptions) {
         x: 0,
         minWidth: options.minWidth || 388,
         maxWidth: options.maxWidth || 388,
-        initialWidth: options.fixedWidth,
+        initialWidth: options.fixedWidth.value,
         initialHeight: options.winHeight - 95,
         parent: true,
         handles: ['mr'],
@@ -172,14 +172,14 @@ export function usePanelDraggable(options: UsePanelDraggableOptions) {
         y: 0,
         minWidth: options.minWidth || 388,
         maxWidth: options.maxWidth || 388,
-        initialWidth: options.fixedWidth,
+        initialWidth: options.fixedWidth.value,
         initialHeight: options.winHeight - 95,
         parent: true,
         handles: ['ml'],
         dragHandle: '.drag-handle'
       }
     }
-
+    console.log('draggableProps', options.fixedWidth.value)
     return data
   })
 

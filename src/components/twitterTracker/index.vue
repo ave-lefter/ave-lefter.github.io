@@ -39,7 +39,7 @@ const {
 } = usePanelDraggable({
   placement,
   boundingRect: computed(() => trackerStore.boundingRect),
-  fixedWidth: trackerStore.fixedWidth,
+  fixedWidth: computed(() => trackerStore.fixedWidth),
   winHeight: trackerStore.winHeight,
   visible: computed(() => trackerStore.visible),
   isLeftFixed: computed(() => trackerStore.isLeftFixed),

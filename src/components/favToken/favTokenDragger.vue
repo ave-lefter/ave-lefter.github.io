@@ -30,7 +30,7 @@ const {
 } = usePanelDraggable({
   placement,
   boundingRect: computed(() => favTokenStore.favTokenBoundingRect),
-  fixedWidth: favTokenStore.fixedWidth,
+  fixedWidth: computed(() => favTokenStore.fixedWidth),
   winHeight: favTokenStore.winHeight,
   visible: computed(() => favTokenStore.visible),
   isLeftFixed: computed(() => favTokenStore.isLeftFixed),
@@ -49,4 +49,5 @@ const {
   maxWidth: 388,
   minWidth: lang.value.indexOf('zh') > -1 ? 281 : 280,
 })
+
 </script>
