@@ -207,7 +207,7 @@
                               color:(Number(row?.sell_tax) > 5 ? '#F6465D' : 'var(--secondary-text1)'),
                           }"
                       >
-                        Tax {{ formatNumber(row?.sell_tax || 0, 2) }}%
+                        {{ $t('tax') }} {{ formatNumber(row?.sell_tax || 0, 2) }}%
                       </span>
                       <span
                         v-else
