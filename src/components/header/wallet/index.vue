@@ -594,7 +594,9 @@ function getUserBalanceDetails(){
     pageSize:300,
     user_ids,
     hide_risk:1,
-    hide_small:0
+    hide_small:0,
+    sort :'balance_usd',
+    sort_dir : 'desc',
   }).then(res=>{
     const data=res?.data||[]
     let exists=false

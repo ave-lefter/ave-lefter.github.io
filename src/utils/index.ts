@@ -443,21 +443,21 @@ export function openBrowser(url: string, type: 'token' | 'address' | 'tx', chain
 
 export function getChainDefaultIconColor(chain?: string) {
   const theme = useThemeStore().theme
-  const defaultColor = theme === 'dark' ? '#333333' : '#999999'
-  if (!chain) {
-    return defaultColor
-  }
-  const colors: Record<string, string> = {
-    solana: '#C931F7',
-    eth: '#627EEA',
-    bsc: '#F0B90A',
-    tron: '#C53027',
-    sui: '#6FBCF0',
-    ton: '#0099E9',
-    base: '#0152FF',
-  }
+  const defaultColor = theme === 'dark' ? '#1E2025' : '#E8F1FF'
+  // if (!chain) {
+  //   return defaultColor
+  // }
+  // const colors: Record<string, string> = {
+  //   solana: '#C931F7',
+  //   eth: '#627EEA',
+  //   bsc: '#F0B90A',
+  //   tron: '#C53027',
+  //   sui: '#6FBCF0',
+  //   ton: '#0099E9',
+  //   base: '#0152FF',
+  // }
 
-  return colors?.[chain] || defaultColor
+  return defaultColor
 }
 
 export function getChainDefaultIcon(chain?: string, text = '', type?: string) {
@@ -473,10 +473,12 @@ export function getChainDefaultIcon(chain?: string, text = '', type?: string) {
       firstChar = [...text][0] || ''
     }
     const char = firstChar.toUpperCase()
+    const theme = useThemeStore().theme
+    const textColor = theme === 'dark' ? '#f5f5f580' : '#11111180'
 
-    const circle = `<?xml version="1.0" standalone="no"?><svg width="32" height="32" version="1.1" xmlns="http://www.w3.org/2000/svg"><circle cx="50%" cy="50%" r="16" fill="${color}"/><text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" font-size="16" fill="#fff" font-family="sans-serif">${char}</text></svg>`
+    const circle = `<?xml version="1.0" standalone="no"?><svg width="32" height="32" version="1.1" xmlns="http://www.w3.org/2000/svg"><circle cx="50%" cy="50%" r="16" fill="${color}"/><text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" font-size="16" fill="${textColor}" font-family="sans-serif">${char}</text></svg>`
 
-    const rect = `<?xml version="1.0" standalone="no"?><svg width="32" height="32" version="1.1" xmlns="http://www.w3.org/2000/svg"><rect width="32" height="32" fill="${color}"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="16" fill="#fff" font-family="sans-serif">${char}</text></svg>`
+    const rect = `<?xml version="1.0" standalone="no"?><svg width="32" height="32" version="1.1" xmlns="http://www.w3.org/2000/svg"><rect width="32" height="32" fill="${color}"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="16" fill="${textColor}" font-family="sans-serif">${char}</text></svg>`
 
     const defaultSvg = type === 'rect' ? rect : circle
 
@@ -628,6 +630,15 @@ export function getColorClass(val: string | number) {
     return 'color-[--down-color]'
   } else {
     return 'color-[--third-text]'
+  }
+}
+export function getBgClass(val: string | number) {
+  if (Number(val) > 0) {
+    return 'bg-#12B8861A'
+  } else if (Number(val) < 0) {
+    return 'bg-#F6465D1A'
+  } else {
+    return 'bg-#12B8861A'
   }
 }
 export function desensitizeEmail(email: string) {
@@ -1368,69 +1379,6 @@ export function getAudioUrl(audio: string) {
   || audioNameToResource.Bar
 }
 
-/**
- * 处理 Twitter 文本，将 @、# 和 http 链接转换为可点击的链接
- * @param text 原始文本
- * @returns 处理后的 HTML 字符串
- */
-export function processTwitterText(text: string): string {
-  if (!text) return ''
-
-  // 转义 HTML 特殊字符，防止 XSS
-  let html = text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;')
-
-  // 先处理换行符
-  html = html.replace(/\n/g, '<br>')
-
-  // 使用更精确的正则表达式，按顺序处理不同类型的链接
-  // 先处理 URL（http/https），避免与 @ 和 # 冲突
-  const urlRegex = /(https?:\/\/[^\s<>"']+)/g
-  html = html.replace(urlRegex, (url: string) => {
-    return `<a href="${url}" class="[&&]:color-[--primary-color] hover:underline" target="_blank" rel="noopener noreferrer">${url}</a>`
-  })
-
-  // 处理 @ 提及（@username），排除已经在 <a> 标签内的内容
-  const mentionRegex = /@([a-zA-Z0-9_]+)/g
-  html = html.replace(mentionRegex, (match: string, username: string, offset: number) => {
-    // 检查当前位置是否在 <a> 标签内
-    // 从字符串开头到当前位置
-    const beforeMatch = html.slice(0, offset)
-    const lastOpenTag = beforeMatch.lastIndexOf('<a')
-    const lastCloseTag = beforeMatch.lastIndexOf('</a>')
-
-    // 如果最后一个 <a> 标签在最后一个 </a> 之后，说明在链接内
-    if (lastOpenTag > lastCloseTag) {
-      return match // 在链接内，不处理
-    }
-
-    return `<a href="https://twitter.com/${username}" class="[&&]:color-[--primary-color] hover:underline" target="_blank" rel="noopener noreferrer">@${username}</a>`
-  })
-
-  // 处理 # 话题标签（#hashtag），排除已经在 <a> 标签内的内容
-  const hashtagRegex = /#([a-zA-Z0-9_]+)/g
-  html = html.replace(hashtagRegex, (match: string, hashtag: string, offset: number) => {
-    // 检查当前位置是否在 <a> 标签内
-    // 从字符串开头到当前位置
-    const beforeMatch = html.slice(0, offset)
-    const lastOpenTag = beforeMatch.lastIndexOf('<a')
-    const lastCloseTag = beforeMatch.lastIndexOf('</a>')
-
-    // 如果最后一个 <a> 标签在最后一个 </a> 之后，说明在链接内
-    if (lastOpenTag > lastCloseTag) {
-      return match // 在链接内，不处理
-    }
-
-    return `<a href="https://twitter.com/hashtag/${hashtag}" class="[&&]:color-[--primary-color] hover:underline" target="_blank" rel="noopener noreferrer">#${hashtag}</a>`
-  })
-
-  return html
-}
-
 export function formatSeconds(seconds: number) {
   const s = Math.floor(seconds)
   if (s >= 86400) return `${Math.floor(s / 86400)}d`
@@ -1484,4 +1432,11 @@ export async function withCache<T>(
   localforage.setItem(cacheKey, { data: res, timestamp: Date.now() })
 
   return res
+}
+
+
+export function format4Str4(val: string) {
+  if(typeof val !== 'string') return val
+  if(val.length <= 8) return val
+  return val.slice(0, 4) + '...' + val.slice(-4)
 }

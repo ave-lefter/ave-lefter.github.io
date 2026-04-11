@@ -39,9 +39,13 @@ watch(() => props.currentRow?.wallet_address||'', () => {
   }
 })
 
+const botStore = useBotStore()
+const walletStore = useWalletStore()
+
 async function _getTxsUserBrief() {
   const data = {
     user_address: props.currentRow.wallet_address,
+    self_address: (botStore?.userInfo?.evmAddress || walletStore.address) as string,
     chain: props.addressAndChain.chain,
     token: props.addressAndChain.address
   }

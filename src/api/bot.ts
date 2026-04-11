@@ -3,7 +3,9 @@ import BigNumber from 'bignumber.js'
 import type { BotChain } from '~/utils/types'
 import { createCacheRequest } from '#imports'
 import { getTonWalletBalance } from '~/utils/wallet/ton'
+import { getNativeToken, NATIVE_TOKEN } from '~/utils/constants'
 import { getBalance, getBalanceList, getTokenDetails } from './swap'
+import { evm_utils as utils } from '@/utils'
 
 export function login(data: {
   username?: string
@@ -444,31 +446,87 @@ export const bot_getTokenBalance = createCacheRequest(async function(data: {
       }
     }))
   }
-  const { $api } = useNuxtApp()
-  if (!useBotStore().accessToken) {
-    return []
-  }
-  return $api('/botapi/swap/getTokenBalance', {
-    method: 'post',
-    body: data
-  }).then(res => {
-    return Promise.all(res?.map(async (i: { balance: any; decimals: number; token: string }) => {
-      let balance = i.balance
-      if (data.chain === 'ton') {
-        balance = await getTonWalletBalance({token: i.token, wallet: data.walletAddress}).catch(async () => 0)
-      }
-      const decimals = i.decimals || 0
-      // let token = i.token === 'sol' ? 'So11111111111111111111111111111111111111112' : i.token
-      // token = token === 'TON' ? NATIVE_TOKEN : token
-      return {
-        ...i,
-        initBalance: balance,
-        balance: Number(decimals) === 0 ? balance : new BigNumber(balance).div(new BigNumber(10).pow(decimals || 0)).toFixed(),
-        chain: data.chain || '',
-        // token
-      }
-    }))
+  // Use getBalances instead of the old API
+  // Convert token addresses to proper native token addresses for getBalances
+  const convertedTokens = data.tokens.map(token => {
+    if (token === getNativeToken(data.chain)) {
+      // For Solana, getBalances expects NATIVE_TOKEN instead of 'sol'
+      // For other chains, getNativeToken already returns the correct address
+      return data.chain === 'solana' ? NATIVE_TOKEN : token
+    }
+    return token
   })
+
+  const result = await getBalances({
+    chain: data.chain,
+    creatorAddress: data.walletAddress,
+    tokens: convertedTokens,
+    showZero: true
+  })
+
+  // Handle case where tokens is null (when balance is 0)
+  const tokensWithBalance = result.tokens || []
+
+  // Create a map of tokens with balance for quick lookup
+  const tokenMap = new Map()
+  tokensWithBalance.forEach(token => {
+    // Map back to original token address for consistency
+    let originalToken = token.token
+    if (token.token === NATIVE_TOKEN && data.chain === 'solana') {
+      originalToken = getNativeToken(data.chain) // This returns 'sol' for Solana
+    }
+    tokenMap.set(originalToken, token)
+  })
+
+  // Return all requested tokens, including those with 0 balance
+  return Promise.all(data.tokens.map(async (tokenAddress: string) => {
+    const tokenWithBalance = tokenMap.get(tokenAddress)
+
+    if (tokenWithBalance) {
+      // Token has balance, use the data from getBalances
+      let balance = tokenWithBalance.balance
+      if (data.chain === 'ton') {
+        balance = await getTonWalletBalance({token: tokenAddress, wallet: data.walletAddress}).catch(async () => 0)
+      }
+      const decimals = tokenWithBalance.decimals || 0
+      const pnl = tokenWithBalance.pnl || {} as any
+      return {
+        ...tokenWithBalance,
+        token: tokenAddress, // Ensure we return the original token address
+        initBalance: balance,
+        balance: Number(decimals) === 0 ? balance : balance,
+        chain: data.chain || '',
+        unrealized_profit: pnl.unrealizedProfit ?? pnl.unrealized_profit ?? '0',
+        realized_profit: pnl.realizedProfit ?? pnl.realized_profit ?? '0',
+        average_net_purchase_price: pnl.averageNetPurchasePrice ?? pnl.average_net_purchase_price ?? '0',
+        net_purchase_amount: pnl.netPurchaseAmount ?? pnl.net_purchase_amount ?? '0'
+      }
+    } else {
+      // Token has no balance, get token details and create default response
+      let balance: number | string = 0
+      if (data.chain === 'ton') {
+        balance = await getTonWalletBalance({token: tokenAddress, wallet: data.walletAddress}).catch(async () => 0)
+      }
+
+      // Get token details for decimals and symbol
+      const tokenDetails = await getTokenDetails({
+        tokenAddress: tokenAddress,
+        chain: data.chain,
+        walletAddress: data.walletAddress
+      }).catch(async () => ({ decimals: 0, symbol: '', logoUrl: '' }))
+
+      return {
+        token: tokenAddress,
+        balance: balance.toString(),
+        initBalance: balance,
+        decimals: tokenDetails?.decimals || 0,
+        chain: data.chain || '',
+        symbol: tokenDetails?.symbol || '',
+        logoUrl: (tokenDetails as any)?.logoUrl || '',
+        price: '0',
+      }
+    }
+  }))
 }, 500)
 
 // 推荐GasTip(二期)
@@ -514,43 +572,174 @@ export const bot_getChainsTokenBalance = createCacheRequest(async function(param
   walletAddress: string
 }>) {
   const { $api } = useNuxtApp()
-  let exChains = ['polygon', 'ton']
-  let paramsChains = params?.filter((i) => !exChains.includes(i.chain)) || []
-  let res1 = paramsChains?.length > 0 ? await $api('/botapi/swap/getChainsTokenBalance', {
-    method: 'post',
-    body: paramsChains
-  }) : []
-  const res = (res1 || [])
-  let paramsExChains = params?.filter((i) => exChains.includes(i.chain)) || []
-  if (paramsExChains?.length > 0) {
-    paramsExChains.forEach((i) => {
-      let k = params.findIndex((j) => j.chain === i.chain)
-      res.splice(k, 0, {
-        chain: i.chain,
-        token: i.tokens[0],
-        walletAddress: i.walletAddress,
-        balance: 0
-      })
-    })
-  }
+  const exChains = ['ton']
+  const paramsChains = params?.filter((i) => !exChains.includes(i.chain)) || []
 
-  return Promise.all((res || []).map(async (i: { chain: string; token: any; walletAddress: any; balance: any }) => {
-    if (i.chain === 'ton') {
-      return {
-        ...i,
-        // ...(await getTokenDetails({tokenAddress: i.token, chain: i.chain, walletAddress: i.walletAddress}).then(async res => ({...res, balance: res?.initBalance || 0})).catch(async () => ({balance: 0}))),
-        decimals: 9,
-        balance: await getTonWalletBalance({token: i.token, wallet: i.walletAddress}).catch(async () => 0) || i?.balance || 0
+  // Check if all chains are the same and not in exChains
+  const uniqueChains = [...new Set(paramsChains.map(i => i.chain))]
+  const useGetBalances = paramsChains.length > 0 && uniqueChains.length === 1
+
+  if (useGetBalances) {
+    // All params are for the same chain, use getBalances
+    const param = paramsChains[0]
+
+    // Convert token addresses for getBalances
+    const convertedTokens = param.tokens.map(token => {
+      if (token === getNativeToken(param.chain)) {
+        // For Solana, getBalances expects NATIVE_TOKEN instead of 'sol'
+        // For other chains, getNativeToken already returns the correct address
+        return param.chain === 'solana' ? NATIVE_TOKEN : token
       }
-    } else if (i.chain === 'polygon') {
-      return {
-        ...i,
-        ...(await getTokenDetails({tokenAddress: i.token, chain: i.chain, walletAddress: i.walletAddress}).then(async res => ({...res, balance: res?.initBalance || 0})).catch(async () => ({balance: 0})))
+      return token
+    })
+
+    const result = await getBalances({
+      chain: param.chain,
+      creatorAddress: param.walletAddress,
+      tokens: convertedTokens,
+      showZero: true
+    })
+
+    // Handle case where tokens is null (when balance is 0)
+    const tokensWithBalance = result.tokens || []
+
+    // Create a map of tokens with balance for quick lookup
+    const tokenMap = new Map()
+    tokensWithBalance.forEach(token => {
+      // Map back to original token address for consistency
+      let originalToken = token.token
+      if (token.token === NATIVE_TOKEN && param.chain === 'solana') {
+        originalToken = getNativeToken(param.chain) // This returns 'sol' for Solana
       }
-    } else {
-      return {...i}
+      tokenMap.set(originalToken, token)
+    })
+
+    // Convert back to original format, including tokens with 0 balance
+    const res: any[] = []
+    for (const tokenAddress of param.tokens) {
+      const tokenWithBalance = tokenMap.get(tokenAddress)
+
+      if (tokenWithBalance) {
+        // Token has balance, use the data from getBalances but keep original format
+        let balance = tokenWithBalance.balance
+        if (param.chain === 'ton') {
+          balance = await getTonWalletBalance({token: tokenAddress, wallet: param.walletAddress}).catch(async () => 0)
+        }
+
+        res.push({
+          chain: param.chain,
+          token: tokenAddress,
+          walletAddress: param.walletAddress,
+          balance: balance,
+          decimals: tokenWithBalance.decimals,
+          symbol: tokenWithBalance.symbol,
+          logoUrl: tokenWithBalance.logoUrl,
+          price: tokenWithBalance.price
+        })
+      } else {
+        // Token has no balance, get token details and create default response
+        let balance: number | string = 0
+        if (param.chain === 'ton') {
+          balance = await getTonWalletBalance({token: tokenAddress, wallet: param.walletAddress}).catch(async () => 0)
+        }
+
+        // Get token details for decimals and symbol
+        const tokenDetails = await getTokenDetails({
+          tokenAddress: tokenAddress,
+          chain: param.chain,
+          walletAddress: param.walletAddress
+        }).catch(async () => ({ decimals: 0, symbol: '', logoUrl: '' }))
+
+        return {
+          token: tokenAddress,
+          balance: balance.toString(),
+          initBalance: balance,
+          decimals: tokenDetails.decimals || 0,
+          chain: param.chain || '',
+          symbol: tokenDetails.symbol || '',
+          logoUrl: (tokenDetails as any).logoUrl || '',
+          price: '0',
+        }
+      }
     }
-  }))
+
+    const paramsExChains = params?.filter((i) => exChains.includes(i.chain)) || []
+    if (paramsExChains?.length > 0) {
+      paramsExChains.forEach((i) => {
+        const k = params.findIndex((j) => j.chain === i.chain)
+        res.splice(k, 0, {
+          chain: i.chain,
+          token: i.tokens[0],
+          walletAddress: i.walletAddress,
+          balance: 0,
+          decimals: 0,
+          symbol: '',
+          logoUrl: '',
+          price: '0'
+        })
+      })
+    }
+
+    return Promise.all((res || []).map(async (i: { chain: string; token: any; walletAddress: any; balance: any }) => {
+      if (i.chain === 'ton') {
+        return {
+          ...i,
+          decimals: 9,
+          balance: await getTonWalletBalance({token: i.token, wallet: i.walletAddress}).catch(async () => 0) || i?.balance || 0
+        }
+      } else {
+        return {...i}
+      }
+    }))
+  } else {
+    const exChains = ['ton', 'polygon']
+    const paramsChains = params?.filter((i) => !exChains.includes(i.chain)) || []
+    // Different chains or chains in exChains, use the old API
+    const res1 = paramsChains?.length > 0 ? await $api('/botapi/swap/getChainsTokenBalance', {
+      method: 'post',
+      body: paramsChains
+    }) : []
+    const res = (res1 || []) as any[]
+    const paramsExChains = params?.filter((i) => exChains.includes(i.chain)) || []
+    if (paramsExChains?.length > 0) {
+      paramsExChains.forEach((i) => {
+        const k = params.findIndex((j) => j.chain === i.chain)
+        res.splice(k, 0, {
+          chain: i.chain,
+          token: i.tokens[0],
+          walletAddress: i.walletAddress,
+          balance: 0,
+          decimals: 0,
+          symbol: '',
+          logoUrl: '',
+          price: '0'
+        })
+      })
+    }
+
+    return Promise.all((res || []).map(async (i: { chain: string; token: any; walletAddress: any; balance: any; decimals?: any; decimal?: any }) => {
+      if (i.chain === 'ton') {
+        return {
+          ...i,
+          // ...(await getTokenDetails({tokenAddress: i.token, chain: i.chain, walletAddress: i.walletAddress}).then(async res => ({...res, balance: res?.initBalance || 0})).catch(async () => ({balance: 0}))),
+          decimals: 9,
+          balance: await getTonWalletBalance({token: i.token, wallet: i.walletAddress}).catch(async () => 0) || i?.balance || 0
+        }
+      } else if (i.chain === 'polygon') {
+        return {
+          ...i,
+          ...(await getTokenDetails({tokenAddress: i.token, chain: i.chain, walletAddress: i.walletAddress}).then(async res => ({...res, initBalance: res?.initBalance || 0,
+            balance: res?.balance || 0
+          })).catch(async () => ({balance: 0})))
+        }
+      } else {
+        return {
+          ...i,
+          balance: utils.formatUnits(i.balance.toString(), i.decimals || i.decimal || 0).toString()
+        }
+      }
+    }))
+  }
 }, 1000)
 
 // 查询sol bundle是否可用
@@ -711,6 +900,11 @@ export function bot_createSwapEvmTx(params: {
   //   params.autoSell = false
   //   params.autoSellConfig = []
   // }
+  const { getCanMev } = useBotSwapStore()
+  const isCanMev = getCanMev(params.chain)
+  if (!isCanMev) {
+    params.isPrivate = false
+  }
   return $api('/botapi/swap/createSwapEvmTxV2', {
     method: 'post',
     body: {
@@ -805,6 +999,11 @@ export function bot_createEvmLimitTx(params: {
 }) {
   const { $api } = useNuxtApp()
   const botStore = useBotStore()
+  const { getCanMev } = useBotSwapStore()
+  const isCanMev = getCanMev(params.chain)
+  if (!isCanMev) {
+    params.isPrivate = false
+  }
   return $api('/botapi/swap/createEvmLimitTx', {
     method: 'post',
     body: {
@@ -1064,7 +1263,7 @@ export function getAutoSlippage(query: {
   })
 }
 
-export function getBalances(body: {
+export const getBalances = createCacheRequest((body: {
   chain: string
   creatorAddress: string
   tokens: string[]
@@ -1093,15 +1292,69 @@ export function getBalances(body: {
             unrealizedProfitRatio: string,
             totalProfitRatio: string,
             averageNetPurchasePrice: string,
-            netPurchaseAmount: string
+            netPurchaseAmount: string,
+            lastUpdateTime: string
         },
         risk_level: number
         risk_score: number
     }[]
-}> {
+}>=> {
+  if (!body.creatorAddress || !body.tokens || body.tokens.length === 0) {
+    return Promise.resolve({
+      chain: body.chain || '',
+      creatorAddress: body.creatorAddress || '',
+      tokens: []
+    })
+  }
+  if (body.showZero === undefined) {
+    body.showZero = true
+  }
   const {$api} = useNuxtApp()
   return $api('/aveswap/v1/swap/getBalances', {
     method: 'post',
     body
   })
-}
+},2000)
+
+// export function getBalances(body: {
+//   chain: string
+//   creatorAddress: string
+//   tokens: string[]
+//   showZero?: boolean
+// }): Promise<{
+//     chain: string,
+//     creatorAddress: string,
+//     tokens: {
+//         token: string,
+//         balance: string,
+//         symbol: string,
+//         logoUrl: string,
+//         decimals: number,
+//         price: string,
+//         pnl: {
+//             buyAmount: string,
+//             buyValue: string,
+//             sellAmount: string,
+//             sellValue: string,
+//             avgBuyPrice: string,
+//             avgSellPrice: string,
+//             realizedProfit: string,
+//             unrealizedProfit: string,
+//             totalProfit: string,
+//             realizedProfitRatio: string,
+//             unrealizedProfitRatio: string,
+//             totalProfitRatio: string,
+//             averageNetPurchasePrice: string,
+//             netPurchaseAmount: string
+//             lastUpdateTime: string
+//         },
+//         risk_level: number
+//         risk_score: number
+//     }[]
+// }> {
+//   const {$api} = useNuxtApp()
+//   return $api('/aveswap/v1/swap/getBalances', {
+//     method: 'post',
+//     body
+//   })
+// }

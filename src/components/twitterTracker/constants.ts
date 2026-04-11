@@ -3,6 +3,9 @@ export const typeEnum={
     retweet: 3,
     quote: 2,
     reply: 4,
+    deletedTweets: 5,
+    top: 6,
+    // unpin: 7,
 }
 export const useTrackerTypes = ()=>{
     const { t } = useI18n()
@@ -12,6 +15,9 @@ export const useTrackerTypes = ()=>{
             { label: t('retweet'), value: typeEnum.retweet },
             { label: t('quote'), value: typeEnum.quote },
             { label: t('reply'), value: typeEnum.reply },
+            { label: t('deletedTweets'), value: typeEnum.deletedTweets },
+            { label: t('top'), value: typeEnum.top },
+            // { label: t('unpin'), value: typeEnum.unpin },
         ]),
         map: computed(()=>({
             [typeEnum.tweet]: {
@@ -34,6 +40,24 @@ export const useTrackerTypes = ()=>{
                 bg:'rgba(0, 197, 128, 0.10)',
                 color:'#00C580'
             },
+            [typeEnum.deletedTweets]: {
+                label:t('deletedTweets'),
+                bg:'rgba(222, 87, 90, 0.1)',
+                color:'#DE575A',
+                action:t('actionDel')
+            },
+            [typeEnum.top]: {
+                label:t('top'),
+                bg:'#46CBF01A',
+                color:'#46CBF0',
+                action:t('actionTop')
+            },
+            // [typeEnum.unpin]: {
+            //     label:t('unpin'),
+            //     bg:'#E082351A',
+            //     color:'#E08235',
+            //     action:t('actionUnpin')
+            // },
         }))
     }
 }

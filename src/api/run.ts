@@ -53,7 +53,8 @@ export function _getRugPullList(params: {
 }
 
 export function _getDevList(params: {
-  token_id: string
+  token_id?: string
+  address_id?: string
   pageNO: number
   pageSize: number
   sort?: string
@@ -63,7 +64,8 @@ export function _getDevList(params: {
   return $api('/v2api/token_info/v1/token/dev', {
     method: 'get',
     query:{
-      token_id: params.token_id,
+      token_id: params?.token_id || '',
+      address_id: params?.address_id || '',
       pageNO: params.pageNO,
       pageSize: params.pageSize,
       sort: params.sort,

@@ -42,7 +42,7 @@
       <div class="flex">
         <Collect iconClass="text-16px cursor-pointer" :isCollected="collected" :userFavoriteGroups="userFavoriteGroups" @confirmSwitchGroup="confirmSwitchGroup" @collect="collect" @newGroupAndCollect="newGroupAndCollect"/>
       </div>
-      
+
       <div class="pump-item_item token-info ml-16px flex items-center color-[--third-text] ">
         <div class="black-container">
           <span
@@ -166,11 +166,27 @@
           <div class="flex items-center">
             <span class="text-16px leading-[1.25] color-[--main-text1] font-500 ellipsis max-w-260px tokenName1">{{ token?.symbol }}
             </span>
+            <span v-if="(lang === 'zh-cn' || lang === 'zh-tw') && (tokenStore.tokenInfoExtra?.symbol_zh || tokenStore.tokenInfoExtra?.name_zh) && tokenStore.tokenInfoExtra?.symbol_zh !== token?.symbol || (!(lang === 'zh-cn' || lang === 'zh-tw')) && (tokenStore.tokenInfoExtra?.symbol_en || tokenStore.tokenInfoExtra?.name_en) && tokenStore.tokenInfoExtra?.symbol_en !== token?.symbol" class="text-16px leading-[1.25] color-[--main-text1] font-500 ellipsis max-w-260px tokenName1 color-[--yellow] ml-4px">
+              <template v-if="lang === 'zh-cn' || lang === 'zh-tw'">
+                {{ tokenStore.tokenInfoExtra?.symbol_zh || '' }}
+              </template>
+              <template v-else>
+                {{ tokenStore.tokenInfoExtra?.symbol_en || '' }}
+              </template>
+            </span>
             <span class="text-16px leading-[1.25] color-[--main-text1] font-500 ellipsis max-w-260px tokenName2" v-tooltip="token?.symbol">{{ token?.symbol }}
             </span>
-            <span class="ml-8px text-12px font-500 mr-8px ellipsis" style="max-width: 60px" v-tooltip="token?.name">{{
-              token?.name
-            }}</span>
+            <span class="ml-4px text-12px font-500 mr-4px ellipsis" style="max-width: 60px" v-tooltip="token?.name">{{
+              token?.name}}
+            </span>
+            <span class="color-[--yellow] text-12px font-500 mr-4px ellipsis" v-if="(lang === 'zh-cn' || lang === 'zh-tw') && (tokenStore.tokenInfoExtra?.symbol_zh || tokenStore.tokenInfoExtra?.name_zh) && tokenStore.tokenInfoExtra?.symbol_zh !== token?.symbol || (!(lang === 'zh-cn' || lang === 'zh-tw')) && (tokenStore.tokenInfoExtra?.symbol_en || tokenStore.tokenInfoExtra?.name_en) && tokenStore.tokenInfoExtra?.symbol_en !== token?.symbol" style="max-width: 60px">
+              <template v-if="lang === 'zh-cn' || lang === 'zh-tw'">
+                {{ tokenStore.tokenInfoExtra?.name_zh || '' }}
+              </template>
+              <template v-else>
+                {{ tokenStore.tokenInfoExtra?.name_en || '' }}
+              </template>
+            </span>
             <div class="flex items-center justify-start">
               <img v-if="(token?.risk_level??0) < 0" class="bg-btn" src="@/assets/images/fengxian.png" :width="12">
               <!-- <div v-if="medias?.length > 0" class="flex text-20px">
@@ -251,6 +267,9 @@
                   </template>
                 </div>
               </div>
+              <div v-if="tokenStore.tokenInfoExtra?.is_cashback" class="bg-btn">
+                <Icon name="custom:cashback" class="text-12px cursor-pointer color-[--yellow] hover:!color-[--primary-color]" v-tooltip="$t('cashback')"/>
+              </div>
               <PumpLive v-if="token?.is_streaming" :tokenId="(route.params.id as string)" />
               <el-popover popper-class="[--el-popover-bg-color:--border]" :persistent="false">
                 <template #reference>
@@ -258,7 +277,7 @@
                     class="media-item bg-btn cursor-pointer"
                   >
                     <Icon
-                      class="text-[--third-text] h-16px w-10px"
+                      class="text-[--third-text] h-16px text-12px"
                       name="custom:search"
                     />
                 </span>
@@ -707,7 +726,7 @@
             >
               <img
                 class="rounded-100%"
-                :src="formatIconTag(tokenStore.tokenInfoExtra?.deployer_platform)"
+                :src="formatIconTag('j7tracker.com')"
                 alt=""
                 :width="12"
               >
@@ -1072,7 +1091,7 @@ const { evmAddress } = storeToRefs(useBotStore())
 const themeStore = useThemeStore()
 const { t } = useI18n()
 const route = useRoute()
-const { mode, dialogVisible_search, dialogSearchText, showMarket, clickHolderCount, popVisible, tagsRatio, pumpBlackList } = storeToRefs(useGlobalStore())
+const { mode, dialogVisible_search, dialogSearchText, showMarket, clickHolderCount, popVisible, tagsRatio, pumpBlackList, lang } = storeToRefs(useGlobalStore())
 const wsStore = useWSStore()
 const editableGroup = shallowRef(false)
 const groupId = shallowRef(0)
@@ -1277,9 +1296,16 @@ const tokenAllPair = computed(() => {
   return tokenStore.tokenAllPair
 })
 const priceChange = computed(() => {
+  const is24H = globalStore?.zone == '24h'
   if (tokenStore.selectedToken && tokenAllPair.value) {
+    if (!is24H) {
+      return tokenStore.tokenInfoExtra?.t_price_change_1d || 0
+    }
     return tokenStore.tokenInfoExtra?.t_price_change_24h || 0
   } else {
+    if (!is24H) {
+      return tokenStore.priceChange || 0
+    }
     return tokenStore.priceChangeV2 || 0
   }
 })
@@ -1372,11 +1398,11 @@ watch(() => wsStore.wsResult[WSEventType.PRICEV2], (val) => {
     if (Array.isArray(val.prices) && val.prices?.length > 0 && tokenStore.tokenInfoExtra) {
       const find = val.prices?.find(i => i.target_token == address.value)
       if (find) {
-        tokenStore.tokenInfoExtra.t_price_change_24h = find.tprice_change_24h
         if (!tokenStore.tokenInfoExtra) return
         tokenStore.tokenInfoExtra = {
           ...tokenStore.tokenInfoExtra,
-          t_price_change_24h: find.tprice_change_24h
+          t_price_change_24h: find.tprice_change_24h,
+          t_price_change_1d: find.tprice_change_1d,
         }
       }
     }

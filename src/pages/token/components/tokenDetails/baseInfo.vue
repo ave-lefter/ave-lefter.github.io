@@ -29,8 +29,9 @@ const listQuery = shallowRef({
   event_type: ''
 })
 const attentionTriggerRef=ref()
-const checkedTrend = ref(['SWAP', 'ADD_LIQUIDITY/REMOVE_LIQUIDITY'])
+const checkedTrend = ref(['SWAP', 'ADD_LIQUIDITY/REMOVE_LIQUIDITY', 'TRANSFER'])
 const trendList = shallowRef<GetTokenDetailsListResponse[]>([])
+const isMarket= shallowRef(false)
 const filteredTrendList = computed(() => {
   const {address} = getAddressAndChainFromId(route.params.id as string)
   return trendList.value.filter(
@@ -160,7 +161,7 @@ function _getTokenDetailsList() {
   }
   if (checkedTrend.value.length === 0) {
     data.event_type = ''
-  } else if (checkedTrend.value.length > 0 && checkedTrend.value.length <= 5) {
+  } else if (checkedTrend.value.length > 0 && checkedTrend.value.length <= 6) {
     let event_type = checkedTrend.value?.filter?.(i => i !== 'all')
     event_type = event_type?.map(i => i.replace('/', ','))
     data.event_type = event_type?.toString()
@@ -182,6 +183,12 @@ function _getTokenDetailsList() {
         }
         if (i.event_type === 'TRANSFER' && i.flow_type == 1) {
           event_type = 'transfer_out'
+        }
+        if (i.event_type === 'INTERNAL_TRANSFER' && i.flow_type == 0) {
+          event_type = 'internal_transfer_in'
+        }
+        if (i.event_type === 'INTERNAL_TRANSFER' && i.flow_type == 1) {
+          event_type = 'internal_transfer_out'
         }
         return {
           ...i,
@@ -531,7 +538,7 @@ function copyTrade() {
         >
           <span class="mr-8px">{{ formatNumber(statistics?.balance_amount_ratio || 0, 2) }}%</span>
           <el-progress
-            :percentage="statistics?.balance_amount_ratio"
+            :percentage="statistics?.balance_amount_ratio || 0"
             :stroke-width="4"
             color="#1CC982"
             :show-text="false"
@@ -583,20 +590,23 @@ function copyTrade() {
         </ExcludeError>
       </div>
       <div class="flex-1 flex flex-col">
-        <span class="color-[--secondary-text] text-12px lh-16px mb-4px">{{ $t('averageMarketBuySell') }}</span>
+        <div class="flex items-center mb-4px">
+          <span class="color-[--secondary-text] text-12px lh-16px">{{ isMarket? $t('averageMarketBuySell') : $t('averagePriceBuySell')}}</span>
+          <Icon name="custom:exchange-horizontal" class="ml-4px color-[--secondary-text] text-10px clickable" @click.stop="isMarket = !isMarket"/>
+        </div>
         <div
           class="flex text-14px lh-20px items-center"
           :class="getColorClass(statistics.total_profit)"
         >
           <ExcludeError :model-value="statistics.average_purchase_price_usd">
             <span class="color-#12B886">
-              ${{ formatNumber(statistics.mcap_buy, {decimals: 2, l: 4, limit: 3}) }}
+              ${{ isMarket? formatNumber(statistics.mcap_buy, {decimals: 2, l: 4, limit: 3}): formatNumber(statistics.average_purchase_price_usd ||0,  { decimals: 4, limit: 6 }) }}
             </span>
           </ExcludeError>
           <span class="color-[--secondary-text]">/</span>
           <ExcludeError :model-value="statistics.average_sold_price_usd">
             <span class="color-#F6465D">
-              ${{ formatNumber(statistics.mcap_sold, {decimals: 2, l: 4, limit: 3}) }}
+              ${{ isMarket? formatNumber(statistics.mcap_sold, {decimals: 2, l: 4, limit: 3}): formatNumber(statistics.average_sold_price_usd || 0,  { decimals: 4, limit: 6 }) }}
             </span>
           </ExcludeError>
         </div>

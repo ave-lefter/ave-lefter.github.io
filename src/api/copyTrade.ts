@@ -159,7 +159,25 @@ export function _getFailFollowTxs(data: {
   pageSize: string
 }) {
   const { $api } = useNuxtApp()
-  return $api('/botapi/swap/getFailFollowTxs', {
+  return $api('/botapi/swap/getFailFollowTxsV2', {
+    method: 'get',
+    headers: {
+      'ave-platform': 'web',
+    },
+    query: data,
+  })
+}
+
+//查询跟单无效
+export function _getFilteredFollowTxs(data: {
+  walletAddress: string
+  chain: string
+  id: number
+  pageNo: string
+  pageSize: string
+}) {
+  const { $api } = useNuxtApp()
+  return $api('/botapi/swap/getFilteredFollowTxs', {
     method: 'get',
     headers: {
       'ave-platform': 'web',

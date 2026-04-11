@@ -7,8 +7,9 @@ export function getPumpOptions(t: ReturnType<typeof useI18n>['t']) {
           'mCapContent',
           'liquidityContent',
           'holdersContent',
-          'top10PositionsContent',
-          'devContent'
+          // 'top10PositionsContent',
+          // 'devContent',
+          'securityContent'
         ],
       },
       {
@@ -31,13 +32,12 @@ export function getPumpOptions(t: ReturnType<typeof useI18n>['t']) {
           'runTime2',
           'snipersContent',
           'snipers1mContent',
-          'securityContent',
-          'insidersContent',
+          // 'insidersContent',
         ],
       },
     ]
   }
-  
+
   export function getPumpDefault(t: ReturnType<typeof useI18n>['t']) {
     console.log(getTextWidth(t('snipers_1m'), 50) + 70,'minw')
     return [
@@ -203,15 +203,15 @@ export function getPumpOptions(t: ReturnType<typeof useI18n>['t']) {
         align:'right'
       },
       {
-        title: t('security'),
+        title: t('tokenInfoSecurity'),
         key: 'security',
         isVisible: true,
         render: 'securityContent',
         children:[
-          {title:t('security'),isVisible:true,render:'securityContent'},
-          {title:t('runPull'),isVisible:true,render:'runPullContent'},
+          {title:t('tokenInfoSecurity'),isVisible:true,render:'securityContent'},
+          // {title:t('runPull'),isVisible:true,render:'runPullContent'},
         ],
-        minWidth:getTextWidth(t('security'), 50) + 55,
+        minWidth:280,
         align:'right'
       },
       {

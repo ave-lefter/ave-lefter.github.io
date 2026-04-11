@@ -2,78 +2,84 @@ import * as Comlink from 'comlink'
 // @ts-ignore
 import ChartWorker from '@/workers/chartState.worker?worker'
 
+// 单例模式：确保全局只有一个 Worker 进程和 saveQueue
 const workerInstance = new ChartWorker()
 const chartApi = Comlink.wrap<any>(workerInstance)
 
 export function useKlineLineSave(getKey: () => string, rootKey: string = 'tv_charts_storage') {
 
-  /**
-   * 内部同步当前的 Storage Key 到 Worker
-   */
   async function syncKey() {
     await chartApi.setStorageKey(rootKey)
   }
 
-  async function loadKlineLine(widget: any) {
-    await syncKey()
-    const subKey = getKey ? getKey() : 'default'
+  async function addStudy(allStudies: Array<any>, chart: any) {
+    const currentStudies = chart.getAllStudies()
+    const storageNames = allStudies.map(s => s.name)
 
+    // 1. 移除多余指标
+    currentStudies.forEach((cs: any) => {
+      if (cs.name !== 'Volume' && !storageNames.includes(cs.name)) {
+        chart.removeEntity(cs.id)
+      }
+    })
+
+    // 2. 顺序恢复指标（含自定义参数 inputs 和 样式 styles/overrides）
+    for (const s of allStudies) {
+      const exists = currentStudies.some((cs: any) => cs.name === s.name)
+      if (!exists) {
+        try {
+          // 参数 4 是 inputs, 参数 5 是 overrides (包含扁平化的 styles)
+          await chart.createStudy(s.name, false, false, s.inputs, s.styles)
+        } catch (e) {
+          console.error(`[Chart-Storage] 恢复指标 ${s.name} 失败:`, e)
+        }
+      }
+    }
+  }
+
+  async function loadKlineLine(widget: any) {
+    if (!widget) return
+    await syncKey()
+
+    const subKey = getKey ? getKey() : 'default'
     const allStates: any = await chartApi.getFullStorage()
 
-    // 加载画图工具数据
-    if (allStates[subKey] && widget) {
-      widget.load?.(allStates[subKey])
+    // 加载画图布局
+    if (allStates[subKey] && widget.load) {
+      widget.load(allStates[subKey])
     }
 
-    // 加载指标
-    let allStudies: Array<string> = allStates['allStudies'] || []
-    if (allStudies.length > 0 && widget?.activeChart?.()) {
-      // 如果有画图工具数据，延迟加载指标以防渲染冲突
-      const delay = allStates[subKey] ? 500 : 0
+    // 加载全局指标
+    const allStudies: Array<any> = allStates['allStudies'] || []
+    const activeChart = widget.activeChart?.()
+
+    if (allStudies.length > 0 && activeChart) {
+      // 延迟 500-800ms 避开 TV 内部加载冲突
+      const delay = allStates[subKey] ? 800 : 0
       setTimeout(() => {
-        addStudy(allStudies, widget?.activeChart?.())
+        addStudy(allStudies, activeChart)
       }, delay)
     }
   }
 
-  function addStudy(allStudies: Array<string>, chart: any) {
-    const currentStudies = chart.getAllStudies()
-    // 过滤掉已经在图表上的指标，避免重复创建；同时排除 Volume（TV 内置，不需要手动创建）
-    const newStudies = allStudies?.filter(s => s !== 'Volume' && !currentStudies.some((cs: any) => cs.name === s))
-    const removeStudies: Array<{name: string; id: string}> = currentStudies?.filter((cs: any) => !allStudies.includes(cs.name) && cs.name !== 'Volume')
-    // 先移除不需要的指标
-    removeStudies.forEach(study => {
-      if (!study.name.includes('Volume')) {
-        chart.removeEntity(study.id)
-      }
-    })
-    newStudies.forEach(s => {
-      chart.createStudy(s, false, false)
-    })
-  }
-
   function saveKlineState(widget: any) {
     widget?.subscribe?.('onAutoSaveNeeded', () => {
-      widget?.save(async (chartObj: any) => {
+      widget.save(async (chartObj: any) => {
         await syncKey()
         const subKey = getKey ? getKey() : 'default'
         const result = await chartApi.saveChart(subKey, chartObj)
-        console.log(`[Chart-Storage] ${result.status}: ${subKey} (Root: ${rootKey})`)
+        console.log(`[Chart-Storage] ${result.status}: ${subKey}`)
       })
     })
-  }
-
-  async function removeCurrentChart() {
-    await syncKey()
-    const subKey = getKey ? getKey() : 'default'
-    const success = await chartApi.removeChart(subKey)
-    if (success) console.log(`[Chart-Storage] 已删除: ${subKey} @ ${rootKey}`)
   }
 
   return {
     loadKlineLine,
     saveKlineState,
-    removeCurrentChart,
+    removeCurrentChart: async () => {
+      await syncKey()
+      return chartApi.removeChart(getKey())
+    },
     clearAllCharts: async () => {
       await syncKey()
       return chartApi.clearAll()

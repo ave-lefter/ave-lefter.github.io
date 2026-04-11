@@ -13,7 +13,7 @@
         <AveEmpty v-if="!loading && tableData.length === 0" class="pt-[40px]" />
         <span v-else />
       </template>
-      <el-table-column :label="$t('type')" fixed="left" v-if="type === 'success' || type === 'failed'">
+      <el-table-column :label="$t('type')" fixed="left" v-if="type === 'success' || type === 'failed'|| type === 'invalid' ">
         <template #header>
           <span>{{ $t('type') }}</span>
           <el-popover
@@ -133,21 +133,21 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('positionsValue')" align="right" :min-width="110" v-if="type === 'success' || type === 'token'">
+      <el-table-column v-if="type === 'success' || type === 'token'" :label="$t('positionsValue')" align="right" :min-width="110">
         <template #default="{ row }">
           <div :class="!row?.value ? 'color-text-3' : ''">
             ${{ row?.value > 0 ? formatNumber(row?.value || 0, 2) : 0 }}
           </div>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('price')" align="right" v-if="type === 'success' || type === 'token'">
+      <el-table-column v-if="type === 'success' || type === 'token'" :label="$t('price')" align="right" >
         <template #default="{ row }">
           <div :class="!row?.price ? 'color-text-3' : ''">
             ${{ row?.price > 0 ? formatNumber(row?.price || row?.price || 0 ) : 0 }}
           </div>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('amount')" align="right">
+      <el-table-column v-if="type === 'success'" :label="$t('amount')" align="right">
         <template #default="{ row }">
           <div :class="!row?.amount ? 'color-text-3' : ''">
             {{ row?.amount > 0 ? formatNumber(row?.amount || 0, 2) : 0 }}
@@ -159,7 +159,12 @@
           {{ Number(row?.lastSwap) >0? formatDate(row?.lastSwap || 0, 'YYYY-MM-DD HH:mm') : '--' }}
         </template>
       </el-table-column>
-      <el-table-column :label="$t('reasonFailure')" align="right" v-if="type === 'failed'">
+      <el-table-column v-if="type === 'failed'" :label="$t('reasonFailure')" align="right">
+        <template #default="{ row }">
+          <span class="color-[--down-color] text-12px">{{ row.errorLog }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column v-if="type === 'invalid'" :label="$t('reasonInvalid')" align="right">
         <template #default="{ row }">
           <span class="color-[--down-color] text-12px">{{ row.errorLog }}</span>
         </template>
@@ -171,7 +176,7 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column align="right" label="TXN" v-if="type === 'success'">
+      <el-table-column v-if="type === 'success'" align="right" label="TXN">
         <template #default="{ row }">
           <a class="ml-5 a-gray font-16" href="javascript:;">
             <Icon

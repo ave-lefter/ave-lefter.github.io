@@ -1,6 +1,7 @@
 import type { PumpConfig, PumpObj } from '@/api/types/pump'
 import localforage from 'localforage'
 import { cloneDeep } from 'lodash-es'
+import { createCacheRequest } from '#imports'
 
 const PUMP_CONFIG_CACHE_KEY = 'pump_config_cache'
 const CACHE_DURATION = 10 * 60 * 1000 // 10 分钟
@@ -13,17 +14,17 @@ export function _getPumpList(params: any): Promise<PumpObj[]> {
 }
 export async function _getPumpConfig(): Promise<PumpConfig[]> {
   const { $api } = useNuxtApp()
-  
+
   try {
     // 尝试从缓存读取
     const cachedData = await localforage.getItem<{ data: PumpConfig[], timestamp: number }>(PUMP_CONFIG_CACHE_KEY)
-    
+
     if (cachedData) {
       const { data, timestamp } = cachedData
       const now = Date.now()
-      
+
       // 检查缓存是否有效（10 分钟内）
-      if (now - timestamp < CACHE_DURATION) {
+      if (now - timestamp < CACHE_DURATION && data?.length) {
         console.log('[PumpConfig] 使用缓存数据')
         return cloneDeep(data)
       } else {
@@ -31,17 +32,17 @@ export async function _getPumpConfig(): Promise<PumpConfig[]> {
         await localforage.removeItem(PUMP_CONFIG_CACHE_KEY)
       }
     }
-    
+
     // 缓存不存在或已过期，从 API 获取
     console.log('[PumpConfig] 从 API 获取最新数据')
-    const freshData = await $api('/v2api/pump/v1/config')
-    
+    const freshData = await createCacheRequest(() => $api('/v2api/pump/v1/config'))()
+
     // 保存到缓存
     await localforage.setItem(PUMP_CONFIG_CACHE_KEY, {
       data: freshData,
       timestamp: Date.now()
     })
-    
+
     return freshData
   } catch (error) {
     console.error('[PumpConfig] 获取配置失败:', error)

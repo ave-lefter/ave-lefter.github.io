@@ -46,4 +46,5 @@ export { default as TokenPage } from './tokenPage/tokenPage.vue'
 export { default as DexHeader } from './dexHeader.vue'
 export { default as TrendChart } from './trendChart.vue'
 export { default as TrendChartHeader } from './trendChartHeader.vue'
+export { default as SecurityHeader } from './securityHeader.vue'
 

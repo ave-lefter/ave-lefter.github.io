@@ -38,6 +38,7 @@ import {
   Snipers1mHeader,
   Snipers1mContent,
   DexHeader,
+  SecurityHeader,
 } from '../components/index'
 import { set } from 'lodash-es'
 import type { RowEventHandlerParams } from 'element-plus'
@@ -112,6 +113,8 @@ const storageKey = computed(() => {
   return CategoryTabsCacheKey.new
 })
 let columns = useStorage(storageKey.value, getNewDefaultColumns(t))
+const secColNew = columns.value.find((c: any) => c.render === 'securityContent')
+if (secColNew) secColNew.minWidth = 280
 const isFirstMount = shallowRef(true)
 watch(
   () => props.activeTab,
@@ -290,7 +293,7 @@ const headerRenderer = computed(() => {
     holders: HoldersHeader,
     smart_money_buy_volume_24h: SmarterHeader,
     dex: DexHeader,
-    security: () => t('security'),
+    security: SecurityHeader,
     holders_top10_ratio: Top10Header,
     quick: () => t('quick'),
     insider_balance_ratio_cur: InsidersHeader,

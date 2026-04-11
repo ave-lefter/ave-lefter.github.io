@@ -3,7 +3,7 @@ import { useLocalStorage } from '@vueuse/core'
 import { deepMerge } from '@/utils/index'
 import { isEqual, cloneDeep } from 'lodash-es'
 import { useBotStore } from './bot'
-import type { BotSettingKey } from '~/utils/types'
+import type { BotChain, BotSettingKey } from '~/utils/types'
 
 export const useBotSettingStore = defineStore('botSetting', () => {
   const defaultSettings = {
@@ -26,6 +26,8 @@ export const useBotSettingStore = defineStore('botSetting', () => {
     autoSell: false,
     buyValueList: ['0.01', '0.02', '0.5', '1', '0.1', '0.25', '2', '5'],
     sellPerList: ['25', '50', '75', '100', '0', '0', '0', '0'],
+    buyUList: {
+    } as Record<string, string[]>,
     isAutoSellConfig: false,
     isAutoSellConfig1: false,
     isAutoSellConfig2: false,
@@ -35,6 +37,7 @@ export const useBotSettingStore = defineStore('botSetting', () => {
     isAutoSellConfig6: false,
   }
   const chains = useBotStore().isSupportChains
+  const botSwapStore = useBotSwapStore()
   type Setting = typeof defaultSettings
   const settings: {
     [key in typeof chains[number]]?: {
@@ -58,10 +61,19 @@ export const useBotSettingStore = defineStore('botSetting', () => {
   } = {}
   chains.forEach(chain => {
     const s = { ...defaultSettings }
-    const sBuy = { ...defaultSettings, mev: true }
-    // if (chain === 'base') {
-    //   s.buyValueList = ['0.01', '0.02', '0.5', '1']
-    // }
+    const chainCanMev = botSwapStore.getCanMev(chain)
+    const sBuy = { ...defaultSettings, mev: !!chainCanMev }
+    const list = botSwapStore?.botSwapBaseTokens?.[(chain || '') as BotChain]
+    list?.forEach(i => {
+      const key = i.address + '-' + chain
+      if (!sBuy.buyUList[key]) {
+        if (['sol', 'TON', NATIVE_TOKEN].includes(i.address)) {
+          sBuy.buyUList[key] = defaultSettings.buyValueList
+        } else {
+          sBuy.buyUList[key] = ['100', '200', '300', '400', '500', '600', '700', '1000']
+        }
+      }
+    })
     settings[chain] = {
       selected: 's1',
       s1: s,

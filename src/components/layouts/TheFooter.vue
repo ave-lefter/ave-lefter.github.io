@@ -30,8 +30,7 @@
           {{ $t('walletMonitor') }}
         </div>
       </el-badge>
-
-      <el-badge :is-dot="isTwitterDotted" class="mr-12px">
+      <el-badge :value="(!trackerStore.visible&&trackerStore.unReader)||undefined" :max="99" class="mr-12px">
         <div
           class="flex items-center gap-4px cursor-pointer hover:color-[--main-text]"
           :class="trackerStore.visible ? 'color-[--main-text]' : 'color-[--secondary-text]'"
@@ -52,7 +51,7 @@
           <div class="flex items-center justify-center text-14px">
             <Icon name="custom:holding" />
           </div>
-          {{t('holding')}}
+          {{t('position2')}}
         </div>
       </el-badge>
       <el-badge :is-dot="false">
@@ -105,6 +104,9 @@
       </div>
     </div>
     <ul class="right">
+      <li>
+        <Net />
+      </li>
       <li class="color-[--secondary-text] hover:color-[--main-text]">
         <a target="_blank" href="https://cloud.tencent.com/" class="flex-center">
           <Icon name="custom:tencent-cloud" class="text-14px mr-2px hover:color-[#0052D9]" />
@@ -140,6 +142,19 @@
           <Icon name="custom:set-up" class="text-12px ml-2px color-[--main-text]" />
         </template>
         <ul class="flex items-start justify-center flex-col text-12px gap-16px font-500">
+          <li class="color-[--secondary-text] hover:color-[--main-text]">
+            <a
+              class="hover:decoration-underline"
+              target="_blank"
+              :href="
+                lang?.includes?.('zh')
+                  ? 'https://doc.ave.ai/cn'
+                  : 'https://doc.ave.ai'
+              "
+            >
+              {{ $t('tutorial') }}
+            </a>
+          </li>
           <li class="color-[--secondary-text] hover:color-[--main-text]">
             <a
               class="hover:decoration-underline"
@@ -216,6 +231,7 @@ import navHoverIcon from '@/assets/icons/footer/nav-hover.svg?url'
 import navWhiteIcon from '@/assets/icons/footer/nav-white.svg?url'
 import navWhiteHoverIcon from '@/assets/icons/footer/nav-white-hover.svg?url'
 import { TokenImg, QuickSwap } from '#components'
+import Net from '@/components/net.vue'
 // import QuickSwap from '../quickSwapTsx.vue'
 import { useWindowSize } from '@vueuse/core'
 const { width } = useWindowSize()
@@ -592,13 +608,18 @@ function AfterHandleBotBuy(item: any) {
   }
 }
 
+function formatUSDT(val: string) {
+  if(typeof val !== 'string') return
+  return /^usd/i.test(val) ? 'U' : val;
+}
+
 function monitorToast(val: IMonitorWsResponse[]) {
   val.forEach((item) => {
     const msg = ElMessage({
       icon: <div></div>,
       showClose: true,
       placement: globalStore.audioSettings.notice.position as any,
-      customClass: `toast-card border-transparent monitorToast ${globalStore.audioSettings.notice.monitorBorder && globalStore.audioSettings.notice.monitorShow === 1 && `${getIsBuy(item) ? 'border-[--up-color]!' : 'border-[--down-color]!'}`} ${globalStore.audioSettings.notice.monitorShow === 0 && 'border-[--dialog-tab-active-bg]!'} ${globalStore.audioSettings.notice.monitorShow === 1 && globalStore.audioSettings.notice.quickBuy && 'monitorToast2'}`,
+      customClass: `toast-card border-transparent monitorToast ${globalStore.audioSettings.notice.monitorBorder && globalStore.audioSettings.notice.monitorShow === 1 && `${getIsBuy(item) ? 'border-[--up-color]!' : 'border-[--down-color]!'}`} ${globalStore.audioSettings.notice.monitorShow === 0 && 'border-[--dialog-tab-active-bg]!'} ${globalStore.audioSettings.notice.monitorShow === 1 && globalStore.audioSettings.notice.quickBuy && 'monitorToast2'} ${globalStore.audioSettings.notice.monitorShow === 0 &&'w-300px!'}`,
       message: () => (
         <div
           class="inline-flex items-center gap-4px text-12px cursor-pointer w-full"
@@ -617,14 +638,13 @@ function monitorToast(val: IMonitorWsResponse[]) {
                 iconSize="16px"
               />
               <span class="ellipsis max-w-80px">
-                {item.maker_alias ||
-                  item.maker_address.slice(0, 4) + '...' + item.maker_address.slice(-4)}
+                {item.maker_alias || format4Str4(item.maker_address)}
               </span>
               <span>
                 {getIsBuy(item) ? t('buy') : t('sell')}&nbsp;
                 <span class={getIsBuy(item) ? 'color-[--up-color]' : 'color-[--down-color]'}>
                   {formatNumber(getIsBuy(item) ? item.from_amount : item.to_amount, 1)}
-                  <span class="ellipsis">{getIsBuy(item) ? item.from_symbol : item.to_symbol}</span>
+                  <span class="ellipsis">{getIsBuy(item) ? formatUSDT(item.from_symbol) : formatUSDT(item.to_symbol)}</span>
                 </span>
               </span>
               <TokenImg
@@ -635,7 +655,7 @@ function monitorToast(val: IMonitorWsResponse[]) {
                 }}
                 token-class="w-16px h-16px"
               />
-              <span class="ellipsis">{getIsBuy(item) ? item.to_symbol : item.from_symbol}</span>
+              <span class="">{getIsBuy(item) ? format4Str4(item.to_symbol)  : format4Str4(item.from_symbol)}</span>
             </div>
           ) : (
             <div class="flex gap-8px items-center w-full">
@@ -661,8 +681,7 @@ function monitorToast(val: IMonitorWsResponse[]) {
                   {/* <span v-if="audioSettings.notice.monitorTh[1]">Zoe&nbsp;</span> */}
                   {globalStore.audioSettings.notice.monitorTh[1] && (
                     <span class="ellipsis max-w-80px">
-                      {item.maker_alias ||
-                        item.maker_address.slice(0, 4) + '...' + item.maker_address.slice(-4)}
+                      {item.maker_alias || format4Str4(item.maker_address)}
                       &nbsp;
                     </span>
                   )}
@@ -672,7 +691,7 @@ function monitorToast(val: IMonitorWsResponse[]) {
                       &nbsp;{getIsBuy(item) ? t('buy') : t('sell')}&nbsp;
                     </span>
                   </span>
-                  <span class="ellipsis">{getIsBuy(item) ? item.to_symbol : item.from_symbol}</span>
+                  <span class="ellipsis">{getIsBuy(item) ? format4Str4(item.to_symbol) : format4Str4(item.from_symbol)}</span>
                 </div>
                 <div class="flex items-center">
                   <TokenImg
@@ -687,8 +706,8 @@ function monitorToast(val: IMonitorWsResponse[]) {
                     <span class={getIsBuy(item) ? 'color-[--up-color]' : 'color-[--down-color]'}>
                       {isEn.value ? ' ' : ''}
                       {formatNumber(getIsBuy(item) ? item.from_amount : item.to_amount, 1)}
-                      <span class="ellipsis">
-                        {getIsBuy(item) ? item.from_symbol : item.to_symbol}
+                      <span class="">
+                        {getIsBuy(item) ? formatUSDT(item.from_symbol)  : formatUSDT(item.to_symbol)}
                       </span>
                     </span>
                     {globalStore.audioSettings.notice.monitorTh[2] && (

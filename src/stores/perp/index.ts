@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import type { PerpInfo } from '@/api/types/perp'
-import { getPerpMetadata as _getPerpMetadata, onboardSite, type ProfitResponse } from '@/api/perp'
+import { getPerpMetadata as _getPerpMetadata, getPerpEdgexAwardInviteLoginReg, onboardSite, type ProfitResponse } from '@/api/perp'
 import { EdgeXSDK, type ApiKeyData, type L2KeyPair } from '@edgex-fe/typescript-sdk'
 import { useLocalStorage } from '@vueuse/core'
 import { usePerpWsPubStore } from './wsPub'
@@ -260,7 +260,8 @@ clientAccountId: ${clientAccountId}`
   function login() {
     return signAndGenerateAPIKeys().then(async() => {
       await sleep(500)
-      return signAndGenerateL2KeyPair().then(() => {
+      return signAndGenerateL2KeyPair().then(async() => {
+        await getPerpEdgexAwardInviteLoginReg().catch(() => {})
         return getOnboardSite()
       })
     })

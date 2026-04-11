@@ -109,7 +109,8 @@ export default function useNews(props:{newsAudio:any,activeParentTab:any,isPause
       })
       const list = res?.list || []
       if (Array.isArray(list) && list?.length > 0) {
-        const formatList = list.filter(item => item?.content?.items?.[0]?.legacy&&item?.content?.items?.[0]?.legacy?.title).map(item => {
+        // const formatList = list.filter(item => item?.content?.items?.[0]?.legacy&&item?.content?.items?.[0]?.legacy?.title).map(item => {
+        const formatList = list.filter(item => item?.content?.items?.[0]?.legacy).map(item => {
             return {
               id:item.id,
               created_at:item.created_at,

@@ -29,6 +29,7 @@ import {
   PriceChange,
   Headline,
   DexHeader,
+  SecurityHeader,
 } from '../components/index'
 import { set } from 'lodash-es'
 import type { RowEventHandlerParams } from 'element-plus'
@@ -96,7 +97,7 @@ watch(
 const tableRef = shallowRef()
 const loading = shallowRef(false)
 const storageKey = computed(() => {
-  return props.activeTab+'Ranks'
+  return props.activeTab+ MarketVersion
 })
 let columns = useStorage(storageKey.value, getActivityDefaultColumns(t))
 const isFirstMount = shallowRef(true)
@@ -279,7 +280,7 @@ const headerRenderer = computed(() => {
     holders: HoldersHeader,
     smart_money_buy_volume_24h: SmarterHeader,
     dex: DexHeader,
-    security: () => t('security'),
+    security: SecurityHeader,
     holders_top10_ratio: Top10Header,
     quick: () => t('quick'),
     sniper_tx_count: SnipersHeader,

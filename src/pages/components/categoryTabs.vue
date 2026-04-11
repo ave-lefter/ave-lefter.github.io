@@ -51,7 +51,7 @@ const configMap = computed(() => {
     if (cur.is_pump && cur.category !== 'pump') {
       prev[cur.category] = {
         icon: '',
-        storageKey: `${cur.category}Ranks`,
+        storageKey: `${cur.category}${MarketVersion}`,
         getDefaultColumns: getPumpDefault,
         getOptions: getPumpOptions,
       }
@@ -242,8 +242,7 @@ watch(
           v-for="(item, index) in categories"
           :key="index"
           class="p-2 lh-16px cursor-pointer rounded-1 flex items-center shrink-0 relative"
-          :class="
-            activeTab === item.category
+          :class="activeTab === item.category
               ? 'color-[--white] bg-[--primary-color]'
               : 'bg-[--main-input-button-bg] color-[--secondary-text]'
           "
