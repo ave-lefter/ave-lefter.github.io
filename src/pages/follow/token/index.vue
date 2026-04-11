@@ -197,6 +197,10 @@ watch(() => wsStore.wsResult[WSEventType.PRICEV2], (priceData) => {
         current_price_usd: newPrice,
         price_change_24h: priceUpdate.price_change_v2,
         price_change: priceUpdate.price_change,
+        t_price_change_24h: priceUpdate.tprice_change_24h,
+        t_price_change_1d: priceUpdate.tprice_change_1d,
+        m_price_change_24h: token.support_aggr_kline == 1 ? priceUpdate.tprice_change_24h : priceUpdate.price_change_v2,
+        m_price_change_1d: token.support_aggr_kline == 1 ? priceUpdate.tprice_change_1d : priceUpdate.price_change,
         pool_circulating_supply: (token.total - token.lock_amount - token.burn_amount - token.other_amount) * newPrice
       }
     }
@@ -402,7 +406,7 @@ const getList = async () => {
 
 watch(()=>zone.value,(val)=>{
   if(sortParam.prop&&sortParam.order){
-    sortParam.prop=(val==='24h'? 'price_change_24h' :'price_change')
+    sortParam.prop=(val==='24h'? 'm_price_change_24h' :'m_price_change_1d')
     handleSortChange(sortParam)
   }
 })
@@ -558,7 +562,7 @@ onBeforeUnmount(() => {
     {{checkedList.length}} -->
     <div class="w-100% mt-12px flex-1 overflow-hidden">
       <el-table ref="tableRef"
- v-loading="loading" :height="pageData.total > 50 ? 'calc(100% - 72px)' : '100%'" :data="tableList" fit
+        v-loading="loading" :height="pageData.total > 50 ? 'calc(100% - 72px)' : '100%'" :data="tableList" fit
         @sort-change="handleSortChange" @row-click="tableRowClick" @selection-change="handleSelectionChange" :row-key="(row:any)=>`${row.token}-${row.chain}`">
         <template #empty>
           <div v-if="botStore.evmAddress || walletStore.address">
@@ -676,15 +680,15 @@ onBeforeUnmount(() => {
           </template>
         </el-table-column>
         <el-table-column :label="t('Chg')+'%'" sortable="custom" :sort-orders="['descending', 'ascending', null]"
-          :prop="zone==='24h'?'price_change_24h':'price_change'" align="right">
+          :prop="zone==='24h'?'m_price_change_24h':'m_price_change_1d'" align="right">
           <template #default="{ row }">
-            <span v-if="Number((zone==='24h'? row.price_change_24h :row.price_change)|| 0) > 0" class="text-[#12b886]">
-              +{{ formatNumber2((zone==='24h'? row.price_change_24h :row.price_change) || 0, 2) }}%
+            <span v-if="Number((zone==='24h'? row.m_price_change_24h :row.m_price_change_1d)|| 0) > 0" class="text-[#12b886]">
+              +{{ formatNumber2((zone==='24h'? row.m_price_change_24h :row.m_price_change_1d) || 0, 2) }}%
             </span>
-            <span v-else-if="Number((zone==='24h'? row.price_change_24h :row.price_change) || 0) == 0" class="text-[#848E9C]">
+            <span v-else-if="Number((zone==='24h'? row.m_price_change_24h :row.m_price_change_1d) || 0) == 0" class="text-[#848E9C]">
               0%
             </span>
-            <span v-else class="text-[#ff646d]">{{ formatNumber2((zone==='24h'? row.price_change_24h :row.price_change) || 0, 2) }}%</span>
+            <span v-else class="text-[#ff646d]">{{ formatNumber2((zone==='24h'? row.m_price_change_24h :row.m_price_change_1d) || 0, 2) }}%</span>
           </template>
         </el-table-column>
         <el-table-column :label="t('riskScore')" sortable="custom" :sort-orders="['descending', 'ascending', null]"
