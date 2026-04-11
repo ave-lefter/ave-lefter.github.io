@@ -100,23 +100,28 @@ export function createPanelDraggableState(options: UsePanelDraggableStoreOptions
   function onLeftDragStop(x: number, y: number) {
     const nearLeft = x <= 12
     
-    // 容差设置为 80
+    // 计算左侧模式下能拖到的最大距离，容差 80px
+    // 当 x 接近这个最大值时，说明用户已经把面板拖到了最右边
     const maxDraggableX = winWidth.value - boundingRect.value.width - 80
     const nearRight = x >= maxDraggableX || x + boundingRect.value.width >= winWidth.value - 12
     
     if (nearLeft) {
+      // 吸附到左侧
       isLeftFixed.value = true
       isRightFixed.value = false
       return
     }
     
+    // 不吸附左侧，更新坐标
     boundingRect.value.x = x
     boundingRect.value.y = y
     
     if (nearRight) {
+      // 吸附到右侧
       isRightFixed.value = true
       isLeftFixed.value = false
     } else {
+      // 自由状态
       isRightFixed.value = false
       isLeftFixed.value = false
     }
@@ -125,22 +130,28 @@ export function createPanelDraggableState(options: UsePanelDraggableStoreOptions
   function onRightDragStop(x: number, y: number) {
     const nearRight = x + boundingRect.value.width >= winWidth.value - 12
     
+    // 计算右侧模式下能拖到的最小距离，容差 80px
+    // 当 x 接近这个最小值时，说明用户已经把面板拖到了最左边
     const minDraggableX = 80
     const nearLeft = x <= 12 || x <= minDraggableX
     
     if (nearRight) {
+      // 吸附到右侧
       isRightFixed.value = true
       isLeftFixed.value = false
       return
     }
     
+    // 不吸附右侧，更新坐标
     boundingRect.value.x = x
     boundingRect.value.y = y
     
     if (nearLeft) {
+      // 吸附到左侧
       isLeftFixed.value = true
       isRightFixed.value = false
     } else {
+      // 自由状态
       isLeftFixed.value = false
       isRightFixed.value = false
     }

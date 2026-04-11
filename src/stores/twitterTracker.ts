@@ -1,149 +1,41 @@
-import {useStorage, useThrottleFn, useWindowSize} from '@vueuse/core'
+import { useStorage } from '@vueuse/core'
+import { createPanelDraggableState } from '~/composables/usePanelDraggableStore'
 
 export const useTwitterTrackerStore = defineStore('tracker', () => {
-    const visible = useStorage('trackerVisible', false)
-    const boundingRect = useStorage('TrackerBoundingRect', {
-        width: 360,
-        height: 500,
-        x: 100,
-        y: 100
-      })
+  // Use the generic draggable state composable
+  const draggableState = createPanelDraggableState({
+    prefix: 'tracker',
+    defaultFixedWidth: 438
+  })
 
-    const {width: winWidth, height: winHeight} = useWindowSize()
-    const isLeftFixed = useStorage('isTrackerLeft', false)
-    const isRightFixed = useStorage('isTrackerRight', false)
-    const fixedWidth = useStorage('trackerFixedWidth', 438)
-    const translateStyle = shallowRef(0)
-    const isPaused = shallowRef(false)
-    const query = useStorage('twitterQuery',{
-      types:[1,2,3,4,5,6],
-      token_keyword:''
-    })
-    const unReader = ref(0)
-    const loading = ref(false)
-    const finished = ref(false)
-    const list = ref([])
-    const cursor = ref(null)
+  const isPaused = shallowRef(false)
+  const query = useStorage('twitterQuery', {
+    types: [1, 2, 3, 4, 5, 6],
+    token_keyword: ''
+  })
+  const unReader = ref(0)
+  const loading = ref(false)
+  const finished = ref(false)
+  const list = ref([])
+  const cursor = ref(null)
 
-    const showFooter = ref(false)
-    const loading2 = ref(false)
-    const finished2 = ref(false)
-    const onDrag = useThrottleFn((x: number) => {
-        if (x <= 0) {
-          translateStyle.value = 12
-        } else {
-          translateStyle.value =
-              x + boundingRect.value.width >= winWidth.value ? -12 : 0
-        }
-      }, 100, false, true)
-      function onDragStop(x: number, y: number) {
-        console.log('onDragStop', x, y)
-        boundingRect.value.x = x
-        boundingRect.value.y = y
-        isLeftFixed.value = x <= 0
-        if (x > 0) {
-          isRightFixed.value = x + boundingRect.value.width >= winWidth.value
-        }
-        setTimeout(() => {
-          translateStyle.value = 0
-        })
-      }
-    
-      function onResizing(width: number, height: number) {
-        boundingRect.value.width = width
-        boundingRect.value.height = height
-      }
-    
-      function onLeftDragStop(x: number, y: number) {
-        const nearLeft = x <= 12
-        
-        // 容差设置为 80，匹配实际的最大可拖拽距离
-        const maxDraggableX = winWidth.value - boundingRect.value.width - 80
-        const nearRight = x >= maxDraggableX || x + boundingRect.value.width >= winWidth.value - 12
-        
-        if (nearLeft) {
-          isLeftFixed.value = true
-          isRightFixed.value = false
-          return
-        }
-        
-        boundingRect.value.x = x
-        boundingRect.value.y = y
-        
-        if (nearRight) {
-          isRightFixed.value = true
-          isLeftFixed.value = false
-        } else {
-          isRightFixed.value = false
-          isLeftFixed.value = false
-        }
-      }
-    
-      function onRightDragStop(x: number, y: number) {
-        const nearRight = x + boundingRect.value.width >= winWidth.value - 12
-        
-        const minDraggableX = 80
-        const nearLeft = x <= 12 || x <= minDraggableX
-        
-        if (nearRight) {
-          isRightFixed.value = true
-          isLeftFixed.value = false
-          return
-        }
-        
-        boundingRect.value.x = x
-        boundingRect.value.y = y
-        
-        if (nearLeft) {
-          isLeftFixed.value = true
-          isRightFixed.value = false
-        } else {
-          isLeftFixed.value = false
-          isRightFixed.value = false
-        }
-      }
-    
-      function onFixedResizing(width: number) {
-        fixedWidth.value = width
-      }
-    
-      const placement=computed(()=>{
-        if(!isLeftFixed.value&&!isRightFixed.value){
-          return 'center'
-        }else if(isLeftFixed.value){
-          return 'left'
-        } else if(isRightFixed.value){
-          return 'right'
-        } else {
-          return 'center'
-        }
-      })
+  const showFooter = ref(false)
+  const loading2 = ref(false)
+  const finished2 = ref(false)
 
-    return {
-        visible,
-        boundingRect,
-        isLeftFixed,
-        isRightFixed,
-        fixedWidth,
-        winWidth,
-        winHeight,
-        onDrag,
-        onDragStop,
-        onResizing,
-        onLeftDragStop,
-        onRightDragStop,
-        onFixedResizing,
-        placement,
-        translateStyle,
-        query,
-        loading,
-        list,
-        isPaused,
-        cursor,
-        finished,
-        showFooter,
-        loading2,
-        finished2,
-        unReader
-    }
+  return {
+    ...draggableState,
+    visible: draggableState.visible,
+    trackerBoundingRect: draggableState.boundingRect,
+    isPaused,
+    query,
+    unReader,
+    loading,
+    list,
+    cursor,
+    finished,
+    showFooter,
+    loading2,
+    finished2
+  }
 })

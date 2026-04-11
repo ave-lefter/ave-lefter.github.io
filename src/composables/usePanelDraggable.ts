@@ -216,11 +216,13 @@ export function usePanelDraggable(options: UsePanelDraggableOptions) {
 
     const placement = options.placement.value
     
+    // 左侧固定模式：x 是相对偏移，需要转换为绝对坐标
     let absoluteX = x
     if (placement === 'left') {
       const leftOffset = dragStore.leftWidth[getPanelKey()] || 0
       absoluteX = leftOffset + x
     }
+    // 右侧固定模式：x 已经是绝对坐标，不需要转换
     
     if (placement === 'left') {
       options.onLeftDragStop(absoluteX, y)
