@@ -436,7 +436,7 @@ const activeChain = useStorage<ChainKey>(
 const audioUrl = ref('')
 const globalStore = useGlobalStore()
 const { pumpSetting, token_logo_url, pumpBlackList } = storeToRefs(globalStore)
-const currentAddress = computed(() =>  botStore?.evmAddress || walletStore?.address ||'')
+const currentAddress = computed(() => botStore?.evmAddress || walletStore?.address || '')
 const orderNew = computed(() => {
   return pumpSetting.value.grid['new']?.order
 })
@@ -680,7 +680,7 @@ const syncCategory = (category: 'new' | 'soon' | 'graduated') => {
       if (!obj) return item
       const merged = {
         ...item,
-        ...(obj.logo_url ? { logo_url: obj.logo_url } : {}),
+        ...(obj.logo_url && !item.logo_url ? { logo_url: obj.logo_url } : {}),
         ...(obj.buy_tax ? { buy_tax: obj.buy_tax } : {}),
         ...(obj.sell_tax ? { sell_tax: obj.sell_tax } : {}),
         ...(obj.name ? { name: obj.name } : {}),
@@ -772,7 +772,13 @@ function requestRefresh(category?: 'new' | 'soon' | 'graduated') {
   handleRefreshLists()
 }
 
-const list1 = computed(() => fourmemeListObj?.[activeChain.value]?.new || [])
+const list1 = computed(() =>
+  fourmemeListObj?.[activeChain.value]?.new?.sort((a, b) => {
+    const timeA = Number(a?.created_at) || Number(a?.time)
+    const timeB = Number(b?.created_at) || Number(b?.time)
+    return timeB - timeA
+  }) || []
+)
 const list2 = computed(() => {
   const sort = pumpV3Pointer.value[activeChain.value].soon.pumpFilter.sort as 'progress' | 'market_cap'
   if (sort) {
@@ -1235,6 +1241,13 @@ onUnmounted(() => {
     cancelAnimationFrame(logoThrottledRafId)
     logoThrottledRafId = null
   }
+  const categories = ['new', 'soon', 'graduated'] as const
+  categories.forEach((category) => {
+    if (Timer[category]) {
+      clearTimeout(Timer[category] as number)
+      Timer[category] = null
+    }
+  })
 })
 const startPortraitTimer = () => {
   if (portraitTimer) {
@@ -1653,9 +1666,18 @@ async function getPump(rawParams: PumpRequestParams, isFilter = false) {
     }
     // HTTP 请求完成后刷新对应类别
     requestRefresh(finalParams.category as 'new' | 'soon' | 'graduated')
-    // Timer[category] = setTimeout(() => getPump(rawParams), 10000)
+    const isTrue = getFilterNumber(state.pumpFilter || {}, platforms.value, baseTokensAllStr.value) > 0
+    if (isTrue) {
+      Timer[category] = setTimeout(() => getPump(rawParams), 5000)
+    } else {
+      if (Timer[category]) {
+        clearTimeout(Timer[category] as number)
+        Timer[category] = null
+      }
+    }
   }
 }
+
 
 /** 辅助函数：统一处理后端无效时间 */
 function parseDate(dateStr?: string | number, toSeconds = false) {

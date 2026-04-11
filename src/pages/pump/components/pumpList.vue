@@ -6,7 +6,6 @@
             v-for="({data: row}, $index) in list"
             :id="row?.target_token + '-' + row?.chain"
             :key="row?.pair + '-' + row?.chain"
-
             class="pump-item_item relative item-row"
             :style="{ background:  pumpSetting.bgList?.includes(row.platform)? pumpSetting?.bg?.[row.platform]?.bg : '' }"
             @click.stop="tableRowClick(row)"
@@ -90,17 +89,13 @@
                   </div>
                   <div class="token-logo">
                     <el-image
+                      v-memo="row.target_token + '-' + row.chain+'-' + (row.logo_url || '')"
                       class="token-icon"
                       :class="{ small: pumpSetting.Progress_isCircle == 'horizontal' }"
                       fit="cover"
-                      :src="
-                        getSymbolDefaultIcon(
-                          row,
-                          pumpSetting.avatar_isCircle == 'circle' ? 'circle' : 'rect'
-                        )
-                      "
+                      :src="srcMap[row.target_token + '-' + row.chain] || getSymbolDefaultIcon(row, pumpSetting.avatar_isCircle == 'circle' ? 'circle' : 'rect')"
                       :style="{
-                        'border-radius': pumpSetting.avatar_isCircle == 'circle' ? '100%' : '4px',
+                        'border-radius': pumpSetting.avatar_isCircle == 'circle' ? '100%' : '4px'
                       }"
                     >
                       <template #error>
@@ -118,7 +113,7 @@
                           :style="{
                             'border-radius': pumpSetting.avatar_isCircle == 'circle' ? '100%' : '0',
                           }"
-                          :src="getChainDefaultIcon(row.chain, row.symbol, pumpSetting.avatar_isCircle == 'circle' ? 'circle' : 'rect')"
+                          :src="srcMap[row.target_token + '-' + row.chain] || getChainDefaultIcon(row.chain, row.symbol, pumpSetting.avatar_isCircle == 'circle' ? 'circle' : 'rect')"
                         >
                       </template>
                     </el-image>
@@ -977,19 +972,7 @@ const handleClearFilter = () => {
 const configStore = useConfigStore()
 const { quickBuyValue, loading, isOut, isSoon, type } = toRefs(props)
 const tableList = shallowRef<PumpObj[]>(props.tableList || [])
-const hover = ref(false)
-// 只监听数组引用变化，不深度监听对象
-watch(() => props.tableList, (newList) => {
-  if (dataSourceCache.value?.length > 0) {
-    dataSourceCache.value?.forEach(item => {
-      const index = newList.findIndex((i: PumpObj) => i.target_token === item.target_address && i.chain === item.chain)
-      if (index !== -1) {
-        newList[index].favorite_holder_count = 1
-      }
-    })
-  }
-  tableList.value = newList
-})
+const srcMap = ref<Record<string, string>>({})
 const router = useRouter()
 const route = useRoute()
 const { token_logo_url } = useConfigStore()
@@ -1271,6 +1254,33 @@ const newestId = ref('')
 
 // 监听原始列表数据 (假设 props.list 是 shallowRef)
 watch(() => props.tableList, (newList, oldList) => {
+  if (dataSourceCache.value?.length > 0) {
+    dataSourceCache.value?.forEach(item => {
+      const index = newList.findIndex((i: PumpObj) => i.target_token === item.target_address && i.chain === item.chain)
+      if (index !== -1) {
+        newList[index].favorite_holder_count = 1
+      }
+    })
+  }
+  tableList.value = newList
+  const currentKeys = new Set<string>()
+  newList.forEach(row => {
+    const key = row.target_token + '-' + row.chain
+    currentKeys.add(key)
+    const logoUrl = String(row.logo_url || '').trim()
+    if (logoUrl) {
+      const src = /^https?:\/\//.test(logoUrl) ? logoUrl : token_logo_url + logoUrl
+      if (srcMap.value[key] !== src) {
+        srcMap.value[key] = src
+      }
+    }
+  })
+  // 移除不再存在的 key
+  for (const key in srcMap.value) {
+    if (!currentKeys.has(key)) {
+      delete srcMap.value[key]
+    }
+  }
   // 1. 判断是否是插入了新数据（长度增加，或第一个元素 ID 变了）
   const new1 = newList?.[0]
   const old1 = oldList?.[0]
@@ -1281,7 +1291,7 @@ watch(() => props.tableList, (newList, oldList) => {
     lastPushTime.value = Date.now()
     newestId.value = new1PairId
   }
-}, { deep: false }) // shallowRef 监听引用即可，性能最高
+}) // shallowRef 监听引用即可，性能最高
 
 // 动画判定函数
 const getAnimClass = (itemData: any) => {
