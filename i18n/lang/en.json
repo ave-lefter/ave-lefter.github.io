@@ -2162,5 +2162,8 @@
   "tutorial": "Tutorial",
   "gridTip": "Please keep at least one category displayed",
   "emailCodeAuth": "Email Verification",
-  "googleAuth2": "Google Authenticator"
+  "googleAuth2": "Google Authenticator",
+  "onlyBuy": "Only Buy",
+  "onlySell": "Only Sell",
+  "minAmountU": "Min Volume($)"
 }

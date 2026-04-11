@@ -124,12 +124,16 @@
               <template #cell-wallet="{ row }">
                 <div class="flex flex-col w-100% gap-8px">
                   <div class="flex-between">
-                    <UserRemark :key="row._marker.maker_address" :address="row._marker.maker_address" :chain="row.chain"
-                      :remark="row.maker_alias || ''" :showIcon="true" :teleported="true"
-                      :wallet_logo="row.maker_logo ? { logo: row.maker_logo, vip_logo: 'https://www.iconaves.com/address_portrait/KOL_V.png' } : {}"
-                      iconSize="24px" :formatAddress="(address) =>
-                          address?.slice(0, 4) + '...' + address?.slice(-4)
-                        " @updateRemark="init2" @click="(e: any) => jumpBalance(row, e)" />
+                    <div class="flex-start gap-4px">
+                      <UserRemark :key="row._marker.maker_address" :address="row._marker.maker_address" :chain="row.chain"
+                        :remark="row.maker_alias || ''" :showIcon="true" :teleported="true"
+                        :wallet_logo="row.maker_logo ? { logo: row.maker_logo, vip_logo: 'https://www.iconaves.com/address_portrait/KOL_V.png' } : {}"
+                        iconSize="24px" :formatAddress="(address) =>
+                            address?.slice(0, 4) + '...' + address?.slice(-4)
+                          " @updateRemark="init2" @click="(e: any) => jumpBalance(row, e)" />
+                      <div class="color-[--third-text]">{{ getTxType(row) }}</div>
+                      <div v-if="row.position_type=='3'" :class="row._profit ? `color-[--up-color]` : `color-[--down-color]`">{{ row._profit }}</div>
+                    </div>
                     <QuickSwap :quickBuyValue="quickBuyValue"
                       :row="{ ...row, ...{ target_token: row?.target_address, token0_address: row?.from_address, token1_address: row?.to_address, symbol: row?._target_Token?.symbol } }"
                       classNames="min-w-70px h-24px!  hidden! group-hover:block! w-quickSwap" />
@@ -162,7 +166,7 @@
                   </div>
                   <div class="flex-between">
                     <div class="flex-start gap-4px">
-                      <div class="color-[--third-text]">{{ getTxType(row) }}</div>
+                      
                       <span :class="getIsBuy(row) ? `color-[--up-color]` : `color-[--down-color]`">
                         {{ !toggleMc ? row?._main_Token?.amount + row?._main_Token?.symbol : row?._main_Token.total }}
                       </span>
@@ -204,7 +208,11 @@
           </el-button>
         </AveEmpty>
       </el-tab-pane>
-
+      <el-tab-pane disabled>
+        <template #label>
+          1111
+        </template>
+      </el-tab-pane>
       <el-tab-pane disabled>
         <template #label>
           <div class="cursor-move w-100% h-100% drag-handle" />
@@ -213,8 +221,13 @@
       <el-tab-pane disabled>
         <template #label>
           <div class="m-op flex-end gap-8px w-100% h-100%">
-            <template v-if="activeName === 0 && props.isLarge">
-              <FilterType v-model="txType" :options="txTypeList" />
+            <template v-if="activeName === 0">
+              <el-button v-if="(activeName === 0) && botStore.evmAddress" :ref="(ref) => addButtonRef = ref" size="small"
+                style="height: 20px;color:var(--d-E0E0E0-l-333);--el-button-border-color:var(--third-text);--el-button-hover-border-color:var(--third-text)" class="dialog-button" :dark="isDark">
+                <!-- <Icon name="ic:baseline-person-add-alt-1" class="text-12px  mr-5px" /> -->
+                {{ $t('add') }}
+              </el-button>
+              <FilterType v-model="txType" :options="txTypeList" :minVol="minVol"/>
               <Icon ref="audioButtonRef" :name="audioSettings.audio.monitor ? 'custom:ad' : 'custom:admute'"
                 class="cursor-pointer color-[--secondary-text]" />
               <!-- <el-switch
@@ -222,17 +235,11 @@
                 class="[&&]:[--el-switch-on-color:--primary-color]"
                 size="small"
                 /> -->
-              <pro-tag size="small" class="cursor-pointer w-55px" @click="toggleMc = !toggleMc">{{
+              <pro-tag v-if="$props.isLarge" size="small" class="cursor-pointer w-55px" @click="toggleMc = !toggleMc">{{
                 !toggleMc ?'U/Pri':'C/MC' }}
                 <Icon name="lsicon:switch-filled" class="ml-4px text-12px" />
               </pro-tag>
             </template>
-            <el-button v-if="(activeName === 0) && botStore.evmAddress" :ref="(ref) => addButtonRef = ref" size="small"
-              style="height: 20px;color:var(--d-E0E0E0-l-333)" class="dialog-button" :dark="isDark">
-              <Icon name="ic:baseline-person-add-alt-1" class="text-12px  mr-5px" />
-              {{ $t('addWallet') }}
-            </el-button>
-
             <QuickBuyInput v-if="(activeName === 0) && isLarge" v-model="quickBuyValue" size="small" />
             <Icon class="text-14px color-[--secondary-text] hover:color-[--main-text] cursor-pointer"
               name="custom:pump-setting" @click.stop.prevent="audioSettings.active = 'notice'" />
@@ -262,7 +269,7 @@ import type { PopoverInstance } from 'element-plus'
 import dayjs from 'dayjs'
 const { t } = useI18n()
 
-const { hasRing, monitorList2: dataSourceCache, visible, activeName, txType, isLeftFixed, isRightFixed } = storeToRefs(useMonitorStore())
+const { hasRing, monitorList2: dataSourceCache, visible, activeName, txType, minVol,isLeftFixed, isRightFixed } = storeToRefs(useMonitorStore())
 
 const { updateNum3 } = storeToRefs(useFollowStore())
 const { isDark, audioSettings } = storeToRefs(useGlobalStore())
@@ -296,8 +303,8 @@ const quickBuyValue = useStorage('quickBuyValue', '0.01')
 const txTypeList = computed(() => {
   return [
     // { label: t('all'), value: 0 },
-    { label: t('buy'), value: 0 },
-    { label: t('sell'), value: 1 },
+    { label: t('onlyBuy'), value: 0 },
+    { label: t('onlySell'), value: 1 },
   ]
 })
 const walletManageProps = computed(() => {
@@ -680,20 +687,21 @@ function jumpToken({ e, rowData }: { e: Event; rowData: any }) {
 
       &:nth-child(2),
       &:nth-child(3),
-      &:nth-child(5) {
+      &:nth-child(6) {
         flex-shrink: 0;
         flex-grow: 0;
         flex-basis: auto;
       }
 
-      &:nth-child(4) {
+      &:nth-child(5) {
         flex: 1;
         padding: 0;
       }
 
+      &:nth-child(4),
       &:last-child {
         padding: 0;
-        justify-content: flex-end;
+        justify-content: flex-start;
         color: inherit;
       }
     }

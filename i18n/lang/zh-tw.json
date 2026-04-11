@@ -2149,5 +2149,8 @@
   "followAuthor": "關注此博主",
   "unfollowAuthor": "取消追蹤此部落客",
   "emailCodeAuth": "信箱驗證碼",
-  "googleAuth2": "谷歌驗證器"
+  "googleAuth2": "谷歌驗證器",
+  "onlyBuy": "只看買入",
+  "onlySell": "只看賣出",
+  "minAmountU": "最小成交額"
 }

@@ -68,6 +68,7 @@ export const useMonitorStore = defineStore('monitor', () => {
   }
   const user_chain=shallowRef('AllChains')
   const txType=shallowRef([0,1])
+  const minVol=shallowRef(0.01)
   const selectGroupId = shallowRef(0)
   const paginationParams= ref({...defaultPaginationParams,pageSize: 50})
   // token: 筛选 token
@@ -131,6 +132,7 @@ export const useMonitorStore = defineStore('monitor', () => {
     hasRing,
     placement,
     paginationParams,
-    txType
+    txType,
+    minVol
   }
 })
