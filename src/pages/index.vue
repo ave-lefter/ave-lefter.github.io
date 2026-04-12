@@ -178,7 +178,7 @@
             :swapSetSelected="swapSetSelected1"
             :loading="pumpV3[activeChain]['new']['loading']"
             :hasFilter="getFilterNumber(pumpV3Pointer[activeChain].new.pumpFilter || {},platforms,baseTokensAllStr) > 0"
-            @mouseover="isPausedObj.new = true"
+            @mouseenter="isPausedObj.new = true"
             @mouseleave="isPausedObj.new = false"
             @clearFilter="handleClearFilter('new')"
           />
@@ -263,8 +263,7 @@
             :swapSetSelected="swapSetSelected2"
             :loading="pumpV3[activeChain]['soon']['loading']"
             isSoon
-            :hasFilter="getFilterNumber(pumpV3Pointer[activeChain].soon.pumpFilter || {},platforms,baseTokensAllStr) > 0"
-            @mouseover="isPausedObj.soon = true"
+            :hasFilter="getFilterNumber(pumpV3Pointer[activeChain].soon.pumpFilter || {},platforms,baseTokensAllStr) > 0"            @mouseenter="isPausedObj.soon = true"
             @mouseleave="isPausedObj.soon = false"
             @clearFilter="handleClearFilter('soon')"
           />
@@ -337,7 +336,7 @@
             :loading="pumpV3[activeChain]['graduated']['loading']"
             isOut
             :hasFilter="getFilterNumber(pumpV3Pointer[activeChain].graduated.pumpFilter || {},platforms,baseTokensAllStr) > 0"
-            @mouseover="isPausedObj.graduated = true"
+            @mouseenter="isPausedObj.graduated = true"
             @mouseleave="isPausedObj.graduated = false"
             @clearFilter="handleClearFilter('graduated')"
           />
@@ -840,7 +839,41 @@ const playGraduatedAudio = useThrottleFn((val) => {
     pumpAudio.value.play().catch(() => {})
   }
 }, 300)
+watch(() => isPausedObj.value.new, (newVal) => {
+  if (!newVal) {
+    const params = {
+      category: 'new' as CategoryKey,
+      chain: activeChain.value,
+      platforms: pumpV3.value?.[activeChain.value]?.platforms?.join(',') || 'all',
+      ...pumpStore.pumpV3[activeChain.value].new.pumpFilter,
+    }
+    getPump(params as any)
+  }
+})
 
+watch(() => isPausedObj.value.soon, (newVal) => {
+  if (!newVal) {
+    const params = {
+      category: 'soon' as CategoryKey,
+      chain: activeChain.value,
+      platforms: pumpV3.value?.[activeChain.value]?.platforms?.join(',') || 'all',
+      ...pumpStore.pumpV3[activeChain.value].soon.pumpFilter,
+    }
+    getPump(params as any)
+  }
+})
+
+watch(() => isPausedObj.value.graduated, (newVal) => {
+  if (!newVal) {
+    const params = {
+      category: 'graduated' as CategoryKey,
+      chain: activeChain.value,
+      platforms: pumpV3.value?.[activeChain.value]?.platforms?.join(',') || 'all',
+      ...pumpStore.pumpV3[activeChain.value].graduated.pumpFilter,
+    }
+    getPump(params as any)
+  }
+})
 watch(()=>pumpV3Pointer.value[activeChain.value].new.pumpFilter.q,(val)=>{
   debouncedFetch('new')
 })
@@ -869,7 +902,6 @@ const stopWatchList3 = watch(
     }
   }
 )
-
 let onCanPlayHandler: (() => void) | null = null
 
 function bindAudioCanPlay() {
@@ -1572,14 +1604,10 @@ async function getPump(rawParams: PumpRequestParams, isFilter = false) {
 
   // 2. 状态拦截
   const isInactive = route.name !== 'index'
-  // const isPaused = isPausedObj.value?.[category] || route.name !== 'index'
-
+  const isPaused = isPausedObj.value?.[category] || route.name !== 'index'
+console.log('-------isPaused---------',isPaused)
   if (isInactive) return
-
-  // if (!isFilter && isPaused) {
-  //   Timer[category] = setTimeout(() => getPump(rawParams), 5000)
-  //   return
-  // }
+  if (isPaused) return
 
   // 3. 构建参数 (浅拷贝避免污染)
   const queryParams: any = { ...rawParams, chain: currentChain }
