@@ -3,7 +3,7 @@
     <span class="font-600">{{ $t('aveBotSwapWallet') }}</span>
   </div>
   <div>
-    <div class="item mt-32px" v-for="(item, $index) in listAddress" :key="$index">
+    <div class="item mt-12px" v-for="(item, $index) in listAddress" :key="$index">
       <div class="text-14px color-[--secondary-text] text-left">
         <span class="color-[--primary-color] mr-4px text-17px">{{ item.chain=='bsc' ? 'Evm': capitalize(item.chain) }}</span
         >{{ $t('walletAddress') }}
@@ -32,7 +32,7 @@
         >
       </div>
     </div>
-    <div class="item mt-32px">
+    <div class="item mt-12px">
       <div class="text-14px color-[--secondary-text] text-left">
         <span>{{ $t('mnemonic') }}</span>
         <span class="color-[--yellow] text-12px block mt-4px"
@@ -48,7 +48,7 @@
           <Icon name="custom:show-code" class="text-16px mr-4px color-[--main-text]" />
           {{ $t('clickMnemonic') }}
         </div>
-        <div class="grid grid-cols-3 gap-8px mt-30px">
+        <div class="grid grid-cols-3 gap-8px mt-12px">
           <div
             class="mnemonic-item block border border-solid border-[--dialog-divider] py-8px px-8px text-center relative"
             v-for="(item, $index) in mnemonic"

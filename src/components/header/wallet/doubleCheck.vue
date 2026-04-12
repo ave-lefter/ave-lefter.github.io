@@ -11,7 +11,7 @@
         <el-form ref="formRef2" :model="form2" :rules="rules" label-width="0" autocomplete="off" size="large" label-position="top" hide-required-asterisk
           @submit.prevent>
           <!-- <div class="tip">{{ $t('enterEmailCodeTips', { email: showEmail }) }}</div> -->
-          <el-form-item :label="$t('emailAuth')" prop="verificationCode">
+          <el-form-item :label="$t('emailCodeAuth')" prop="verificationCode">
             <el-input
               v-model="form2.verificationCode" class="h-48px font-500 text-14px" :autocomplete="'new-verificationCode2' + Math.random()"
               :placeholder="showEmail" name="new-verificationCode2">
@@ -24,7 +24,7 @@
               </template>
             </el-input>
           </el-form-item>
-          <el-form-item :label="t('googleAuth')" prop="authCode" class="mb-40px!">
+          <el-form-item :label="t('googleAuth2')" prop="authCode" class="mb-40px!">
             <el-input
               v-model="form2.authCode" class="h-48px font-500 text-14px" :autocomplete="'new-authCode' + Math.random()"
               :placeholder="t('googleAuthPlaceholder')" name="authCodeField" />

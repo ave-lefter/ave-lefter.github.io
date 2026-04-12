@@ -519,6 +519,7 @@
   "unKnown": "Dump",
   "unKnown1": "Unknown",
   "mine": "Mine",
+  "myWatchlist": "My Watchlist",
   "bought": "Bought",
   "sold": "Sold",
   "seemsNoProblem": "Seems to be no problem",
@@ -1967,7 +1968,7 @@
   "botWallet": "Bot Wallet",
   "createWithdrawIncomeOrder": "Withdrawal request has been submitted",
   "inviteYourFriends": "Invite friends to participate in trading on Ave",
-  "shareAndEarn": "Enjoy up to <span class=\"color-#27BDFD\">60%</span> commission rebate on fees",
+  "shareAndEarn": "Enjoy up to <span class=\"color-#27BDFD\">42%</span> commission rebate on fees",
   "loginForInvite": "Login to invite friends",
   "inviteActivity": "Invitation Event",
   "inviteYourFriendsToRegister": "Invite friends to register an Ave account and enjoy transaction rebates",
@@ -2139,6 +2140,7 @@
   "removeTokenTips2": "Delete the selected monitoring?",
   "twitterFollowers": "Twitter Followers",
   "position2": "Position",
+  "cashback": "Cashback coins return the creator fee to traders instead of the coin creator",
   "deletedTweets": "Deleted",
   "unpin": "Unpin",
   "actionDel": "have deleted this tweet",
@@ -2160,5 +2162,8 @@
   "internalTransferIn": "Internal In",
   "internalTransferOut": "Internal Out",
   "tutorial": "Tutorial",
-  "gridTip": "Please keep at least one category displayed"
+  "gridTip": "Please keep at least one category displayed",
+  "emailCodeAuth": "Email Verification",
+  "googleAuth2": "Google Authenticator",
+  "myRemark": "My Remarks"
 }

@@ -210,9 +210,7 @@
         </template>
         <template #default="{ row }">
           <span
-            :style="{
-              color: filterType(row?.event_type)?.color == 'green' ? upColor : downColor,
-            }"
+            :class="filterType(row?.event_type)?.color ? filterType(row?.event_type)?.color : ''"
           >
             {{ filterType(row?.event_type)?.name }}
           </span>
@@ -256,13 +254,13 @@
                 <el-input
                   v-model.trim.number="filterForm.amount.amount_min"
                   :placeholder="$t('minor')"
-                  
+
                 />
                 <span class="ml-10px mr-10px">~</span>
                 <el-input
                   v-model.trim.number="filterForm.amount.amount_max"
                   :placeholder="$t('max1')"
-                  
+
                 />
               </div>
               <div class="mt-10px flex">
@@ -292,6 +290,16 @@
               {{ row?.amount > 0 ? formatNumber(row?.token1_amount || 0, 2) : 0 }}
               <span class="color-#959A9F">{{ row?.token1_symbol }}</span>
             </span>
+          </div>
+          <div class="flex items-end justify-end" v-else-if="['transfer_in','transfer_out','internal_transfer_in','internal_transfer_out'].includes(row.event_type)">
+            {{ formatNumber(row.amount, 2) }}&nbsp;{{ row.event_type == 'transfer_in' || row.event_type == 'internal_transfer_in' ? $t('from') : $t('to') }}
+            <NuxtLink
+              target="_blank"
+              :to="`/address/${row.opponent_address}/${row.chain}`" class="border-b border-b-dashed hover:opacity-80"
+              @click.stop
+            >
+              {{ row.opponent_address?.slice(0,4) }}...{{ row.opponent_address?.slice(-4) }}
+            </NuxtLink>
           </div>
           <span v-else>
             {{ row?.amount > 0 ? formatNumber(row?.amount || 0, 2) : 0 }}
@@ -330,13 +338,13 @@
                 <el-input
                   v-model.trim.number="filterForm.price.volume_min"
                   :placeholder="$t('minor')"
-                  
+
                 />
                 <span class="ml-10px mr-10px">~</span>
                 <el-input
                   v-model.trim.number="filterForm.price.volume_max"
                   :placeholder="$t('max1')"
-                  
+
                 />
               </div>
               <div class="mt-10px flex">
@@ -375,6 +383,7 @@
 <script setup>
 import AveEmpty from '@/components/aveEmpty.vue'
 import TokenColumn from '@/components/tokenColumn.vue'
+import { isEvmChain } from '@/utils/index'
 const props = defineProps({
   trendQuery: {
     type: Object,
@@ -408,6 +417,11 @@ const props = defineProps({
     type: Number,
     default: 10,
   },
+  chain: {
+    type: String,
+    default: '',
+  },
+
 })
 
 const emit = defineEmits(['refreshWhaleTrendList'])
@@ -454,6 +468,14 @@ const trendTypeList = computed(() => [
     name: $t('ADD_LIQUIDITY') + '/' + $t('REMOVE_LIQUIDITY'),
   },
   { id: 'TRANSFER', name: $t('wallet_detail_transfer_in_out') },
+  ...(isEvmChain(props.chain)
+  ? [
+      {
+        id: 'INTERNAL_TRANSFER',
+        name: $t('internalTransfer'),
+      },
+    ]
+  : []),
   { id: 'BURN', name: $t('BURN') },
   { id: 'MINT', name: $t('mint1') },
 ])
@@ -470,59 +492,67 @@ function filterType(type) {
   const o = {
     swap_buy: {
       name: $t('swap_buy'),
-      color: 'green',
+      color: 'color-#12B886',
     },
     swap_sell: {
       name: $t('swap_sell'),
-      color: 'red',
+      color: 'color-#F6465D',
     },
     AUTHORITY: {
       name: $t('AUTHORITY'),
-      color: 'red',
+      color: 'color-#F6465D',
     },
     ADD_LIQUIDITY: {
       name: $t('ADD_LIQUIDITY'),
-      color: 'green',
+      color: 'color-#12B886',
     },
     NEW_COIN: {
       name: $t('NEW_COIN'),
-      color: 'green',
+      color: 'color-#12B886',
     },
     MINT: {
       name: $t('MINT'),
-      color: 'green',
+      color: 'color-#12B886',
     },
     FREEZE: {
       name: $t('FREEZE'),
-      color: 'red',
+      color: 'color-#F6465D',
     },
     transfer_in: {
       name: $t('transfer_in'),
-      color: 'green',
+      color: 'color-#34D304',
     },
     transfer_out: {
       name: $t('transfer_out'),
-      color: 'red',
+      color: 'color-#BC16B6',
+    },
+    internal_transfer_in: {
+      name: $t('internalTransferIn'),
+      color: 'color-#34D304',
+    },
+    internal_transfer_out: {
+      name: $t('internalTransferOut'),
+      color: 'color-#BC16B6',
     },
     BURN: {
       name: $t('BURN'),
-      color: 'red',
+      color: 'color-#F6465D',
     },
     NEW_PAIR: {
       name: $t('NEW_PAIR'),
-      color: 'red',
+      color: 'color-#F6465D',
     },
     THAW: {
       name: $t('THAW'),
-      color: 'green',
+      color: 'color-#12B886',
     },
     BALANCE_CHANGE: {
       name: $t('BALANCE_CHANGE'),
-      color: 'red',
+      color: 'color-#F6465D',
     },
     REMOVE_LIQUIDITY: {
       name: $t('REMOVE_LIQUIDITY'),
-      color: 'red',
+      color: 'color-#F6465D',
     },
   }
   return o[type]

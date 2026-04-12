@@ -24,6 +24,11 @@ export interface PumpConfig {
 
 export interface PumpObj {
   remark: string
+  name_en: string
+  name_zh: string
+  symbol_en: string
+  symbol_zh: string
+  is_cashback: any
   deployer_platform: string
   is_cloned: any
   colluded_cluster_ratio: any

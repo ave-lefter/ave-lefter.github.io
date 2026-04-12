@@ -554,3 +554,21 @@ debox-chat-widget {
     }
   }
 }
+/* 指示器整体 */
+.el-carousel__indicators {
+  display: flex;
+  justify-content: center;
+}
+
+/* 每个点 */
+.el-carousel__indicator button {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%; /* 👈 圆点关键 */
+  background-color: rgba(255, 255, 255, 0.5);
+}
+
+/* 激活状态 */
+.el-carousel__indicator.is-active button {
+  background-color: #fff;
+}

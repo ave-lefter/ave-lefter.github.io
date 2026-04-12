@@ -317,6 +317,67 @@ export function generateAvatarIcon(string: string) {
   // return canvas.toDataURL('image/png')
 }
 
+// 根据字符串生成头像
+export function generateAvatarIcon1(string: string) {
+  const hashBuffer = sha1(string)
+  const hash = hashBuffer.toString()
+  const width = 80
+  const height = 80
+  const pixelSize = 10
+  const canvas = document.createElement('canvas')
+  canvas.width = width
+  canvas.height = height
+  const ctx = canvas.getContext('2d')
+
+  // 辅助函数：降低颜色亮度
+  const darkenColor = (hexColor: string, factor = 1) => {
+    const r = parseInt(hexColor.slice(0, 2), 16)
+    const g = parseInt(hexColor.slice(2, 4), 16)
+    const b = parseInt(hexColor.slice(4, 6), 16)
+    const newR = Math.floor(r * factor)
+    const newG = Math.floor(g * factor)
+    const newB = Math.floor(b * factor)
+    return ((newR << 16) | (newG << 8) | newB).toString(16).padStart(6, '0')
+  }
+
+  // 从哈希中提取更分散的颜色值
+  const color1 = '#' + darkenColor(hash.slice(0, 6), 0.2)
+  const color2 = '#' + darkenColor(hash.slice(10, 16), 1)  // 跳过中间部分
+  const color3 = '#' + darkenColor(hash.slice(20, 26), 0.6)  // 使用后面的部分
+  const columns = Math.floor(width / pixelSize)
+  const rows = Math.floor(height / pixelSize)
+  const halfColumns = Math.floor((columns + 1) / 2)
+  for (let row = 0; row < rows; row++) {
+    for (let column = 0; column < halfColumns; column++) {
+      const xPos = column * pixelSize
+      const yPos = row * pixelSize
+      const colorChoice = (row * halfColumns + column) % 3
+      let color
+      switch (colorChoice) {
+        case 0:
+          color = color1
+          break
+        case 1:
+          color = color2
+          break
+        case 2:
+          color = color3
+          break
+        default:
+          color = color1
+          break
+      }
+      if (ctx) {
+        ctx.fillStyle = color
+        ctx.fillRect(xPos, yPos, pixelSize, pixelSize)
+        ctx.fillRect(width - xPos - pixelSize, yPos, pixelSize, pixelSize)
+      }
+    }
+  }
+  return canvas.toDataURL('image/png')
+}
+
+
 export function isValidAddress(address: string, chain = 'eth') {
   if (chain === 'solana') {
     try {
@@ -443,21 +504,21 @@ export function openBrowser(url: string, type: 'token' | 'address' | 'tx', chain
 
 export function getChainDefaultIconColor(chain?: string) {
   const theme = useThemeStore().theme
-  const defaultColor = theme === 'dark' ? '#333333' : '#999999'
-  if (!chain) {
-    return defaultColor
-  }
-  const colors: Record<string, string> = {
-    solana: '#C931F7',
-    eth: '#627EEA',
-    bsc: '#F0B90A',
-    tron: '#C53027',
-    sui: '#6FBCF0',
-    ton: '#0099E9',
-    base: '#0152FF',
-  }
+  const defaultColor = theme === 'dark' ? '#1E2025' : '#E8F1FF'
+  // if (!chain) {
+  //   return defaultColor
+  // }
+  // const colors: Record<string, string> = {
+  //   solana: '#C931F7',
+  //   eth: '#627EEA',
+  //   bsc: '#F0B90A',
+  //   tron: '#C53027',
+  //   sui: '#6FBCF0',
+  //   ton: '#0099E9',
+  //   base: '#0152FF',
+  // }
 
-  return colors?.[chain] || defaultColor
+  return defaultColor
 }
 
 export function getChainDefaultIcon(chain?: string, text = '', type?: string) {
@@ -473,10 +534,12 @@ export function getChainDefaultIcon(chain?: string, text = '', type?: string) {
       firstChar = [...text][0] || ''
     }
     const char = firstChar.toUpperCase()
+    const theme = useThemeStore().theme
+    const textColor = theme === 'dark' ? '#f5f5f580' : '#11111180'
 
-    const circle = `<?xml version="1.0" standalone="no"?><svg width="32" height="32" version="1.1" xmlns="http://www.w3.org/2000/svg"><circle cx="50%" cy="50%" r="16" fill="${color}"/><text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" font-size="16" fill="#fff" font-family="sans-serif">${char}</text></svg>`
+    const circle = `<?xml version="1.0" standalone="no"?><svg width="32" height="32" version="1.1" xmlns="http://www.w3.org/2000/svg"><circle cx="50%" cy="50%" r="16" fill="${color}"/><text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" font-size="16" fill="${textColor}" font-family="sans-serif">${char}</text></svg>`
 
-    const rect = `<?xml version="1.0" standalone="no"?><svg width="32" height="32" version="1.1" xmlns="http://www.w3.org/2000/svg"><rect width="32" height="32" fill="${color}"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="16" fill="#fff" font-family="sans-serif">${char}</text></svg>`
+    const rect = `<?xml version="1.0" standalone="no"?><svg width="32" height="32" version="1.1" xmlns="http://www.w3.org/2000/svg"><rect width="32" height="32" fill="${color}"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="16" fill="${textColor}" font-family="sans-serif">${char}</text></svg>`
 
     const defaultSvg = type === 'rect' ? rect : circle
 
@@ -1430,4 +1493,11 @@ export async function withCache<T>(
   localforage.setItem(cacheKey, { data: res, timestamp: Date.now() })
 
   return res
+}
+
+
+export function format4Str4(val: string) {
+  if(typeof val !== 'string') return val
+  if(val.length <= 8) return val
+  return val.slice(0, 4) + '...' + val.slice(-4)
 }

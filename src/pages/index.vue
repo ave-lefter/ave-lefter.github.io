@@ -447,7 +447,7 @@ const activeChain = useStorage<ChainKey>(
 const audioUrl = ref('')
 const globalStore = useGlobalStore()
 const { pumpSetting, token_logo_url, pumpBlackList } = storeToRefs(globalStore)
-const currentAddress = computed(() =>  botStore?.evmAddress || walletStore?.address ||'')
+const currentAddress = computed(() => botStore?.evmAddress || walletStore?.address || '')
 const orderNew = computed(() => {
   return pumpSetting.value.grid['new']?.order
 })
@@ -551,6 +551,11 @@ const logoList = shallowRef<{
   sell_tax: number,
   deployer_platform: string
   is_cloned: number,
+  is_cashback: number
+  name_en: string
+  name_zh: string
+  symbol_en: string
+  symbol_zh: string
 }[]>([])
 
 type PumpWorkerAPI = {
@@ -689,13 +694,18 @@ const syncCategory = (category: 'new' | 'soon' | 'graduated') => {
       if (!obj) return item
       const merged = {
         ...item,
-        ...(obj.logo_url ? { logo_url: obj.logo_url } : {}),
+        ...(obj.logo_url && !item.logo_url ? { logo_url: obj.logo_url } : {}),
         ...(obj.buy_tax ? { buy_tax: obj.buy_tax } : {}),
         ...(obj.sell_tax ? { sell_tax: obj.sell_tax } : {}),
         ...(obj.name ? { name: obj.name } : {}),
         ...(obj.symbol ? { symbol: obj.symbol } : {}),
+        ...(obj.name_en ? { name_en: obj.name_en } : {}),
+        ...(obj.symbol_en ? { symbol_en: obj.symbol_en } : {}),
+        ...(obj.name_zh ? { name_zh: obj.name_zh } : {}),
+        ...(obj.symbol_zh ? { symbol_zh: obj.symbol_zh } : {}),
         ...(obj.appendix ? { medias: getMedias(obj.appendix), twitter_type: obj.twitter_type } : {}),
         ...(obj.is_cloned ? { is_cloned: obj.is_cloned } : {}),
+        ...(obj.is_cashback ? { is_cashback: obj.is_cashback } : {}),
         ...(obj.deployer_platform ? { deployer_platform: obj.deployer_platform } : {}),
         ...(obj.is_pump_agent ? { is_pump_agent: obj.is_pump_agent } : {})
       }
@@ -776,7 +786,13 @@ function requestRefresh(category?: 'new' | 'soon' | 'graduated') {
   handleRefreshLists()
 }
 
-const list1 = computed(() => fourmemeListObj?.[activeChain.value]?.new || [])
+const list1 = computed(() =>
+  fourmemeListObj?.[activeChain.value]?.new?.sort((a, b) => {
+    const timeA = Number(a?.created_at) || Number(a?.time)
+    const timeB = Number(b?.created_at) || Number(b?.time)
+    return timeB - timeA
+  }) || []
+)
 const list2 = computed(() => {
   const sort = pumpV3Pointer.value[activeChain.value].soon.pumpFilter.sort as 'progress' | 'market_cap'
   if (sort) {
@@ -1015,31 +1031,19 @@ watchTokenUpdatedUnwatch = watch(
           ...(rawVal.sell_tax !== undefined ? { sell_tax: rawVal.sell_tax } : {}),
           ...(rawVal.name ? { name: rawVal.name } : {}),
           ...(rawVal.symbol ? { symbol: rawVal.symbol } : {}),
+          ...(rawVal.name_en ? { name_en: rawVal.name_en } : {}),
+          ...(rawVal.symbol_en ? { symbol_en: rawVal.symbol_en } : {}),
+          ...(rawVal.name_zh ? { name_zh: rawVal.name_zh } : {}),
+          ...(rawVal.symbol_zh ? { symbol_zh: rawVal.symbol_zh } : {}),
           ...(rawVal.appendix ? { medias: getMedias(rawVal.appendix), twitter_type: rawVal.twitter_type } : {}),
           ...(rawVal.is_cloned !== undefined ? { is_cloned: rawVal.is_cloned } : {}),
+          ...(rawVal.is_cashback !== undefined ? { is_cashback: rawVal.is_cashback } : {}),
           ...(rawVal.deployer_platform ? { deployer_platform: rawVal.deployer_platform } : {}),
           ...(rawVal.is_pump_agent !== undefined ? { is_pump_agent: rawVal.is_pump_agent } : {})
         }
         list[index] = merged
       }
     })
-    const index = wsTableList.value.findIndex(item => item.target_token === rawVal.token)
-    if (index !== -1) {
-      const prev = wsTableList.value[index]
-      const merged = {
-        ...prev,
-        ...(rawVal.logo_url ? { logo_url: rawVal.logo_url } : {}),
-        ...(rawVal.buy_tax !== undefined ? { buy_tax: rawVal.buy_tax } : {}),
-        ...(rawVal.sell_tax !== undefined ? { sell_tax: rawVal.sell_tax } : {}),
-        ...(rawVal.name ? { name: rawVal.name } : {}),
-        ...(rawVal.symbol ? { symbol: rawVal.symbol } : {}),
-        ...(rawVal.appendix ? { medias: getMedias(rawVal.appendix), twitter_type: rawVal.twitter_type } : {}),
-        ...(rawVal.is_cloned !== undefined ? { is_cloned: rawVal.is_cloned } : {}),
-        ...(rawVal.deployer_platform ? { deployer_platform: rawVal.deployer_platform } : {}),
-        ...(rawVal.is_pump_agent !== undefined ? { is_pump_agent: rawVal.is_pump_agent } : {})
-      }
-      wsTableList.value[index] = merged
-    }
     const prev = bufferLogoMap.get(rawVal.token)
     setLRU(
       bufferLogoMap,
@@ -1252,6 +1256,13 @@ onUnmounted(() => {
     cancelAnimationFrame(logoThrottledRafId)
     logoThrottledRafId = null
   }
+  const categories = ['new', 'soon', 'graduated'] as const
+  categories.forEach((category) => {
+    if (Timer[category]) {
+      clearTimeout(Timer[category] as number)
+      Timer[category] = null
+    }
+  })
 })
 const startPortraitTimer = () => {
   if (portraitTimer) {
@@ -1670,9 +1681,18 @@ async function getPump(rawParams: PumpRequestParams, isFilter = false) {
     }
     // HTTP 请求完成后刷新对应类别
     requestRefresh(finalParams.category as 'new' | 'soon' | 'graduated')
-    // Timer[category] = setTimeout(() => getPump(rawParams), 10000)
+    const isTrue = getFilterNumber(state.pumpFilter || {}, platforms.value, baseTokensAllStr.value) > 0
+    if (isTrue) {
+      Timer[category] = setTimeout(() => getPump(rawParams), 5000)
+    } else {
+      if (Timer[category]) {
+        clearTimeout(Timer[category] as number)
+        Timer[category] = null
+      }
+    }
   }
 }
+
 
 /** 辅助函数：统一处理后端无效时间 */
 function parseDate(dateStr?: string | number, toSeconds = false) {

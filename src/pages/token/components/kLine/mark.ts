@@ -5,6 +5,7 @@ import type { IChartingLibraryWidget, Mark } from '~/types/tradingview/charting_
 import { getUserKlineTxTags, getKlineProfilingTagsV2, type IGetKlineProfilingTagsV2Item,  type HolderBuy, type WalletLogo } from '@/api/token'
 import type { SimpleWSTx, WSTx } from './types'
 import { SupportTokenKlineLaunchpad, SupportTokenKlineChains } from '~/utils/constants'
+import { generateAvatarIcon1 as generateAvatarIcon } from '@/utils'
 
 type TradeSide = {
   amount: number
@@ -18,7 +19,64 @@ type TradeData = {
   sell?: TradeSide
 }
 
-type HolderBuyData = HolderBuy & {wallet_address:string,wallet_logo:WalletLogo}
+type HolderBuyData = HolderBuy & {wallet_address:string,wallet_logo:WalletLogo,remark?:string,txid?:string}
+
+// 地址缩写函数
+function formatAddress(address: string): string {
+  if (!address || address.length <= 10) return address
+  return `${address.slice(0, 4)}...${address.slice(-4)}`
+}
+
+// 获取地址后四位（前面加*）
+function getAddressLast4(address: string): string {
+  if (!address || address.length < 4) return address
+  return `*${address.slice(-4)}`
+}
+
+// 获取显示名称，优先显示备注，否则显示缩写地址
+function getDisplayName(remark?: string, walletName?: string, address?: string, chain?: string): string {
+  // 优先使用传入的remark
+  if (remark && remark.trim()) {
+    const trimmedRemark = remark.trim()
+    // 如果有地址，在备注后面加括号显示地址后四位
+    if (address) {
+      const last4 = getAddressLast4(address)
+      return `${trimmedRemark}(${last4})`
+    }
+    return trimmedRemark
+  }
+
+  // 尝试从本地存储获取备注
+  if (address && chain) {
+    try {
+      const remarksStore = useRemarksStore()
+      const localRemark = remarksStore.getRemarkByAddress({ address, chain })
+      if (localRemark && localRemark.trim()) {
+        const trimmedLocalRemark = localRemark.trim()
+        // 在本地存储的备注后面加括号显示地址后四位
+        const last4 = getAddressLast4(address)
+        return `${trimmedLocalRemark}(${last4})`
+      }
+    } catch (error) {
+      // 静默处理错误，不影响其他显示逻辑
+    }
+  }
+
+  // 使用钱包名称，同时补充地址后四位，避免推送场景缺少地址识别
+  if (walletName && walletName.trim()) {
+    const trimmedWalletName = walletName.trim()
+    if (address) {
+      const last4 = getAddressLast4(address)
+      return `${trimmedWalletName}(${last4})`
+    }
+    return trimmedWalletName
+  }
+
+  // 最后使用缩写地址
+  if (address) return formatAddress(address)
+
+  return ''
+}
 
 type TFormatTxsParams = {
   urlPrefix:string
@@ -35,11 +93,17 @@ export function useKlineMarks() {
   const localeStore = useLocaleStore()
   const botStore = useBotStore()
   const walletStore = useWalletStore()
+  const remarksStore = useRemarksStore()
   const globalStore = useGlobalStore()
   const wsStore = useWSStore()
   // 创建打点数据
   const marksTabs = computed(() => {
     const arr = (botStore?.evmAddress || walletStore?.address) ? [{ id: 'trade', name: t('mine') }] : []
+    // 添加我的关注 tab
+    if (botStore?.evmAddress || walletStore?.address) {
+      arr.push({ id: '-100', name: t('myWatchlist') })
+      arr.push({ id: '-101', name: t('myRemark') })
+    }
     return arr.concat(tokenStore.totalHolders?.filter?.(i => (i?.total_address || 0) > 0 && ['16','19','25','30','31']?.includes(i.type))?.map?.((i) => ({
       id: i.type,
       name: i?.[filterLanguage(localeStore.locale)]
@@ -50,12 +114,20 @@ export function useKlineMarks() {
   const markTabsVisible = useLocalStorage('tv_markTabsVisible',true)
   const markTabsChecked: RemovableRef<{ [key: string]: boolean }> = useLocalStorage('tv_markTabsChecked', {
     trade: true,
+    '-100': true,
+    '-101': false,
     16: false,
     19: false,
     25: true,
     30: false,
     31: true
   })
+  let myPortraitRefreshTimer: ReturnType<typeof setTimeout> | null = null
+  let myPortraitCooldownUntil = 0
+  let myPortraitBypassThrottleUntil = 0
+  let myPortraitOnlyRefreshUntil = 0
+  let portraitCacheOnlyRefreshUntil = 0
+  let portraitCacheRefreshRetryTimer: ReturnType<typeof setTimeout> | null = null
   let rootNodeEl: HTMLElement | null = null
   const clearRootNodeHandler = () => {
     if (rootNodeEl) {
@@ -115,6 +187,9 @@ export function useKlineMarks() {
       b1.innerText = i.name
       btn.appendChild(b1)
       b1.onclick = () => {
+        if (i.id === '-100' || i.id === '-101') {
+          allowImmediateMyPortraitFetch()
+        }
         if (markTabsChecked.value[i.id]) {
           markTabsChecked.value[i.id] = false
           b1.style.color = 'inherit'
@@ -122,6 +197,32 @@ export function useKlineMarks() {
         } else {
           markTabsChecked.value[i.id] = true
           b1.style.color = '#3F80F7'
+          // 如果是我的关注标签，清除相关缓存以确保获取最新数据
+          if (i.id === '-100') {
+            const token = tokenStore?.token?.token
+            const chain = tokenStore?.token?.chain
+            const pair = tokenStore?.pairAddress
+            const user = botStore?.evmAddress || walletStore?.address
+            // 清除所有相关的缓存
+            profilingMarksCache.forEach((value, key) => {
+              if (key.startsWith(`${pair}-${chain}-${user}`) && key.includes(`-100-`)) {
+                profilingMarksCache.delete(key)
+              }
+            })
+          }
+          // 如果是我的关注标签，清除相关缓存以确保获取最新数据
+          if (i.id === '-101') {
+            const token = tokenStore?.token?.token
+            const chain = tokenStore?.token?.chain
+            const pair = tokenStore?.pairAddress
+            const user = botStore?.evmAddress || walletStore?.address
+            // 清除所有相关的缓存
+            marksMap.forEach((value, key) => {
+              if (key.startsWith(`${pair}-${chain}-${user}`) && key.includes(`-101-`)) {
+                marksMap.delete(key)
+              }
+            })
+          }
         }
         _widget?.activeChart?.()?.refreshMarks?.()
       }
@@ -132,6 +233,8 @@ export function useKlineMarks() {
   const marksMap: Map<string, TradeData[]> = new Map()
   // 画像打点
   const profilingMarksCache: Map<string, any[]> = new Map()
+  // websocket 增量画像缓存，不依赖 from/to
+  const profilingLiveCache: Map<string, any[]> = new Map()
   const MAX_CACHE_SIZE = 50
 
   const touchCache = <T>(map: Map<string, T>, key: string): T | undefined => {
@@ -151,19 +254,347 @@ export function useKlineMarks() {
     }
   }
 
-  watch(() => tokenStore.token?.token, () => {
+  const clearMarkCaches = () => {
     marksMap.clear()
     profilingMarksCache.clear()
+    profilingLiveCache.clear()
+  }
+
+  const cancelMyPortraitRefresh = () => {
+    if (myPortraitRefreshTimer) {
+      clearTimeout(myPortraitRefreshTimer)
+      myPortraitRefreshTimer = null
+    }
+    myPortraitCooldownUntil = 0
+    myPortraitBypassThrottleUntil = 0
+    myPortraitOnlyRefreshUntil = 0
+  }
+
+  const cancelPortraitCacheRefresh = () => {
+    portraitCacheOnlyRefreshUntil = 0
+    if (portraitCacheRefreshRetryTimer) {
+      clearTimeout(portraitCacheRefreshRetryTimer)
+      portraitCacheRefreshRetryTimer = null
+    }
+  }
+
+  const resetMarkRefreshState = () => {
+    cancelMyPortraitRefresh()
+    cancelPortraitCacheRefresh()
+  }
+
+  watch(() => tokenStore.token?.token, () => {
+    clearMarkCaches()
+    resetMarkRefreshState()
   })
 
   onUnmounted(() => {
     clearRootNodeHandler()
+    resetMarkRefreshState()
   })
   type MigratedType = {
       migrate_time: number
       migrate_uprice: string
       showMarket: boolean
       mcap: number
+  }
+
+  const getProfilingCacheKey = ({
+    pair,
+    chain,
+    user,
+    interval,
+    type,
+    from,
+    to
+  }: {
+    pair: string
+    chain: string
+    user: string
+    interval: string
+    type: string
+    from: number
+    to: number
+  }) => `${pair}-${chain}-${user}-${interval}-${type}-${from}-${to}`
+
+  const getProfilingLiveCacheKey = ({
+    pair,
+    chain,
+    user,
+    interval,
+    type
+  }: {
+    pair: string
+    chain: string
+    user: string
+    interval: string | number
+    type: string
+  }) => `${pair}-${chain}-${user}-${interval}-${type}`
+
+  const findReusableCacheKey = <T>(map: Map<string, T>, prefix: string, from: number, to: number) => {
+    for (const key of Array.from(map.keys()).reverse()) {
+      if (!key.startsWith(prefix)) continue
+      const match = key.match(/-(\d+)-(\d+)$/)
+      if (!match) continue
+      const cachedFrom = Number(match[1])
+      const cachedTo = Number(match[2])
+      if (cachedFrom <= from && cachedTo >= to) {
+        return key
+      }
+    }
+  }
+
+  const normalizeKlineTime = (time: number | string | undefined | null) => {
+    const normalized = Number(time || 0)
+    if (!normalized) return 0
+    return String(Math.trunc(normalized)).length > 10 ? Math.floor(normalized / 1000) : Math.floor(normalized)
+  }
+
+  const getBucketTime = (time: number | string | undefined | null, interval: number | string) => {
+    const normalizedTime = normalizeKlineTime(time)
+    const normalizedInterval = Number(interval) || 1
+    return Math.floor(normalizedTime / normalizedInterval) * normalizedInterval
+  }
+
+  const filterTradeDataByRange = (data: TradeData[], from: number, to: number, interval: number | string) => {
+    return data.filter(item => {
+      const bucketTime = getBucketTime(item.time, interval)
+      return bucketTime >= from && bucketTime <= to
+    })
+  }
+
+  const filterProfilingDataByRange = <T extends IGetKlineProfilingTagsV2Item>(data: T[], from: number, to: number, interval: number | string) => {
+    return data.filter(item => {
+      const holders = item.holders || []
+      if (holders.length === 0) {
+        const bucketTime = getBucketTime(item.time, interval)
+        return bucketTime >= from && bucketTime <= to
+      }
+      return holders.some(holder => {
+        const buyBucketTime = getBucketTime(holder.buy?.tx_time, interval)
+        const sellBucketTime = getBucketTime(holder.sell?.tx_time, interval)
+        return (buyBucketTime >= from && buyBucketTime <= to) ||
+          (sellBucketTime >= from && sellBucketTime <= to)
+      })
+    })
+  }
+
+  const loadProfilingMarksData = async ({
+    from,
+    to,
+    interval,
+    pair,
+    chain,
+    token,
+    user,
+    type,
+    isTokenKline
+  }: {
+    from: number
+    to: number
+    interval: string
+    pair: string
+    chain: string
+    token: string
+    user: string
+    type: string
+    isTokenKline: boolean
+  }) => {
+    const id = getProfilingCacheKey({ pair, chain, user, interval, type, from, to })
+    const cachePrefix = `${pair}-${chain}-${user}-${interval}-${type}-`
+    const isMyPortraitType = type === '-100' || type === '-101'
+    const selfAddress = botStore?.evmAddress || walletStore?.address || ''
+
+    if (isMyPortraitType && !selfAddress) {
+      return []
+    }
+
+    if (!isMyPortraitType && profilingMarksCache.has(id)) {
+      const res = touchCache(profilingMarksCache, id) || []
+      if (res.length > 0) return res as IGetKlineProfilingTagsV2Item[]
+      profilingMarksCache.delete(id)
+    }
+
+    const reusableKey = isMyPortraitType
+      ? undefined
+      : findReusableCacheKey(profilingMarksCache, cachePrefix, from, to)
+    if (reusableKey) {
+      const res = touchCache(profilingMarksCache, reusableKey) || []
+      const filteredRes = filterProfilingDataByRange(res as IGetKlineProfilingTagsV2Item[], from, to, interval)
+      if (filteredRes.length > 0) return filteredRes
+    }
+
+    if (!isMyPortraitType) {
+      const liveKey = getProfilingLiveCacheKey({ pair, chain, user, interval, type })
+      if (profilingLiveCache.has(liveKey)) {
+        const liveRes = touchCache(profilingLiveCache, liveKey) || []
+        const filteredLiveRes = filterProfilingDataByRange(liveRes as IGetKlineProfilingTagsV2Item[], from, to, interval)
+        if (filteredLiveRes.length > 0) {
+          return filteredLiveRes
+        }
+      }
+    }
+
+    const now = Date.now()
+    if (
+      isMyPortraitType
+      && now < myPortraitCooldownUntil
+      && now >= myPortraitBypassThrottleUntil
+    ) {
+      return []
+    }
+
+    const data = {
+      from,
+      to,
+      interval,
+      type,
+      ...(!isTokenKline && {
+        pair_id: pair + '-' + chain,
+      }),
+      ...(isTokenKline && {
+        token_id: token,
+      }),
+      ...(isMyPortraitType && {
+        self_address: selfAddress
+      }),
+    }
+    const res = await getKlineProfilingTagsV2(data)
+    const cacheArr = Array.isArray(res)
+      ? res.map(el => ({
+        ...el,
+        type
+      }))
+      : []
+    const dedupedCacheArr = dedupeProfilingCacheItems(cacheArr)
+    setCache(profilingMarksCache, id, dedupedCacheArr)
+    if (!isMyPortraitType) {
+      const liveKey = getProfilingLiveCacheKey({ pair, chain, user, interval, type })
+      const existingLive = profilingLiveCache.get(liveKey) || []
+      setCache(profilingLiveCache, liveKey, dedupeProfilingCacheItems([...(existingLive as any[]), ...dedupedCacheArr]))
+    }
+    return dedupedCacheArr as IGetKlineProfilingTagsV2Item[]
+  }
+
+  const getProfilingMarkDedupKey = (mark: { tx_time: number; user_address: string; id: string; txid?: string }) => {
+    if (mark.txid) return mark.txid
+    const side = mark.id.includes('-buy-') ? 'buy' : 'sell'
+    return `${mark.tx_time}-${side}-${mark.user_address}`
+  }
+
+  const getProfilingCacheItemDedupKey = (item: IGetKlineProfilingTagsV2Item & { type?: string }) => {
+    const holder = item.holders?.[0]
+    const txid = holder?.buy?.txid || holder?.sell?.txid
+    if (txid) return txid
+    const side = holder?.buy ? 'buy' : holder?.sell ? 'sell' : 'unknown'
+    const txTime = holder?.buy?.tx_time || holder?.sell?.tx_time || item.time
+    return `${item.type || ''}-${txTime}-${side}-${holder?.wallet_address || ''}`
+  }
+
+  const dedupeProfilingCacheItems = <T extends IGetKlineProfilingTagsV2Item & { type?: string }>(items: T[]) => {
+    const seen = new Set<string>()
+    return items.filter((item) => {
+      const key = getProfilingCacheItemDedupKey(item)
+      if (seen.has(key)) return false
+      seen.add(key)
+      return true
+    })
+  }
+
+  const mergeProfilingCacheData = <T extends IGetKlineProfilingTagsV2Item & { type?: string }>(...groups: T[][]) => {
+    return dedupeProfilingCacheItems(groups.flat().filter(Boolean))
+  }
+
+  const dedupeProfilingMarks = (marks: (Mark & { tx_time: number; user_address: string; txid?: string })[]) => {
+    const seen = new Set<string>()
+    return marks.filter((mark) => {
+      const key = getProfilingMarkDedupKey(mark)
+      if (seen.has(key)) return false
+      seen.add(key)
+      return true
+    })
+  }
+
+  const pickMarkTabName = (id: string) => marksTabs.value.find(tab => tab.id === id)?.name || ''
+  const isMyPortraitTabChecked = () => !!(markTabsChecked.value?.['-100'] || markTabsChecked.value?.['-101'])
+
+  const clearMyPortraitCaches = ({
+    pair,
+    chain,
+    user
+  }: {
+    pair: string
+    chain: string
+    user: string
+  }) => {
+    profilingMarksCache.forEach((value, key) => {
+      if (!key.startsWith(`${pair}-${chain}-${user}-`)) return
+      if (key.includes(`-100-`) || key.includes(`-101-`)) {
+        profilingMarksCache.delete(key)
+      }
+    })
+  }
+
+  const scheduleMyPortraitRefresh = ({
+    pair,
+    chain,
+    user,
+    widget
+  }: {
+    pair: string
+    chain: string
+    user: string
+    widget: IChartingLibraryWidget | null
+  }) => {
+    if (!isMyPortraitTabChecked() || !pair || !chain || !user) return
+    if (myPortraitRefreshTimer) return
+    const now = Date.now()
+    const delay = myPortraitCooldownUntil > now
+      ? myPortraitCooldownUntil - now
+      : (myPortraitCooldownUntil === 0 ? 2000 : 0)
+    myPortraitRefreshTimer = setTimeout(() => {
+      myPortraitRefreshTimer = null
+      clearMyPortraitCaches({ pair, chain, user })
+      const triggerAt = Date.now()
+      myPortraitBypassThrottleUntil = triggerAt + 3000
+      myPortraitCooldownUntil = triggerAt + 10000
+      myPortraitOnlyRefreshUntil = triggerAt + 3000
+      widget?.activeChart?.()?.refreshMarks?.()
+    }, delay)
+  }
+
+  const allowImmediateMyPortraitFetch = () => {
+    if (myPortraitRefreshTimer) {
+      clearTimeout(myPortraitRefreshTimer)
+      myPortraitRefreshTimer = null
+    }
+    myPortraitCooldownUntil = 0
+    myPortraitBypassThrottleUntil = Date.now() + 3000
+  }
+
+  const schedulePortraitCacheRefresh = (widget: IChartingLibraryWidget | null) => {
+    portraitCacheOnlyRefreshUntil = Date.now() + 3000
+    widget?.activeChart?.()?.refreshMarks?.()
+    if (portraitCacheRefreshRetryTimer) {
+      clearTimeout(portraitCacheRefreshRetryTimer)
+    }
+    portraitCacheRefreshRetryTimer = setTimeout(() => {
+      portraitCacheOnlyRefreshUntil = Date.now() + 3000
+      widget?.activeChart?.()?.refreshMarks?.()
+      portraitCacheRefreshRetryTimer = null
+    }, 600)
+  }
+
+  const matchPortraitType = (item: { maker_type?: string; remark?: string; wallet_address?: string }, typeId: string) => {
+    const makerTypes = String(item?.maker_type || '').split(',').filter(Boolean)
+    if (typeId === '-101') {
+      const chain = tokenStore?.token?.chain || ''
+      return !!(item?.remark?.trim() || (item?.wallet_address && chain && remarksStore.getRemarkByAddress({ address: item.wallet_address, chain })))
+    }
+    if (typeId === '-100') {
+      return makerTypes.includes('-100')
+    }
+    return makerTypes.includes(typeId)
   }
 
   function getMarks({from, to, interval, onDataCallback, pair, chain, token, user, migrated}: {
@@ -184,20 +615,85 @@ export function useKlineMarks() {
       getMigrated(onDataCallback, migrated, Number(interval))
     }
     if (!markTabsVisible.value) return
+    const now = Date.now()
+    const isMyPortraitOnlyRefresh = now < myPortraitOnlyRefreshUntil
+    const isPortraitCacheOnlyRefresh = now < portraitCacheOnlyRefreshUntil
+    const isMyWatchlistChecked = !!markTabsChecked.value?.['-100']
+    const isMyRemarkChecked = !!markTabsChecked.value?.['-101']
+    if ((isMyWatchlistChecked || isMyRemarkChecked) && !isPortraitCacheOnlyRefresh) {
+      Promise.all([
+        isMyWatchlistChecked
+          ? loadProfilingMarksData({ from, to, interval, pair, chain, token, user, type: '-100', isTokenKline })
+          : Promise.resolve([]),
+        isMyRemarkChecked
+          ? loadProfilingMarksData({ from, to, interval, pair, chain, token, user, type: '-101', isTokenKline })
+          : Promise.resolve([]),
+      ]).then(([watchlistRes, remarkRes]) => {
+        const mergedMarks = dedupeProfilingMarks([
+          ...formatProfilingToMarks(remarkRes || [], interval, '-101', pickMarkTabName('-101')),
+          ...formatProfilingToMarks(watchlistRes || [], interval, '-100', pickMarkTabName('-100')),
+        ])
+        onDataCallback(mergedMarks)
+      })
+    }
     marksTabs.value.forEach((v) => {
+      if (v.id === '-100' || v.id === '-101') return
+      if (isMyPortraitOnlyRefresh) return
       const id = pair + '-' + chain + '-' + user + '-' + interval + '-' + v.id + '-' + from + '-' + to
+      const cachePrefix = `${pair}-${chain}-${user}-${interval}-${v.id}-`
+      const liveKey = getProfilingLiveCacheKey({ pair, chain, user, interval, type: String(v.id) })
       if (marksMap.has(id) && markTabsChecked.value?.[v.id]) {
         const res = touchCache(marksMap, id)
         const marks = formatToMarks(res || [], interval, v.id, v.name)
         onDataCallback(marks || [])
         return
       }
+      const reusableTradeKey = findReusableCacheKey(marksMap, cachePrefix, from, to)
+      if (reusableTradeKey && markTabsChecked.value?.[v.id]) {
+        const res = touchCache(marksMap, reusableTradeKey) || []
+        const filteredRes = filterTradeDataByRange(res as TradeData[], from, to, interval)
+        if (filteredRes.length > 0) {
+          const marks = formatToMarks(filteredRes, interval, v.id, v.name)
+          onDataCallback(marks || [])
+          return
+        }
+      }
+      // 如果缓存存在但数据为空，强制重新请求
       if(profilingMarksCache.has(id) && markTabsChecked.value?.[v.id]) {
         const res = touchCache(profilingMarksCache, id) || []
-        const marks = formatProfilingToMarks(res, interval, v.id, v.name)
-        onDataCallback(marks)
-        return
+        // 如果缓存数据为空，清除缓存并重新请求
+        if(res.length === 0) {
+          profilingMarksCache.delete(id)
+        } else {
+          const liveRes = profilingLiveCache.has(liveKey) ? (touchCache(profilingLiveCache, liveKey) || []) : []
+          const mergedRes = mergeProfilingCacheData(res, filterProfilingDataByRange(liveRes, from, to, interval))
+          const marks = formatProfilingToMarks(mergedRes, interval, v.id, v.name)
+          onDataCallback(marks)
+          return
+        }
       }
+      const reusableProfilingKey = findReusableCacheKey(profilingMarksCache, cachePrefix, from, to)
+      if(reusableProfilingKey && markTabsChecked.value?.[v.id] && v.id !== '-100' && v.id !== '-101') {
+        const res = touchCache(profilingMarksCache, reusableProfilingKey) || []
+        const filteredRes = filterProfilingDataByRange(res, from, to, interval)
+        const liveRes = profilingLiveCache.has(liveKey) ? (touchCache(profilingLiveCache, liveKey) || []) : []
+        const mergedRes = mergeProfilingCacheData(filteredRes, filterProfilingDataByRange(liveRes, from, to, interval))
+        if (mergedRes.length > 0) {
+          const marks = formatProfilingToMarks(mergedRes, interval, v.id, v.name)
+          onDataCallback(marks)
+          return
+        }
+      }
+      if (profilingLiveCache.has(liveKey) && markTabsChecked.value?.[v.id] && v.id !== '-100' && v.id !== '-101') {
+        const res = touchCache(profilingLiveCache, liveKey) || []
+        const filteredRes = filterProfilingDataByRange(res, from, to, interval)
+        if (filteredRes.length > 0) {
+          const marks = formatProfilingToMarks(filteredRes, interval, v.id, v.name)
+          onDataCallback(marks)
+          return
+        }
+      }
+      if (isPortraitCacheOnlyRefresh) return
       if (v.id === 'trade' && markTabsChecked.value?.[v.id]) {
         let data = {
           from,
@@ -223,6 +719,10 @@ export function useKlineMarks() {
           }),
           ...(isTokenKline && {
             token_id: token,
+          }),
+          // 添加 self_address 参数用于我的关注
+          ...((v.id === '-100' || v.id === '-101') && {
+            self_address: botStore?.evmAddress || walletStore?.address
           }),
         }
         getKlineProfilingTagsV2(data).then((res) => {
@@ -273,16 +773,16 @@ export function useKlineMarks() {
     type: keyof typeof markTabsChecked.value,
     name: string
   ) {
-    const result: (Mark & { tx_time: number,user_address:string })[] = []
+    const result: (Mark & { tx_time: number,user_address:string,txid?:string })[] = []
     const urlPrefix = useConfigStore().globalConfig?.token_logo_url || 'https://www.iconaves.com/'
     const interval1 = Number(interval)
     for(const item of data){
       const bucketTime = Math.floor(item.time / interval1) * interval1
       for(const holder of item.holders){
-        const {wallet_address,wallet_logo} = holder
+        const {wallet_address,wallet_logo,remark} = holder
         if(holder.buy){
           result.push(formatTxsObj({
-            el:{...holder.buy,wallet_address,wallet_logo},
+            el:{...holder.buy,wallet_address,wallet_logo,remark},
             side:'buy',
             type,
             name,
@@ -292,7 +792,7 @@ export function useKlineMarks() {
         }
         if(holder.sell){
           result.push(formatTxsObj({
-            el:{...holder.sell,wallet_address,wallet_logo},
+            el:{...holder.sell,wallet_address,wallet_logo,remark},
             side:'sell',
             type,
             name,
@@ -315,15 +815,20 @@ export function useKlineMarks() {
   }:TFormatTxsParams) {
       const isBuy = side === 'buy'
       const isKOL = type === '31'
+      const isMyWatchlist = type === '-100'
+      const isMyRemark = type === '-101'
       let imageUrl = isBuy
       ? `${urlPrefix}signals/marks/mark-buy-${type}.png`
       : `${urlPrefix}signals/marks/mark-sell-${type}.png`
       if(el.wallet_logo?.logo && ['.png', '.jpg', '.jpeg', '.gif', '.webp'].some((ext) => el.wallet_logo.logo.includes(ext))){
         imageUrl = el.wallet_logo.logo
+      } else if((isMyWatchlist || isMyRemark) && !el.wallet_logo?.logo) {
+        // 对于我的关注，如果 logo 不存在，使用 generateAvatarIcon
+        imageUrl = generateAvatarIcon(el.remark || el.wallet_address || '')
       }
       let borderColor = 'transparent'
       let borderWidth = 0
-      if(isKOL){
+      if(isKOL || isMyWatchlist || isMyRemark){
         borderWidth = 2
         if(isBuy){
           borderColor = '#12B886'
@@ -332,8 +837,14 @@ export function useKlineMarks() {
         }
       }
 
+      const markId = el.txid
+        ? `${el.tx_time}-${side}-${type}-${el.txid}`
+        : ((isMyWatchlist || isMyRemark)
+          ? `${el.tx_time}-${side}-${el.wallet_address}`
+          : `${el.tx_time}-${side}-${type}`)
+
       return {
-        id: `${el.tx_time}-${side}-${type}`,
+        id: markId,
         time: bucketTime,
         color: { background: 'transparent', border: borderColor },
         imageUrl,
@@ -345,26 +856,32 @@ export function useKlineMarks() {
         text:getTooltipTxt(name, type, el, isBuy,bucketTime),
         showLabelWhenImageLoaded: false,
         user_address:el.wallet_address,
-        tx_time:el.tx_time
+        tx_time:el.tx_time,
+        txid: el.txid
       }
   }
 
   function getTooltipTxt(name:string, type:number|string, el:HolderBuyData,isBuy:boolean,bucketTime:number) {
     const swapType = isBuy ? t('bought') : t('sold')
     const formatedName = name?.replace(/\(.*\)$/, '')
+    // 获取当前链信息
+    const chain = tokenStore?.token?.chain
+    // 获取显示名称，优先显示备注，否则显示缩写地址
+    const displayName = getDisplayName(el.remark, el.wallet_logo?.name, el.wallet_address, chain)
+
     // 处理聪明钱
     if(Number(type) === 30) {
       const swapType = isBuy ? t('netInflow') : t('netOutflow')
       const flowText = isBuy ? t('inflow') : t('outflow')
       const AvgTxt = isBuy ? t('campaignBuyAvg') : t('campaignSellAvg')
-      return `${formatedName} ${swapType}
+      return `${displayName || formatedName} ${swapType}
         ${flowText}: ${formatNumber(el.volume, 2)}(${formatNumber(el.txns, 0)})
         ${AvgTxt}: $${formatNumber(Number(el.volume) / (Number(el.amount) || 1), 4)}
         ${swapType}: ${formatNumber(el.volume, 2)}
         ${formatDate(el.tx_time, 'YYYY-MM-DD HH:mm')}
       `
     }
-    return `${el.wallet_logo?.name || `${formatedName}`} ${swapType}
+    return `${displayName || formatedName} ${swapType}
         ${t('amountB')}: ${formatNumber(el.amount, 2)}
         ${t('amountU')}: $${formatNumber(el.volume, 2)}
         ${t('price')}: $${formatNumber(Number(el.volume) / (Number(el.amount) || 1), 4)}
@@ -547,11 +1064,10 @@ ${formatDate(entry.time, 'YYYY-MM-DD HH:mm')}
         item.push(result)
       }
     })
-    _widget?.activeChart?.()?.refreshMarks?.()
   }
 
   // 定义枚举优先级 dev > kol > 聪明钱 > 狙击 > 老鼠仓
-const priorityOrder = ['25','31','30','19','16']
+const priorityOrder = ['-101','-100','25','31','30','19','16']
 
   function wsPublicPortraitUpdateMarks(val:any[],_widget: IChartingLibraryWidget | null,{interval,user}:any){
     if(Array.isArray(val)){
@@ -560,10 +1076,11 @@ const priorityOrder = ['25','31','30','19','16']
           const addMarks:any[]=[]
           marksTabs.value.toSorted((a, b) => priorityOrder.indexOf(a.id) - priorityOrder.indexOf(b.id)).forEach(v=>{
             val.forEach(item=>{
-              if(item.maker_type.includes(v.id)){
+              if(matchPortraitType(item, v.id)){
                 const holderData = {
                       amount: item.amount,
                       tx_time: item.time,
+                      txid: item.txid,
                       txns: 1,
                       volume: item.volume
                 }
@@ -581,16 +1098,19 @@ const priorityOrder = ['25','31','30','19','16']
                 addMarks.push(markData)
               }
             })
+            const liveKey = getProfilingLiveCacheKey({ pair, chain, user, interval, type: String(v.id) })
+            const existingLive = profilingLiveCache.get(liveKey) || []
+            if (addMarks.length > 0) {
+              setCache(profilingLiveCache, liveKey, dedupeProfilingCacheItems([...(existingLive as any[]), ...addMarks]))
+            }
             profilingMarksCache.forEach((item,key)=>{
               if(key.startsWith(pair + '-' + chain + '-' + user  + '-' + interval + '-' + v.id)){
-                item.push(...addMarks)
+                const nextItems = dedupeProfilingCacheItems([...(item || []), ...addMarks])
+                item.splice(0, item.length, ...nextItems)
               }
             })
             addMarks.length = 0
         })
-        if(_widget){
-          _widget.activeChart?.()?.refreshMarks?.()
-        }
     }
   }
 
@@ -601,9 +1121,15 @@ const priorityOrder = ['25','31','30','19','16']
     getMarks,
     wsTxUpdateMarks,
     profilingMarksCache,
+    profilingLiveCache,
     createDisplayButton,
     markTabsVisible,
-    wsPublicPortraitUpdateMarks
+    wsPublicPortraitUpdateMarks,
+    scheduleMyPortraitRefresh,
+    allowImmediateMyPortraitFetch,
+    schedulePortraitCacheRefresh,
+    clearMarkCaches,
+    cancelMyPortraitRefresh,
+    resetMarkRefreshState
   }
 }
-
