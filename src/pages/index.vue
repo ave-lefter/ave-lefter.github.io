@@ -1605,7 +1605,6 @@ async function getPump(rawParams: PumpRequestParams, isFilter = false) {
   // 2. 状态拦截
   const isInactive = route.name !== 'index'
   const isPaused = isPausedObj.value?.[category] || route.name !== 'index'
-console.log('-------isPaused---------',isPaused)
   if (isInactive) return
   if (isPaused) return
 
