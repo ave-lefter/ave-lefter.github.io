@@ -40,7 +40,6 @@ const {
   placement,
   boundingRect: computed(() => trackerStore.boundingRect),
   fixedWidth: computed(() => trackerStore.fixedWidth),
-  winHeight: trackerStore.winHeight,
   visible: computed(() => trackerStore.visible),
   isLeftFixed: computed(() => trackerStore.isLeftFixed),
   isRightFixed: computed(() => trackerStore.isRightFixed),

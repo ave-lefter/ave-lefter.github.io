@@ -31,7 +31,6 @@ const {
   placement,
   boundingRect: computed(() => positionStore.positionBoundingRect),
   fixedWidth: computed(() => positionStore.fixedWidth),
-  winHeight: positionStore.winHeight,
   visible: computed(() => positionStore.visible),
   isLeftFixed: computed(() => positionStore.isLeftFixed),
   isRightFixed: computed(() => positionStore.isRightFixed),

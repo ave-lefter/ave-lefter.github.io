@@ -54,7 +54,6 @@ export interface UsePanelDraggableOptions {
   placement: Ref<'center' | 'left' | 'right'>
   boundingRect: Ref<PanelBoundingRect>
   fixedWidth: Ref<number>
-  winHeight: number
   visible: Ref<boolean>
   isLeftFixed: Ref<boolean>
   isRightFixed: Ref<boolean>
@@ -76,7 +75,7 @@ export interface UsePanelDraggableOptions {
 export function usePanelDraggable(options: UsePanelDraggableOptions) {
   const { t } = useI18n()
   const dragStore = useDragStore()
-  const { width: winWidth } = useWindowSize()
+  const { width: winWidth, height: winHeight } = useWindowSize()
 
   const lazyComponent = shallowRef<Component | null>(null)
   const shouldRenderChild = shallowRef(true)
@@ -159,7 +158,7 @@ export function usePanelDraggable(options: UsePanelDraggableOptions) {
         minWidth: options.minWidth || 388,
         maxWidth: options.maxWidth || 388,
         initialWidth: options.fixedWidth.value,
-        initialHeight: options.winHeight - 95,
+        initialHeight: winHeight.value - 95,
         parent: true,
         handles: ['mr'],
         dragHandle: '.drag-handle'
@@ -173,7 +172,7 @@ export function usePanelDraggable(options: UsePanelDraggableOptions) {
         minWidth: options.minWidth || 388,
         maxWidth: options.maxWidth || 388,
         initialWidth: options.fixedWidth.value,
-        initialHeight: options.winHeight - 95,
+        initialHeight: winHeight.value - 95,
         parent: true,
         handles: ['ml'],
         dragHandle: '.drag-handle'
@@ -197,7 +196,7 @@ export function usePanelDraggable(options: UsePanelDraggableOptions) {
       }
     } else {
       return {
-        scrollHeight: options.winHeight - sideOffset
+        scrollHeight: winHeight.value - sideOffset
       }
     }
   })
@@ -209,20 +208,23 @@ export function usePanelDraggable(options: UsePanelDraggableOptions) {
 
   // Event handlers
   const handleDragStop = (x: number, y: number) => {
-    if ((Math.abs(x) < 1 || x + options.boundingRect.value.width >= winWidth.value) && dragStore.fixedCount >= 3) {
-      ElMessage.warning(t('popTips'))
-      return
-    }
-
     const placement = options.placement.value
-    
+    console.log('handleDragStop', x, y,placement) 
     // 左侧固定模式：x 是相对偏移，需要转换为绝对坐标
     let absoluteX = x
     if (placement === 'left') {
       const leftOffset = dragStore.leftWidth[getPanelKey()] || 0
       absoluteX = leftOffset + x
     }
-    // 右侧固定模式：x 已经是绝对坐标，不需要转换
+    
+    // 对于固定模式之间的切换，不检查上限
+    // 只检查 center 模式下是否会触边
+    if (placement === 'center' && dragStore.fixedCount >= 3) {
+      if (Math.abs(absoluteX) < 1 || absoluteX + options.boundingRect.value.width >= winWidth.value) {
+        ElMessage.warning(t('popTips'))
+        return
+      }
+    }
     
     if (placement === 'left') {
       options.onLeftDragStop(absoluteX, y)

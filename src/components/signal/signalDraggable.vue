@@ -7,16 +7,28 @@ const { t } = useI18n()
 const { width: winWidth } = useWindowSize()
 
 function dragStop(x: number, y: number) {
-  if ((Math.abs(x) < 1 || x + signalStore.signalBoundingRect.width >= winWidth.value) && dragStore.fixedCount >= 3) {
-    ElMessage.warning(t('popTips'))
-    return
-  }
+  // 左侧固定模式：x 是相对偏移，需要转换为绝对坐标
+  let absoluteX = x
   if (signalStore.placement === 'left') {
-    signalStore.onLeftDragStop(x, y)
+    const leftOffset = dragStore.leftWidth.signal || 0
+    absoluteX = leftOffset + x
+  }
+  
+  // 对于固定模式之间的切换，不检查上限
+  // 只检查 center 模式下是否会触边
+  if (signalStore.placement === 'center' && dragStore.fixedCount >= 3) {
+    if (Math.abs(absoluteX) < 1 || absoluteX + signalStore.signalBoundingRect.width >= winWidth.value) {
+      ElMessage.warning(t('popTips'))
+      return
+    }
+  }
+  
+  if (signalStore.placement === 'left') {
+    signalStore.onLeftDragStop(absoluteX, y)
   } else if (signalStore.placement === 'right') {
-    signalStore.onRightDragStop(x, y)
+    signalStore.onRightDragStop(absoluteX, y)
   } else {
-    signalStore.onDragStop(x, y)
+    signalStore.onDragStop(absoluteX, y)
   }
 }
 

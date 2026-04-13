@@ -31,7 +31,6 @@ const {
   placement,
   boundingRect: computed(() => favTokenStore.favTokenBoundingRect),
   fixedWidth: computed(() => favTokenStore.fixedWidth),
-  winHeight: favTokenStore.winHeight,
   visible: computed(() => favTokenStore.visible),
   isLeftFixed: computed(() => favTokenStore.isLeftFixed),
   isRightFixed: computed(() => favTokenStore.isRightFixed),
