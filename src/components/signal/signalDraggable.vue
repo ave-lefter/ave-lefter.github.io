@@ -7,6 +7,18 @@ const { t } = useI18n()
 const { width: winWidth } = useWindowSize()
 
 function handleOnDrag(x: number, y: number) {
+  // 左侧固定模式：限制不能拖出屏幕右边界
+  if (signalStore.placement === 'left') {
+    const currentLeftOffset = dragStore.leftWidth.signal || 0
+    const absoluteX = currentLeftOffset + x  // 计算绝对位置
+    const panelWidth = signalStore.fixedWidth
+    
+    // 确保面板不会超出屏幕右边界
+    if (absoluteX + panelWidth > winWidth.value) {
+      return false
+    }
+  }
+  
   // 右侧固定模式：x 是绝对坐标，不允许向右拖动超过初始位置
   if (signalStore.placement === 'right') {
     const initialX = dragStore.rightWidth.signal || 0
