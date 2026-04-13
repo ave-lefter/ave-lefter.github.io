@@ -39,8 +39,7 @@ const {
 } = usePanelDraggable({
   placement,
   boundingRect: computed(() => trackerStore.boundingRect),
-  fixedWidth: trackerStore.fixedWidth,
-  winHeight: trackerStore.winHeight,
+  fixedWidth: computed(() => trackerStore.fixedWidth),
   visible: computed(() => trackerStore.visible),
   isLeftFixed: computed(() => trackerStore.isLeftFixed),
   isRightFixed: computed(() => trackerStore.isRightFixed),
@@ -58,12 +57,15 @@ const {
 })
 
 // Override childProps for twitter tracker's specific needs
-const trackerChildProps = computed(() => ({
-  ...childProps.value,
-  class: placement.value === 'center'
-    ? 'border-1px border-solid border-[--d-1A1A1A-l-F2F2F2] shadow-[0_5px_10px_0_var(--d-FFFFFF14-l-00000014)]'
-    : undefined
-}))
+const trackerChildProps = computed(() => {
+  const { scrollHeight, ...restProps } = childProps.value
+  return {
+    ...restProps,
+    class: placement.value === 'center'
+      ? 'border-1px border-solid border-[--d-1A1A1A-l-F2F2F2] shadow-[0_5px_10px_0_var(--d-FFFFFF14-l-00000014)]'
+      : undefined
+  }
+})
 
 function subscribePublicTwitter(method) {
   v2WsStore.send({

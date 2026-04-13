@@ -53,8 +53,7 @@ export interface PanelBoundingRect {
 export interface UsePanelDraggableOptions {
   placement: Ref<'center' | 'left' | 'right'>
   boundingRect: Ref<PanelBoundingRect>
-  fixedWidth: number
-  winHeight: number
+  fixedWidth: Ref<number>
   visible: Ref<boolean>
   isLeftFixed: Ref<boolean>
   isRightFixed: Ref<boolean>
@@ -76,7 +75,7 @@ export interface UsePanelDraggableOptions {
 export function usePanelDraggable(options: UsePanelDraggableOptions) {
   const { t } = useI18n()
   const dragStore = useDragStore()
-  const { width: winWidth } = useWindowSize()
+  const { width: winWidth, height: winHeight } = useWindowSize()
 
   const lazyComponent = shallowRef<Component | null>(null)
   const shouldRenderChild = shallowRef(true)
@@ -109,7 +108,7 @@ export function usePanelDraggable(options: UsePanelDraggableOptions) {
   watch(() => options.placement.value, () => {
     reload()
     reCreateChild()
-  })
+  }, { flush: 'post' })
 
   // Auto load component on mount or visibility change
   onMounted(() => {
@@ -148,7 +147,8 @@ export function usePanelDraggable(options: UsePanelDraggableOptions) {
         parent: true,
         handles: ['tl', 'tm', 'tr', 'mr', 'br', 'bm', 'bl', 'ml'],
         dragHandle: '.drag-handle',
-        z: 1
+        z: 1,
+        onDrag: handleDrag  // ✅ 添加 onDrag 回调
       }
     } else if (placement === 'left') {
       data = {
@@ -158,11 +158,12 @@ export function usePanelDraggable(options: UsePanelDraggableOptions) {
         x: 0,
         minWidth: options.minWidth || 388,
         maxWidth: options.maxWidth || 388,
-        initialWidth: options.fixedWidth,
-        initialHeight: options.winHeight - 95,
+        initialWidth: options.fixedWidth.value,
+        initialHeight: winHeight.value - 95,
         parent: true,
         handles: ['mr'],
-        dragHandle: '.drag-handle'
+        dragHandle: '.drag-handle',
+        onDrag: handleDrag  // ✅ 添加 onDrag 回调
       }
     } else if (placement === 'right') {
       data = {
@@ -172,14 +173,15 @@ export function usePanelDraggable(options: UsePanelDraggableOptions) {
         y: 0,
         minWidth: options.minWidth || 388,
         maxWidth: options.maxWidth || 388,
-        initialWidth: options.fixedWidth,
-        initialHeight: options.winHeight - 95,
+        initialWidth: options.fixedWidth.value,
+        initialHeight: winHeight.value - 95,
         parent: true,
         handles: ['ml'],
-        dragHandle: '.drag-handle'
+        dragHandle: '.drag-handle',
+        onDrag: handleDrag  // ✅ 添加 onDrag 回调
       }
     }
-
+    console.log('draggableProps', options.fixedWidth.value)
     return data
   })
 
@@ -197,7 +199,7 @@ export function usePanelDraggable(options: UsePanelDraggableOptions) {
       }
     } else {
       return {
-        scrollHeight: options.winHeight - sideOffset
+        scrollHeight: winHeight.value - sideOffset
       }
     }
   })
@@ -209,18 +211,30 @@ export function usePanelDraggable(options: UsePanelDraggableOptions) {
 
   // Event handlers
   const handleDragStop = (x: number, y: number) => {
-    if ((Math.abs(x) < 1 || x + options.boundingRect.value.width >= winWidth.value) && dragStore.fixedCount >= 3) {
-      ElMessage.warning(t('popTips'))
-      return
-    }
-
     const placement = options.placement.value
+    console.log('handleDragStop', x, y,placement) 
+    // 左侧固定模式：x 是相对偏移，需要转换为绝对坐标
+    let absoluteX = x
     if (placement === 'left') {
-      options.onLeftDragStop(x, y)
+      const leftOffset = dragStore.leftWidth[getPanelKey()] || 0
+      absoluteX = leftOffset + x
+    }
+    
+    // 对于固定模式之间的切换，不检查上限
+    // 只检查 center 模式下是否会触边
+    if (placement === 'center' && dragStore.fixedCount >= 3) {
+      if (Math.abs(absoluteX) < 1 || absoluteX + options.boundingRect.value.width >= winWidth.value) {
+        ElMessage.warning(t('popTips'))
+        return
+      }
+    }
+    
+    if (placement === 'left') {
+      options.onLeftDragStop(absoluteX, y)
     } else if (placement === 'right') {
-      options.onRightDragStop(x, y)
+      options.onRightDragStop(absoluteX, y)
     } else {
-      options.onDragStop(x, y)
+      options.onDragStop(absoluteX, y)
     }
   }
 
@@ -233,11 +247,35 @@ export function usePanelDraggable(options: UsePanelDraggableOptions) {
     }
   }
 
-  const handleDrag = (x: number) => {
+  const handleDrag = (x: number, y?: number) => {
     const placement = options.placement.value
+    
+    // 左侧固定模式：限制不能拖出屏幕右边界
+    if (placement === 'left') {
+      const currentLeftOffset = dragStore.leftWidth[getPanelKey()] || 0
+      const absoluteX = currentLeftOffset + x  // 计算绝对位置
+      const panelWidth = options.fixedWidth.value
+      
+      // 确保面板不会超出屏幕右边界
+      if (absoluteX + panelWidth > winWidth.value) {
+        return false
+      }
+    }
+    
+    // 右侧固定模式：x 是绝对坐标，不允许向右拖动超过初始位置
+    if (placement === 'right') {
+      const initialX = dragStore.rightWidth[getPanelKey()] || 0
+      if (x > initialX) {
+        return false
+      }
+    }
+    
+    // center 模式：调用原有的 onDrag 处理样式
     if (placement === 'center') {
       options.onDrag(x)
     }
+    
+    return true
   }
 
   return {

@@ -6,17 +6,58 @@ const dragStore = useDragStore()
 const { t } = useI18n()
 const { width: winWidth } = useWindowSize()
 
-function dragStop(x: number, y: number) {
-  if ((Math.abs(x) < 1 || x + signalStore.signalBoundingRect.width >= winWidth.value) && dragStore.fixedCount >= 3) {
-    ElMessage.warning(t('popTips'))
-    return
-  }
+function handleOnDrag(x: number, y: number) {
+  // 左侧固定模式：限制不能拖出屏幕右边界
   if (signalStore.placement === 'left') {
-    signalStore.onLeftDragStop(x, y)
+    const currentLeftOffset = dragStore.leftWidth.signal || 0
+    const absoluteX = currentLeftOffset + x  // 计算绝对位置
+    const panelWidth = signalStore.fixedWidth
+    
+    // 确保面板不会超出屏幕右边界
+    if (absoluteX + panelWidth > winWidth.value) {
+      return false
+    }
+  }
+  
+  // 右侧固定模式：x 是绝对坐标，不允许向右拖动超过初始位置
+  if (signalStore.placement === 'right') {
+    const initialX = dragStore.rightWidth.signal || 0
+    if (x > initialX) {
+      return false
+    }
+  }
+  
+  // center 模式：调用原有的 onDrag 处理样式
+  if (signalStore.placement === 'center') {
+    signalStore.onDrag(x)
+  }
+  
+  return true
+}
+
+function dragStop(x: number, y: number) {
+  // 左侧固定模式：x 是相对偏移，需要转换为绝对坐标
+  let absoluteX = x
+  if (signalStore.placement === 'left') {
+    const leftOffset = dragStore.leftWidth.signal || 0
+    absoluteX = leftOffset + x
+  }
+  
+  // 对于固定模式之间的切换，不检查上限
+  // 只检查 center 模式下是否会触边
+  if (signalStore.placement === 'center' && dragStore.fixedCount >= 3) {
+    if (Math.abs(absoluteX) < 1 || absoluteX + signalStore.signalBoundingRect.width >= winWidth.value) {
+      ElMessage.warning(t('popTips'))
+      return
+    }
+  }
+  
+  if (signalStore.placement === 'left') {
+    signalStore.onLeftDragStop(absoluteX, y)
   } else if (signalStore.placement === 'right') {
-    signalStore.onRightDragStop(x, y)
+    signalStore.onRightDragStop(absoluteX, y)
   } else {
-    signalStore.onDragStop(x, y)
+    signalStore.onDragStop(absoluteX, y)
   }
 }
 
@@ -40,7 +81,7 @@ v-if="!signalStore.isLeftFixed && !signalStore.isRightFixed && signalStore.signa
             'bl',
             'ml',
         ]" drag-cancel="#drag-disabled,#drag-settings,#custom-filter" @onDragStop="dragStop"
-        @onResizing="signalStore.onResizing" @onDrag="signalStore.onDrag">
+        @onResizing="signalStore.onResizing" :on-drag="handleOnDrag">
         <Signal
 :container-width="signalStore.signalBoundingRect.width"
             :scroll-height="signalStore.signalBoundingRect.height - 117"
@@ -53,7 +94,7 @@ v-if="signalStore.isLeftFixed && signalStore.signalVisible"
         :initial-width="signalStore.fixedWidth" :initial-height="signalStore.winHeight - 95" :parent="true" :handles="[
             'mr',
         ]" drag-cancel="#drag-disabled" @onDragStop="dragStop"
-        @onResizing="signalStore.onFixedResizing">
+        @onResizing="signalStore.onFixedResizing" :on-drag="handleOnDrag">
         <Signal :container-width="signalStore.fixedWidth" :scroll-height="signalStore.winHeight - 200" />
     </Draggable>
     <Draggable
@@ -63,7 +104,7 @@ v-if="signalStore.isRightFixed && signalStore.signalVisible"
         :initial-width="signalStore.fixedWidth" :initial-height="signalStore.winHeight - 95" :handles="[
             'ml',
         ]" drag-cancel="#drag-disabled" @onDragStop="dragStop"
-        @onResizing="signalStore.onFixedResizing">
+        @onResizing="signalStore.onFixedResizing" :on-drag="handleOnDrag">
         <Signal :container-width="signalStore.fixedWidth" :scroll-height="signalStore.winHeight - 200" />
     </Draggable>
 </template>
