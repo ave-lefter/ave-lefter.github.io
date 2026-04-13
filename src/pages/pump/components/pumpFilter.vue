@@ -138,10 +138,7 @@
                 <el-checkbox v-for="item in deployerPlatforms" :key="item.platform" :label="item.platform"
                   class="[&&]:mr-0 [&&]:[--el-checkbox-height:28px]">
                   <span class="flex items-center gap-8px color-[--main-text1]">
-                    <el-image class="rounded w-14px" :src="`${configStore.token_logo_url}${item.logo_url?.replace(
-                      '/signals/',
-                      'signals/'
-                    )}`" />
+                    <el-image class="rounded w-14px" :src="formatIconTag('j7tracker.com')" />
                     {{ item.name }}
                   </span>
                 </el-checkbox>
