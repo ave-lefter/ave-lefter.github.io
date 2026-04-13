@@ -4,17 +4,7 @@
       <el-form-item prop="user_chain" required label-position="top" size="large" class="mb-13px!">
         <div class="flex justify-between items-center w-100%">
           <h4 class="font-500 text-12px lh-[120%] color-[--main-text]">{{ $t('addWallet') }}</h4>
-          <el-select v-model="form.user_chain" :placeholder="t('placeholderPrefix1') + t('chain')" value-key="value" size="small" style="--el-fill-color-blank:var(--border);" :suffix-icon="CaretBottom" class="w-70px!" :teleported="false" popper-class="w-103px" :persistent="false">
-            <template #prefix>
-              <div class="h-12px inline-flex items-center">
-                <img :src="`${token_logo_url}chain/${form.user_chain?.id}.png`" class="rd-50%" width="12" lazy alt="">
-              </div>
-            </template>
-            <el-option v-for="item in chainOptions" :key="item.value" :label="item.label" :value="item" class="h-26px! flex! items-center! font-500! text-14px! lh-none!">
-              <img :src="`${token_logo_url}chain/${item?.id}.png`" class="rd-50% mr-4px" width="16" lazy alt="">
-              <span>{{ item.label }}</span>
-            </el-option>
-          </el-select>
+          <ChainSelector v-model="form.user_chain" @change="handleChainChange" />
         </div>
       </el-form-item>
       <el-form-item prop="address" required label-position="top" size="large" class="mb-20px!">
@@ -41,8 +31,6 @@
 <script setup lang="ts">
 
 import type { FormInstance, FormRules } from 'element-plus'
-import {CaretBottom} from '@element-plus/icons-vue'
-// import { addFavoriteGroup2 } from '~/api/attention'
 const { t } = useI18n()
 const props = defineProps({
   width:{
@@ -99,6 +87,11 @@ const validateAddress2 = (rule: any, value: string, callback: (arg0?: Error) => 
   callback()
 }
 
+function handleChainChange(value: any) {
+  if (form.value.address) {
+    formRef.value?.validateField('address')
+  }
+}
 
 const rules = computed<FormRules>(() => {
   return {
@@ -115,17 +108,6 @@ const rules = computed<FormRules>(() => {
       { pattern: /^(?!.*[!@#$%^&*(),.?":{}|<>])(.{2,50})$/, message: t('remarkError'), trigger: ['blur'] }
     ],
   }
-})
-
-const chainOptions=computed(()=>{
- return SupportFullDataChain.map(el=>{
-    const chainInfo = getChainInfo(el)
-    return {
-      label:el==='solana' ? 'SOL' : chainInfo.net_name.toUpperCase(),
-      value:chainInfo.chain_id,
-      id:chainInfo.net_name
-    }
-  })
 })
 
 function handleSubmit(formEl: FormInstance | undefined) {

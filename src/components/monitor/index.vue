@@ -132,7 +132,10 @@
                             address?.slice(0, 4) + '...' + address?.slice(-4)
                           " @updateRemark="init2" @click="(e: any) => jumpBalance(row, e)" />
                       <div class="color-[--third-text]">{{ getTxType(row) }}</div>
-                      <div v-if="row.position_type=='3'" :class="row._profit ? `color-[--up-color]` : `color-[--down-color]`">{{ row._profit }}</div>
+                      <template v-if="row.position_type=='3'">
+                        <div v-if="(row._profit_ratio==='--')||!row._profit_ratio"  class="color-[--third-text]"></div>
+                        <div v-else :class="row._profit_ratio ? `color-[--up-color]` : `color-[--down-color]`">{{ `${Number(row._profit_ratio) > 0 ? '+' : '-'}${formatNumber2((row?._profit_ratio || 0) * 100 || 0, 2, 4, 4)}%` }}</div>
+                      </template>
                     </div>
                     <QuickSwap :quickBuyValue="quickBuyValue"
                       :row="{ ...row, ...{ target_token: row?.target_address, token0_address: row?.from_address, token1_address: row?.to_address, symbol: row?._target_Token?.symbol } }"
@@ -210,7 +213,7 @@
       </el-tab-pane>
       <el-tab-pane disabled>
         <template #label>
-          1111
+          <ChainSelector class="w-32px!" v-model="selectedChain" :show-label="false" wrapper-class="w-ChainSelector" />
         </template>
       </el-tab-pane>
       <el-tab-pane disabled>
@@ -263,7 +266,6 @@ import BigNumber from 'bignumber.js'
 import { getHistoryMonitor, batchPauseMonitor, addAttention2 } from '~/api/attention'
 import QuickBuyInput from './components/quickBuyInput.vue'
 import FilterType from './components/filterType.vue'
-import { downColor, upColor } from '@/utils/constants'
 import type { AveTable } from '#components'
 import type { PopoverInstance } from 'element-plus'
 import dayjs from 'dayjs'
@@ -298,6 +300,11 @@ const audioButtonRef = ref()
 
 const toggleMc = ref(false)
 const addFavAddressPopRef = ref()
+const selectedChain = useStorage('monitorSelectedChain', {
+  label: 'SOL',
+  value: 'solana',
+  id: 'solana'
+})
 // const activeName.value=ref(0)
 const quickBuyValue = useStorage('quickBuyValue', '0.01')
 const txTypeList = computed(() => {
@@ -581,7 +588,8 @@ const formateTxInfo = function (item: { [x: string]: any; maker_address?: any; w
       isBuy
     },
     _profit: item?.pnl_usd == '--' ? '--' : '$' + formatNumber2(Math.abs(item?.pnl_usd || 0) || 0, 2),
-    _profit_ratio: item?.pnl_usd == '--' ? '--' : formatNumber2((item?.pnl_ratio || 0) * 100 || 0, 2, 4, 4) + '%',
+    _profit_ratio: item?.pnl_usd == '--' ? '--' : item?.pnl_ratio,
+    // _profit_ratio: item?.pnl_usd == '--' ? '--' : formatNumber2((item?.pnl_ratio || 0) * 100 || 0, 2, 4, 4),
     _mc: Number(item?.target_mcap) ? ('$' + formatNumberS(item?.target_mcap || 0, {
       decimals: 0,
       limit: 3
@@ -715,5 +723,23 @@ function jumpToken({ e, rowData }: { e: Event; rowData: any }) {
 
 :deep() .w-quickSwap .m-text {
   margin-top: -2px;
+}
+:deep() .w-ChainSelector .el-select__wrapper{
+  background-color: transparent;
+  &.is-focused{
+    box-shadow: none;
+  }
+  .el-select__prefix{
+    img{
+      width: 16px;
+      height: 16px;
+    }
+  }
+  .el-select__suffix{
+    .el-select__icon{
+      width: 12px;
+      height: 12px;
+    }
+  }
 }
 </style>
