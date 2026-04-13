@@ -105,7 +105,9 @@
                 // height:'500px',
                 '--el-table-border': '1px solid transparent'
               }" row-class='cursor-pointer group' :rowEventHandlers="{
-                onClick: (row: any) => jumpToken(row)
+                onClick: (row: any) => jumpToken(row),
+                onMouseenter:()=>isHoverTable=true,
+                onMouseleave:()=>isHoverTable=false
               }">
               <template #header-wallet>
                 <div class="flex-between w-100%">
@@ -118,7 +120,13 @@
                       <Icon name="lsicon:switch-filled" class="ml-4px text-12px" />
                     </pro-tag>
                   </div>
-                  <QuickBuyInput v-model="quickBuyValue" size="small" />
+                  <div class="flex-end gap-8px">
+                    <div v-show="isHoverTable" class="flex items-center color-#FFA622 text-12px">
+                      <Icon name="custom:stop" />
+                      <!-- <span class="ml-3px">{{ $t('paused') }}</span> -->
+                    </div>
+                    <QuickBuyInput v-model="quickBuyValue" size="small" />
+                  </div>
                 </div>
               </template>
               <template #cell-wallet="{ row }">
@@ -300,6 +308,7 @@ const audioButtonRef = ref()
 
 const toggleMc = ref(false)
 const addFavAddressPopRef = ref()
+const isHoverTable = ref(false)
 const selectedChain = useStorage('monitorSelectedChain', {
   label: 'SOL',
   value: 'solana',
@@ -440,8 +449,16 @@ const columns = computed(() => {
 })
 watch(() => wsStore.wsResult[WSEventType.MONITOR], (val) => {
   mergeDataSource(val)
-  if (visible.value && (activeName.value === 0)) {
+  if (visible.value && (activeName.value === 0)&&!isHoverTable.value) {
     updateDateSource()
+  }
+})
+
+watch(() => isHoverTable.value, (val) => {
+  if (val) {
+    nextTick(() => {
+      updateDateSource()
+    })
   }
 })
 
