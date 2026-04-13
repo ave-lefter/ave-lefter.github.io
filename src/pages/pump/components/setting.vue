@@ -12,7 +12,7 @@
     <template #reference>
       <slot :visible="visible">
         <el-button class="btn mr-8px h-28px" :class="{ active: isExit }">
-          <Icon name="custom:customized" class="text-13px mr-4px" /> {{ $t('customize') }}
+          <Icon name="custom:customized" class="text-13px" />
           <Icon
             :name="visible ? 'radix-icons:triangle-up' : 'radix-icons:triangle-down'"
             class="text-16px ml-4px"

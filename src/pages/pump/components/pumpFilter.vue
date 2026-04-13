@@ -1,6 +1,6 @@
 <template>
   <el-dialog align-center v-model="localVisible" header-class="hidden"
-    class="[--el-bg-color:--pump-bg] border-1px border-solid border-[--main-divider] dialog color-[--main-text1]" title="" :width="488"
+    class="border-1px border-solid border-[--main-divider] dialog color-[--main-text1]" title="" :width="488"
     style="padding: 0" append-to-body :persistent="false" :show-close="false">
     <template #default>
       <div
@@ -138,10 +138,7 @@
                 <el-checkbox v-for="item in deployerPlatforms" :key="item.platform" :label="item.platform"
                   class="[&&]:mr-0 [&&]:[--el-checkbox-height:28px]">
                   <span class="flex items-center gap-8px color-[--main-text1]">
-                    <el-image class="rounded w-14px" :src="`${configStore.token_logo_url}${item.logo_url?.replace(
-                      '/signals/',
-                      'signals/'
-                    )}`" />
+                    <el-image class="rounded w-14px" :src="formatIconTag('j7tracker.com')" />
                     {{ item.name }}
                   </span>
                 </el-checkbox>
