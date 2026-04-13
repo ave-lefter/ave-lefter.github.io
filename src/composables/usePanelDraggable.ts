@@ -250,20 +250,11 @@ export function usePanelDraggable(options: UsePanelDraggableOptions) {
   const handleDrag = (x: number, y?: number) => {
     const placement = options.placement.value
     
-    // 左侧固定模式：x 是相对偏移（初始为 0）
-    if (placement === 'left') {
-      if (x < 0) {  // 不允许向左拖动（负偏移）
-        console.log('Left drag blocked:', x)
-        return false  // ✅ 返回 false 阻止拖动
-      }
-    }
-    
-    // 右侧固定模式：x 是绝对坐标
+    // 右侧固定模式：x 是绝对坐标，不允许向右拖动超过初始位置
     if (placement === 'right') {
       const initialX = dragStore.rightWidth[getPanelKey()] || 0
-      if (x > initialX) {  // 不允许超过初始位置（向右拖动）
-        console.log('Right drag blocked:', x, '>', initialX)
-        return false  // ✅ 返回 false 阻止拖动
+      if (x > initialX) {
+        return false
       }
     }
     
@@ -272,7 +263,7 @@ export function usePanelDraggable(options: UsePanelDraggableOptions) {
       options.onDrag(x)
     }
     
-    return true  // ✅ 返回 true 允许拖动
+    return true
   }
 
   return {

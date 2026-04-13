@@ -7,18 +7,11 @@ const { t } = useI18n()
 const { width: winWidth } = useWindowSize()
 
 function handleOnDrag(x: number, y: number) {
-  // 左侧固定模式：x 是相对偏移（初始为 0）
-  if (signalStore.placement === 'left') {
-    if (x < 0) {  // 不允许向左拖动（负偏移）
-      return false  // ✅ 返回 false 阻止拖动
-    }
-  }
-  
-  // 右侧固定模式：x 是绝对坐标
+  // 右侧固定模式：x 是绝对坐标，不允许向右拖动超过初始位置
   if (signalStore.placement === 'right') {
     const initialX = dragStore.rightWidth.signal || 0
-    if (x > initialX) {  // 不允许超过初始位置（向右拖动）
-      return false  // ✅ 返回 false 阻止拖动
+    if (x > initialX) {
+      return false
     }
   }
   
@@ -27,7 +20,7 @@ function handleOnDrag(x: number, y: number) {
     signalStore.onDrag(x)
   }
   
-  return true  // ✅ 返回 true 允许拖动
+  return true
 }
 
 function dragStop(x: number, y: number) {
