@@ -17,7 +17,7 @@ function getApi() {
         options.baseURL = newBase
       }
       const url = request as string
-      if (url?.includes('botapi')) {
+      if (url?.includes('botapi') || url?.includes('/v2api/pump/v1/all') || url?.includes('v2api/fav_tokens/v1/upsert/remark')) {
         botOnRequest({ options, request })
       } else {
         onRequest({ options, request })

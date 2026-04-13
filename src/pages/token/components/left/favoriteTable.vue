@@ -14,6 +14,9 @@ import type { IPriceV2Response } from '~/api/types/ws'
 import { useEventBus, useLocalStorage, useStorage } from '@vueuse/core'
 import { BusEventType, type IFavDialogEventArgs } from '~/utils/constants'
 import type { ScrollbarInstance } from 'element-plus'
+const favTokenStore = useFavTokenStore()
+const pumpRemarkEditEvent = useEventBus<IFavDialogEventArgs>(BusEventType.PUMP_REMARK_EDIT)
+pumpRemarkEditEvent.on(handleFavDialogEvent)
 import { VueDraggable } from 'vue-draggable-plus'
 const topEventBus = useEventBus(BusEventType.TOP_FAV_CHANGE)
 topEventBus.on(refresh)
@@ -30,6 +33,7 @@ onUnmounted(() => {
   topEventBus.off(refresh)
   favDialogEvent.off(refresh)
   topAddGroupEvent.off(refresh)
+  pumpRemarkEditEvent.off(handleFavDialogEvent)
 })
 
 function refresh(data:any) {
@@ -235,17 +239,17 @@ watch(
     if(val.sortBy==="price_change" || val.sortBy==="price_change_v2"){
         sortParam.sort_dir=['asc', '', 'desc'][(val.activeSort||0)+1]
         sortParam.sort=val.sortBy
-       
+
     }else{
       sortParam.sort_dir=''
       sortParam.sort=''
     }
-    
+
     // 当 activeSort 为 0 时，重置 sortBy 以启用拖拽
     if (val.activeSort === 0) {
       sort.value.sortBy = null
     }
-    
+
     resetListStatus()
     loadMoreFavorites()
   }
@@ -385,20 +389,20 @@ function resetListStatus() {
 
 async function handleDragEnd(evt: any) {
   isDragging.value = false
-  
+
   // 获取被拖拽的 item 信息
   const draggedItem = favoritesList.value[evt.newIndex]
   if (!draggedItem) return
-  
+
   const moves = [{
     token_id: draggedItem.token + '-' + draggedItem.chain,
     new_index: evt.newIndex + 1  // API 使用 1-based index
   }]
-  
+
   // 更新排序
   try {
     await batchChangeFavoritesIndex(walletAddress.value, activeTab.value, moves)
-    
+
     ElMessage.success(t('success'))
     favDialogEvent.emit({
       type: 'order',
@@ -423,6 +427,12 @@ function toggleMode(mode: string) {
     favoriteCondition.value.currentMode = 'mcap'
   }
   console.log('toggleMode', mode)
+}
+function handleFavDialogEvent({ type }: IFavDialogEventArgs) {
+  if (type === 'pump_remark_edit' && favTokenStore.visible) {
+    resetListStatus()
+    loadMoreFavorites()
+  }
 }
 </script>
 
@@ -494,9 +504,9 @@ function toggleMode(mode: string) {
             :to="`/token/${row.token}-${row.chain}`"
           >
               <div class="flex items-center flex-1">
-                <Icon 
+                <Icon
                   v-if="sort.activeSort === 0 && !sort.sortBy"
-                  name="material-symbols:dehaze" 
+                  name="material-symbols:dehaze"
                   class="text-14px text-[--third-text] cursor-move drag-handle3 w-0 group-hover:w-14px mr-0 group-hover:mr-6px transition-all duration-200 overflow-hidden"
                 />
               <TokenImg class="mr-8px" :row="{...row,issue_platform:''}" v-tooltip="{

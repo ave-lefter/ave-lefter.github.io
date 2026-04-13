@@ -175,6 +175,7 @@
                       v-copy="row.name"
                       class="name text-12px font-500 mr-5px color-[--third-text1] symbol-ellipsis ellipsis-auto block"
                       >{{ row.name }}</span>
+                      <RemarkEditor :token="row.token" :chain="row.chain" :remark="row.remark" @update:remark="row.remark = $event" />
                       <img
                         v-if="row.is_cloned"
                         @mouseover.stop="onEnter($event, row, props.type,getDataColor, true)"
@@ -776,6 +777,18 @@
                   v-show="pumpSetting?.define?.some((i) => i === 'txs')"
                   class="flex-end text-12px pr-12px bg-1 py-2px"
                 >
+                  <div class="flex-end bg-1">
+                    <div class="mr-2px color-[--third-text1]">F</div>
+                    <img
+                      v-if="row?.chain"
+                      class="icon-symbol rounded-100% h-14px mr-2px"
+                      :src="`${token_logo_url}chain/${row?.chain}.png`"
+                    >
+                    <span v-if="Number(row?.commission_sum ?? 0)+ Number(row?.priority_fee_sum ?? 0) + Number(row?.fee_sum ?? 0) >0" class="color-[--main-text1]">
+                        {{ formatNumber((Number(row?.commission_sum ?? 0)+ Number(row?.priority_fee_sum ?? 0) + Number(row?.fee_sum ?? 0)) , 2) }}
+                    </span>
+                    <span v-else class="color-[--third-text1]" >0</span>
+                  </div>
                   <div v-tooltip.raw="{
                         content: `<div class='max-w-[400px] color-[--secondary-text]'>${$t('netInflow')}: <span class=${ 'color-'+(Number(row?.net_flow_vol) === 0 || row?.net_flow_vol == null? '' : ((row?.net_flow_vol||0)>0?'[--up-color]':'[--down-color]'))}>${Number(row?.net_flow_vol) === 0 || row?.net_flow_vol == null? 0 : ( (row?.net_flow_vol > 0 ? '+$' : '-$')+ formatNumber(Math.abs(row?.net_flow_vol ?? 0), { decimals: 2, l: 4, limit: 3, locale: 'en' }))}</span> </div>`,
                         props: {
@@ -920,6 +933,7 @@ import HolderRank from './holderRank/index.vue'
 import { useSimilarTokenPopup } from '../utils'
 import { windowEndpoint } from 'comlink'
 import AiPop from './aiPop/index.vue'
+import RemarkEditor from './remarkEditor.vue'
 import qsImage from '@/assets/images/pump/qs.svg'
 const props = defineProps({
   tableList: {

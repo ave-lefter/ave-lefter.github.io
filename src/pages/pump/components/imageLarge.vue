@@ -65,7 +65,7 @@
         <div class="text-12px lh-12px color-[--third-text] mb-12px">{{ t('mcap') }}</div>
       </div>
       <div class="flex flex-col gap-8px">
-        <div v-for="token in similarpic" :key="token.id" class="flex items-center gap-8px cursor-pointer"
+        <div v-for="token in similarpic" :key="token.id" class="flex items-center gap-8px cursor-pointer hover:bg-[--dialog-list-hover] "
           @click="navigateTo(`/token/${token.token}-${token.chain}`)">
           <div class="flex-1">
             <div class="lh-16px color-[--main-text]">{{ token.symbol }}</div>
@@ -89,7 +89,7 @@
         <div class="text-12px lh-12px color-[--third-text] mb-12px">{{ t('mcap') }}</div>
       </div>
       <div class="flex flex-col gap-8px">
-        <div v-for="token in tokens" :key="token.id" class="flex items-center gap-8px cursor-pointer"
+        <div v-for="token in tokens" :key="token.id" class="flex items-center gap-8px cursor-pointer hover:bg-[--dialog-list-hover] "
           @click="navigateTo(`/token/${token.token}-${token.chain}`)">
           <TokenImg :row="token" />
           <div class="flex-1">
