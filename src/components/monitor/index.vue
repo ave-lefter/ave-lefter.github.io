@@ -112,9 +112,9 @@
               <template #header-wallet>
                 <div class="flex-between w-100%">
                   <div class="flex-start gap-8px">
-                    <FilterType v-model="txType" :options="txTypeList" />
+                    <!-- <FilterType v-model="txType" :options="txTypeList" />
                     <Icon ref="audioButtonRef" :name="audioSettings.audio.monitor ? 'custom:ad' : 'custom:admute'"
-                      class="cursor-pointer text-16px color-[--secondary-text]" />
+                      class="cursor-pointer text-16px color-[--secondary-text]" /> -->
                     <pro-tag size="small" class="cursor-pointer w-55px" @click="toggleMc = !toggleMc">{{
                       !toggleMc ?'U/Pri':'C/MC' }}
                       <Icon name="lsicon:switch-filled" class="ml-4px text-12px" />
@@ -125,6 +125,7 @@
                       <Icon name="custom:stop" />
                       <!-- <span class="ml-3px">{{ $t('paused') }}</span> -->
                     </div>
+                    <BatchWallet :chain=" getChainInfo(selectedChain.value,true)?.net_name" :boundary="null" />
                     <QuickBuyInput v-model="quickBuyValue" size="small" />
                   </div>
                 </div>
@@ -274,8 +275,10 @@ import BigNumber from 'bignumber.js'
 import { getHistoryMonitor, batchPauseMonitor, addAttention2 } from '~/api/attention'
 import QuickBuyInput from './components/quickBuyInput.vue'
 import FilterType from './components/filterType.vue'
+import BatchWallet from '~/pages/token/components/right/botSwap/batchWallet.vue'
 import type { AveTable } from '#components'
 import type { PopoverInstance } from 'element-plus'
+import type { BotChain } from '~/utils/types'
 import dayjs from 'dayjs'
 const { t } = useI18n()
 
