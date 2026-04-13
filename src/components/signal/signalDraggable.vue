@@ -6,6 +6,30 @@ const dragStore = useDragStore()
 const { t } = useI18n()
 const { width: winWidth } = useWindowSize()
 
+function handleOnDrag(x: number, y: number) {
+  // 左侧固定模式：x 是相对偏移（初始为 0）
+  if (signalStore.placement === 'left') {
+    if (x < 0) {  // 不允许向左拖动（负偏移）
+      return false  // ✅ 返回 false 阻止拖动
+    }
+  }
+  
+  // 右侧固定模式：x 是绝对坐标
+  if (signalStore.placement === 'right') {
+    const initialX = dragStore.rightWidth.signal || 0
+    if (x > initialX) {  // 不允许超过初始位置（向右拖动）
+      return false  // ✅ 返回 false 阻止拖动
+    }
+  }
+  
+  // center 模式：调用原有的 onDrag 处理样式
+  if (signalStore.placement === 'center') {
+    signalStore.onDrag(x)
+  }
+  
+  return true  // ✅ 返回 true 允许拖动
+}
+
 function dragStop(x: number, y: number) {
   // 左侧固定模式：x 是相对偏移，需要转换为绝对坐标
   let absoluteX = x
@@ -52,7 +76,7 @@ v-if="!signalStore.isLeftFixed && !signalStore.isRightFixed && signalStore.signa
             'bl',
             'ml',
         ]" drag-cancel="#drag-disabled,#drag-settings,#custom-filter" @onDragStop="dragStop"
-        @onResizing="signalStore.onResizing" @onDrag="signalStore.onDrag">
+        @onResizing="signalStore.onResizing" :on-drag="handleOnDrag">
         <Signal
 :container-width="signalStore.signalBoundingRect.width"
             :scroll-height="signalStore.signalBoundingRect.height - 117"
@@ -65,7 +89,7 @@ v-if="signalStore.isLeftFixed && signalStore.signalVisible"
         :initial-width="signalStore.fixedWidth" :initial-height="signalStore.winHeight - 95" :parent="true" :handles="[
             'mr',
         ]" drag-cancel="#drag-disabled" @onDragStop="dragStop"
-        @onResizing="signalStore.onFixedResizing">
+        @onResizing="signalStore.onFixedResizing" :on-drag="handleOnDrag">
         <Signal :container-width="signalStore.fixedWidth" :scroll-height="signalStore.winHeight - 200" />
     </Draggable>
     <Draggable
@@ -75,7 +99,7 @@ v-if="signalStore.isRightFixed && signalStore.signalVisible"
         :initial-width="signalStore.fixedWidth" :initial-height="signalStore.winHeight - 95" :handles="[
             'ml',
         ]" drag-cancel="#drag-disabled" @onDragStop="dragStop"
-        @onResizing="signalStore.onFixedResizing">
+        @onResizing="signalStore.onFixedResizing" :on-drag="handleOnDrag">
         <Signal :container-width="signalStore.fixedWidth" :scroll-height="signalStore.winHeight - 200" />
     </Draggable>
 </template>

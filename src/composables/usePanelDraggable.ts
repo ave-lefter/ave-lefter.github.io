@@ -147,7 +147,8 @@ export function usePanelDraggable(options: UsePanelDraggableOptions) {
         parent: true,
         handles: ['tl', 'tm', 'tr', 'mr', 'br', 'bm', 'bl', 'ml'],
         dragHandle: '.drag-handle',
-        z: 1
+        z: 1,
+        onDrag: handleDrag  // ✅ 添加 onDrag 回调
       }
     } else if (placement === 'left') {
       data = {
@@ -161,7 +162,8 @@ export function usePanelDraggable(options: UsePanelDraggableOptions) {
         initialHeight: winHeight.value - 95,
         parent: true,
         handles: ['mr'],
-        dragHandle: '.drag-handle'
+        dragHandle: '.drag-handle',
+        onDrag: handleDrag  // ✅ 添加 onDrag 回调
       }
     } else if (placement === 'right') {
       data = {
@@ -175,7 +177,8 @@ export function usePanelDraggable(options: UsePanelDraggableOptions) {
         initialHeight: winHeight.value - 95,
         parent: true,
         handles: ['ml'],
-        dragHandle: '.drag-handle'
+        dragHandle: '.drag-handle',
+        onDrag: handleDrag  // ✅ 添加 onDrag 回调
       }
     }
     console.log('draggableProps', options.fixedWidth.value)
@@ -244,11 +247,32 @@ export function usePanelDraggable(options: UsePanelDraggableOptions) {
     }
   }
 
-  const handleDrag = (x: number) => {
+  const handleDrag = (x: number, y?: number) => {
     const placement = options.placement.value
+    
+    // 左侧固定模式：x 是相对偏移（初始为 0）
+    if (placement === 'left') {
+      if (x < 0) {  // 不允许向左拖动（负偏移）
+        console.log('Left drag blocked:', x)
+        return false  // ✅ 返回 false 阻止拖动
+      }
+    }
+    
+    // 右侧固定模式：x 是绝对坐标
+    if (placement === 'right') {
+      const initialX = dragStore.rightWidth[getPanelKey()] || 0
+      if (x > initialX) {  // 不允许超过初始位置（向右拖动）
+        console.log('Right drag blocked:', x, '>', initialX)
+        return false  // ✅ 返回 false 阻止拖动
+      }
+    }
+    
+    // center 模式：调用原有的 onDrag 处理样式
     if (placement === 'center') {
       options.onDrag(x)
     }
+    
+    return true  // ✅ 返回 true 允许拖动
   }
 
   return {
