@@ -898,7 +898,7 @@
         <span>{{ $t('totalTax') }}</span>
         <div class="block mt-8px color-[--main-text1]">
           <span>
-            {{ formatNumber((Number(tokenInfoExtra?.commission_sum ?? 0) + Number(tokenInfoExtra?.gas_fee_sum ?? 0)), 2) }}%
+            {{ formatNumber((Number(tokenInfoExtra?.commission_sum ?? 0) + Number(tokenInfoExtra?.gas_fee_sum ?? 0)), 2) }}
           </span>
         </div>
       </div>
