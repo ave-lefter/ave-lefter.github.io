@@ -894,11 +894,11 @@
           formatNumber(token?.holders || 0, { limit: 10 })
         }}</span>
       </div>
-      <div v-if="Number(tokenInfoExtra?.commission_sum ?? 0) + Number(tokenInfoExtra?.priority_fee_sum ?? 0) + Number(tokenInfoExtra?.fee_sum ?? 0) >0" class="item ml-24px">
+      <div v-if="Number(tokenInfoExtra?.commission_sum ?? 0) + Number(tokenInfoExtra?.gas_fee_sum ?? 0) >0" class="item ml-24px">
         <span>{{ $t('totalTax') }}</span>
         <div class="block mt-8px color-[--main-text1]">
           <span>
-            {{ formatNumber((Number(tokenInfoExtra?.commission_sum ?? 0) + Number(tokenInfoExtra?.priority_fee_sum ?? 0) + Number(tokenInfoExtra?.fee_sum ?? 0)), 2) }}%
+            {{ formatNumber((Number(tokenInfoExtra?.commission_sum ?? 0) + Number(tokenInfoExtra?.gas_fee_sum ?? 0)), 2) }}%
           </span>
         </div>
       </div>

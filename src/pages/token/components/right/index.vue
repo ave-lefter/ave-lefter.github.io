@@ -231,11 +231,8 @@ function mergeStatistics(source: any) {
   if (source?.commission_sum != null && tokenStore.tokenInfoExtra) {
     tokenStore.tokenInfoExtra.commission_sum = source.commission_sum
   }
-  if (source?.priority_fee_sum != null && tokenStore.tokenInfoExtra) {
-    tokenStore.tokenInfoExtra.priority_fee_sum = source.priority_fee_sum
-  }
-  if (source?.fee_sum != null && tokenStore.tokenInfoExtra) {
-    tokenStore.tokenInfoExtra.fee_sum = source.fee_sum
+  if (source?.gas_fee_sum != null && tokenStore.tokenInfoExtra) {
+    tokenStore.tokenInfoExtra.gas_fee_sum = source.gas_fee_sum
   }
 }
 const similarTokenList = ref([])

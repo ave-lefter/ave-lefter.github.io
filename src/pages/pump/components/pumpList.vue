@@ -784,8 +784,8 @@
                       class="icon-symbol rounded-100% h-14px mr-2px"
                       :src="`${token_logo_url}chain/${row?.chain}.png`"
                     >
-                    <span v-if="Number(row?.commission_sum ?? 0)+ Number(row?.priority_fee_sum ?? 0) + Number(row?.fee_sum ?? 0) >0" class="color-[--main-text1]">
-                        {{ formatNumber((Number(row?.commission_sum ?? 0)+ Number(row?.priority_fee_sum ?? 0) + Number(row?.fee_sum ?? 0)) , 2) }}
+                    <span v-if="Number(row?.commission_sum ?? 0) + Number(row?.gas_fee_sum ?? 0) >0" class="color-[--main-text1]">
+                        {{ formatNumber((Number(row?.commission_sum ?? 0) + Number(row?.gas_fee_sum ?? 0)) , 2) }}
                     </span>
                     <span v-else class="color-[--third-text1]" >0</span>
                   </div> -->

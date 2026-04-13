@@ -168,8 +168,7 @@ export interface TokenInfoExtra {
   name_en: string
   t_price_change_1d: number
   commission_sum: string
-  priority_fee_sum: string
-  fee_sum: string
+  gas_fee_sum: string
 }
 
 
