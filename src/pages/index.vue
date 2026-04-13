@@ -839,41 +839,64 @@ const playGraduatedAudio = useThrottleFn((val) => {
     pumpAudio.value.play().catch(() => {})
   }
 }, 300)
-watch(() => isPausedObj.value.new, (newVal) => {
-  if (!newVal) {
-    const params = {
-      category: 'new' as CategoryKey,
-      chain: activeChain.value,
-      platforms: pumpV3.value?.[activeChain.value]?.platforms?.join(',') || 'all',
-      ...pumpStore.pumpV3[activeChain.value].new.pumpFilter,
-    }
-    getPump(params as any)
-  }
-})
+// watch(() => isPausedObj.value.new, (newVal) => {
+//   if (!newVal) {
+//     const params = {
+//       category: 'new' as CategoryKey,
+//       chain: activeChain.value,
+//       platforms: pumpV3.value?.[activeChain.value]?.platforms?.join(',') || 'all',
+//       ...pumpStore.pumpV3[activeChain.value].new.pumpFilter,
+//     }
+//     getPump(params as any)
+//   }
+// })
 
-watch(() => isPausedObj.value.soon, (newVal) => {
-  if (!newVal) {
-    const params = {
-      category: 'soon' as CategoryKey,
-      chain: activeChain.value,
-      platforms: pumpV3.value?.[activeChain.value]?.platforms?.join(',') || 'all',
-      ...pumpStore.pumpV3[activeChain.value].soon.pumpFilter,
-    }
-    getPump(params as any)
-  }
-})
+// watch(() => isPausedObj.value.soon, (newVal) => {
+//   if (!newVal) {
+//     const params = {
+//       category: 'soon' as CategoryKey,
+//       chain: activeChain.value,
+//       platforms: pumpV3.value?.[activeChain.value]?.platforms?.join(',') || 'all',
+//       ...pumpStore.pumpV3[activeChain.value].soon.pumpFilter,
+//     }
+//     getPump(params as any)
+//   }
+// })
 
-watch(() => isPausedObj.value.graduated, (newVal) => {
-  if (!newVal) {
-    const params = {
-      category: 'graduated' as CategoryKey,
-      chain: activeChain.value,
-      platforms: pumpV3.value?.[activeChain.value]?.platforms?.join(',') || 'all',
-      ...pumpStore.pumpV3[activeChain.value].graduated.pumpFilter,
-    }
-    getPump(params as any)
+// watch(() => isPausedObj.value.graduated, (newVal) => {
+//   if (!newVal) {
+//     const params = {
+//       category: 'graduated' as CategoryKey,
+//       chain: activeChain.value,
+//       platforms: pumpV3.value?.[activeChain.value]?.platforms?.join(',') || 'all',
+//       ...pumpStore.pumpV3[activeChain.value].graduated.pumpFilter,
+//     }
+//     getPump(params as any)
+//   }
+// })
+
+
+const categories: CategoryKey[] = ['new', 'soon', 'graduated']
+watch(
+  () => categories.map(key => isPausedObj.value[key]),
+  (newVals, oldVals) => {
+    newVals.forEach((newVal, index) => {
+      const oldVal = oldVals?.[index]
+      const category = categories[index]
+      const state = pumpV3.value[activeChain.value]?.[category]
+      const isTrue = getFilterNumber(state.pumpFilter || {}, platforms.value, baseTokensAllStr.value) > 0
+      if (oldVal && !newVal && isTrue) {
+        const params = {
+          category,
+          chain: activeChain.value,
+          platforms: pumpV3.value?.[activeChain.value]?.platforms?.join(',') || 'all',
+          ...state.pumpFilter,
+        }
+        getPump(params as any)
+      }
+    })
   }
-})
+)
 watch(()=>pumpV3Pointer.value[activeChain.value].new.pumpFilter.q,(val)=>{
   debouncedFetch('new')
 })
@@ -1604,8 +1627,8 @@ async function getPump(rawParams: PumpRequestParams, isFilter = false) {
 
   // 2. 状态拦截
   const isInactive = route.name !== 'index'
-  const isPaused = isPausedObj.value?.[category] || route.name !== 'index'
   if (isInactive) return
+  const isPaused = isPausedObj.value?.[category]
   if (isPaused) return
 
   // 3. 构建参数 (浅拷贝避免污染)
