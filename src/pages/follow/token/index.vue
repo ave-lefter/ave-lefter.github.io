@@ -362,6 +362,7 @@ const collect = (row: any) => {
 const getRowGroupChange = async (val: number, row: any) => {
   const tokenId = row.token + '-' + row.chain
   await moveFavoriteGroup(tokenId, val, addressValue.value)
+  updateNum11.value++
   getList()
 }
 
