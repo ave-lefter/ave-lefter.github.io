@@ -137,8 +137,7 @@ export interface PumpObj {
   is_pump_agent: number
   favorite_holder_count: number
   commission_sum: string
-  priority_fee_sum: string
-  fee_sum: string
+  gas_fee_sum: string
 }
 
 interface Pair {

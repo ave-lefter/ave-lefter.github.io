@@ -607,8 +607,7 @@ type StatisticsItem = {
   summary_score: number
   colluded_cluster_ratio: number
   commission_sum: string
-  priority_fee_sum: string
-  fee_sum: string
+  gas_fee_sum: string
 }
 let portraitTimer: ReturnType<typeof setTimeout> | null = null
 let isPortraitSubscribed = false
@@ -1733,7 +1732,7 @@ async function getPump(rawParams: PumpRequestParams, isFilter = false) {
     requestRefresh(finalParams.category as 'new' | 'soon' | 'graduated')
     const isTrue = getFilterNumber(state.pumpFilter || {}, platforms.value, baseTokensAllStr.value) > 0
     if (isTrue) {
-      Timer[category] = setTimeout(() => getPump(rawParams), 5000)
+      Timer[category] = setTimeout(() => getPump(rawParams), category === 'graduated' ? 30000 : 5000)
     } else {
       if (Timer[category]) {
         clearTimeout(Timer[category] as number)
@@ -2130,8 +2129,7 @@ const DIRECT_MAP: [keyof StatisticsItem, keyof PumpObj][] = [
   ['followers', 'followers'],
   ['following', 'following'],
   ['commission_sum', 'commission_sum'],
-  ['priority_fee_sum', 'priority_fee_sum'],
-  ['fee_sum', 'fee_sum'],
+  ['gas_fee_sum', 'gas_fee_sum'],
 
 ]
 const NUMBER_MAP: [keyof StatisticsItem, keyof PumpObj][] = [
@@ -2270,8 +2268,7 @@ const MERGE_KEYS = [
   'summary_score',
   'colluded_cluster_ratio',
   'commission_sum',
-  'priority_fee_sum',
-  'fee_sum'
+  'gas_fee_sum'
 ] as const
 
 function mergeStatistics(prev: any, next: any) {
