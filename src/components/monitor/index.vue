@@ -126,7 +126,14 @@
                       <!-- <span class="ml-3px">{{ $t('paused') }}</span> -->
                     </div>
                     <BatchWallet :chain=" getChainInfo(selectedChain.value,true)?.net_name" :boundary="null" />
-                    <QuickBuyInput v-model="quickBuyValue" size="small" />
+                    <QuickSwapSetCustom
+                      v-model:quickBuyValue="quickBuyValue"
+                      v-model:customSelected="swapSetSelected"
+                      :chain="getChainInfo(selectedChain.value, true)?.net_name"
+                      displayType="select"
+                      :height="24"
+                    />
+                    <!-- <QuickBuyInput v-model="quickBuyValue" size="small" /> -->
                   </div>
                 </div>
               </template>
@@ -252,7 +259,15 @@
                 <Icon name="lsicon:switch-filled" class="ml-4px text-12px" />
               </pro-tag>
             </template>
-            <QuickBuyInput v-if="(activeName === 0) && isLarge" v-model="quickBuyValue" size="small" />
+            <!-- <QuickBuyInput v-if="(activeName === 0) && isLarge" v-model="quickBuyValue" size="small" /> -->
+            <QuickSwapSetCustom
+              v-if="(activeName === 0) && isLarge"
+              v-model:quickBuyValue="quickBuyValue"
+              v-model:customSelected="swapSetSelected"
+              :chain="getChainInfo(selectedChain.value, true)?.net_name"
+              displayType="select"
+              :height="24"
+            />
             <Icon class="text-14px color-[--secondary-text] hover:color-[--main-text] cursor-pointer"
               name="custom:pump-setting" @click.stop.prevent="audioSettings.active = 'notice'" />
             <Icon name="custom:close" class="text-14px shrink-0 cursor-pointer color-[--main-text]"
@@ -276,9 +291,10 @@ import { getHistoryMonitor, batchPauseMonitor, addAttention2 } from '~/api/atten
 import QuickBuyInput from './components/quickBuyInput.vue'
 import FilterType from './components/filterType.vue'
 import BatchWallet from '~/pages/token/components/right/botSwap/batchWallet.vue'
+import QuickSwapSetCustom from '~/components/quickSwap/quickSwapSetCustom.vue'
 import type { AveTable } from '#components'
 import type { PopoverInstance } from 'element-plus'
-import type { BotChain } from '~/utils/types'
+import type { BotChain, BotSettingKey } from '~/utils/types'
 import dayjs from 'dayjs'
 const { t } = useI18n()
 
@@ -319,6 +335,7 @@ const selectedChain = useStorage('monitorSelectedChain', {
 })
 // const activeName.value=ref(0)
 const quickBuyValue = useStorage('quickBuyValue', '0.01')
+const swapSetSelected = useStorage<BotSettingKey>('monitorSwapSetSelected', 's1')
 const txTypeList = computed(() => {
   return [
     // { label: t('all'), value: 0 },
