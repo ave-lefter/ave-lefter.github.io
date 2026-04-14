@@ -263,6 +263,7 @@
             :swapSetSelected="swapSetSelected2"
             :loading="pumpV3[activeChain]['soon']['loading']"
             isSoon
+            :sortField="pumpV3Pointer[activeChain].soon?.pumpFilter?.sort || ''"
             :hasFilter="getFilterNumber(pumpV3Pointer[activeChain].soon.pumpFilter || {},platforms,baseTokensAllStr) > 0"            @mouseenter="isPausedObj.soon = true"
             @mouseleave="isPausedObj.soon = false"
             @clearFilter="handleClearFilter('soon')"
@@ -900,10 +901,19 @@ watch(()=>pumpV3Pointer.value[activeChain.value].new.pumpFilter.q,(val)=>{
   debouncedFetch('new')
 })
 
+// 记录已播放过声音的 token（按 category 隔离），45ms 后自动清除，避免接口延迟刷新重复播放
+const playedAudioTokens: Record<string, Map<string, number>> = { new: new Map(), soon: new Map(), graduated: new Map() }
+watch(activeChain, () => {
+  playedAudioTokens.new.clear()
+  playedAudioTokens.soon.clear()
+  playedAudioTokens.graduated.clear()
+})
+
 const stopWatchList1 = watch(
   () => list1.value?.[0]?.target_token,
   (newValue, oldValue)=>{
-    if (oldValue) {
+    if (oldValue && newValue) {
+      playedAudioTokens.new.set(newValue, Date.now())
       playNewAudio(newValue)
     }
   }
@@ -911,7 +921,8 @@ const stopWatchList1 = watch(
 const stopWatchList2 = watch(
   () => list2.value?.[0]?.target_token,
   (newValue, oldValue)=>{
-    if (oldValue) {
+    if (newValue && oldValue && (playedAudioTokens.soon?.size === 0 || !playedAudioTokens.soon.has(newValue))) {
+      playedAudioTokens.soon.set(newValue, Date.now())
       playSoonAudio(newValue)
     }
   }
@@ -919,11 +930,32 @@ const stopWatchList2 = watch(
 const stopWatchList3 = watch(
   () => list3.value?.[0]?.target_token,
   (newValue, oldValue)=>{
-    if (oldValue) {
+    if (newValue && oldValue && (playedAudioTokens.graduated?.size === 0 || !playedAudioTokens.graduated.has(newValue))) {
+      playedAudioTokens.graduated.set(newValue, Date.now())
       playGraduatedAudio(newValue)
     }
   }
 )
+let cleanerAudioTokens: number | null = null
+function startCleanerAudioTokens() {
+  if (cleanerAudioTokens) return // 防止重复开启
+  cleanerAudioTokens = window.setInterval(() => {
+    const now = Date.now()
+    Object.values(playedAudioTokens).forEach(map => {
+      map.forEach((time, key) => {
+        if (now - time > 45000) {
+          map.delete(key)
+        }
+      })
+    })
+  }, 50000)
+}
+function stopCleanerAudioTokens() {
+  if (cleanerAudioTokens) {
+    clearInterval(cleanerAudioTokens)
+    cleanerAudioTokens = null
+  }
+}
 let onCanPlayHandler: (() => void) | null = null
 
 function bindAudioCanPlay() {
@@ -1225,6 +1257,7 @@ function initPage() {
 
 onBeforeMount(() => {
   // 初始化 Web Worker（非阻塞主线程处理 WS item 转换）
+  startCleanerAudioTokens()
   const worker = new PumpWsMappingWorker()
   pumpWsNativeWorker = worker
   pumpWsMappingWorker = wrap<PumpWorkerAPI>(worker)
@@ -1240,6 +1273,7 @@ onBeforeMount(() => {
 })
 
 onUnmounted(() => {
+  stopCleanerAudioTokens()
   favDialogEvent.off(handleFavDialogEvent)
   if (timerAutoFresh) {
     clearInterval(timerAutoFresh)
@@ -1732,7 +1766,7 @@ async function getPump(rawParams: PumpRequestParams, isFilter = false) {
     requestRefresh(finalParams.category as 'new' | 'soon' | 'graduated')
     const isTrue = getFilterNumber(state.pumpFilter || {}, platforms.value, baseTokensAllStr.value) > 0
     if (isTrue) {
-      Timer[category] = setTimeout(() => getPump(rawParams), category === 'graduated' ? 30000 : 5000)
+      Timer[category] = setTimeout(() => getPump(rawParams),  category ==='graduated' ? 45000 : 5000)
     } else {
       if (Timer[category]) {
         clearTimeout(Timer[category] as number)
@@ -2037,12 +2071,14 @@ watch(documentVisible, (val) => {
   if (route.name !== 'index') return
   if (val) {
     initPage()
+    startCleanerAudioTokens()
     if (timerAutoFresh) {
       clearInterval(timerAutoFresh)
       timerAutoFresh = null
     }
     getPumpList()
   } else {
+    stopCleanerAudioTokens()
     unbindAudioCanPlay()
     isPausedObj.value.new = false
     isPausedObj.value.soon = false

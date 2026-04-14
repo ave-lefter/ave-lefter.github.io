@@ -2092,7 +2092,8 @@
   "averageMarketBuySell": "Average Market Buy/Sell",
   "averagePriceBuySell": "Average Price Buy/Sell",
   "tokenTax": "Token Tax",
-  "totalTax": "Total Tax",
+  "totalTax": "Total Fees",
+  "totalTaxTip": "Total fees include Priority Fees, Bribe Fees and Trading Fees",
   "taxTip": "Token tax: Token tax rate",
   "smarterAddress": "Smarter Address",
   "openMonitorSuccess": "Monitoring successfully enabled",
@@ -2165,5 +2166,7 @@
   "gridTip": "Please keep at least one category displayed",
   "emailCodeAuth": "Email Verification",
   "googleAuth2": "Google Authenticator",
-  "myRemark": "My Remarks"
+  "myRemark": "My Remarks",
+  "autoTranslationOn": "ON Auto-Translation",
+  "autoTranslationOFF": "OFF Auto-Translation"
 }

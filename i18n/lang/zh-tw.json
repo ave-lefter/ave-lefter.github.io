@@ -2072,6 +2072,7 @@
   "cancelMonitorSuccess": "取消監控成功",
   "tokenTax": "代幣稅",
   "totalTax": "總手續費",
+  "totalTaxTip": "總手續費包括優先費 & 買通費 & 交易費",
   "taxTip": "代幣稅：代幣稅率",
   "smarterAddress": "聪明钱包数",
   "kolSummary": "共有{people}比特{type}，目前有{holders}人持倉，{type}持倉{vol}，占比{ratio}",
@@ -2152,5 +2153,7 @@
   "unfollowAuthor": "取消追蹤此部落客",
   "emailCodeAuth": "信箱驗證碼",
   "googleAuth2": "谷歌驗證器",
-  "myRemark": "我的備註"
+  "myRemark": "我的備註",
+  "autoTranslationOn": "開啟自動翻譯",
+  "autoTranslationOFF": "关闭自动翻译"
 }

@@ -123,6 +123,10 @@
                     {{ $t('showSearch') }}
                   </template>
                 </li>
+                <li @click="pumpSetting.isLang = !pumpSetting.isLang">
+                    <Icon :name="`${pumpSetting.isLang ? 'majesticons:translate' : 'tdesign:translate-1'}`" class="text-12px mr-8px" />
+                    {{ pumpSetting.isLang ? $t('autoTranslationOn'): $t('autoTranslationOFF') }}
+                </li>
                 <li @click="switchProgress">
                   <Icon
                     v-if="pumpSetting.Progress_isCircle == 'horizontal'"

@@ -895,11 +895,15 @@
         }}</span>
       </div>
       <div v-if="Number(tokenInfoExtra?.commission_sum ?? 0) + Number(tokenInfoExtra?.gas_fee_sum ?? 0) >0" class="item ml-24px">
-        <span>{{ $t('totalTax') }}</span>
-        <div class="block mt-8px color-[--main-text1]">
-          <span>
-            {{ formatNumber((Number(tokenInfoExtra?.commission_sum ?? 0) + Number(tokenInfoExtra?.gas_fee_sum ?? 0)), 2) }}
-          </span>
+        <span class="border-b border-b-dashed inline-block w-fit cursor-pointer" v-tooltip="$t('totalTaxTip')">{{ $t('totalTax') }}</span>
+        <div class="flex-start mt-8px color-[--main-text1]">
+          <img
+            v-if="chain"
+            class="icon-symbol rounded-100% h-14px mr-2px"
+            :src="`${token_logo_url}chain/${chain}.png`"
+          >
+          <span>{{ formatNumber((Number(tokenInfoExtra?.commission_sum ?? 0) + Number(tokenInfoExtra?.gas_fee_sum ?? 0)), 2) }}</span>
+          <!-- <span v-if="getChainInfo(chain)?.name">{{ getChainInfo(chain)?.name }}</span> -->
         </div>
       </div>
       <div v-if="(tokenInfoExtra?.buy_tax??0) > 0 || (tokenInfoExtra?.sell_tax??0) > 0" class="item ml-24px">
@@ -1089,7 +1093,7 @@ import {
 import { formatNumber } from '@/utils/formatNumber'
 import { ElMessage } from 'element-plus'
 import { useEventBus } from '@vueuse/core'
-import { verifyLogin } from '@/utils'
+import { verifyLogin, getChainInfo } from '@/utils'
 const { token_logo_url } = useConfigStore()
 const tokenStore = useTokenStore()
 const globalStore = useGlobalStore()
@@ -1363,6 +1367,7 @@ const chain = computed(() => {
 // console.log('-------tokenInfo---------', tokenInfo)
 // console.log('-------token---------', token)
 onMounted(() => {
+  // console.log('----5555555555------',getChainInfo(chain))
   if (walletAddress.value) {
     getTokenFavoriteCheck()
     getTokenUserFavoriteGroups() //获取分组数组

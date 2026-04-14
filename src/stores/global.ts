@@ -55,6 +55,7 @@ export const useGlobalStore = defineStore('global', () => {
     isRight: boolean
     isBlacklist: boolean
     show_search: boolean
+    isLang: boolean
     isInt: boolean
     define: string[]
     data: Record<
@@ -91,6 +92,7 @@ export const useGlobalStore = defineStore('global', () => {
     isRight: false,
     isBlacklist: true,
     show_search: true,
+    isLang: true,
     isInt: false,
     define: [
       'name',
