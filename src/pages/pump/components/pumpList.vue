@@ -200,7 +200,7 @@
                         v-if="Number(row.buy_tax) == Number(row.sell_tax)"
                         class="bg-[--d-1E2025-l-E8F1FF] rounded-4px px-2px text-10px"
                         :style="{
-                              color:(Number(row?.sell_tax) > 5 ? '#F6465D' : 'var(--secondary-text1)'),
+                              color:(Number(row?.sell_tax) > 0 ? '#F6465D' : 'var(--secondary-text1)'),
                           }"
                       >
                         {{ $t('tax') }} {{ formatNumber(row?.sell_tax || 0, 2) }}%
@@ -209,7 +209,7 @@
                         v-else
                         class="bg-[--d-1E2025-l-E8F1FF] rounded-4px px-2px text-10px"
                           :style="{
-                              color: (Number(row?.sell_tax) > 5 || Number(row?.buy_tax) > 5  ? '#F6465D' :'var(--secondary-text1)'),
+                              color: (Number(row?.sell_tax) > 0 || Number(row?.buy_tax) > 0  ? '#F6465D' :'var(--secondary-text1)'),
                           }"
                       >
                       B {{ formatNumber(row?.buy_tax || 0, 2) }}%&nbsp;&nbsp;S {{ formatNumber(row?.sell_tax || 0, 2) }}%
@@ -219,7 +219,7 @@
                       v-else-if="Number(row.buy_tax)"
                       class="bg-[--d-1E2025-l-E8F1FF] rounded-4px px-2px text-10px"
                       :style="{
-                            color:(Number(row?.buy_tax) > 5 ? '#F6465D' : 'var(--secondary-text1)'),
+                            color:(Number(row?.buy_tax) > 0 ? '#F6465D' : 'var(--secondary-text1)'),
                         }"
                     >
                       B {{ formatNumber(row?.buy_tax || 0, 2) }}%
@@ -228,7 +228,7 @@
                       v-else-if="Number(row.sell_tax)"
                       class="bg-[--d-1E2025-l-E8F1FF] rounded-4px text-10px"
                         :style="{
-                            color:(Number(row?.sell_tax) > 5 ? '#F6465D' : 'var(--secondary-text1)'),
+                            color:(Number(row?.sell_tax) > 0 ? '#F6465D' : 'var(--secondary-text1)'),
                         }"
                     >
                       S {{ formatNumber(row?.sell_tax || 0, 2) }}%
