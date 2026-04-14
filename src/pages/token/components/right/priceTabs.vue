@@ -10,7 +10,7 @@
     >
       <div class="name">{{ item.name }}</div>
       <div class="value" :style="{ color: getColor(item.id) }">
-        {{!!tokenStore.pair ? formatNumber(tokenStore.pair?.[`price_change_${item?.id}`], 2) : '--' }}%
+        {{ getPriceValue(item.id) }}%
       </div>
     </button>
    </div>
@@ -39,11 +39,23 @@ const volumeVisible = ref(true)
 const $emit = defineEmits(['update:modelValue'])
 const tokenStore = useTokenStore()
 const getColor = (id: string) => {
-  const val = tokenStore.pair?.[`price_change_${id}` as 'price_change_5m' | 'price_change_1h' | 'price_change_4h' | 'price_change_24h']
+  let val = tokenStore.pair?.[`price_change_${id}` as 'price_change_5m' | 'price_change_1h' | 'price_change_4h' | 'price_change_24h']
+  if (id === '24h' && tokenStore.selectedToken && tokenStore.tokenAllPair) {
+    val = tokenStore.tokenInfoExtra?.t_price_change_24h || tokenStore.tokenInfo?.token?.price_change_v2 || 0
+  }
   if(!val) return '#999'
   if (val > 0) return '#12B886'
   if (val < 0) return '#F6465D'
   return '#999'
+}
+
+const getPriceValue = (id: string) => {
+  if (!tokenStore.pair) return '--'
+  let val = tokenStore.pair?.[`price_change_${id}` as 'price_change_5m' | 'price_change_1h' | 'price_change_4h' | 'price_change_24h']
+  if (id === '24h' && tokenStore.selectedToken && tokenStore.tokenAllPair) {
+    val = tokenStore.tokenInfoExtra?.t_price_change_24h || tokenStore.tokenInfo?.token?.price_change_v2 || 0
+  }
+  return formatNumber(val, 2)
 }
 const mouseLeave = () => {
   setTimeout(() => {

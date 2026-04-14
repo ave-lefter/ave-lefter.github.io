@@ -40,6 +40,11 @@ interface GetFavListResponse {
   pool_size: number;
   remark?: string;
   issue_platform?:string
+  t_price_change_24h?: string;
+  t_price_change_1d?: string;
+  m_price_change_24h?: string;
+  m_price_change_1d?: string;
+  support_aggr_kline?: 1|0;
 }
 
 // Get user favorite tokens

@@ -362,6 +362,11 @@ export interface GetHotTokensResponse {
   price_change: string;
   // priceChange24h
   price_change_v2: string;
+  t_price_change_24h: string;
+  t_price_change_1d: string;
+  m_price_change_24h: string;
+  m_price_change_1d: string;
+  support_aggr_kline: 1|0;
   is_adv: number;
   is_showasadv: number;
   token_index: number;

@@ -295,22 +295,22 @@
                 >
                 <div class="text-12px mt-3px">
                   <span
-                    v-if="Number((zone==='24h'? row.price_change_v2 :row.price_change)) > 0"
+                    v-if="Number((zone==='24h'? row.m_price_change_24h :row.m_price_change_1d)) > 0"
                     style="color: #12b886; padding: 10px 0"
                   >
-                    +{{ formatNumber((zone==='24h'? row.price_change_v2 :row.price_change) || 0) }}%
+                    +{{ formatNumber((zone==='24h'? row.m_price_change_24h :row.m_price_change_1d) || 0) }}%
                   </span>
                   <span
-                    v-if="Number((zone==='24h'? row.price_change_v2 :row.price_change)) == 0"
+                    v-if="Number((zone==='24h'? row.m_price_change_24h :row.m_price_change_1d)) == 0"
                     style="color: #848e9c; padding: 10px 0"
                   >
                     0%
                   </span>
                   <span
-                    v-if="Number((zone==='24h'? row.price_change_v2 :row.price_change)) < 0"
+                    v-if="Number((zone==='24h'? row.m_price_change_24h :row.m_price_change_1d)) < 0"
                     style="color: #ff646d; padding: 10px 0"
                   >
-                    {{ formatNumber((zone==='24h'? row.price_change_v2 :row.price_change) || 0) }}%
+                    {{ formatNumber((zone==='24h'? row.m_price_change_24h :row.m_price_change_1d) || 0) }}%
                   </span>
                 </div>
               </div>
