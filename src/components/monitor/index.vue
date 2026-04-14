@@ -149,8 +149,8 @@
                           " @updateRemark="init2" @click="(e: any) => jumpBalance(row, e)" />
                       <div class="color-[--third-text]">{{ getTxType(row) }}</div>
                       <template v-if="row.position_type=='3'">
-                        <div v-if="(row._profit_ratio==='--')||!row._profit_ratio"  class="color-[--third-text]"></div>
-                        <div v-else :class="row._profit_ratio ? `color-[--up-color]` : `color-[--down-color]`">{{ `${Number(row._profit_ratio) > 0 ? '+' : '-'}${formatNumber2((row?._profit_ratio || 0) * 100 || 0, 2, 4, 4)}%` }}</div>
+                        <div v-if="(row._profit==='--')||!row._profit"  class="color-[--third-text]"></div>
+                        <div v-else :class="row._profit>0 ? `color-[--up-color]` : `color-[--down-color]`">{{ `${Number(row._profit) > 0 ? '+' : '-'}$${formatNumber2(Math.abs(row?._profit || 0) || 0, 2)}` }}</div>
                       </template>
                     </div>
                     <QuickSwap :quickBuyValue="quickBuyValue"
@@ -624,7 +624,8 @@ const formateTxInfo = function (item: { [x: string]: any; maker_address?: any; w
       maker_tags: item?.maker_tags,
       isBuy
     },
-    _profit: item?.pnl_usd == '--' ? '--' : '$' + formatNumber2(Math.abs(item?.pnl_usd || 0) || 0, 2),
+    _profit: item?.pnl_usd == '--' ? '--' : item?.pnl_usd,
+    // _profit: item?.pnl_usd == '--' ? '--' : '$' + formatNumber2(Math.abs(item?.pnl_usd || 0) || 0, 2),
     _profit_ratio: item?.pnl_usd == '--' ? '--' : item?.pnl_ratio,
     // _profit_ratio: item?.pnl_usd == '--' ? '--' : formatNumber2((item?.pnl_ratio || 0) * 100 || 0, 2, 4, 4),
     _mc: Number(item?.target_mcap) ? ('$' + formatNumberS(item?.target_mcap || 0, {
