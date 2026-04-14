@@ -23,6 +23,7 @@ export interface PumpConfig {
 }
 
 export interface PumpObj {
+  remark: string
   name_en: string
   name_zh: string
   symbol_en: string
@@ -135,6 +136,8 @@ export interface PumpObj {
   }
   is_pump_agent: number
   favorite_holder_count: number
+  commission_sum: string
+  gas_fee_sum: string
 }
 
 interface Pair {

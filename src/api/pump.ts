@@ -120,3 +120,16 @@ export function _getHolderRank(params: {
     },
   })
 }
+//编辑token备注
+export function editPumpTokenRemark(token: string, chain: string, remark: string, address: string) {
+  const { $api } = useNuxtApp()
+  return $api('v2api/fav_tokens/v1/upsert/remark', {
+    method: 'post',
+    body: {
+      token_address: token,
+      token_chain: chain,
+      remark,
+      address,
+    },
+  })
+}

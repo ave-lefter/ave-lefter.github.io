@@ -178,7 +178,7 @@
             :swapSetSelected="swapSetSelected1"
             :loading="pumpV3[activeChain]['new']['loading']"
             :hasFilter="getFilterNumber(pumpV3Pointer[activeChain].new.pumpFilter || {},platforms,baseTokensAllStr) > 0"
-            @mouseover="isPausedObj.new = true"
+            @mouseenter="isPausedObj.new = true"
             @mouseleave="isPausedObj.new = false"
             @clearFilter="handleClearFilter('new')"
           />
@@ -263,8 +263,7 @@
             :swapSetSelected="swapSetSelected2"
             :loading="pumpV3[activeChain]['soon']['loading']"
             isSoon
-            :hasFilter="getFilterNumber(pumpV3Pointer[activeChain].soon.pumpFilter || {},platforms,baseTokensAllStr) > 0"
-            @mouseover="isPausedObj.soon = true"
+            :hasFilter="getFilterNumber(pumpV3Pointer[activeChain].soon.pumpFilter || {},platforms,baseTokensAllStr) > 0"            @mouseenter="isPausedObj.soon = true"
             @mouseleave="isPausedObj.soon = false"
             @clearFilter="handleClearFilter('soon')"
           />
@@ -337,7 +336,7 @@
             :loading="pumpV3[activeChain]['graduated']['loading']"
             isOut
             :hasFilter="getFilterNumber(pumpV3Pointer[activeChain].graduated.pumpFilter || {},platforms,baseTokensAllStr) > 0"
-            @mouseover="isPausedObj.graduated = true"
+            @mouseenter="isPausedObj.graduated = true"
             @mouseleave="isPausedObj.graduated = false"
             @clearFilter="handleClearFilter('graduated')"
           />
@@ -390,9 +389,20 @@ import { getFilterNumber } from './pump/utils'
 
 import SlippageSetMarket from './token/components/right/botSwap/slippageSetMarket.vue'
 import QuickSwapSetCustom from '@/components/quickSwap/quickSwapSetCustom.vue'
+import { BusEventType, type IFavDialogEventArgs } from '@/utils/constants'
+import { useEventBus } from '@vueuse/core'
 defineOptions({
   name: 'pump' // 显式命名
 })
+
+const favDialogEvent = useEventBus<IFavDialogEventArgs>(BusEventType.FAV_DIALOG)
+favDialogEvent.on(handleFavDialogEvent)
+
+function handleFavDialogEvent({ type }: IFavDialogEventArgs) {
+  if (type === 'remark' && route.name === 'index') {
+    getPumpList()
+  }
+}
 let timerAutoFresh: number | null = null
 type TimeoutReturnType = ReturnType<typeof setTimeout> | number | null
 const Timer: {
@@ -596,6 +606,8 @@ type StatisticsItem = {
   following: number
   summary_score: number
   colluded_cluster_ratio: number
+  commission_sum: string
+  gas_fee_sum: string
 }
 let portraitTimer: ReturnType<typeof setTimeout> | null = null
 let isPortraitSubscribed = false
@@ -826,7 +838,64 @@ const playGraduatedAudio = useThrottleFn((val) => {
     pumpAudio.value.play().catch(() => {})
   }
 }, 300)
+// watch(() => isPausedObj.value.new, (newVal) => {
+//   if (!newVal) {
+//     const params = {
+//       category: 'new' as CategoryKey,
+//       chain: activeChain.value,
+//       platforms: pumpV3.value?.[activeChain.value]?.platforms?.join(',') || 'all',
+//       ...pumpStore.pumpV3[activeChain.value].new.pumpFilter,
+//     }
+//     getPump(params as any)
+//   }
+// })
 
+// watch(() => isPausedObj.value.soon, (newVal) => {
+//   if (!newVal) {
+//     const params = {
+//       category: 'soon' as CategoryKey,
+//       chain: activeChain.value,
+//       platforms: pumpV3.value?.[activeChain.value]?.platforms?.join(',') || 'all',
+//       ...pumpStore.pumpV3[activeChain.value].soon.pumpFilter,
+//     }
+//     getPump(params as any)
+//   }
+// })
+
+// watch(() => isPausedObj.value.graduated, (newVal) => {
+//   if (!newVal) {
+//     const params = {
+//       category: 'graduated' as CategoryKey,
+//       chain: activeChain.value,
+//       platforms: pumpV3.value?.[activeChain.value]?.platforms?.join(',') || 'all',
+//       ...pumpStore.pumpV3[activeChain.value].graduated.pumpFilter,
+//     }
+//     getPump(params as any)
+//   }
+// })
+
+
+const categories: CategoryKey[] = ['new', 'soon', 'graduated']
+watch(
+  () => categories.map(key => isPausedObj.value[key]),
+  (newVals, oldVals) => {
+    newVals.forEach((newVal, index) => {
+      const oldVal = oldVals?.[index]
+      const category = categories[index]
+      const state = pumpV3.value[activeChain.value]?.[category]
+      const isTrue = getFilterNumber(state.pumpFilter || {}, platforms.value, baseTokensAllStr.value) > 0
+      if (oldVal && !newVal && isTrue) {
+        const params = {
+          category,
+          chain: activeChain.value,
+          platforms: pumpV3.value?.[activeChain.value]?.platforms?.join(',') || 'all',
+          ...state.pumpFilter,
+        }
+        getPump(params as any)
+      }
+    })
+  }
+)
 watch(()=>pumpV3Pointer.value[activeChain.value].new.pumpFilter.q,(val)=>{
   debouncedFetch('new')
 })
@@ -855,7 +924,6 @@ const stopWatchList3 = watch(
     }
   }
 )
-
 let onCanPlayHandler: (() => void) | null = null
 
 function bindAudioCanPlay() {
@@ -1172,6 +1240,7 @@ onBeforeMount(() => {
 })
 
 onUnmounted(() => {
+  favDialogEvent.off(handleFavDialogEvent)
   if (timerAutoFresh) {
     clearInterval(timerAutoFresh)
     timerAutoFresh = null
@@ -1557,14 +1626,9 @@ async function getPump(rawParams: PumpRequestParams, isFilter = false) {
 
   // 2. 状态拦截
   const isInactive = route.name !== 'index'
-  // const isPaused = isPausedObj.value?.[category] || route.name !== 'index'
-
   if (isInactive) return
-
-  // if (!isFilter && isPaused) {
-  //   Timer[category] = setTimeout(() => getPump(rawParams), 5000)
-  //   return
-  // }
+  const isPaused = isPausedObj.value?.[category]
+  if (isPaused) return
 
   // 3. 构建参数 (浅拷贝避免污染)
   const queryParams: any = { ...rawParams, chain: currentChain }
@@ -1668,7 +1732,7 @@ async function getPump(rawParams: PumpRequestParams, isFilter = false) {
     requestRefresh(finalParams.category as 'new' | 'soon' | 'graduated')
     const isTrue = getFilterNumber(state.pumpFilter || {}, platforms.value, baseTokensAllStr.value) > 0
     if (isTrue) {
-      Timer[category] = setTimeout(() => getPump(rawParams), 5000)
+      Timer[category] = setTimeout(() => getPump(rawParams), category === 'graduated' ? 30000 : 5000)
     } else {
       if (Timer[category]) {
         clearTimeout(Timer[category] as number)
@@ -2063,7 +2127,10 @@ const DIRECT_MAP: [keyof StatisticsItem, keyof PumpObj][] = [
   ['headline_en', 'headline_en'],
   ['summary_score', 'summary_score'],
   ['followers', 'followers'],
-  ['following', 'following']
+  ['following', 'following'],
+  ['commission_sum', 'commission_sum'],
+  ['gas_fee_sum', 'gas_fee_sum'],
+
 ]
 const NUMBER_MAP: [keyof StatisticsItem, keyof PumpObj][] = [
   ['holder_count', 'holders'],//dev_holder_count
@@ -2199,7 +2266,9 @@ const MERGE_KEYS = [
   'followers',
   'following',
   'summary_score',
-  'colluded_cluster_ratio'
+  'colluded_cluster_ratio',
+  'commission_sum',
+  'gas_fee_sum'
 ] as const
 
 function mergeStatistics(prev: any, next: any) {

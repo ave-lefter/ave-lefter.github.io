@@ -14,6 +14,9 @@ import type { IPriceV2Response } from '~/api/types/ws'
 import { useEventBus, useLocalStorage, useStorage } from '@vueuse/core'
 import { BusEventType, type IFavDialogEventArgs } from '~/utils/constants'
 import type { ScrollbarInstance } from 'element-plus'
+const favTokenStore = useFavTokenStore()
+const pumpRemarkEditEvent = useEventBus<IFavDialogEventArgs>(BusEventType.PUMP_REMARK_EDIT)
+pumpRemarkEditEvent.on(handleFavDialogEvent)
 import { VueDraggable } from 'vue-draggable-plus'
 const topEventBus = useEventBus(BusEventType.TOP_FAV_CHANGE)
 topEventBus.on(refresh)
@@ -30,6 +33,7 @@ onUnmounted(() => {
   topEventBus.off(refresh)
   favDialogEvent.off(refresh)
   topAddGroupEvent.off(refresh)
+  pumpRemarkEditEvent.off(handleFavDialogEvent)
 })
 
 function refresh(data:any) {
@@ -71,6 +75,10 @@ watch(
           current_price_usd: item.uprice,
           price_change: item.price_change,
           price_change_v2: item.price_change_v2,
+          t_price_change_24h: item.tprice_change_24h,
+          t_price_change_1d: item.tprice_change_1d,
+          m_price_change_24h: i.support_aggr_kline == 1 ? item.tprice_change_24h : item.price_change_v2,
+          m_price_change_1d: i.support_aggr_kline == 1 ? item.tprice_change_1d : item.price_change,
           pool_circulating_supply:
             (i.total - i.lock_amount - i.burn_amount - i.other_amount) * item.uprice
         }
@@ -107,7 +115,7 @@ const activeTab = shallowRef(0)
 const favoriteCondition = useStorage('favoriteCondition', { currentMode: 'mcap' })
 const sort = shallowRef<{
   activeSort: number
-  sortBy: 'symbol' | 'current_price_usd' | 'price_change' | 'price_change_v2' | null
+  sortBy: 'symbol' | 'current_price_usd' | 'price_change' | 'price_change_v2' | 'm_price_change_24h' | 'm_price_change_1d' | null
 }>({
   activeSort: 0,
   sortBy: null,
@@ -156,7 +164,7 @@ const columns = computed(() => {
         (favoriteCondition.value.currentMode === 'mcap' ? t('mCap') : t('price')) +
         '{currentMode}/' +
         t('Chg')+'%',
-      value: zone.value === '24h' ? 'price_change_v2' : 'price_change',
+      value: zone.value === '24h' ? 'm_price_change_24h' : 'm_price_change_1d',
       currentMode: favoriteCondition.value.currentMode,
       flex: 'flex-1 justify-end',
       sort: true,
@@ -182,7 +190,7 @@ const sortedFavList = computed(() => {
       return (codeB - codeA) * sort.value.activeSort
     })
   }
-  else if(sort.value.sortBy === 'price_change'||sort.value.sortBy === 'price_change_v2'){
+  else if(sort.value.sortBy === 'm_price_change_24h'||sort.value.sortBy === 'm_price_change_1d'){
     return favoritesList.value.toSorted((a: any, b: any) => {
       return ((b[sort.value.sortBy!] || 0) - (a[sort.value.sortBy!] || 0)) * sort.value.activeSort
     })
@@ -219,9 +227,9 @@ watch(
 watch(
   ()=>zone.value,
   (val2) => {
-    if(sortParam.sort_dir&&(sortParam.sort==='price_change_v2' || sortParam.sort==='price_change')){
-      sortParam.sort=(val2==='24h'?'price_change_v2':'price_change')
-      sort.value.sortBy=(val2==='24h'?'price_change_v2':'price_change')
+    if(sortParam.sort_dir&&(sortParam.sort==='m_price_change_24h' || sortParam.sort==='m_price_change_1d')){
+      sortParam.sort=(val2==='24h'?'m_price_change_24h':'m_price_change_1d')
+      sort.value.sortBy=(val2==='24h'?'m_price_change_24h':'m_price_change_1d')
       resetListStatus()
       loadMoreFavorites()
     }
@@ -232,20 +240,20 @@ watch(
   () => sort.value,
   (val) => {
     console.log('sort changed', val)
-    if(val.sortBy==="price_change" || val.sortBy==="price_change_v2"){
+    if(val.sortBy==='m_price_change_24h' || val.sortBy==='m_price_change_1d'){
         sortParam.sort_dir=['asc', '', 'desc'][(val.activeSort||0)+1]
         sortParam.sort=val.sortBy
-       
+
     }else{
       sortParam.sort_dir=''
       sortParam.sort=''
     }
-    
+
     // 当 activeSort 为 0 时，重置 sortBy 以启用拖拽
     if (val.activeSort === 0) {
       sort.value.sortBy = null
     }
-    
+
     resetListStatus()
     loadMoreFavorites()
   }
@@ -385,16 +393,16 @@ function resetListStatus() {
 
 async function handleDragEnd(evt: any) {
   isDragging.value = false
-  
+
   // 获取被拖拽的 item 信息
   const draggedItem = favoritesList.value[evt.newIndex]
   if (!draggedItem) return
-  
+
   const moves = [{
     token_id: draggedItem.token + '-' + draggedItem.chain,
     new_index: evt.newIndex + 1  // API 使用 1-based index
   }]
-  
+
   // 更新排序
   try {
     await batchChangeFavoritesIndex(walletAddress.value, activeTab.value, moves)
@@ -423,6 +431,12 @@ function toggleMode(mode: string) {
     favoriteCondition.value.currentMode = 'mcap'
   }
   console.log('toggleMode', mode)
+}
+function handleFavDialogEvent({ type }: IFavDialogEventArgs) {
+  if (type === 'pump_remark_edit' && favTokenStore.visible) {
+    resetListStatus()
+    loadMoreFavorites()
+  }
 }
 </script>
 
@@ -494,9 +508,9 @@ function toggleMode(mode: string) {
             :to="`/token/${row.token}-${row.chain}`"
           >
               <div class="flex items-center flex-1">
-                <Icon 
+                <Icon
                   v-if="sort.activeSort === 0 && !sort.sortBy"
-                  name="material-symbols:dehaze" 
+                  name="material-symbols:dehaze"
                   class="text-14px text-[--third-text] cursor-move drag-handle3 w-0 group-hover:w-14px mr-0 group-hover:mr-6px transition-all duration-200 overflow-hidden"
                 />
               <TokenImg class="mr-8px" :row="{...row,issue_platform:''}" v-tooltip="{
@@ -539,14 +553,14 @@ function toggleMode(mode: string) {
               <div v-else>${{ formatNumber(row.pool_circulating_supply || 0, 2) }}</div>
               <div
                 :class="`flex-1 text-right text-12px
-                ${getColorClass((zone==='24h'? row.price_change_v2 :row.price_change))}
-            `"
+                ${getColorClass((zone==='24h'? row.m_price_change_24h :row.m_price_change_1d) || 0)}`
+            "
               >
-                <template v-if="Number((zone==='24h'? row.price_change_v2 :row.price_change)) === 0">0%</template>
-                <template v-else-if="!(zone==='24h'? row.price_change_v2 :row.price_change) || (zone==='24h'? row.price_change_v2 :row.price_change) === '--'">--</template>
+                <template v-if="Number((zone==='24h'? row.m_price_change_24h :row.m_price_change_1d)) === 0">0%</template>
+                <template v-else-if="!(zone==='24h'? row.m_price_change_24h :row.m_price_change_1d) || (zone==='24h'? row.m_price_change_24h :row.m_price_change_1d) === '--'">--</template>
                 <template v-else>
-                  {{ Number((zone==='24h'? row.price_change_v2 :row.price_change)) > 0 ? '+' : '-'
-                  }}{{ formatNumber(Math.abs(Number((zone==='24h'? row.price_change_v2 :row.price_change))) || 0, 2) }}%
+                  {{ Number((zone==='24h'? row.m_price_change_24h :row.m_price_change_1d)) > 0 ? '+' : '-'
+                  }}{{ formatNumber(Math.abs(Number((zone==='24h'? row.m_price_change_24h :row.m_price_change_1d))) || 0, 2) }}%
                 </template>
               </div>
             </div>

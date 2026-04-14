@@ -228,6 +228,12 @@ function mergeStatistics(source: any) {
   if (source?.colluded_cluster_ratio != null) {
     tagsRatio.value.colluded_cluster_ratio = source.colluded_cluster_ratio
   }
+  if (source?.commission_sum != null && tokenStore.tokenInfoExtra) {
+    tokenStore.tokenInfoExtra.commission_sum = source.commission_sum
+  }
+  if (source?.gas_fee_sum != null && tokenStore.tokenInfoExtra) {
+    tokenStore.tokenInfoExtra.gas_fee_sum = source.gas_fee_sum
+  }
 }
 const similarTokenList = ref([])
 async function _getSimilarToken() {
