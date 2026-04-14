@@ -23,7 +23,7 @@ const topAddGroupEvent = useEventBus(BusEventType.TOP_ADD_GROUP)
 topAddGroupEvent.on(_getUserFavoriteGroups)
 
 const otherListArea = ref<ScrollbarInstance>()
-const {updateNum11,delTokenGroup} = storeToRefs(useFollowStore())
+const {updateNum4,updateNum11,delTokenGroup} = storeToRefs(useFollowStore())
 const isDragging = ref(false)
 
 onUnmounted(() => {
@@ -398,7 +398,7 @@ async function handleDragEnd(evt: any) {
   // 更新排序
   try {
     await batchChangeFavoritesIndex(walletAddress.value, activeTab.value, moves)
-    
+    updateNum4.value++
     ElMessage.success(t('success'))
     favDialogEvent.emit({
       type: 'order',
