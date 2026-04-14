@@ -8,7 +8,19 @@ import ArcProgress from '~/components/arcProgress.vue'
 import { getNewFavoriteList, getUserFavoriteGroups, removeFavorite, removeFavoriteGroup, addFavoriteGroup, changeFavoriteGroupName, moveFavoriteGroup, editTokenFavRemark, getGroupChangeIndex, batchDeleteFavorite } from '~/api/fav'
 import { WSEventType } from '~/utils/constants'
 import type { TableInstance } from 'element-plus'
+import { useEventBus, useLocalStorage, useStorage } from '@vueuse/core'
+import { BusEventType, type IFavDialogEventArgs } from '~/utils/constants'
+const favDialogEvent = useEventBus<IFavDialogEventArgs>(BusEventType.FAV_DIALOG)
+favDialogEvent.on(refresh)
 
+function refresh(data:any) {
+   setActiveTab(activeTab.value)
+}
+
+
+onUnmounted(() => {
+  favDialogEvent.off(refresh)
+})
 let sortParam:any={}
 
 let timeoutId: any = null;
