@@ -777,7 +777,7 @@
                   v-show="pumpSetting?.define?.some((i) => i === 'txs')"
                   class="flex-end text-12px pr-12px bg-1 py-2px"
                 >
-                  <!-- <div class="flex-end bg-1">
+                  <div class="flex-end bg-1">
                     <div class="mr-2px color-[--third-text1]">F</div>
                     <img
                       v-if="row?.chain"
@@ -788,7 +788,7 @@
                         {{ formatNumber((Number(row?.commission_sum ?? 0) + Number(row?.gas_fee_sum ?? 0)) , 2) }}
                     </span>
                     <span v-else class="color-[--third-text1]" >0</span>
-                  </div> -->
+                  </div>
                   <div v-tooltip.raw="{
                         content: `<div class='max-w-[400px] color-[--secondary-text]'>${$t('netInflow')}: <span class=${ 'color-'+(Number(row?.net_flow_vol) === 0 || row?.net_flow_vol == null? '' : ((row?.net_flow_vol||0)>0?'[--up-color]':'[--down-color]'))}>${Number(row?.net_flow_vol) === 0 || row?.net_flow_vol == null? 0 : ( (row?.net_flow_vol > 0 ? '+$' : '-$')+ formatNumber(Math.abs(row?.net_flow_vol ?? 0), { decimals: 2, l: 4, limit: 3, locale: 'en' }))}</span> </div>`,
                         props: {
