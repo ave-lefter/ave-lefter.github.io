@@ -38,7 +38,7 @@
         <div :ref="(el) => virtualizer.measureElement(el)" :data-index="virtualRow.index"
           class="border-b-1px border-b-solid border-b-[--border]">
           <ListItem :item="getItem(virtualRow)" :index="virtualRow.index" @measureElement="virtualizer.measureElement(el)" />
-          <div v-if="['2', '3', '4'].includes(getItem(virtualRow).type) && (getItem(virtualRow).retweeted_tweet || getItem(virtualRow).quoted_tweet || getItem(virtualRow).replied_tweet)"
+          <div v-if="['2', '3', '4','5'].includes(getItem(virtualRow).type) && (getItem(virtualRow).retweeted_tweet || getItem(virtualRow).quoted_tweet || getItem(virtualRow).replied_tweet)"
             class="border-1px border-solid border-[--dialog-divider] rounded-8px px-12px pt-16px ml-0px mb-16px">
             <ListItem :item="getItem(virtualRow).retweeted_tweet || getItem(virtualRow).quoted_tweet || getItem(virtualRow).replied_tweet" :index="-1" @measureElement="virtualizer.measureElement(el)" />
           </div>

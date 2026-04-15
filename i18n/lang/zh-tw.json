@@ -2154,6 +2154,8 @@
   "emailCodeAuth": "信箱驗證碼",
   "googleAuth2": "谷歌驗證器",
   "myRemark": "我的備註",
+  "closeDragMode": "開啟拖曳排序",
+  "openSortMode": "關閉拖曳排序",
   "autoTranslationOn": "開啟自動翻譯",
   "autoTranslationOFF": "关闭自动翻译"
 }

@@ -2168,6 +2168,8 @@
   "emailCodeAuth": "邮箱验证码",
   "googleAuth2": "谷歌验证器",
   "myRemark": "我的备注",
+  "closeDragMode": "开启拖拽排序",
+  "openSortMode": "关闭拖拽排序",
   "autoTranslationOn": "开启自动翻译",
   "autoTranslationOFF": "关闭自动翻译"
 }

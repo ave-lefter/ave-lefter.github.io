@@ -2167,6 +2167,8 @@
   "emailCodeAuth": "Email Verification",
   "googleAuth2": "Google Authenticator",
   "myRemark": "My Remarks",
+  "closeDragMode": "Enable sorting",
+  "openSortMode": "Disable sorting",
   "autoTranslationOn": "ON Auto-Translation",
   "autoTranslationOFF": "OFF Auto-Translation"
 }

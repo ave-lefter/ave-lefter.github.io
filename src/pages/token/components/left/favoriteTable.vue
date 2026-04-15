@@ -28,6 +28,7 @@ topAddGroupEvent.on(_getUserFavoriteGroups)
 const otherListArea = ref<ScrollbarInstance>()
 const {updateNum4,updateNum11,delTokenGroup} = storeToRefs(useFollowStore())
 const isDragging = ref(false)
+const isDragModeEnabled = useStorage('fav-isDragModeEnabled', false)
 
 onUnmounted(() => {
   topEventBus.off(refresh)
@@ -254,6 +255,11 @@ watch(
       sort.value.sortBy = null
     }
 
+    // 点击排序后自动关闭拖拽模式
+    if (val.activeSort !== 0 || val.sortBy) {
+      isDragModeEnabled.value = false
+    }
+
     resetListStatus()
     loadMoreFavorites()
   }
@@ -432,6 +438,18 @@ function toggleMode(mode: string) {
   }
   console.log('toggleMode', mode)
 }
+
+function toggleDragMode() {
+  isDragModeEnabled.value = !isDragModeEnabled.value
+    // 开启拖拽模式时，清除排序状态
+  if (isDragModeEnabled.value) {
+    sort.value.activeSort = 0
+    sort.value.sortBy = null
+    sortParam.sort = ''
+    sortParam.sort_dir = ''
+  }
+}
+
 function handleFavDialogEvent({ type }: IFavDialogEventArgs) {
   if (type === 'pump_remark_edit' && favTokenStore.visible) {
     resetListStatus()
@@ -478,11 +496,20 @@ function handleFavDialogEvent({ type }: IFavDialogEventArgs) {
           <Icon name="material-symbols:arrow-forward-ios-rounded" />
         </span>
       </div>
-      <Icon
-        name="custom:remark"
-        class="shrink-0 text-12px mr-0 cursor-pointer color-[--third-text] hover:color-#286DFF"
-        @click.self="onEdit"
-      />
+      <div class="flex items-center gap-4px">
+        <Icon
+          v-tooltip="!isDragModeEnabled ? t('closeDragMode') : t('openSortMode')"
+          name="custom:move1"
+          class="shrink-0 text-11px cursor-pointer"
+          :class="isDragModeEnabled ? 'color-#286DFF' : 'color-[--third-text]'"
+          @click="toggleDragMode"
+        />
+        <Icon
+          name="custom:remark"
+          class="shrink-0 text-12px cursor-pointer color-[--third-text] hover:color-#286DFF"
+          @click.self="onEdit"
+        />
+      </div>
     </div>
     <THead v-model:sort="sort" :columns="columns" :toggleMode="toggleMode" />
     <el-scrollbar ref="otherListArea" :height="scrollbarHeight">
@@ -496,23 +523,18 @@ function handleFavDialogEvent({ type }: IFavDialogEventArgs) {
         <VueDraggable
           v-model="favoritesList"
           :animation="300"
-          :disabled="sort.activeSort !== 0 || !!sort.sortBy"
+          :disabled="!isDragModeEnabled"
           @start="handleDragStart"
           :force-fallback="true"
           @end="handleDragEnd"
         >
           <NuxtLink
-            v-for="(row, $index) in (sort.activeSort === 0 && !sort.sortBy) ? favoritesList : sortedFavList"
+            v-for="(row, $index) in isDragModeEnabled ? favoritesList : sortedFavList"
             :key="`${row.token}-${row.chain}`"
             class="px-10px flex items-center h-40px cursor-pointer hover:bg-[--dialog-bg] group"
             :to="`/token/${row.token}-${row.chain}`"
           >
               <div class="flex items-center flex-1">
-                <Icon
-                  v-if="sort.activeSort === 0 && !sort.sortBy"
-                  name="material-symbols:dehaze"
-                  class="text-14px text-[--third-text] cursor-move drag-handle3 w-0 group-hover:w-14px mr-0 group-hover:mr-6px transition-all duration-200 overflow-hidden"
-                />
               <TokenImg class="mr-8px" :row="{...row,issue_platform:''}" v-tooltip="{
                 content:{
                   is:TokenImg,
@@ -564,8 +586,13 @@ function handleFavDialogEvent({ type }: IFavDialogEventArgs) {
                 </template>
               </div>
             </div>
+            <Icon
+              v-if="isDragModeEnabled"
+              name="material-symbols:dehaze"
+              class="text-14px text-[--third-text] cursor-move drag-handle3 ml-6px"
+            />
           </NuxtLink>
-          <AveEmpty v-if="((sort.activeSort === 0 && !sort.sortBy) ? favoritesList.length : sortedFavList.length) === 0 && !listStatus.loading" />
+          <AveEmpty v-if="(isDragModeEnabled ? favoritesList.length : sortedFavList.length) === 0 && !listStatus.loading" />
         </VueDraggable>
         <div
           v-if="listStatus.loading && listStatus.pageNo > 1"
