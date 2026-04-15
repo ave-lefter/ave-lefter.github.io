@@ -33,6 +33,57 @@ const visible = computed({
 const isLoading = shallowRef(false)
 const userBriefData = ref()
 const attentionKey = ref(0)
+
+// 缓存请求结果，最多 50 个
+interface CacheItem {
+  data: any
+  timestamp: number
+}
+const requestCache = new Map<string, CacheItem>()
+const CACHE_MAX_SIZE = 50
+const CACHE_EXPIRE_TIME = 60 * 60 * 1000 // 1 小时（毫秒）
+
+// 生成缓存 key
+function getCacheKey(user_address: string, chain: string, token: string): string {
+  return `${user_address}_${chain}_${token}`
+}
+
+// 检查缓存是否过期
+function isCacheExpired(cacheItem: CacheItem): boolean {
+  return Date.now() - cacheItem.timestamp > CACHE_EXPIRE_TIME
+}
+
+// 管理缓存大小，超过 50 个时删除最早的
+function manageCacheSize() {
+  // 使用 while 循环确保删除到不超过 50 个
+  while (requestCache.size > CACHE_MAX_SIZE) {
+    const firstKey = requestCache.keys().next().value
+    if (firstKey) {
+      requestCache.delete(firstKey)
+    } else {
+      break
+    }
+  }
+}
+
+// 清理过期的缓存
+function cleanExpiredCache() {
+  const now = Date.now()
+  const expiredKeys: string[] = []
+  
+  // 先收集所有过期的 key
+  for (const [key, cacheItem] of requestCache.entries()) {
+    if (now - cacheItem.timestamp > CACHE_EXPIRE_TIME) {
+      expiredKeys.push(key)
+    }
+  }
+  
+  // 再统一删除，避免遍历时修改 Map
+  expiredKeys.forEach(key => {
+    requestCache.delete(key)
+  })
+}
+
 watch(() => props.currentRow?.wallet_address||'', () => {
   if (props.currentRow) {
     _getTxsUserBrief()
@@ -42,6 +93,11 @@ watch(() => props.currentRow?.wallet_address||'', () => {
 const botStore = useBotStore()
 const walletStore = useWalletStore()
 
+// 组件卸载时清理缓存
+onUnmounted(() => {
+  requestCache.clear()
+})
+
 async function _getTxsUserBrief() {
   const data = {
     user_address: props.currentRow.wallet_address,
@@ -49,11 +105,27 @@ async function _getTxsUserBrief() {
     chain: props.addressAndChain.chain,
     token: props.addressAndChain.address
   }
+  
+  // 生成缓存 key
+  const cacheKey = getCacheKey(data.user_address, data.chain, data.token)
+  
+  // 检查缓存是否存在且未过期
+  if (requestCache.has(cacheKey)) {
+    const cachedItem = requestCache.get(cacheKey)!
+    if (!isCacheExpired(cachedItem)) {
+      userBriefData.value = cachedItem.data
+      return
+    } else {
+      // 缓存已过期，删除
+      requestCache.delete(cacheKey)
+    }
+  }
+  
   isLoading.value = true
   try {
     const res = await getTxsUserBrief(data)
     if (res) {
-      userBriefData.value = {
+      const result = {
         ...res,
         ratio: Number(res.history_max_balance_amount) > 0
           ? Math.min(new BigNumber(res.balance_amount)
@@ -64,6 +136,18 @@ async function _getTxsUserBrief() {
         // isLoad
         isLoading: (res.total_sold_usd === '') && (res.total_purchase_usd === ''),
       }
+      
+      // 存入缓存，记录时间戳
+      requestCache.set(cacheKey, {
+        data: result,
+        timestamp: Date.now()
+      })
+      
+      // 先清理过期缓存，再管理缓存大小
+      cleanExpiredCache()
+      manageCacheSize()
+      
+      userBriefData.value = result
     }
   } catch (e) {
     console.log('=>(markerTooltip.vue:38) e', e)
