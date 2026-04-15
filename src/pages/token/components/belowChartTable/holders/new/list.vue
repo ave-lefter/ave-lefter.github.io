@@ -515,12 +515,12 @@
           getChainInfo(addressAndChain.chain)?.main_name +
           $t('origin') +
           '/' +
-          $t('time')
+          $t('createdTime')
         "
         :width="getTextWidth(getChainInfo(addressAndChain.chain)?.main_name +
           $t('origin') +
           '/' +
-          $t('time'))+ 70"
+          $t('createdTime'))+ 70"
         align="right"
         min-width="150"
       >
@@ -596,10 +596,10 @@
       </el-table-column>
       <el-table-column
         class-name="bg-286DFF1A"
-        :label="token?.symbol + $t('origin') + '/' + $t('time')"
+        :label="token?.symbol + $t('origin') + '/' + $t('transferTime')"
         align="right"
         min-width="150"
-        :width="getTextWidth(token?.symbol + $t('origin') + '/' + $t('time'))+ 70"
+        :width="getTextWidth(token?.symbol + $t('origin') + '/' + $t('transferTime'))+ 70"
       >
         <template #default="{ row }">
           <div

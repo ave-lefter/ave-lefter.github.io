@@ -957,6 +957,7 @@
   "swapFail": "Swap failed",
   "insufficentFunds": "Insufficent funds",
   "insufficentGasSOL": "Not enough SOL to pay gas fee",
+  "insufficentGas": "Insufficient {symbol} balance to pay gas fee, at least {min} {symbol} required",
   "insufficentFundsSol": "Insufficient SOL balance",
   "networkIsUnstable": "Network is unstable, please try again later",
   "swapUnknownError": "Transaction purchase failed...\n\nTry the following methods to try again:\n- Manually increase slippage\n- Change buy or sell token\n- reset the purchase quantity, etc.",
@@ -2170,5 +2171,6 @@
   "closeDragMode": "Enable sorting",
   "openSortMode": "Disable sorting",
   "autoTranslationOn": "ON Auto-Translation",
-  "autoTranslationOFF": "OFF Auto-Translation"
+  "autoTranslationOFF": "OFF Auto-Translation",
+  "transferTime": "Transfer Time"
 }
