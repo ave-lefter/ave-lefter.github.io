@@ -1,6 +1,6 @@
 <template>
   <el-dialog align-center v-model="localVisible" header-class="hidden"
-    class="border-1px border-solid border-[--main-divider] dialog color-[--main-text1]" title="" :width="488"
+    class="[--el-bg-color:--d-0E0F10-l-FFF] border-1px border-solid border-[--main-divider] dialog color-[--main-text1]" title="" :width="488"
     style="padding: 0" append-to-body :persistent="false" :show-close="false">
     <template #default>
       <div

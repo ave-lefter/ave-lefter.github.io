@@ -19,6 +19,8 @@ export interface IPriceV2Response {
     volume_u_24h: number;
     change: number;
     token: string;
+    tprice_change_24h: string;
+    tprice_change_1d: string;
   }[];
 }
 
