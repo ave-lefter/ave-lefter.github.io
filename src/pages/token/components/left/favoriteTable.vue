@@ -496,19 +496,20 @@ function handleFavDialogEvent({ type }: IFavDialogEventArgs) {
           <Icon name="material-symbols:arrow-forward-ios-rounded" />
         </span>
       </div>
-
-      <Icon
-        v-tooltip="!isDragModeEnabled ? t('closeDragMode') : t('openSortMode')"
-        name="custom:move1"
-        class="shrink-0 text-11px mx-4px cursor-pointer"
-        :class="isDragModeEnabled ? 'color-#286DFF' : 'color-[--third-text]'"
-        @click="toggleDragMode"
-      />
-      <Icon
-        name="custom:remark"
-        class="shrink-0 text-12px mr-0 cursor-pointer color-[--third-text] hover:color-#286DFF"
-        @click.self="onEdit"
-      />
+      <div class="flex items-center gap-4px">
+        <Icon
+          v-tooltip="!isDragModeEnabled ? t('closeDragMode') : t('openSortMode')"
+          name="custom:move1"
+          class="shrink-0 text-11px cursor-pointer"
+          :class="isDragModeEnabled ? 'color-#286DFF' : 'color-[--third-text]'"
+          @click="toggleDragMode"
+        />
+        <Icon
+          name="custom:remark"
+          class="shrink-0 text-12px cursor-pointer color-[--third-text] hover:color-#286DFF"
+          @click.self="onEdit"
+        />
+      </div>
     </div>
     <THead v-model:sort="sort" :columns="columns" :toggleMode="toggleMode" />
     <el-scrollbar ref="otherListArea" :height="scrollbarHeight">
