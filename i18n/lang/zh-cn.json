@@ -2097,6 +2097,7 @@
   "cancelMonitorSuccess": "取消监控成功",
   "tokenTax": "代币税",
   "totalTax": "总手续费",
+  "totalTaxTip": "总手续费包括优先费 & 贿赂费 & 交易费",
   "taxTip": "代币税：代币税率",
   "smarterAddress": "聪明钱包数",
   "kolSummary": "共有{people}位{type}, 目前有{holders}人持仓, {type}持仓{vol},占比{ratio}",
@@ -2168,5 +2169,7 @@
   "googleAuth2": "谷歌验证器",
   "myRemark": "我的备注",
   "closeDragMode": "开启拖拽排序",
-  "openSortMode": "关闭拖拽排序"
+  "openSortMode": "关闭拖拽排序",
+  "autoTranslationOn": "开启自动翻译",
+  "autoTranslationOFF": "关闭自动翻译"
 }

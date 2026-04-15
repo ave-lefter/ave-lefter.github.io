@@ -262,7 +262,7 @@ async function getTokenBalance(chain: string) {
       decimals: token.decimals || token.decimal
     }
   }
-}
+}defineExpose({ submitBotSwap })
 </script>
 
 <template>

@@ -13,6 +13,7 @@
       <div class="flex flex-col gap-8px">
         <div v-for="token in tokens" :key="token.id" class="flex items-center gap-8px cursor-pointer"
           @click="navigateTo(`/token/${token.token}-${token.chain}`)">
+          <TokenImg :row="token" />
           <div class="flex-1">
             <div class="color-[--main-text] text-12px">{{ token.symbol }}</div>
             <div class="lh-12px text-10px color-[--third-text]">

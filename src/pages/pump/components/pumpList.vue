@@ -137,7 +137,7 @@
                     >
                       <Icon class="text-16px text-#fff" name="custom:search" />
                     </a>
-                    <div v-if="!isOut" class="bg-btn bg-[--secondary-bg] absolute bottom--8px left--10px !rounded-4px border border-1 border-solid border-[--border] color-[--yellow] text-9px">
+                    <div v-show="!isOut" class="bg-btn bg-[--secondary-bg] absolute bottom--8px left--10px !rounded-4px border border-1 border-solid border-[--border] color-[--yellow] text-9px">
                       {{(row?.progress || 0).toFixed(0)}}%
                     </div>
                     <el-image
@@ -198,7 +198,7 @@
                     >
                       <span
                         v-if="Number(row.buy_tax) == Number(row.sell_tax)"
-                        class="bg-[--d-1E2025-l-E8F1FF] rounded-4px px-2px text-10px"
+                        class="bg-[--d-1E2025-l-E8F1FF] rounded-4px px-2px text-10px mr-4px"
                         :style="{
                               color:(Number(row?.sell_tax) > 0 ? '#F6465D' : 'var(--secondary-text1)'),
                           }"
@@ -217,7 +217,7 @@
                     </span>
                     <span
                       v-else-if="Number(row.buy_tax)"
-                      class="bg-[--d-1E2025-l-E8F1FF] rounded-4px px-2px text-10px"
+                      class="bg-[--d-1E2025-l-E8F1FF] rounded-4px px-2px text-10px mr-4px"
                       :style="{
                             color:(Number(row?.buy_tax) > 0 ? '#F6465D' : 'var(--secondary-text1)'),
                         }"
@@ -226,15 +226,16 @@
                     </span>
                     <span
                       v-else-if="Number(row.sell_tax)"
-                      class="bg-[--d-1E2025-l-E8F1FF] rounded-4px text-10px"
+                      class="bg-[--d-1E2025-l-E8F1FF] rounded-4px text-10px mr-4px"
                         :style="{
                             color:(Number(row?.sell_tax) > 0 ? '#F6465D' : 'var(--secondary-text1)'),
                         }"
                     >
                       S {{ formatNumber(row?.sell_tax || 0, 2) }}%
                     </span>
+                    <!-- <span  class="py-1px px-4px rounded-4px; bg-#ffa6221a color-[--yellow] text-9px lh-12px">持仓</span> -->
                   </div>
-                  <div v-if="(lang === 'zh-cn' || lang === 'zh-tw') && (row.symbol_zh || row.name_zh) && row.symbol_zh !== row.symbol || (!(lang === 'zh-cn' || lang === 'zh-tw')) && (row.symbol_en || row.name_en) && row.symbol_en !== row.symbol" class="flex-start text-11px line-height-14px mt-2px color-[--yellow] whitespace-nowrap overflow-hidden">
+                  <div v-if="pumpSetting.isLang && (lang === 'zh-cn' || lang === 'zh-tw') && (row.symbol_zh || row.name_zh) && row.symbol_zh !== row.symbol || (!(lang === 'zh-cn' || lang === 'zh-tw')) && (row.symbol_en || row.name_en) && row.symbol_en !== row.symbol" class="flex-start text-11px line-height-14px mt-2px color-[--yellow] whitespace-nowrap overflow-hidden">
                     <template v-if="lang === 'zh-cn' || lang === 'zh-tw'">
                       {{ row.symbol_zh || '' }}&nbsp;&nbsp;{{ row.name_zh || '' }}
                     </template>
@@ -277,7 +278,7 @@
                           </template>
                       </div>
                       <img
-                        v-if="row.baseToken"
+                        v-show="row.baseToken"
                           v-tooltip="{
                           content:getLiqTooltip(row),
                           props: { 'raw-content': true, 'popper-class': 'pump-tooltip' }
@@ -573,7 +574,7 @@
                     </div>
                   </div>
                   <div class="flex-start text-12px absolute bottom-0"
-                  :class=" ((lang === 'zh-cn' || lang === 'zh-tw') && (row.symbol_zh || row.name_zh) && row.symbol_zh !== row.symbol || (!(lang === 'zh-cn' || lang === 'zh-tw')) && (row.symbol_en || row.name_en) && row.symbol_en !== row.symbol) && hasTwitterXUser(row.medias)? '' : 'absolute bottom-0px'"
+                  :class="pumpSetting.isLang && ((lang === 'zh-cn' || lang === 'zh-tw') && (row.symbol_zh || row.name_zh) && row.symbol_zh !== row.symbol || (!(lang === 'zh-cn' || lang === 'zh-tw')) && (row.symbol_en || row.name_en) && row.symbol_en !== row.symbol) && hasTwitterXUser(row.medias)? '' : 'absolute bottom-0px'"
                   >
                     <div
                       v-show="pumpSetting?.define?.some((i) => i === 'top')"
@@ -721,7 +722,7 @@
                   </div>
                 </div>
               </div>
-              <div class="pump-right">
+              <div class="pump-right" @click.stop="handlePumpRightClick(row)">
                 <div
                  v-show="(pumpSetting.border && pumpSetting.size_swap === '16px') || pumpSetting.bgList?.includes(row.platform)"
                  class="w-160px h-120px absolute z-2 top--12px right--8px border border-solid rounded-8px" :style="{background:  pumpSetting.bgList?.includes(row.platform)? pumpSetting?.bg?.[row.platform]?.bg : ( pumpSetting.border &&  pumpSetting.size_swap ==='16px'? '#12B88614': ''), 'border-color': pumpSetting.border &&  pumpSetting.size_swap ==='16px'? (pumpSetting.border =='border_hight' ? '#12B886': 'var(--border)') : 'transparent' ,'box-shadow': pumpSetting.border &&  pumpSetting.size_swap ==='16px'? (pumpSetting.border =='border_hight' ? '0px 0px 10px 0px #12B88699': '0px 2px 10px 0px var(--border)') : ''}"
@@ -731,7 +732,7 @@
                   v-if="
                     (isSoon && row.progress > 99) || pumpSetting?.define?.some((i) => i === 'mcap')
                   "
-                  class="flex-end text-12px pr-12px bg-1"
+                  class="flex-end text-12px bg-1"
                   :class="pumpSetting.fontSize_mc =='12px'? 'mb-2px' : 'mb-0px'"
                 >
                   <div v-if="isSoon && row.progress >= 99.99" class="bg-1 flex-end py-2px">
@@ -775,9 +776,9 @@
                 </div>
                 <div
                   v-show="pumpSetting?.define?.some((i) => i === 'txs')"
-                  class="flex-end text-12px pr-12px bg-1 py-2px"
+                  class="flex-end text-12px bg-1 py-2px"
                 >
-                  <div class="flex-end bg-1">
+                  <div class="flex-end bg-1 cursor-pointer" v-tooltip="$t('totalTaxTip')">
                     <div class="mr-2px color-[--third-text1]">F</div>
                     <img
                       v-if="row?.chain"
@@ -829,7 +830,7 @@
                     />
                   </div>
                 </div>
-                <div class="btns-swap flex-end pr-12px" :style="{ background:  pumpSetting.bgList?.includes(row.platform)? pumpSetting?.bg?.[row.platform]?.bg : '' }">
+                <div class="btns-swap flex-end pr-12px" :style="{ background:  pumpSetting.bgList?.includes(row.platform)? pumpSetting?.bg?.[row.platform]?.bg : '' }" @click.stop="handlePumpRightClick(row)">
                   <div
                     v-if="row?.state === 'migrating'"
                     style="
@@ -856,10 +857,11 @@
                   </div>
                   <QuickSwap
                     v-if="parseInt(pumpSetting?.size_swap|| '0') > 0"
+                    :ref="el => el && (quickSwapRefs[row.target_token + '-' + row.chain] = el)"
                     :quickBuyValue="quickBuyValue"
                     :swapSetSelected="props.swapSetSelected"
                     :row="row"
-                    :classNames="pumpSetting.border &&  pumpSetting.size_swap ==='16px' ? '' :'bg-[--up-color] color-#fff'"
+                    :classNames="pumpSetting.border &&  pumpSetting.size_swap ==='16px' ? 'bg-[transparent]' :'bg-[--up-color] color-#fff'"
                     :size="pumpSetting.size_swap"
                     @jump="jump(row)"
                   />
@@ -1215,6 +1217,14 @@ function getDataColor(type: string, num: number) {
     }
   }
 }
+const quickSwapRefs: Record<string, any> = {}
+
+function handlePumpRightClick(row: any) {
+  if (parseInt(pumpSetting?.value.size_swap || '0') <= 0) return
+  const key = row.target_token + '-' + row.chain
+  quickSwapRefs[key]?.submitBotSwap?.()
+}
+
 function jump (row: { target_token: string; chain: string }) {
   if (pumpSetting.value.jump == 'open') {
   router.push({
@@ -1389,7 +1399,7 @@ defineExpose({
     .pump-right {
       // box-shadow: -2px 0px 4px 0px #00000099;
       // background: var(--secondary-bg);
-      width: 0;
+      width: 160px;
       position: absolute;
       right: 0;
       top: 0;
@@ -1416,8 +1426,8 @@ defineExpose({
   }
   .token-logo {
     // margin-right: 12px;
-    // width: 64px;
-    // height: 64px;
+    width: 60px;
+    // height: 60px;
     position: relative;
     display: flex;
     align-items: center;
