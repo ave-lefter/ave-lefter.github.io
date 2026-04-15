@@ -2165,5 +2165,7 @@
   "gridTip": "Please keep at least one category displayed",
   "emailCodeAuth": "Email Verification",
   "googleAuth2": "Google Authenticator",
-  "myRemark": "My Remarks"
+  "myRemark": "My Remarks",
+  "closeDragMode": "Enable sorting",
+  "openSortMode": "Disable sorting"
 }

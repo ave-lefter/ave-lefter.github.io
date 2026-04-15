@@ -2166,5 +2166,7 @@
   "gridTip": "至少保留一个分类显示",
   "emailCodeAuth": "邮箱验证码",
   "googleAuth2": "谷歌验证器",
-  "myRemark": "我的备注"
+  "myRemark": "我的备注",
+  "closeDragMode": "开启拖拽排序",
+  "openSortMode": "关闭拖拽排序"
 }
