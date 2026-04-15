@@ -28,7 +28,7 @@ topAddGroupEvent.on(_getUserFavoriteGroups)
 const otherListArea = ref<ScrollbarInstance>()
 const {updateNum4,updateNum11,delTokenGroup} = storeToRefs(useFollowStore())
 const isDragging = ref(false)
-const isDragModeEnabled = ref(false)
+const isDragModeEnabled = useStorage('fav-isDragModeEnabled', false)
 
 onUnmounted(() => {
   topEventBus.off(refresh)
