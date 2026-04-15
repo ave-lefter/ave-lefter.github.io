@@ -148,6 +148,7 @@ export const SupportTokenKlineLaunchpad = [
   'bsc-four.meme',
   'bsc-flap.sh',
   'bsc-four_agent_meme',
+  'bsc-web3.binance.com',
   'solana-dexscreener.com',
   'solana-pump.fun',
   'solana-time.fun',
