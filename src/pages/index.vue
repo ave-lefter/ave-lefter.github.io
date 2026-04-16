@@ -21,7 +21,7 @@
           <!-- <span>{{ item.chain_show || '' }}</span> -->
         </div>
       </div>
-      <div class="bg-[--main-input-button-bg] rounded-4px mr-8px text-12px px-10px py-7px flex items-center justify-center gap-6px">
+      <!-- <div class="bg-[--main-input-button-bg] rounded-4px mr-8px text-12px px-10px py-7px flex items-center justify-center gap-6px">
         <div
           class="flex items-center justify-center cursor-pointer"
           v-for="item in tabsList"
@@ -34,70 +34,50 @@
             class="text-10px color-[--third-text1] ml-4px"
           />
         </div>
-      </div>
-      <!-- <el-popover
-        v-model:visible="visible_platforms"
+      </div> -->
+      <el-popover
         placement="bottom-start"
         popper-class="new-popover"
         :width="'auto'"
         :persistent="false"
         trigger="click"
+        v-model:visible="gridPopoverVisible"
       >
         <template #reference>
-          <el-button class="btn mr-16px">
-            <template v-for="(i, $index) in platformsList" :key="$index">
-              <el-image
-                class="mr-5px rounded w-14px"
-                :src="`${token_logo_url}${i.platform_icon?.replace(
-                  '/signals/',
-                  'signals/'
-                )}`"
-              />
-              <span v-if="platformsList?.length == 1">{{
-                i.platform_show
-              }}</span>
-            </template>
+          <div class="bg-[--main-input-button-bg] rounded-4px mr-8px text-12px px-10px py-7px flex items-center justify-center gap-6px cursor-pointer">
+            <span class="color-[--main-text1]">
+              {{ tabsList.every(i => pumpSetting.grid[i.id].show) ? $t('all') : (tabsList.filter(i => pumpSetting.grid[i.id].show).map(i => i.name).join('、') || '—') }}
+            </span>
             <Icon
-              :name="
-                isRotate
-                  ? 'radix-icons:triangle-up'
-                  : 'radix-icons:triangle-down'
-              "
-              class="text-16px color-[--main-text]"
+              :name="gridPopoverVisible ? 'radix-icons:triangle-up' : 'radix-icons:triangle-down'"
+              class="text-16px"
             />
-          </el-button>
+          </div>
         </template>
         <template #default>
-          <template v-for="item in pumpConfig" :key="item.chain">
-            <template v-if="item.chain === activeChain">
-              <el-checkbox-group
-                v-model="pumpV3[activeChain].platforms as string[]"
-                class="pump-platforms flex flex-col"
-              >
-                <el-checkbox
-                  v-for="i in item.platforms"
-                  :key="i.platform"
-                  :label="i.platform_show"
-                  :value="i.platform"
-                  :disabled="
-                    pumpV3[activeChain].platforms?.includes(i.platform) &&
-                    pumpV3[activeChain].platforms?.length === 1
-                  "
-                >
-                  <el-image
-                    class="mr-5px rounded w-14px"
-                    :src="`${token_logo_url}${i.platform_icon?.replace(
-                      '/signals/',
-                      'signals/'
-                    )}`"
-                  />
-                  {{ i.platform_show }}
-                </el-checkbox>
-              </el-checkbox-group>
-            </template>
-          </template>
+          <div class="flex flex-col">
+            <div
+              v-for="item in tabsList"
+              :key="item.id"
+              class="flex items-center gap-8px py-6px cursor-pointer hover:bg-[--main-input-button-bg] rounded-4px text-14px"
+              @click.stop="globalStore.toggleGrid(item.id)"
+            >
+              <span class="relative inline-flex items-center justify-center text-14px">
+                <Icon
+                  :name="pumpSetting.grid[item.id].show ? 'fluent:checkbox-checked-16-filled' : 'fluent:checkbox-unchecked-16-filled'"
+                  :class="pumpSetting.grid[item.id].show ? 'color-[--primary-color]' : 'color-[--third-text1]'"
+                />
+                <Icon
+                  v-if="pumpSetting.grid[item.id].show"
+                  name="fluent:checkmark-16-filled"
+                  class="absolute color-#fff text-8px pointer-events-none"
+                />
+              </span>
+              <span :class="pumpSetting.grid[item.id].show ? 'color-[--main-color]' : 'color-[--third-text1]'">{{ item.name }}</span>
+            </div>
+          </div>
         </template>
-      </el-popover> -->
+      </el-popover>
 
       <div class="flex-1" />
       <Setting :chain="(activeChain as BotChain)" :pumpConfig="pumpConfig"/>
@@ -380,8 +360,7 @@ import type {
   PumpObj,
   ChainKey,
   CategoryKey,
-  WSPumpObj,
-  pumpBlack
+  WSPumpObj
 } from '@/api/types/pump'
 import type { BotChain } from '@/utils/types'
 import AutoSellSetting from '@/components/autoSellSetting/index.vue'
@@ -464,6 +443,7 @@ const listTab = computed(() => ([
 ]))
 const pumpConfig = useStorage<PumpConfig[]>('pumpConfigV2', [])
 // const isRotate = ref(false)
+const gridPopoverVisible = ref(false)
 const { pump_notice, pumpV3, pumpFilterDefault, pump_query} = storeToRefs(usePumpStore())
 const pumpAudio = useTemplateRef('pumpAudio')
 // const visible_platforms = shallowRef(false)
@@ -723,9 +703,9 @@ const syncCategory = (category: 'new' | 'soon' | 'graduated') => {
       list = list.filter((i) => !tokenSet.has(i.target_token))
     }
 
-    if (pumpSetting.value.isBlacklist && pumpBlackList.value?.length) {
-      list = list.filter((item: any) => !pumpBlackList.value.some((black: any) => hitBlacklist(item, black)))
-    }
+    // if (pumpSetting.value.isBlacklist && pumpBlackList.value?.length) {
+    //   list = list.filter((item: any) => !pumpBlackList.value.some((black: any) => hitBlacklist(item, black)))
+    // }
 
     list = getFilterData(list, pumpFilter)
     fourmemeListObj[currentChain][category] = list.slice(0, 100)
@@ -2347,22 +2327,6 @@ function handleClearFilter(type: 'new' | 'soon' | 'graduated') {
   const baseTokensString = baseTokenMap.value?.values?.()?.toArray?.()?.map((i: any) => i.token)?.join(',') || ''
   pumpStore.pumpV3[activeChain.value][type].pumpFilter = {...pumpFilterDefault.value,platforms:platformsString,base_tokens:baseTokensString}
   getPumpList(true)
-}
-function hitBlacklist(item:PumpObj, black: pumpBlack) {
-  if (black.type === 'twitter') {
-    const address = black.address?.replace('@', '')
-    return item.medias?.some(m => m.url?.includes(address))
-  }
-
-  if (black.type === 'keyword') {
-    return black.address === item.symbol
-  }
-
-  if (black.type === 'ca' || black.type === 'dev') {
-    return black.address === item.token
-  }
-
-  return false
 }
 </script>
 

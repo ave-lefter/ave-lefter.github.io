@@ -207,7 +207,7 @@ function addTokenFavorite(row, newGroupId: number) {
         <div class="flex items-center lh-20px" @mouseleave="showOriginalSymbol = false">
           <span
             class="flex items-center lh-12px whitespace-nowrap overflow-hidden"
-            v-if="(lang === 'zh-cn' || lang === 'zh-tw') && (row.symbol_zh || row.name_zh) && row.symbol_zh !== getSymbol(row) || (!(lang === 'zh-cn' || lang === 'zh-tw')) && (row.symbol_en || row.name_en) && row.symbol_en !== getSymbol(row)"
+            v-if="globalStore.pumpSetting.isLang && (lang === 'zh-cn' || lang === 'zh-tw') && (row.symbol_zh || row.name_zh) && row.symbol_zh !== getSymbol(row) || (!(lang === 'zh-cn' || lang === 'zh-tw')) && (row.symbol_en || row.name_en) && row.symbol_en !== getSymbol(row)"
           >
             <Icon
               name="custom:lang"
