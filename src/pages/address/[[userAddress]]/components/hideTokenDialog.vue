@@ -1,5 +1,7 @@
-<script setup>
+<script setup lang="ts">
 import {setUserTokenStatus} from '@/api/wallet'
+import { useEventBus } from '@vueuse/core'
+import { BusEventType } from '@/utils/constants'
 
 const {t} = useI18n()
 const props = defineProps({
@@ -14,6 +16,7 @@ const {updateHolderNum}= storeToRefs(useUserStore())
 const themeStore = useThemeStore()
 const emit = defineEmits(['update:modelValue', 'hideToken'])
 const loading = ref(false)
+const blacklistEvent = useEventBus(BusEventType.TOKEN_BLACKLIST_CHANGE)
 const hideTokenVisible = computed({
   get() {
     return props.modelValue
@@ -30,11 +33,12 @@ async function confirm() {
     await setUserTokenStatus({
       token,
       type: 'blacklist'
-    }, props.self_address, chain)
+    }, props.self_address || '', chain)
     ElMessage.success(t('success'))
     hideTokenVisible.value = false
     emit('hideToken')
     updateHolderNum.value++
+    blacklistEvent.emit({ token, chain, action: 'blacklist' })
   } catch (e) {
     console.log('=>(tokenList.vue:742) e', e)
   } finally {

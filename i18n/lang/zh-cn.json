@@ -2173,5 +2173,7 @@
   "openSortMode": "关闭拖拽排序",
   "autoTranslationOn": "开启自动翻译",
   "autoTranslationOFF": "关闭自动翻译",
-  "transferTime": "转入时间"
+  "transferTime": "转入时间",
+  "myPositions": "我的仓位",
+  "quickSellMsg": "你即将卖出 {a} {s}"
 }

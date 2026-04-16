@@ -6,14 +6,15 @@ import {bot_createSolTx, bot_createSwapEvmTx, bot_createSwapTonTx, bot_getTokenB
 import {ElNotification} from 'element-plus'
 import {formatBotGasTips, hasCreateTxError, getCreateTxErrorMsg, handleBotError} from '~/utils/bot'
 import BigNumber from 'bignumber.js'
-import {useDebounceFn, useLocalStorage, useThrottleFn} from '@vueuse/core'
+import {useDebounceFn, useLocalStorage, useThrottleFn, useEventBus} from '@vueuse/core'
 import {useWalletStore} from '~/stores/wallet'
-import type { BotChain, BotSettingKey } from '~/utils/types'
+import type { BotChain, BotSettingKey, SwapCompletedEventPayload } from '~/utils/types'
 import { recordTxV2, updateTxV2 } from '~/api/tracking'
 import dayjs from 'dayjs'
 import BlackList from  '~/components/header/positions/blackList.vue'
 import HideTokenDialog from '~/pages/address/[[userAddress]]/components/hideTokenDialog.vue'
 import { getTokensPrice } from '@/api/token'
+import { BusEventType } from '~/utils/constants'
 const {updateHolderNum}= storeToRefs(useUserStore())
 const {t} = useI18n()
 const wsStore = useWSStore()
@@ -41,24 +42,45 @@ watch(() => wsStore.wsResult[WSEventType.PRICEV2], (val: IPriceV2Response) => {
       const price = new BigNumber(current.uprice || 0)
       const balance_usd = new BigNumber(el.balance || 0).times(current.uprice || 0)
       if (!noProfit) {
-        const unrealized_profit = price.minus(el.average_net_purchase_price || 0).times(BigNumber.max(el.net_purchase_amount || 0, el.balance || 0))
-        // const total_purchase_usd = new BigNumber(el.balance_usd || 0).minus(el.total_profit || 0)
-        const total_profit = unrealized_profit.plus(el.realized_profit || 0)
-        const total_profit_ratio = new BigNumber(current.uprice || 0).minus(el.average_net_purchase_price || 0).div(el.average_net_purchase_price)
-        if (total_profit_ratio.toNumber() < -1 || Number(el.average_net_purchase_price) < 0) {
+        const avgNetPurchasePrice = BigNumber(el.average_net_purchase_price || el.average_purchase_price_usd || 0)
+        const netPurchaseAmount = Number(el.net_purchase_amount || el.balance || 0)
+        const balance_amount = Number((el.balance || 0))
+        if (!balance_amount && !netPurchaseAmount) return el
+        const actualAmount = BigNumber.max(netPurchaseAmount, balance_amount)
+        const unrealized_profit = price.minus(avgNetPurchasePrice).times(actualAmount)
+
+        const realized_profit = BigNumber(el.realized_profit || 0)
+
+        const total_profit = unrealized_profit.plus(Number((realized_profit || 0)))
+        const buyVol = BigNumber(netPurchaseAmount || 0).times(price).toFixed()
+        // let unrealized_profit_ratio = BigNumber(el.unrealized_profit_ratio || 0)
+        const unrealized_profit_ratio = BigNumber(unrealized_profit).div(buyVol)
+
+        let total_profit_ratio = BigNumber(Number(el.total_profit_ratio) || 0)
+        if (buyVol) {
+          total_profit_ratio = BigNumber(total_profit).div(buyVol)
+        }
+
+        // 边界检查：如果利润率小于 -100% 或均价异常，保持原样或按业务逻辑处理
+        if (total_profit_ratio.toNumber() < -1 || avgNetPurchasePrice.lt(0)) {
           return el
         } else {
           return {
             ...el,
             current_price_usd: current.uprice,
             balance_usd: balance_usd.toNumber(),
-            total_profit: total_profit.toFixed(),
-            total_profit_ratio: total_profit_ratio.toFixed(),
-            unrealized_profit: unrealized_profit.toFixed(),
-            realized_profit: el.realized_profit || 0
+            // 更新利润值
+            total_profit: total_profit.toFixed(6),
+            unrealized_profit: unrealized_profit.toFixed(6),
+            realized_profit: realized_profit.toFixed(6),
+            // 更新利润率：确保字段名与模板/子组件绑定一致
+            // 如果子组件使用 total_profit_ratio 显示总利润率，unrealized_profit_ratio 显示未实现利润率
+            total_profit_ratio: total_profit_ratio.toFixed(6),
+            unrealized_profit_ratio: unrealized_profit_ratio.toFixed(6)
           }
         }
       } else {
+        // 无利润数据时，仅更新价格和市值
         return {
           ...el,
           current_price_usd: current.uprice,
@@ -124,7 +146,10 @@ watch(()=>updateHolderNum.value, () => {
   // net_purchase_amount: string
 
 const getTokenBalance = useThrottleFn(function (token: string, chain: string) {
-  const creatorAddress = botStore.getWalletAddress(chain)
+  let creatorAddress = botStore.getWalletAddress(chain)
+  if (!creatorAddress && walletStore.address && walletStore.chain === chain) {
+    creatorAddress = walletStore.address
+  }
   if (creatorAddress) {
     getBalances({
       chain,
@@ -231,6 +256,23 @@ const getTokenBalance = useThrottleFn(function (token: string, chain: string) {
     })
   }
 }, 0, false, true)
+
+const swapCompletedEvent = useEventBus<SwapCompletedEventPayload>(BusEventType.SWAP_COMPLETED)
+swapCompletedEvent.on(({ fromToken, toToken, chain }) => {
+  console.log('Swap completed in positionsTable:', { fromToken, toToken, chain })
+  if (fromToken && chain) {
+    getTokenBalance(fromToken, chain)
+    setTimeout(()=>{
+      getTokenBalance(fromToken, chain)
+    },5000)
+  }
+  if (toToken && chain) {
+    getTokenBalance(toToken, chain)
+    setTimeout(()=>{
+      getTokenBalance(toToken, chain)
+    },5000)
+  }
+})
 
 watch(() => wsStore.wsResult[WSEventType.ASSET], (val: IAssetResponse) => {
   // getTokenBalance('','bsc')
@@ -888,9 +930,10 @@ onBeforeUnmount(() => {
                     {{!AmountU? formatNumber(row.balance, 2): '$' + formatNumber(row.balance_usd ||0, 2)}}
                   </template>
                 </div>
-                <div v-if="row.token!==NATIVE_TOKEN" class="mt-2px text-11px lh-14px"  :class="getColorClass(row.total_profit)">
-                  <template v-if="Number(row.total_profit) === 0">0</template>
-                  <template v-else-if="row.total_profit === '--'">--</template>
+                <div v-if="row.token!==NATIVE_TOKEN" class="mt-2px text-11px lh-14px"  :class="isStableCoin(row.token + '-' + row.chain) ? 'color-[--third-text]' : getColorClass(row.total_profit)">
+                  <template v-if="row.total_profit === '--' || isStableCoin(row.token + '-' + row.chain)">--</template>
+                  <template v-else-if="Number(row.total_profit) === 0">0</template>
+
                   <template v-else>
                     {{ Number(row.total_profit) > 0 ? '+$' : '-$' }}{{
                       formatNumber(Math.abs(Number(row.total_profit)), 2)

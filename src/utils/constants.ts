@@ -134,6 +134,8 @@ export const BusEventType = {
   TOP_ADD_GROUP: 'top-add-group',
   DEV_TOKENS_TAB: 'dev-tokens-tab',
   PUMP_REMARK_EDIT: 'pump_remark_edit',
+  TOKEN_BLACKLIST_CHANGE: 'token-blacklist-change',
+  SWAP_COMPLETED: 'swap-completed',
 }
 
 export const ProvideType = {
