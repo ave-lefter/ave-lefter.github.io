@@ -1514,5 +1514,7 @@
   "symbol": "상징",
   "symbolDesc": "$SOL, $ETH 및 기타 토큰 강조 표시",
   "tokenAddressDesc": "하이라이트 토큰 CA",
-  "newMessage": "새 메시지"
+  "newMessage": "새 메시지",
+  "fastModeTitle": "번개 모드, 즉시 온체인",
+  "fastModeDesc": "더 빠름(약 2초 빠름), 롤백 또는 중복 실행이 발생할 수 있습니다."
 }

@@ -2175,5 +2175,7 @@
   "autoTranslationOFF": "关闭自动翻译",
   "transferTime": "转入时间",
   "myPositions": "我的仓位",
-  "quickSellMsg": "你即将卖出 {a} {s}"
+  "quickSellMsg": "你即将卖出 {a} {s}",
+  "fastModeTitle": "闪电模式，极速上链",
+  "fastModeDesc": "速度更快（约快2秒），可能出现回滚或重复执行等。"
 }

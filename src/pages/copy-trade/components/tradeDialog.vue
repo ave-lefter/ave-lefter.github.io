@@ -62,6 +62,14 @@
               </el-option>
             </el-select>
           </el-form-item>
+          <el-form-item v-if="form.chain=='bsc'" :label="$t('fastModeTitle')" label-position="left">
+            <p class="text-12px color-[--third-text] ml-[-214px] mt-20px mb-0">{{ $t('fastModeDesc') }}</p>
+            <el-switch
+              v-model="form.isFastModel"
+              class="ml-auto"
+              style="--el-switch-on-color: #3c6cf6; zoom: 0.9; height: 14px"
+            />
+          </el-form-item>
           <el-form-item :label="$t('copyTradeMethod')" label-position="top">
             <div class="tabs">
               <button
