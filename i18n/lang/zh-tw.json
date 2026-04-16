@@ -945,6 +945,7 @@
   "swapFail": "交易失敗",
   "insufficentFunds": "餘額不足",
   "insufficentGasSOL": "沒有足夠的 SOL 支付 gas 費",
+  "insufficentGas": "{symbol}餘額不足以支付gas費，至少需要{min} {symbol}",
   "insufficentFundsSol": "SOL 餘額不足",
   "networkIsUnstable": "網絡不穩定，請稍後再試",
   "swapUnknownError": "交易購買失敗......\n\n可嘗試以下方法重試:\n- 手動增大滑點\n- 更換購買或賣出幣種\n- 重新設置購買數量等",
@@ -2157,5 +2158,6 @@
   "closeDragMode": "開啟拖曳排序",
   "openSortMode": "關閉拖曳排序",
   "autoTranslationOn": "開啟自動翻譯",
-  "autoTranslationOFF": "关闭自动翻译"
+  "autoTranslationOFF": "关闭自动翻译",
+  "transferTime": "轉入時間"
 }
