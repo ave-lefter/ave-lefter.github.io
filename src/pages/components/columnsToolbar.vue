@@ -15,7 +15,8 @@ let storeColumns = useStorage(props.storageKey, props.getDefaultColumns(t))
 const globalStore = useGlobalStore()
 const hotSettings = ref({
   avatar_isCircle:globalStore.pumpSetting.avatar_isCircle,
-  isBlacklist:globalStore.pumpSetting.isBlacklist
+  isBlacklist: globalStore.pumpSetting.isBlacklist,
+  isLang: globalStore.pumpSetting.isLang
 })
 
 const hotOptions = computed(() => props.getOptions(t))
@@ -32,7 +33,8 @@ const openDialog = () => {
   console.log(storeColumns.value)
   hotSettings.value = {
     avatar_isCircle:globalStore.pumpSetting.avatar_isCircle,
-    isBlacklist:globalStore.pumpSetting.isBlacklist
+    isBlacklist: globalStore.pumpSetting.isBlacklist,
+    isLang: globalStore.pumpSetting.isLang
   }
 }
 
@@ -57,6 +59,7 @@ const handleConfirm = () => {
   storeColumns.value = cloneDeep(modelColumns.value)
   globalStore.pumpSetting.avatar_isCircle = hotSettings.value.avatar_isCircle
   globalStore.pumpSetting.isBlacklist = hotSettings.value.isBlacklist
+  globalStore.pumpSetting.isLang = hotSettings.value.isLang
 }
 
 const handleReset = async () => {
@@ -76,6 +79,7 @@ const handleReset = async () => {
   hotSettings.value.isBlacklist = true
   globalStore.pumpSetting.avatar_isCircle = hotSettings.value.avatar_isCircle
   globalStore.pumpSetting.isBlacklist = hotSettings.value.isBlacklist
+  globalStore.pumpSetting.isLang = hotSettings.value.isLang
 }
 
 function findColumnByRender(renderKey:string) {
@@ -122,6 +126,17 @@ function handleSelectChild(childItem, renderKey:string) {
           <template v-else>
             <Icon name="custom:key-visible" class="text-8px mr-8px" />{{
               $t('showBlackList')
+            }}</template
+          >
+        </div>
+        <div class="cursor-pointer flex items-center" @click="hotSettings.isLang = !hotSettings.isLang">
+          <template v-if="hotSettings.isLang">
+            <Icon name="majesticons:translate" class="text-12px mr-8px" />
+            {{ $t('autoTranslationOn') }}
+          </template>
+          <template v-else>
+            <Icon name="tdesign:translate-1" class="text-12px mr-8px" />{{
+              $t('autoTranslationOFF')
             }}</template
           >
         </div>

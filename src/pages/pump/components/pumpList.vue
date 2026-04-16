@@ -66,15 +66,11 @@
                     </span>
                     <span
                       v-if="hasTwitterXUser(row?.medias)"
-                      v-tooltip="pumpBlackList?.findIndex(i => i.address == row.token && i.type == 'twitter') !== -1 ? $t('cancel') + $t('BlackListTwitter') : $t('BlackListTwitter')"
+                      v-tooltip="pumpBlackList?.findIndex(i => hitBlacklist(row, i) && i.type == 'twitter') !== -1 ? $t('cancel') + $t('BlackListTwitter') : $t('BlackListTwitter')"
                       class="bg-[--d-000-l-FFF] cursor-pointer px-2px py-2px color-[--third-text1] block rounded-2px mt-4px hover:color-[--primary-color] w-16px h-16px flex items-center justify-center"
                     >
                       <Icon
-                        v-if="
-                          pumpBlackList?.findIndex(
-                            (i) => i.address == row.token && i.type == 'twitter'
-                          ) !== -1
-                        "
+                        v-if="pumpBlackList?.findIndex(i => hitBlacklist(row, i) && i.type == 'twitter') !== -1"
                         name="custom:twitter-unvisible"
                         class="text-12px color-[#F6465D]"
                         @click.stop="addOrRemoveBlaclList(row, 'twitter')"
@@ -925,7 +921,7 @@ import {
 } from '@/utils/index'
 import { formatNumber } from '@/utils/formatNumber'
 import { Icon } from '#components'
-import type { PumpObj } from '@/api/types/pump'
+import type { PumpObj, pumpBlack } from '@/api/types/pump'
 import XIcon from '~/components/xPopup/xIcon.vue'
 import { useVirtualList } from '@vueuse/core'
 import ProgressPop from './progressPop.vue'
@@ -1079,8 +1075,9 @@ function addOrRemoveBlaclList(item: { token: string , medias: any[]}, type: 'ca'
   if (pumpBlackList.value) {
     if (type == 'twitter') {
       const twitter = item?.medias?.filter?.(i => i.icon === 'twitter')?.[0]
-      const twitterAccount = formatXUser(twitter?.url)
+      const twitterAccount = formatXUser(twitter?.url)?.slice(1)
       if (twitterAccount) {
+
         const findIndex = pumpBlackList.value?.findIndex(
         (i) => twitterAccount == i.address && i.type == type
         )
@@ -1286,6 +1283,10 @@ watch(() => props.tableList, (newList, oldList) => {
       }
     })
   }
+
+  if (pumpSetting.value.isBlacklist && pumpBlackList.value?.length) {
+    newList = newList.filter((item: any) => !pumpBlackList.value.some((black: any) => hitBlacklist(item, black)))
+  }
   tableList.value = newList
   const currentKeys = new Set<string>()
   newList.forEach(row => {
@@ -1333,6 +1334,22 @@ const getAnimClass = (itemData: any) => {
   }
 
   return ''
+}
+function hitBlacklist(item:PumpObj, black: pumpBlack) {
+  if (black.type === 'twitter') {
+    const address = black.address?.replace('@', '')
+    return item.medias?.some(m => m.url?.includes(address))
+  }
+
+  if (black.type === 'keyword') {
+    return black.address === item.symbol
+  }
+
+  if (black.type === 'ca' || black.type === 'dev') {
+    return black.address === item.token
+  }
+
+  return false
 }
 function getLiqTooltip(row: PumpObj) {
   const isToken0 =
