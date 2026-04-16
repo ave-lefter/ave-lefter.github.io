@@ -351,7 +351,7 @@
               <a
                 v-if="aiSummary?.headline || aiSummary?.summary"
                 v-tooltip.raw="{
-                  content: `<div class='max-w-[400px]'>${aiSummary.headline || aiSummary.summary}</div>`,
+                  content: `<div class='max-w-[400px] whitespace-pre-wrap'>${aiSummary.headline || aiSummary.summary}</div>`,
                   props:{
                     placement:'top-start'
                   }

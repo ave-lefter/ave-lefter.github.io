@@ -2175,5 +2175,7 @@
   "autoTranslationOFF": "关闭自动翻译",
   "transferTime": "转入时间",
   "myPositions": "我的仓位",
-  "quickSellMsg": "你即将卖出 {a} {s}"
+  "quickSellMsg": "你即将卖出 {a} {s}",
+  "top100SellAvgMC": "前100卖出平均市值",
+  "top100PurchaseAvgMC": "前100持仓平均市值"
 }

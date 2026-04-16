@@ -43,13 +43,25 @@
         <span class="ml-4px">{{ formatNumber(aggregateStats?.top100Ratio * 100 || 0, 2) }}%</span>
       </div>
       <div class="ml-16px">
-        <span class="color-[--third-text]">{{ $t('top100PurchaseAvg') }}:</span>
-        <span class="ml-4px">${{ formatNumber(aggregateStats?.top100PurchaseAvg || 0, 2) }}</span>
+        <div class="inline-flex items-center clickable" @click.stop="isMC = !isMC">
+          <span class="color-[--third-text]">{{ !isMC ? $t('top100PurchaseAvg') : $t('top100PurchaseAvgMC') }}</span>
+          <Icon name="custom:exchange-horizontal" class="ml-4px color-[--third-text] text-10px"/>:
+        </div>
+        <span v-if="!isMC" class="ml-4px">${{ formatNumber(aggregateStats?.top100PurchaseAvg || 0, 2) }}</span>
+        <span v-else class="ml-4px">${{   Number(aggregateStats?.top100PurchaseAvg) === 0
+                ? '-'
+                : formatNumber(Number(aggregateStats?.top100PurchaseAvg) * Number(circulation) || 0, 2) }}</span>
         <span v-if="Number(price) >0" class="ml-4px" :class="Number(aggregateStats?.top100PurchaseAvg) < Number(price) ? 'color-[--up-color]': 'color-[--down-color]'">({{ aggregateStats?.top100PurchaseAvg >0? formatNumber((Number(price) - Number(aggregateStats?.top100PurchaseAvg))/Number(aggregateStats?.top100PurchaseAvg) *100 || 0, 2)+'%' : 0 }})</span>
       </div>
       <div class="ml-16px">
-        <span class="color-[--third-text]">{{ $t('top100SellAvg') }}:</span>
-        <span class="ml-4px">${{ formatNumber(aggregateStats?.top100SellAvg || 0, 2) }}</span>
+        <div class="inline-flex items-center clickable" @click.stop="isMC = !isMC">
+          <span class="color-[--third-text]">{{ !isMC ? $t('top100SellAvg') : $t('top100SellAvgMC') }}</span>
+          <Icon name="custom:exchange-horizontal" class="ml-4px color-[--third-text] text-10px"/>:
+        </div>
+        <span v-if="!isMC" class="ml-4px">${{ formatNumber(aggregateStats?.top100SellAvg || 0, 2) }}</span>
+        <span v-else class="ml-4px">${{   Number(aggregateStats?.top100SellAvg) === 0
+              ? '-'
+              : formatNumber(Number(aggregateStats?.top100SellAvg) * Number(circulation) || 0, 2) }}</span>
         <span v-if="Number(price) >0" class="ml-4px" :class="Number(aggregateStats?.top100SellAvg) < Number(price) ? 'color-[--up-color]': 'color-[--down-color]'">({{aggregateStats?.top100SellAvg >0? formatNumber((Number(price) - Number(aggregateStats?.top100SellAvg))/Number(aggregateStats?.top100SellAvg) *100 || 0, 2)+'%' : 0 }})</span>
       </div>
     </div>
@@ -253,7 +265,7 @@ import {
   type AggregateStats,
   type HolderStat,
 } from '@/api/holders'
-import { useEventBus, useLocalStorage } from '@vueuse/core'
+import { useEventBus, useLocalStorage,useStorage } from '@vueuse/core'
 import List from './list.vue'
 import LineContent from './lineContent.vue'
 const holderListSortObj = useLocalStorage('holderListSortObj', {
@@ -278,9 +290,8 @@ const holderListSortObj = useLocalStorage('holderListSortObj', {
     order: '',
   },
 })
-const { price, totalHolders} = storeToRefs(useTokenStore())
+const { price, totalHolders, circulation} = storeToRefs(useTokenStore())
 const {token} = storeToRefs(useTokenStore())
-
 const route = useRoute()
 const botStore = useBotStore()
 const walletStore = useWalletStore()
@@ -300,6 +311,7 @@ const selfAddress = computed(() => botStore.evmAddress || walletStore.address)
   // const show_bubble = shallowRef(false)
 const searchOriginKeyword = shallowRef('')
 const searchOriginType = shallowRef('')
+const isMC = useStorage('holders_isMC', false)
 const holdersRef = useTemplateRef('holdersRef')
 const tabs = computed(() => {
   const arr: Array<{ label: string; value: string }> = []
@@ -499,6 +511,7 @@ function getHoldersList(sortObj?: { sort_by: string; order: string }) {
     .then((res) => {
       holderListObj.value[activeTab.value] = res?.holderStats || []
       aggregateStatsObj.value[activeTab.value] = res?.aggregateStats || {}
+      console.log('holderListObj', res)
     })
     .catch(() => {
       holderListObj.value[activeTab.value] = []

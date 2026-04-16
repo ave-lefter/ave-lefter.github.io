@@ -2174,5 +2174,7 @@
   "autoTranslationOFF": "OFF Auto-Translation",
   "transferTime": "Transfer Time",
   "myPositions": "My Position",
-  "quickSellMsg": "You are about to sell {a} {s}"
+  "quickSellMsg": "You are about to sell {a} {s}",
+  "top100SellAvgMC": "Top100 Sell Avg MC",
+  "top100PurchaseAvgMC": "Top100 Purchase Avg Price"
 }
