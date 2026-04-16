@@ -18,6 +18,10 @@ const props = defineProps({
     type: String,
     required: true
   },
+  symbol: {
+    type: String,
+    default: ''
+  },
   classString: {
     type: String,
     required: false,
@@ -26,6 +30,10 @@ const props = defineProps({
   chain: {
     type: String,
     required: true
+  },
+  logo_url: {
+    type: String,
+    default: ''
   },
   type: {
     type: String,
@@ -43,6 +51,8 @@ const bgImg = ref('')
 const qrcodeUrl = ref('')
 const localeStore = useLocaleStore()
 const configStore = useConfigStore()
+
+const s3BaseUrl = computed(() => configStore.token_logo_url)
 const imgList = computed(() => {
   const upShareImg = configStore.globalConfig.pc_share_image.replace(/^.*\|/, '')
   const ups = upShareImg.split(',').map((img: string) => {
@@ -159,7 +169,7 @@ function getColorClass(val: string) {
           :src="bgImg"
           alt="share"
         >
-        <div class="inline-block">
+        <div class="inline-block mb-40px">
           <div class="flex flex-col">
             <div class="flex items-center">
               <img
@@ -176,16 +186,26 @@ function getColorClass(val: string) {
               }}</span>
           </div>
         </div>
-        <div class="flex items-center mt-40px">
-          <UserAvatar
+        <!-- <div v-if="symbol" class="color-[--secondary-text] mb-2px">{{ symbol }}</div> -->
+        <div class="flex items-center">
+          <!-- <UserAvatar
             :address="address"
             :chain="chain"
             icon-size="40px"
             icon-chain-size="20px"
+          /> -->
+          <TokenImg
+            :row="{
+              logo_url: props.logo_url ? `${s3BaseUrl}${props.logo_url}` : '',
+              chain: props.chain,
+              symbol: props.symbol,
+            }"
+            token-class="w-40px h-40px"
           />
-          <span class="text-14px color-[--third-text] ml-8px">
-              {{ address?.slice(0, 4) + '...' + address?.slice(-4) }}
-          </span>
+          <div class="text-16px color-[--third-text] ml-8px">
+            <div class="color-#fff mb-2px">{{ props.symbol }}</div>
+            <div class="text-12px">{{ address?.slice(0, 4) + '...' + address?.slice(-4) }}</div>
+          </div>
         </div>
         <div class="mt-15px text-40px lh-none" :class="getColorClass(statistics.total_profit_ratio)">
           <div class="color-[--third-text] text-14px">{{ $t('RIO') }}</div>

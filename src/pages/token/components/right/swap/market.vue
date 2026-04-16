@@ -186,7 +186,9 @@ import { ElMessageBox } from '#imports'
 import { handleError, getGasPrice } from '@/utils/wallet/utils'
 import { getTokensPrice } from '~/api/token'
 import PercentStep from './percentStep.vue'
-import { useLocalStorage, useCountdown } from '@vueuse/core'
+import { useLocalStorage, useCountdown, useEventBus } from '@vueuse/core'
+import { BusEventType } from '~/utils/constants'
+import type { SwapCompletedEventPayload } from '~/utils/types'
 import { recordTransaction, updateTransaction } from '~/api/tracking'
 import { sui_signAndExecuteTransactionBlock } from '@/utils/wallet/sui'
 import { getSolanaSwapQuoteTransaction, sendSolanaSwapTransaction } from '@/utils/wallet/solana'
@@ -198,6 +200,7 @@ import { getTonTokenTransferMsg, sendTonTransaction } from '~/utils/wallet/ton'
 const { t } = useI18n()
 // const { showExecuting, showSuccess, closeExecuting, updateExecutingSeconds } = useTransactionPrompt()
 const configStore = useConfigStore()
+const swapCompletedEvent = useEventBus<SwapCompletedEventPayload>(BusEventType.SWAP_COMPLETED)
 
 const initSlippage = '2'
 const swapStore = useSwapStore()
@@ -2074,6 +2077,7 @@ async function submitSwap(_swapSubmitInfo = swapSubmitInfo.value) {
       percentStepRef.value?.handleClick?.(0)
       // this.dialogVisibleSwap = false
       activeShow.value = 3
+      swapCompletedEvent.emit({ fromToken: swapStore.token1.address, toToken: swapStore.token2.address, chain: chain.value })
       return typeof res?.wait === 'function' ? res.wait() : res
     }).then((res: { hash: string, to: string }) => {
       console.log('----transaction---', res)
@@ -2086,6 +2090,7 @@ async function submitSwap(_swapSubmitInfo = swapSubmitInfo.value) {
       })
       selectedRouterIndex.value = 0
       swapPathList.value = []
+      swapCompletedEvent.emit({ fromToken: swapStore.token1.address, toToken: swapStore.token2.address, chain: chain.value })
       setTimeout(() => {
         swapStore.getTokenDetails()
         swapStore.getUserTokenList()
@@ -2211,6 +2216,7 @@ async function submitSolanaSwap() {
       // this.$refs?.percentStep?.handleClick?.(0)
       percentStepRef.value?.handleClick?.(0)
       activeShow.value = 3
+      swapCompletedEvent.emit({ fromToken: swapStore.token1.address, toToken: swapStore.token2.address, chain: chain.value })
       return typeof res?.wait === 'function' ? res.wait() : res
     }).then((res: { transaction: { signatures: any[] }; blockTime: any; transactionHash: any }) => {
       console.log('----transaction---', res)
@@ -2224,6 +2230,7 @@ async function submitSolanaSwap() {
         // const [fromAmount, toAmount] = getTransactionTokenChange(res, _swapInfo.fromToken.address, _swapInfo.toToken.address)
         swapStore.getTokenDetails()
         swapStore.getUserTokenList()
+        swapCompletedEvent.emit({ fromToken: swapStore.token1.address, toToken: swapStore.token2.address, chain: chain.value })
         // if (isSwap) {
         //   this.solanaTxs = this.solanaTxs.slice().map(item => {
         //     const i = {...item}
@@ -2375,6 +2382,7 @@ async function submitSuiSwap() {
         percentStepRef.value?.handleClick?.(0)
         // dialogVisibleSwap.value = false
         activeShow.value = 3
+        swapCompletedEvent.emit({ fromToken: swapStore.token1.address, toToken: swapStore.token2.address, chain: chain.value })
         return typeof res?.wait === 'function' ? res.wait() : res
       }
     }).then(res => {
@@ -2388,6 +2396,7 @@ async function submitSuiSwap() {
         })
         swapStore.getTokenDetails()
         swapStore.getUserTokenList()
+        swapCompletedEvent.emit({ fromToken: swapStore.token1.address, toToken: swapStore.token2.address, chain: chain.value })
         // const amountChange = sui_getBalanceChanges({ txInfo, balanceChanges: res?.balanceChanges || [] })
         if (isSwap) {
           // this.suiTxs = this.suiTxs.slice().map(item => {
@@ -2539,6 +2548,7 @@ async function submitTonSwap() {
       percentStepRef.value?.handleClick?.(0)
       // dialogVisibleSwap.value = false
       activeShow.value = 3
+      swapCompletedEvent.emit({ fromToken: swapStore.token1.address, toToken: swapStore.token2.address, chain: chain.value })
       return typeof res?.wait === 'function' ? res.wait() : res
     }).then(async res => {
       console.log('----transaction---', res)
@@ -2551,6 +2561,7 @@ async function submitTonSwap() {
         })
         swapStore.getTokenDetails()
         swapStore.getUserTokenList()
+        swapCompletedEvent.emit({ fromToken: swapStore.token1.address, toToken: swapStore.token2.address, chain: chain.value })
         // let amountChange = await getTonTransactionTokenChange(res)
         if (isSwap) {
           // this.tonTxs = this.tonTxs.slice().map(item => {

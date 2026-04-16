@@ -8,7 +8,54 @@ export function getWhaleStatistics(params) {
 }
 
 // 币种列表
-export function getWhaleTokenList(params) {
+export function getWhaleTokenList(params: {
+  user_address: string
+  chain: string
+  pageNO: number
+  pageSize: number
+  sort_dir?: string
+  sort?: string
+  is_self?: 0 | 1
+  hide_sold?: number
+  hide_small?: number
+  hide_risk?: number
+  hide_noswap?: number
+}): Promise<Array<{
+  token: string
+  chain: string
+  logo_url: string
+  symbol: string
+  risk_level: number
+  risk_score: number
+  decimals: number
+  main_pair_tvl: number
+  is_little_pool: number
+  last_txn_time: string
+  total_profit: string
+  total_profit_ratio: string
+  unrealized_profit: string
+  realized_profit: string
+  unrealized_profit_ratio: string
+  realized_profit_ratio: string
+  balance_amount: string
+  balance_usd: string
+  total_purchase_usd: string
+  average_purchase_price_usd: string
+  total_sold_usd: string
+  average_sold_price_usd: string
+  total_transfer_in_amount: string
+  total_transfer_out_amount: string
+  total_purchase: string
+  total_sold: string
+  main_token_price: string
+  main_token_symbol: string
+  current_price_usd: string
+  issue_platform: string
+  average_net_purchase_price: string
+  net_purchase_amount: string
+  total_purchase_amount: string
+  total_sold_amount: string
+}>>{
   const { $api } = useNuxtApp()
   return $api('/v2api/walletinfo/v1/tokens', {
     method: 'get',

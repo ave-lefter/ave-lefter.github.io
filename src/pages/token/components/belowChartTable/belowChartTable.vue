@@ -21,6 +21,7 @@ const {token, tokenInfoExtra ,pairAddress,commonHeight} = storeToRefs(useTokenSt
 const activeTab = shallowRef<keyof typeof components | 'Orders'>('Transactions')
 const components = {
   Transactions,
+  Position: defineAsyncComponent(() => import('./position/index.vue')),
   Holders: Holders,
   LP: defineAsyncComponent(() => import('./lp/index.vue')),
   Attention: defineAsyncComponent(() => import('./attention/index.vue')),
@@ -31,6 +32,7 @@ const components = {
 const tabs = computed(() => {
   return [
   { name: t('transactions'), component: 'Transactions' as const },
+  { name: t('myPositions'), component: 'Position' as const },
   { name: t('holders'), component: 'Holders' as const },
   { name: t('poolInfo'), component: 'LP' as const },
   { name: t('attention1') +`(${globalStore.headFollowsNum.all})`, component: 'Attention' as const },
@@ -69,7 +71,7 @@ watch(
 watch(
   () => tokenStore.placeOrderSuccess,
   () => {
-    if (activeTab.value !== 'MySwap') {
+    if (activeTab.value !== 'MySwap' && activeTab.value !== 'Position') {
       activeTab.value = 'MySwap'
     }
   }

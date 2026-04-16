@@ -3,7 +3,7 @@ import dayjs from 'dayjs'
 import { getPositionTermPage } from '~/api/perp'
 import { usePerpStore } from '~/stores/perp'
 import BigNumber from 'bignumber.js'
-import Share from "./share.vue";
+import Share from './share.vue'
 // import { PositionFactory, SymbolEntity } from '~/utils/perp/domain'
 // import type { IContract } from '~/utils/perp/types'
 

@@ -1501,3 +1501,18 @@ export function format4Str4(val: string) {
   if(val.length <= 8) return val
   return val.slice(0, 4) + '...' + val.slice(-4)
 }
+
+// 是否是稳定币
+export function isStableCoin(token: string) {
+  const stableCoins = ['0x55d398326f99059ff775485246999027b3197955-bsc', '0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d-bsc', '0x8d0d000ee44948fc98c9b98a4fa4921476f08b0d-bsc', '0xe9e7cea3dedca5984780bafc599bd69add087d56-bsc','0x1af3f329e8be154074d8769d1ffa4ee058b1dbc3-bsc',
+    '0xdac17f958d2ee523a2206206994597c13d831ec7-eth', '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48-eth', '0x8d0d000ee44948fc98c9b98a4fa4921476f08b0d-eth', '0x8e870d67f660d95d5be530380d0ec0bd388289e1-eth', '0x0000000000085d4780b73119b644ae5ecd22b376-eth', '0x6b175474e89094c44da98b954eedeac495271d0f-eth', '0x4fabb145d64652a948d72533023f6e7a623c7c53-eth',
+    '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913-base', '0x50c5725949a6f0c72e6c4a641f24049a917db0cb-base', '0xd9aaec86b65d86f6a7b5b1b0c42ffa531710b6ca-base',
+    '0x1e4a5963abfd975d8c9021ce480b42188849d41d-xlayer', '0x74b7f16337b8972027f6196a17a631ac6de26d22-xlayer',
+    'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB-solana', 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v-solana',
+    'EQCxE6mUtQJKFnGfaROTKOt1lZbDiiX1kCixRv7Nw2Id_sDs-ton',
+    '0x3c499c542cef5e3811e1192ce70d8cc03d5c3359-polygon', '0xa8d394fe7380b8ce6145d5f85e6ac22d4e91acde-polygon', '0x2791bca1f2de4661ed88a30c99a7a9449aa84174-polygon', '0xc2132d05d31c914a87c6611c10748aeb04b58e8f-polygon',
+    '0xff970a61a04b1ca14834a43f5de4533ebddb5cc8-arbitrum', '0xfd086bc7cd5c481dcc9c85ebe478a1c0b69fcbb9-arbitrum',
+  ]
+  return stableCoins.includes(token)
+}
+

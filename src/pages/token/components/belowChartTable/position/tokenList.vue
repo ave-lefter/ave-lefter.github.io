@@ -17,7 +17,20 @@
       @sort-change="handleSortChange"
     >
       <template #empty>
-        <AveEmpty v-if="!loading && tableData.length===0" class="pt-[40px]"/>
+        <AveEmpty v-if="!loading && tableData.length===0" class="py-40px">
+          <span v-if="botStore.evmAddress || walletStore.address" class="color-[--third-text] text-12px my-10px lh-none">{{ $t('emptyNoData') }}</span>
+          <template v-else>
+            <span class="text-12px mt-10px lh-none">{{ $t('noWalletTip') }}</span>
+            <el-button
+              class="mt-10px lh-none"
+              @click="botStore.$patch({
+              connectVisible: true
+            })"
+            >
+              {{ $t('connectWallet') }}
+            </el-button>
+          </template>
+        </AveEmpty>
         <span v-else/>
       </template>
       <TokenColumn
@@ -29,8 +42,9 @@
           sortOrders: ['descending', 'ascending', null],
           prop: 'last_txn_time',
         }"
+        tokenClass="w-24px h-24px"
       >
-        <template v-if="isSelfAddress && (walletStore.walletName!=='WatchWallet')" #default="{ row }">
+        <template v-if="(walletStore.walletName!=='WatchWallet')" #default="{ row }">
           <Icon
             name="bx:bxs-hide"
             class="absolute top-0 left-0 hidden bxs-hide cursor-pointer color-[--secondary-text]"
@@ -38,54 +52,40 @@
           />
         </template>
       </TokenColumn>
-      <el-table-column
-        :label="$t('total_profit')"
-        :sort-orders="['descending', 'ascending', null]"
-        align="right"
-        prop="total_profit"
-        sortable="custom"
-      >
+      <el-table-column :label="$t('totalBuy')" align="right">
         <template #default="{ row }">
-          <span v-if="row?.total_profit > 0" class="color-[--up-color]">
-            ${{ formatNumber(row?.total_profit || 0, 2) }}
+          <span v-if="row?.total_purchase_usd == 0">0</span>
+          <span v-else-if="row?.total_purchase_usd == '--'">--</span>
+          <span v-else>
+            {{ '$' + formatNumber(row?.total_purchase_usd || 0, 2) }}
           </span>
-          <span v-else-if="row?.total_profit == 0">$0</span>
-          <span v-else-if="row?.total_profit == '--'">--</span>
-          <span v-else class="color-[--down-color]">
-            {{ '-$' + formatNumber(Math.abs(row?.total_profit) || 0, 2) }}
-          </span>
-          <span class="block lh-17px color-[--third-text]">
-            <template v-if="row?.total_profit_ratio == 0">0</template>
-            <template v-else-if="row?.total_profit_ratio == '--'">--</template>
+          <span
+              class="block text-12px lh-17px color-[--third-text]"
+          >
+            <template v-if="row?.total_purchase_amount == 0">0</template>
+            <template v-else-if="row?.total_purchase_amount == '--'">--</template>
             <template v-else>
-              <span :style="{ color: row?.total_profit_ratio > 0 ? 'color-[--up-color]' : 'color-[--down-color]' }">
-                {{ formatNumber(row?.total_profit_ratio * 100 || 0, 2) }}%
-              </span>
+              {{ formatNumber(row?.total_purchase_amount || 0, 2) }}
             </template>
           </span>
         </template>
       </el-table-column>
-      <el-table-column
-        :label="$t('total_unrealized_profit')"
-        :sort-orders="['descending', 'ascending', null]"
-        align="right"
-        prop="unrealized_profit"
-        sortable="custom"
-      >
+      <el-table-column :label="$t('totalSell')" align="right">
         <template #default="{ row }">
-          <div v-if="row?.unrealized_profit == 0 && row.balance_amount == 0" class="color-[--down-color] text-12px">
-            {{$t('sellAl')}}
-          </div>
-          <div v-else>
-            <span v-if="row?.unrealized_profit > 0" class="color-[--up-color]">
-              ${{ formatNumber(row?.unrealized_profit || 0, 2) }}
-            </span>
-            <span v-else-if="row?.unrealized_profit == 0">$0</span>
-            <span v-else-if="row?.unrealized_profit == '--'">--</span>
-            <span v-else class="color-[--down-color]">
-              {{ '-$' + formatNumber(Math.abs(row?.unrealized_profit) || 0, 2) }}
-            </span>
-          </div>
+          <span v-if="row?.total_sold_usd == 0">0</span>
+          <span v-else-if="row?.total_sold_usd == '--'">--</span>
+          <span v-else>
+            {{ '$' + formatNumber(row?.total_sold_usd || 0, 2) }}
+          </span>
+          <span
+              class="block text-12px lh-17px color-[--third-text]"
+          >
+            <template v-if="row?.total_sold_amount == 0">0</template>
+            <template v-else-if="row?.total_sold_amount == '--'">--</template>
+            <template v-else>
+              {{ formatNumber(row?.total_sold_amount || 0, 2) }}
+            </template>
+          </span>
         </template>
       </el-table-column>
       <el-table-column
@@ -135,45 +135,69 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('wallet_detail_total_buy_avg')" align="right">
+      <el-table-column
+        :label="$t('total_unrealized_profit')"
+        :sort-orders="['descending', 'ascending', null]"
+        align="right"
+        prop="unrealized_profit"
+        sortable="custom"
+      >
         <template #default="{ row }">
-          <span v-if="row?.total_purchase_usd == 0">0</span>
-          <span v-else-if="row?.total_purchase_usd == '--'">--</span>
-          <span v-else>
-            {{ '$' + formatNumber(row?.total_purchase_usd || 0, 2) }}
+          <div v-if="row?.unrealized_profit == 0 && row.balance_amount == 0" class="color-[--down-color] text-12px">
+            {{$t('sellAl')}}
+          </div>
+          <div v-else>
+            <span v-if="row?.unrealized_profit == '--' || isStableCoin(row.token + '-' + row.chain)">--</span>
+            <span v-else-if="row?.unrealized_profit > 0" class="color-[--up-color]">
+              ${{ formatNumber(row?.unrealized_profit || 0, 2) }}
+            </span>
+            <span v-else-if="row?.unrealized_profit == 0">$0</span>
+
+            <span v-else class="color-[--down-color]">
+              {{ '-$' + formatNumber(Math.abs(row?.unrealized_profit) || 0, 2) }}
+            </span>
+            <span class="block lh-17px color-[--third-text] text-12px">
+              <template v-if="row?.unrealized_profit_ratio == '--' || isStableCoin(row.token + '-' + row.chain)">--</template>
+              <template v-else-if="row?.unrealized_profit_ratio == 0">0</template>
+              <template v-else>
+                <span :class="[row?.unrealized_profit_ratio > 0 ? 'color-[--up-color]' : 'color-[--down-color]' ]">
+                  {{ formatNumber(row?.unrealized_profit_ratio * 100 || 0, 2) }}%
+                </span>
+              </template>
+            </span>
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column
+        :label="$t('total_profit')"
+        :sort-orders="['descending', 'ascending', null]"
+        align="right"
+        prop="total_profit"
+        sortable="custom"
+      >
+        <template #default="{ row }">
+          <span v-if="row?.total_profit == '--' || isStableCoin(row.token + '-' + row.chain)">--</span>
+          <span v-else-if="row?.total_profit > 0" class="color-[--up-color]">
+            ${{ formatNumber(row?.total_profit || 0, 2) }}
           </span>
-          <span
-              class="block text-12px lh-17px color-[--third-text]"
-          >
-            <template v-if="row?.average_purchase_price_usd == 0">0</template>
-            <template v-else-if="row?.average_purchase_price_usd == '--'">--</template>
+          <span v-else-if="row?.total_profit == 0">$0</span>
+          <span v-else class="color-[--down-color]">
+            {{ '-$' + formatNumber(Math.abs(row?.total_profit) || 0, 2) }}
+          </span>
+          <span class="block lh-17px color-[--third-text] text-12px">
+            <template v-if="row?.total_profit_ratio == '--' || isStableCoin(row.token + '-' + row.chain)">--</template>
+            <template v-else-if="row?.total_profit_ratio == 0">0</template>
+
             <template v-else>
-              {{ '$' + formatNumber(row?.average_purchase_price_usd || 0, 2) }}
+              <span :class="[row?.total_profit_ratio > 0 ? 'color-[--up-color]' : 'color-[--down-color]' ]">
+                {{ formatNumber(row?.total_profit_ratio * 100 || 0, 2) }}%
+              </span>
             </template>
           </span>
         </template>
       </el-table-column>
 
-      <el-table-column :label="$t('wallet_detail_total_sell_avg')" align="right">
-        <template #default="{ row }">
-          <span v-if="row?.total_sold_usd == 0">0</span>
-          <span v-else-if="row?.total_sold_usd == '--'">--</span>
-          <span v-else>
-            {{ '$' + formatNumber(row?.total_sold_usd || 0, 2) }}
-          </span>
-          <span
-              class="block text-12px lh-17px color-[--third-text]"
-          >
-            <template v-if="row?.average_sold_price_usd == 0">0</template>
-            <template v-else-if="row?.average_sold_price_usd == '--'">--</template>
-            <template v-else>
-              {{ '$' + formatNumber(row?.average_sold_price_usd || 0, 2) }}
-            </template>
-          </span>
-        </template>
-      </el-table-column>
-
-      <el-table-column :label="$t('wallet_detail_transfer_in_out')" align="right">
+      <!-- <el-table-column :label="$t('wallet_detail_transfer_in_out')" align="right">
         <template #default="{ row }">
           <template v-if="row?.total_transfer_in_amount == 0">0</template>
           <template v-else-if="row?.total_transfer_in_amount == '--'">--</template>
@@ -205,10 +229,20 @@
             {{ formatNumber(row?.total_sold || 0, 2) }}
           </span>
         </template>
-      </el-table-column>
-      <el-table-column :label="$t('share')" align="right">
+      </el-table-column> -->
+      <el-table-column label="" align="right">
         <template #default="{ row }">
-          <Share :statistics="row" :type="'topHolder'" :address="row.token" :chain="row.chain" :symbol="row.symbol" :logo_url="row.logo_url || ''" />
+          <div v-if="row.token !== NATIVE_TOKEN" class="flex items-center justify-end gap-5px">
+            <QuickSwap
+              v-if="botStore.evmAddress && Number(row?.balance_amount || 0) > 0"
+              :swapValue="props.swapValue"
+              :swapSetSelected="(props.swapSetSelected as  's1' | 's2' | 's3')"
+              :creatorAddress="props.creatorAddress"
+              swapType="sell"
+              :row="row"
+            />
+            <Share :statistics="row" :type="'topHolder'" :address="row.token" :chain="row.chain" :symbol="row.symbol" :logo_url="row.logo_url || ''" />
+          </div>
         </template>
       </el-table-column>
     </el-table>
@@ -216,17 +250,18 @@
       v-model="hideTokenVisible"
       :row="currentHideToken"
       :self_address="address"
-      @hideToken="()=>{}"
+      @hideToken="_emit('hideToken')"
     />
   </div>
 </template>
 
 <script setup lang="ts">
 // import { formatNumber2, formatNumberS } from '@/utils/formatNumber'
-import HideTokenDialog from './hideTokenDialog.vue'
+import HideTokenDialog from '@/pages/address/[[userAddress]]/components/hideTokenDialog.vue'
 import TokenColumn from '@/components/tokenColumn.vue'
 import AveEmpty from '@/components/aveEmpty.vue'
 import Share from '@/components/share.vue'
+import QuickSwap from './quickSwap.vue'
 const props = defineProps({
   tableData: {
     type: Array,
@@ -261,24 +296,40 @@ const props = defineProps({
     default: 10,
   },
   isSelfAddress: Boolean,
-  address: String,
+  address: {
+    type: String,
+    default: '',
+  },
+  swapValue: {
+    type: [String, Number],
+    default: '100',
+  },
+  swapSetSelected: {
+    type: String,
+    default: '',
+  },
+  creatorAddress: {
+    type: String,
+    default: '',
+  }
 })
 
 const _emit = defineEmits(['hideToken'])
 const hideTokenVisible = ref(false)
 const currentHideToken = ref({})
-const injecteIsVolUSDT = inject<Ref<boolean>>('isVolUSDT')
-const themeStore = useThemeStore()
+// const injecteIsVolUSDT = inject<Ref<boolean>>('isVolUSDT')
+const injecteIsVolUSDT = ref(false)
 const walletStore = useWalletStore()
 const tokenDetailSStore = useTokenDetailsStore()
-const route = useRoute()
+const botStore = useBotStore()
 function jumpBalance(row) {
+  const address = botStore.walletList?.find(item => item.evmAddress === props.creatorAddress)?.addresses?.find(i => i.chain === row.chain)?.address || walletStore.address || ''
   tokenDetailSStore.$patch({
     drawerVisible: true,
     tokenInfo: {
       id: row.token + '-' + row.chain,
       symbol: row.symbol,
-      logo_url: row.logo_url,
+      logo_url: row?.logo_url || '',
       chain: row.chain,
       address: row.token,
       remark: '',
@@ -290,7 +341,7 @@ function jumpBalance(row) {
       token1_symbol: '',
       pairAddress: '',
     },
-    user_address: route.params.userAddress as string || useBotStore().getWalletAddress(row.chain) || useWalletStore().address,
+    user_address: address,
   })
 }
 
