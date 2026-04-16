@@ -55,7 +55,7 @@ import TheFooter from '@/components/layouts/TheFooter.vue'
 import SignalDraggable from '~/components/signal/signalDraggable.vue'
 // import PositionDragger from '~/components/position/positionDragger.vue'
 
-import { useEventBus } from '@vueuse/core'
+import { useEventBus,useMagicKeys } from '@vueuse/core'
 const PnlTracker = defineAsyncComponent(() => import('./components/pnlTracker.vue'))
 const TrackerDragger = defineAsyncComponent(() => import('~/components/twitterTracker/index.vue'))
 const botStore = useBotStore()
@@ -110,6 +110,15 @@ const scrollTopEvent = useEventBus(BusEventType.SCROLL_TO_TOP)
 function scrollToTop() {
   scrollTopEvent.emit()
 }
+
+// 监听键盘按下 / 键
+const keys = useMagicKeys()
+watch(keys['/'], (pressed) => {
+  if (pressed) {
+    useGlobalStore().dialogVisible_search = !useGlobalStore().dialogVisible_search
+  }
+})
+
 </script>
 
 <style lang="scss">
