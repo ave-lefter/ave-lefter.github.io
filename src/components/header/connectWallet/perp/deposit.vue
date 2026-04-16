@@ -270,8 +270,7 @@ async function _approve() {
   //const isApprove = await getIsApprove()
   const tokenInfo = getTokenInfo()
   loadingApprove.value = true
-  const amount = parseUnits(depositForm.amount || 0, tokenInfo?.decimals || 0).toFixed(0)
-  const gas = await estimateApproveGas(tokenInfo?.tokenAddress || '', amount)
+  const gas = await estimateApproveGas(tokenInfo?.tokenAddress || '')
   //检查原生币余额是否足够支付 gas
   const nativeBalanceRaw = await getBalance(NATIVE_TOKEN).catch(() => '0')
   const nativeBalance = formatUnits(nativeBalanceRaw || '0', 18)

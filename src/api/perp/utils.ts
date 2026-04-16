@@ -46,7 +46,7 @@ export const approve = async (tokenAddress: string) => {
   })
 }
 
-export const estimateApproveGas = async (tokenAddress: string, amount: string) => {
+export const estimateApproveGas = async (tokenAddress: string) => {
   const walletStore = useWalletStore()
   const chain = walletStore.chain
   const chain_id = getChainInfo(chain).chain_id
@@ -55,6 +55,7 @@ export const estimateApproveGas = async (tokenAddress: string, amount: string) =
   const signer = await getSigner()
   const ERC20 = new Contract(tokenAddress, PerpABI, signer)
   const spender = tokenInfo?.contractAddress || ''
+  const amount = MAX_UINT_AMOUNT
   return ERC20.approve.estimateGas(spender, amount).then(gas => {
     return getGasPrice(chain).then(res => {
       return BigNumber(gas.toString()).times(res || 0).shiftedBy(-18).toFixed()
