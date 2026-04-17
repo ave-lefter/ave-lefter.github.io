@@ -15,18 +15,19 @@
     @change="handleChange"
   >
     <template #prefix>
-      <div class="inline-flex items-center gap-1">
+      <div class="inline-flex items-center">
         <template v-if="multiple && Array.isArray(selectedChain)">
           <img
-            v-for="chain in selectedChain.slice(0, 3)"
+            v-for="(chain, index) in selectedChain.slice(0, 2)"
             :key="chain.id"
             :src="`${token_logo_url}chain/${chain.id}.png`"
             class="rd-50%"
+            :class="['rounded-50% mr--4px relative','z-'+(index+1), (index === selectedChain.length - 1) && 'mr-0']"
             width="12"
             lazy
             alt=""
           >
-          <span v-if="selectedChain.length > 3" class="text-8px text-gray-400">+{{ selectedChain.length - 3 }}</span>
+          <span :class="['inline-block bg-[#333] text-[#fff] min-w-14px h-14px lh-14px text-12px  border-rd-4px text-center',selectedChain.length===1?'ml-4px':'ml-4px']">{{ selectedChain.length }}</span>
         </template>
         <img
           v-else-if="!multiple && selectedChain && !Array.isArray(selectedChain) && selectedChain?.id"
