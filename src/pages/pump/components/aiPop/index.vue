@@ -1,5 +1,5 @@
 <template>
-  <div class="h-12px" @mouseover.stop="onEnter1">
+  <div class="h-12px" @mouseenter.stop="onEnter1">
     <slot v-bind="contentProps">
     </slot>
   </div>

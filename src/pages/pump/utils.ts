@@ -177,5 +177,11 @@ export function useSimilarTokenPopup() {
           filterList.splice(index, 1)
         }
       }
+      if (filterList.includes('ltcs') && filterList.includes(' rtcs')) {
+        const index = filterList.indexOf(' rtcs')
+        if (index !== -1) {
+          filterList.splice(index, 1)
+        }
+      }
       return filterList?.length || 0
   }

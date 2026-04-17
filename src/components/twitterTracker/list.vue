@@ -20,7 +20,7 @@
   <div v-else ref="parentRef" class="affix-container overflow-y-auto scrollbar-hide" style="height:calc(100% - 75px)" @scroll="onScroll">
     <el-affix v-if="hasTop"  target=".affix-container" :offset="100">
       <div class="flex justify-center">
-        <div class="flex items-center gap-0px py-6px px-4px rounded-4px bg-[--dialog-bg] text-[#37B270] text-12px clickable" @click="handleTop"><Icon name="custom:arrow-up"/>newMessage') }}</div>
+        <div class="flex items-center gap-0px py-6px px-4px rounded-4px bg-[--dialog-bg] text-[#37B270] text-12px clickable" @click="handleTop"><Icon name="custom:arrow-up"/>{{t('newMessage') }}</div>
       </div>
     </el-affix>
     <div :style="{

@@ -84,7 +84,7 @@
           v-for="item in mainCoins"
           :key="item.symbol || item.logo_url"
           class="flex items-center gap-4px text-12px"
-          :to="`/token/${item.id}`"
+          :to="`/perp/${item.symbol}USD`"
         >
           <img
             v-if="mainCoinLogos[item.symbol]"
