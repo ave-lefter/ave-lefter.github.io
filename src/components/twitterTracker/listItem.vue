@@ -110,7 +110,7 @@
                         </span>
                     </div>
                     <template v-if="(+props.item.original_type!==typeEnum.retweet)&&translationVisible&&showTranslation">
-                        <div v-if="processedContentZh?.html" class="mt-8px bg-[--main-list-hover] px-12px py-6px rounded-4px text-[--main-text1]" v-html="processedContentZh?.html" @click="handleContentClick"></div>
+                        <div v-if="processedContentZh?.html&&processedContent?.needsTranslation" class="mt-8px bg-[--main-list-hover] px-12px py-6px rounded-4px text-[--main-text1]" v-html="processedContentZh?.html" @click="handleContentClick"></div>
                         <el-skeleton v-else-if="processedContent?.needsTranslation" animated class="mt-8px">
                             <template #template>
                                 <el-skeleton-item variant="p" style="width: 100%" />
