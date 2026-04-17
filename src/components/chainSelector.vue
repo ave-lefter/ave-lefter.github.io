@@ -1,21 +1,35 @@
 <template>
   <el-select
     v-model="selectedChain"
+    :multiple="multiple"
     :placeholder="placeholder || (t('placeholderPrefix1') + t('chain'))"
     value-key="value"
     size="small"
+    :clearable="false"
     style="--el-fill-color-blank:var(--border);"
     :suffix-icon="CaretBottom"
     :class="[props.class, props.wrapperClass]"
-    :teleported="true"
-    popper-class="w-103px chain-selector-popper"
+    :teleported="props.teleported||false"
+    :popper-class="`${props.popperClass} w-103px chain-selector-popper`"
     :persistent="false"
     @change="handleChange"
   >
     <template #prefix>
-      <div class="inline-flex items-center">
+      <div class="inline-flex items-center gap-1">
+        <template v-if="multiple && Array.isArray(selectedChain)">
+          <img
+            v-for="chain in selectedChain.slice(0, 3)"
+            :key="chain.id"
+            :src="`${token_logo_url}chain/${chain.id}.png`"
+            class="rd-50%"
+            width="12"
+            lazy
+            alt=""
+          >
+          <span v-if="selectedChain.length > 3" class="text-8px text-gray-400">+{{ selectedChain.length - 3 }}</span>
+        </template>
         <img
-          v-if="selectedChain?.id"
+          v-else-if="!multiple && selectedChain && !Array.isArray(selectedChain) && selectedChain?.id"
           :src="`${token_logo_url}chain/${selectedChain.id}.png`"
           class="rd-50%"
           width="12"
@@ -57,12 +71,15 @@ interface ChainOption {
 }
 
 interface Props {
-  modelValue?: ChainOption | null
+  modelValue?: ChainOption | ChainOption[] | null
   placeholder?: string
   chains?: string[]
   showLabel?: boolean
+  multiple?: boolean
   class?: string
+  teleported?: boolean
   wrapperClass?: string
+  popperClass?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -70,17 +87,25 @@ const props = withDefaults(defineProps<Props>(), {
   placeholder: '',
   chains: () => [...SupportFullDataChain],
   showLabel: true,
+  multiple: false,
   class: 'w-70px!',
+  popperClass: '',
   wrapperClass: ''
 })
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: ChainOption | null): void
-  (e: 'change', value: ChainOption | null): void
+  (e: 'update:modelValue', value: ChainOption | ChainOption[] | null): void
+  (e: 'change', value: ChainOption | ChainOption[] | null): void
 }>()
 
 const selectedChain = computed({
-  get: () => props.modelValue,
+  get: () => {
+    if (props.multiple) {
+      return Array.isArray(props.modelValue) ? props.modelValue : []
+    } else {
+      return Array.isArray(props.modelValue) ? null : props.modelValue
+    }
+  },
   set: (val) => emit('update:modelValue', val)
 })
 
@@ -95,7 +120,7 @@ const chainOptions = computed(() => {
   })
 })
 
-function handleChange(value: ChainOption | null) {
+function handleChange(value: ChainOption | ChainOption[] | null) {
   emit('change', value)
 }
 </script>
@@ -113,6 +138,9 @@ function handleChange(value: ChainOption | null) {
 :deep(.chain-selector-popper) {
   z-index: 9999 !important;
 }
+// :deep(.el-select__selection) {
+//   display:
+// }
 </style>
 
 <style lang="scss">

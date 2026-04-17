@@ -125,11 +125,11 @@
                       <Icon name="custom:stop" />
                       <!-- <span class="ml-3px">{{ $t('paused') }}</span> -->
                     </div>
-                    <BatchWallet :chain=" getChainInfo(selectedChain.value,true)?.net_name" :boundary="null" />
+                    <BatchWallet :chain=" getChainInfo(selectedChain[0]?.value,true)?.net_name" :boundary="null" />
                     <QuickSwapSetCustom
                       v-model:quickBuyValue="quickBuyValue"
                       v-model:customSelected="swapSetSelected"
-                      :chain="getChainInfo(selectedChain.value, true)?.net_name"
+                      :chain="getChainInfo(selectedChain[0]?.value, true)?.net_name"
                       displayType="select"
                       :height="24"
                     />
@@ -229,7 +229,7 @@
       </el-tab-pane>
       <el-tab-pane disabled>
         <template #label>
-          <ChainSelector class="w-32px!" v-model="selectedChain" :show-label="false" wrapper-class="w-ChainSelector" />
+          <ChainSelector class="w-32px!" v-model="selectedChain" :show-label="false" wrapper-class="w-ChainSelector" popper-class="monitor-chain-selector-popper" :multiple="true" :teleported="true"/>
         </template>
       </el-tab-pane>
       <el-tab-pane disabled>
@@ -264,7 +264,7 @@
               v-if="(activeName === 0) && isLarge"
               v-model:quickBuyValue="quickBuyValue"
               v-model:customSelected="swapSetSelected"
-              :chain="getChainInfo(selectedChain.value, true)?.net_name"
+              :chain="getChainInfo(selectedChain[0]?.value, true)?.net_name"
               displayType="select"
               :height="24"
             />
@@ -328,11 +328,11 @@ const audioButtonRef = ref()
 const toggleMc = ref(false)
 const addFavAddressPopRef = ref()
 const isHoverTable = ref(false)
-const selectedChain = useStorage('monitorSelectedChain', {
+const selectedChain = useStorage('monitorSelectedChain', [{
   label: 'SOL',
   value: 'solana',
   id: 'solana'
-})
+}, { label: 'BSC', value: '56', id: 'bsc' }])
 // const activeName.value=ref(0)
 const quickBuyValue = useStorage('quickBuyValue', '0.01')
 const swapSetSelected = useStorage<BotSettingKey>('monitorSwapSetSelected', 's1')
@@ -779,5 +779,13 @@ function jumpToken({ e, rowData }: { e: Event; rowData: any }) {
       height: 12px;
     }
   }
+  .el-select__selection{
+    display: none;
+  }
+}
+</style>
+<style lang="scss">
+.monitor-chain-selector-popper{
+  width: 130px;
 }
 </style>
