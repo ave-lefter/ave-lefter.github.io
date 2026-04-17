@@ -2165,5 +2165,7 @@
   "googleAuth2": "Google Authenticator",
   "onlyBuy": "Only Buy",
   "onlySell": "Only Sell",
-  "minAmountU": "Min Volume($)"
+  "minAmountU": "Min Volume($)",
+  "monitorNum": "Monitor wallet count",
+  "favTotal": "Follow wallet total count"
 }

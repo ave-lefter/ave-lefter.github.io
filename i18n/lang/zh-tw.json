@@ -2152,5 +2152,7 @@
   "googleAuth2": "谷歌驗證器",
   "onlyBuy": "只看買入",
   "onlySell": "只看賣出",
-  "minAmountU": "最小成交額"
+  "minAmountU": "最小成交額",
+  "monitorNum": "監控錢包數",
+  "favTotal": "關注錢包總數"
 }

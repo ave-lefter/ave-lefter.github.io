@@ -25,7 +25,7 @@
                   :wallet_logo="row.maker_logo ? { logo: row.maker_logo, vip_logo: 'https://www.iconaves.com/address_portrait/KOL_V.png' } : {}"
                   iconSize="24px" :formatAddress="(address) =>
                       address?.slice(0, 4) + '...' + address?.slice(-4)
-                    " @updateRemark="init2" @click="(e: any) => jumpBalance(row, e)" />
+                    " @updateRemark="getMonitorList" @click="(e: any) => jumpBalance(row, e)" />
               </template>
               <template #header-type>
                 <span>{{ $t('type') }}</span>
@@ -110,30 +110,37 @@
                 onMouseleave:()=>isHoverTable=false
               }">
               <template #header-wallet>
-                <div class="flex-between w-100%">
-                  <div class="flex-start gap-8px">
-                    <!-- <FilterType v-model="txType" :options="txTypeList" />
-                    <Icon ref="audioButtonRef" :name="audioSettings.audio.monitor ? 'custom:ad' : 'custom:admute'"
-                      class="cursor-pointer text-16px color-[--secondary-text]" /> -->
-                    <pro-tag size="small" class="cursor-pointer w-55px" @click="toggleMc = !toggleMc">{{
-                      !toggleMc ?'U/Pri':'C/MC' }}
-                      <Icon name="lsicon:switch-filled" class="ml-4px text-12px" />
-                    </pro-tag>
-                  </div>
-                  <div class="flex-end gap-8px">
-                    <div v-show="isHoverTable" class="flex items-center color-#FFA622 text-12px">
-                      <Icon name="custom:stop" />
-                      <!-- <span class="ml-3px">{{ $t('paused') }}</span> -->
+                <div class="flex flex-col w-100% gap-14px"> 
+                  <div></div>
+                  <div class="flex-between w-100%">
+                    <div class="flex-start gap-8px">
+                      <!-- <FilterType v-model="txType" :options="txTypeList" />
+                      <Icon ref="audioButtonRef" :name="audioSettings.audio.monitor ? 'custom:ad' : 'custom:admute'"
+                        class="cursor-pointer text-16px color-[--secondary-text]" /> -->
+                      <pro-tag size="small" class="cursor-pointer w-55px" @click="toggleMc = !toggleMc">{{
+                        !toggleMc ?'U/Pri':'C/MC' }}
+                        <Icon name="lsicon:switch-filled" class="ml-4px text-12px" />
+                      </pro-tag>
                     </div>
-                    <BatchWallet :chain=" getChainInfo(selectedChain[0]?.value,true)?.net_name" :boundary="null" />
-                    <QuickSwapSetCustom
-                      v-model:quickBuyValue="quickBuyValue"
-                      v-model:customSelected="swapSetSelected"
-                      :chain="getChainInfo(selectedChain[0]?.value, true)?.net_name"
-                      displayType="select"
-                      :height="24"
-                    />
-                    <!-- <QuickBuyInput v-model="quickBuyValue" size="small" /> -->
+                    <div class="flex-end gap-8px">
+                      <div v-show="isHoverTable" class="flex items-center color-#FFA622 text-12px">
+                        <Icon name="custom:stop" />
+                        <!-- <span class="ml-3px">{{ $t('paused') }}</span> -->
+                      </div>
+                      <BatchWallet :chain=" getChainInfo(selectedChain[0]?.value,true)?.net_name" :boundary="null" />
+                      <QuickSwapSetCustom
+                        v-model:quickBuyValue="quickBuyValue"
+                        v-model:customSelected="swapSetSelected"
+                        :chain="getChainInfo(selectedChain[0]?.value, true)?.net_name"
+                        displayType="select"
+                        :height="24"
+                      />
+                      <!-- <QuickBuyInput v-model="quickBuyValue" size="small" /> -->
+                    </div>
+                  </div>
+                  <div class="flex flex-start gap-17px items-center text-[--third-text]">
+                    <span>{{ $t('monitorNum') }}&nbsp;<b class="text-[--main-text]">{{ monitor_count }}</b></span>
+                    <span>{{ $t('favTotal') }}&nbsp;<b class="text-[--main-text]">{{ fav_count }}</b></span>
                   </div>
                 </div>
               </template>
@@ -146,7 +153,7 @@
                         :wallet_logo="row.maker_logo ? { logo: row.maker_logo, vip_logo: 'https://www.iconaves.com/address_portrait/KOL_V.png' } : {}"
                         iconSize="24px" :formatAddress="(address) =>
                             address?.slice(0, 4) + '...' + address?.slice(-4)
-                          " @updateRemark="init2" @click="(e: any) => jumpBalance(row, e)" />
+                          " @updateRemark="getMonitorList" @click="(e: any) => jumpBalance(row, e)" />
                       <div class="color-[--third-text]">{{ getTxType(row) }}</div>
                       <template v-if="row.position_type=='3'">
                         <div v-if="(row._profit==='--')||!row._profit"  class="color-[--third-text]"></div>
@@ -287,7 +294,7 @@ import WalletManage from './walletManage.vue'
 import { throttle } from 'lodash-es'
 import { useStorage } from '@vueuse/core'
 import BigNumber from 'bignumber.js'
-import { getHistoryMonitor, batchPauseMonitor, addAttention2 } from '~/api/attention'
+import { getHistoryMonitor, batchPauseMonitor, addAttention2, getFavCount as _getFavCount } from '~/api/attention'
 import QuickBuyInput from './components/quickBuyInput.vue'
 import FilterType from './components/filterType.vue'
 import BatchWallet from '~/pages/token/components/right/botSwap/batchWallet.vue'
@@ -300,7 +307,7 @@ const { t } = useI18n()
 
 const { hasRing, monitorList2: dataSourceCache, visible, activeName, txType, minVol,isLeftFixed, isRightFixed } = storeToRefs(useMonitorStore())
 
-const { updateNum3 } = storeToRefs(useFollowStore())
+const { updateNum3,currentAddress } = storeToRefs(useFollowStore())
 const { isDark, audioSettings } = storeToRefs(useGlobalStore())
 const props = defineProps({
   scrollHeight: {
@@ -328,6 +335,8 @@ const audioButtonRef = ref()
 const toggleMc = ref(false)
 const addFavAddressPopRef = ref()
 const isHoverTable = ref(false)
+const fav_count = ref(0)
+const monitor_count = ref(0)
 const selectedChain = useStorage('monitorSelectedChain', [{
   label: 'SOL',
   value: 'solana',
@@ -374,7 +383,7 @@ watch(() => txType.value, (val) => {
     monitor_type.push('sell')
   }
   batchPauseMonitor(monitor_type).then(() => {
-    init2()
+    getMonitorList()
   })
 })
 watch(() => visible.value, (val) => {
@@ -530,9 +539,10 @@ watch(() => botStore.evmAddress, (val) => {
   }
 })
 function init() {
-  init2()
+  getMonitorList()
+  getFavCount()
 }
-function init2() {
+function getMonitorList() {
   if (!botStore.evmAddress) return
   loading.value = true
   let filtered_type = ''
@@ -564,6 +574,16 @@ function init2() {
     loading.value = false
   })
 
+}
+
+function getFavCount() {
+  _getFavCount({
+    self_address:currentAddress.value
+  }).then((res) => {
+    fav_count.value = res?.fav_count || 0
+    monitor_count.value = res?.monitor_count
+ || 0
+  })
 }
 function getIsBuy(item: { position_type?: string | number; tx_type?: string | number }) {
   // console.log('item', item)

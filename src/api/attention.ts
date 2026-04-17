@@ -390,6 +390,18 @@ export function getHistoryMonitor({pageNo=1,pageSize=50,filtered_type}:{
     }
   })
 }
+
+// Get user monitorAddress
+export function getFavCount({self_address}:{self_address:string}) {
+  const { $api } = useNuxtApp()
+  return $api('/v2api/fav_users/v1/user/fav_count',{
+    method: 'get',
+    params: {
+      self_address,
+    }
+  })
+}
+
 export const getAttentionPageList=createCacheRequest(function({ group = 0, user_chain, sort = '', sort_dir = '', keyword = '', last_tx_time_max = '', last_tx_time_min = '', time_interval = '', pageSize = 100, pageNO = 1, address = localStorage.bot_evmAddress || localStorage.walletAddress }: any){
 if (!address || address === 'undefined') {
     return Promise.resolve(null)
