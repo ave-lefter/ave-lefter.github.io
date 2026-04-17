@@ -2167,5 +2167,7 @@
   "onlySell": "Only Sell",
   "minAmountU": "Min Volume($)",
   "monitorNum": "Monitor wallet count",
-  "favTotal": "Follow wallet total count"
+  "favTotal": "Follow wallet total count",
+  "emptyButtonText": "Please monitor the wallet first",
+  "emptyButtonText1": "Please pay attention to the wallet first"
 }

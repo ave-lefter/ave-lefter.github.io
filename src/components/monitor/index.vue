@@ -8,7 +8,7 @@
         <template v-if="botStore.evmAddress">
           <div v-if="props.isLarge" v-loading="loading" class="text-12px m-table"
             element-loading-background="transparent">
-            <AveTable ref="aveTableRef" rowKey="id" :data="dataSource" :columns="columns" fixed :style="{
+            <AveTable ref="aveTableRef" :showEmptyText="true" rowKey="id" :data="dataSource" :columns="columns" fixed :style="{
               height: props.scrollHeight + 'px',
               // '--el-table-border':'1px solid var(--dialog-list-hover)',
               // '--el-table-bg-color':'transparent'
@@ -96,10 +96,20 @@
                   :row="{ ...row, ...{ target_token: row?.target_address, token0_address: row?.from_address, token1_address: row?.to_address, symbol: row?._target_Token?.symbol } }"
                   classNames="min-w-70px h-24px! w-quickSwap" />
               </template>
+              <template v-if="monitor_count===0" #empty>
+                <div v-if="!loading" class="h-full flex flex-col items-center justify-center pt-0px">
+                  <img v-if="themeStore.theme==='light'" src="@/assets/images/empty-white.svg" alt="">
+                  <img v-else src="@/assets/images/empty-black.svg" alt="">
+                  <span class="mt-10px">
+                    {{ $t('emptyNoData') }}
+                  </span>
+                  <el-button class="mt-10px" type="primary" size="small" @click="activeName=1">{{ $t('emptyButtonText') }}</el-button>
+                </div>
+              </template>
             </AveTable>
           </div>
-          <div v-else v-loading="loading" class="text-12px m-table" element-loading-background="transparent">
-            <AveTable ref="aveTableRef" rowKey="id" fixed :data="dataSource" :columns="columns" :headerHeight="54"
+          <div v-else v-loading="loading" class="text-12px m-table pt-14px" element-loading-background="transparent">
+            <AveTable ref="aveTableRef" rowKey="id" fixed :data="dataSource" :columns="columns" :headerHeight="54"  :showEmptyText="true"
               :rowHeight="70" headerClass="bg-transparent" :style="{
                 height: props.scrollHeight + 'px',
                 // height:'500px',
@@ -111,7 +121,6 @@
               }">
               <template #header-wallet>
                 <div class="flex flex-col w-100% gap-14px"> 
-                  <div></div>
                   <div class="flex-between w-100%">
                     <div class="flex-start gap-8px">
                       <!-- <FilterType v-model="txType" :options="txTypeList" />
@@ -138,7 +147,7 @@
                       <!-- <QuickBuyInput v-model="quickBuyValue" size="small" /> -->
                     </div>
                   </div>
-                  <div class="flex flex-start gap-17px items-center text-[--third-text]">
+                  <div class="flex flex-start gap-17px items-center text-[--third-text] font-400 text-12px lh-16px">
                     <span>{{ $t('monitorNum') }}&nbsp;<b class="text-[--main-text]">{{ monitor_count }}</b></span>
                     <span>{{ $t('favTotal') }}&nbsp;<b class="text-[--main-text]">{{ fav_count }}</b></span>
                   </div>
@@ -209,6 +218,16 @@
                       <span class="color-[--main-text]">{{ toggleMc ? row?._target_Token?.price : row?._mc }}</span>
                     </div>
                   </div>
+                </div>
+              </template>
+              <template v-if="monitor_count===0" #empty>
+                <div v-if="!loading" class="h-full flex flex-col items-center justify-center pt-0px">
+                  <img v-if="themeStore.theme==='light'" src="@/assets/images/empty-white.svg" alt="">
+                  <img v-else src="@/assets/images/empty-black.svg" alt="">
+                  <span class="mt-10px">
+                    {{ $t('emptyNoData') }}
+                  </span>
+                  <el-button class="mt-10px" type="primary" size="small" @click="activeName=1">{{ $t('emptyButtonText') }}</el-button>
                 </div>
               </template>
             </AveTable>
@@ -307,7 +326,7 @@ const { t } = useI18n()
 
 const { hasRing, monitorList2: dataSourceCache, visible, activeName, txType, minVol,isLeftFixed, isRightFixed } = storeToRefs(useMonitorStore())
 
-const { updateNum3,currentAddress } = storeToRefs(useFollowStore())
+const { updateNum2,updateNum3,updateNum13,currentAddress } = storeToRefs(useFollowStore())
 const { isDark, audioSettings } = storeToRefs(useGlobalStore())
 const props = defineProps({
   scrollHeight: {
@@ -324,6 +343,7 @@ const dataSource = ref<any[]>([])
 // const dataSourceCache = monitorList2
 const loading = ref(false)
 const botStore = useBotStore()
+const themeStore = useThemeStore()
 const wsStore = useWSStore()
 const aveTableRef = ref<InstanceType<typeof AveTable> | null>(null)
 const firstActivated = ref(true)
@@ -491,6 +511,14 @@ watch(() => isHoverTable.value, (val) => {
   }
 })
 
+watch(() => updateNum3.value + updateNum13.value, (val) => {
+  if (val) {
+    if(!monitor_count.value){
+      getMonitorList()
+    }
+    getFavCount()
+  }
+})
 // onMounted(() => {
 
 // })

@@ -5,7 +5,7 @@
         <el-option :key="0" :value="0" :label="$t('defaultGroup')" class="[&&]:h-20px [&&]:lh-20px [&&]:text-12px"/>
         <el-option v-for="item in addressGroups" :key="item.group_id" :label="item.name" :value="item.group_id"  class="[&&]:h-20px [&&]:lh-20px [&&]:text-12px"/>
       </el-select>
-      <el-button ref="addButtonRef" class="dialog-button"  style="height: 32px; padding: 8px 10px !important;font-size: 12px; color:var(--d-E0E0E0-l-333)">
+      <el-button ref="addButtonRef1" class="dialog-button"  style="height: 32px; padding: 8px 10px !important;font-size: 12px; color:var(--d-E0E0E0-l-333)">
         <Icon name="ic:baseline-person-add-alt-1" class="text-12px  mr-5px"/>
         {{ $t('addWallet') }}
       </el-button>
@@ -112,6 +112,16 @@
               <Icon name="bx:bxs-trash-alt" class="text-13px color-[--third-text]" @click.stop.prevent="handleDeleteAttention(row)"/>
             </div>
          </template>
+         <template #empty>
+          <div v-if="!loading" class="h-full flex flex-col items-center justify-center pt-0px">
+            <img v-if="themeStore.theme==='light'" src="@/assets/images/empty-white.svg" alt="">
+            <img v-else src="@/assets/images/empty-black.svg" alt="">
+            <span class="mt-10px">
+              {{ $t('emptyNoData') }}
+            </span>
+            <el-button ref="addButtonRef2" class="mt-10px" type="primary" size="small">{{ $t('emptyButtonText1') }}</el-button>
+          </div>
+         </template>
           <!-- <template #footer>
             <div
               class="flex items-center"
@@ -126,7 +136,8 @@
           </template> -->
       </AveTable>
     </div>
-     <AddFavAddressPop v-if="addButtonRef" ref="addFavAddressPopRef" :buttonRef="addButtonRef" @onConfirm="handleConfirmAdd"/>
+     <AddFavAddressPop v-if="addButtonRef1" ref="addFavAddressPopRef" :buttonRef="addButtonRef1" @onConfirm="handleConfirmAdd"/>
+     <AddFavAddressPop v-if="addButtonRef2" ref="addFavAddressPopRef" :buttonRef="addButtonRef2" @onConfirm="handleConfirmAdd"/>
   </div>
 </template>
 
@@ -163,8 +174,11 @@ const chainOptions=computed(()=>{
   ]
 })
 const visible = ref(false)
-const addButtonRef = ref()
+const addButtonRef1 = ref() 
+const addButtonRef2 = ref() 
 const addFavAddressPopRef = ref()
+// 当前激活的按钮 ref（用于弹框定位）
+const currentButtonRef = ref()
 // const selectGroupId=ref(0)
 const {selectGroupId,paginationParams,user_chain,monitorList1} = storeToRefs(useMonitorStore())
 const {currentAddress ,showBatchAddressDetails, updateNum12,updateNum13,updateNum14,updateNum2,updateNum3,addressGroups} = storeToRefs(useFollowStore())
@@ -192,6 +206,7 @@ const conditions = reactive({
   last_trade_time: string|number
 })
 const botStore = useBotStore()
+const themeStore = useThemeStore()
 // const dataSource=ref([] as Array<any>)
 const loading=ref(false)
 // const pageData = ref({
@@ -239,6 +254,7 @@ watch(() => updateNum12.value+updateNum13.value+updateNum14.value+updateNum3.val
 function init(){
   getTableList()
 }
+
 function handleConfirmAdd(formData:any,resetFields?:() => void,stopLoading?:()=>void) {
   addAttention2({ address:botStore.evmAddress, user_chain: formData?.user_chain?.id ,user_address:formData.address,remark:formData.remark,group:formData.group_id,is_monitored:0}).then(() => {
     // init2()

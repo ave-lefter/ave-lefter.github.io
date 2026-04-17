@@ -2154,5 +2154,7 @@
   "onlySell": "只看賣出",
   "minAmountU": "最小成交額",
   "monitorNum": "監控錢包數",
-  "favTotal": "關注錢包總數"
+  "favTotal": "關注錢包總數",
+  "emptyButtonText": "请先监控钱包",
+  "emptyButtonText1": "請先關注錢包"
 }
