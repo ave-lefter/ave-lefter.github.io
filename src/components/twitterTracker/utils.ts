@@ -208,6 +208,7 @@ export function processTwitterText(
 
   // Performance optimization: Fast path for plain text without special characters
   if ((!tokens || tokens.length === 0) && PLAIN_TEXT_REGEX.test(text)) {
+    // console.log('Using fast path for plain text', text,needsTranslation(text) )
     return { 
       html: escapeHtml(text), 
       needsTranslation: needsTranslation(text) 
@@ -372,7 +373,7 @@ export function processTwitterText(
   // Determine if translation is needed based on plain text segments
   const plainTextContent = plainTextSegments.join('')
   const shouldTranslate = needsTranslation(plainTextContent)
-  
+  // console.log('Using fast path for plain text', plainTextContent,shouldTranslate )
   return { 
     html: result, 
     needsTranslation: shouldTranslate 
