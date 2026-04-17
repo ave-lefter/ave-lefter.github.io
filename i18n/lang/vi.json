@@ -906,5 +906,7 @@
   "symbol": "Biểu tượng",
   "symbolDesc": "Làm nổi bật $SOL, $ETH và các token khác",
   "tokenAddressDesc": "Đánh dấu mã thông báo CA",
-  "newMessage": "Tin nhắn mới"
+  "newMessage": "Tin nhắn mới",
+  "fastModeTitle": "Chế độ Tia chớp, Tức thì trên chuỗi",
+  "fastModeDesc": "Nhanh hơn (nhanh hơn khoảng 2 giây), có thể dẫn đến khôi phục hoặc thực thi trùng lặp."
 }

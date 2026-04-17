@@ -662,5 +662,7 @@
   "symbol": "Sembol",
   "symbolDesc": "$SOL, $ETH ve diğer tokenleri vurgulayın",
   "tokenAddressDesc": "Token CA'yı vurgulayın",
-  "newMessage": "Yeni Mesaj"
+  "newMessage": "Yeni Mesaj",
+  "fastModeTitle": "Şimşek Modu, Anında Zincir Üstü",
+  "fastModeDesc": "Daha hızlı (yaklaşık 2 saniye daha hızlı), geri alma veya yinelenen yürütme ile sonuçlanabilir."
 }
