@@ -6,7 +6,7 @@ import { BigNumber } from 'bignumber.js'
 import type { GetTotalHoldersResponse} from '~/api/stats'
 import {getTotalHolders} from '~/api/stats'
 import { ElMessage } from 'element-plus'
-import { DefaultHeight, SupportTokenKlineLaunchpad, SupportTokenKlineChains } from '~/utils/constants'
+import { DefaultHeight } from '~/utils/constants'
 import { getXType } from '~/api/x'
 
 type Token = {
@@ -45,8 +45,7 @@ export const useTokenStore = defineStore('token', () => {
   })
 
   const tokenAllPair = computed(() => {
-    const isSupportTokenKlineLaunchpad = SupportTokenKlineLaunchpad?.includes?.(token.value?.chain + '-' + (token.value?.launchpad || ''))
-    if (!(SupportTokenKlineChains?.includes?.(token.value?.chain || '') || isSupportTokenKlineLaunchpad)) {
+    if (!token.value?.support_aggr_kline) {
       return null
     }
     const _pairs = tokenInfo.value?.pairs
@@ -326,10 +325,7 @@ export const useTokenStore = defineStore('token', () => {
         }
       })
       tokenInfo.value?.pairs.unshift(newPair)
-
-
-    const isSupportTokenKlineLaunchpad = SupportTokenKlineLaunchpad?.includes?.(token.value?.chain + '-' + (token.value?.launchpad || ''))
-      if (SupportTokenKlineChains?.includes?.(token.value?.chain || '') || isSupportTokenKlineLaunchpad) {
+      if (token.value?.support_aggr_kline) {
         switchPair(true)
       } else {
         switchPair(newPair.pair)

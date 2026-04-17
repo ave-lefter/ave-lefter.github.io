@@ -2017,6 +2017,12 @@ function getFilterData(list: PumpObj[], conditions: any) {
     if(conditions?.rstax) {
       pass = pass && Number(i.sell_tax|| 0) <= Number(conditions.rstax)
     }
+    if(conditions?.ltcs) {
+      pass = pass && (Number(i?.commission_sum ?? 0) + Number(i?.gas_fee_sum ?? 0)) >= Number(conditions.ltcs)
+    }
+    if(conditions?.rtcs) {
+      pass = pass && (Number(i?.commission_sum ?? 0) + Number(i?.gas_fee_sum ?? 0)) <= Number(conditions.rtcs)
+    }
     return pass
   })
 }

@@ -1,35 +1,37 @@
 <!-- eslint-disable vue/no-parsing-error -->
 <template>
   <div class="relative">
-    <el-alert
-      v-if="(tokenStore?.token?.risk_level ?? 0) < 0"
-      class="myTxs-notice"
-      type="warning"
-      :title="$t('riskWarning') + ': ' + $t('riskWarningContent1')"
-      show-icon
-      :style="{
-        backgroundColor: mode === 'light' ? '#ffa94d0d' : '#36131C',
-        color: '#f00',
-        border: 'none',
-        fontSize: '12px'
-      }"
-      :closable="false"
-    />
-    <el-alert
-      v-else-if="tokenStore.warningStatus"
-      class="myTxs-notice"
-      type="warning"
-      :title="t('alertNotice')"
-      show-icon
-      closable
-      :style="{
-        backgroundColor: mode === 'light' ? '#ffa94d0d' : '#3b1e0c',
-        color: '#ED6A0C',
-        border: 'none',
-        fontSize: '12px'
-      }"
-      @close="handleNoticeClose"
-    />
+    <template v-if="!tokenStore.loadingToken">
+      <el-alert
+        v-if="(tokenStore?.token?.risk_level ?? 0) < 0"
+        class="myTxs-notice"
+        type="warning"
+        :title="$t('riskWarning') + ': ' + $t('riskWarningContent1')"
+        show-icon
+        :style="{
+          backgroundColor: mode === 'light' ? '#ffa94d0d' : '#36131C',
+          color: '#f00',
+          border: 'none',
+          fontSize: '12px'
+        }"
+        :closable="false"
+      />
+      <el-alert
+        v-else-if="tokenStore.warningStatus"
+        class="myTxs-notice"
+        type="warning"
+        :title="t('alertNotice')"
+        show-icon
+        closable
+        :style="{
+          backgroundColor: mode === 'light' ? '#ffa94d0d' : '#3b1e0c',
+          color: '#ED6A0C',
+          border: 'none',
+          fontSize: '12px'
+        }"
+        @close="handleNoticeClose"
+      />
+    </template>
     <div
       class="info flex items-center bg-[--secondary-bg] mb-.5px h-64px p-x-16px text-12px color-[--third-text]"
     >
@@ -1325,12 +1327,8 @@ const marketCap = computed(() => {
 })
 
 const volume24 = computed(() => {
-  const isSupportTokenKlineLaunchpad = SupportTokenKlineLaunchpad?.includes?.(
-    chain.value + '-' + (tokenStore?.token?.launchpad || '')
-  )
   const isTokenKline =
-    (SupportTokenKlineChains?.includes?.(chain.value) ||
-      isSupportTokenKlineLaunchpad) &&
+    tokenStore.tokenInfo?.token?.support_aggr_kline &&
     'tokenAllPair' in tokenStore &&
     tokenStore?.tokenAllPair &&
     tokenStore?.selectedToken
