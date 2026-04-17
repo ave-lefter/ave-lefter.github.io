@@ -819,6 +819,7 @@ function createFollowOrder() {
     isPrivate: form.value.isPrivate, //防夹
     priorityFee: new BigNumber(priorityFee || 0).multipliedBy(10 ** 9!),
     tokenBlacklist: tokenBlacklist?.value?.filter(Boolean),
+    isFastModel: form.value.isFastModel, //快速模式
   }
   // ...(form.value?.id ? { id: form.value.id } : {}),
   formRef.value?.validate((valid) => {

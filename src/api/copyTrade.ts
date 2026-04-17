@@ -31,6 +31,7 @@ interface CopyTradeParams {
   disableAt: number // 结束时间点，整点，每天在此之后不跟
   tokenBlacklist: Array<string> // token黑名单，里面的不跟买
   ignoreHeld: false // 是否跟买已持仓的代币，false是跟买， true不跟买已持仓
+  isFastModel: boolean // 是否开启快速模式
 }
 
 //创建跟单

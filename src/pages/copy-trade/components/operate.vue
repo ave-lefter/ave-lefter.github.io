@@ -181,6 +181,7 @@ function getFollowSwapOrder() {
     }
   form.value.slippage = res.slippage /100
   form.value.isPrivate = res.isPrivate
+  form.value.isFastModel = res.isFastModel ?? false
   // form.value.priorityFee = res?.priorityFee
   form.value.priorityFee = decimals ? new BigNumber(res?.priorityFee || 0).div(
       10 ** decimals) : ''
