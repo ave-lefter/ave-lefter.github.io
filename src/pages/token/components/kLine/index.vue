@@ -211,7 +211,7 @@ import {
 import type { WSTx, KLineBar, SimpleWSTx } from './types'
 import BigNumber from 'bignumber.js'
 import { useKlineMarks } from './mark'
-import { DefaultHeight, WSSimpleTxChain, SupportTokenKlineLaunchpad, SupportTokenKlineChains } from '~/utils/constants'
+import { DefaultHeight, WSSimpleTxChain } from '~/utils/constants'
 import { TW_STUDY } from './constant'
 import UnknownRisk from './unknownRisk.vue'
 import DialogRemind from './dialogRemind.vue'
@@ -404,7 +404,6 @@ watch(
       const new_main_pair_data = val.new_main_pair_data
         if(new_main_pair_data.target_token == tokenAddress.value){
           const migrate_uprice = new_main_pair_data.target_token == new_main_pair_data.token0_address ? new_main_pair_data?.token0_price_usd : new_main_pair_data?.token1_price_usd
-          console.log('----------migrate_uprice------------',migrate_uprice)
           if (new_main_pair_data?.blocktime) {
             migrated.value = {
               migrate_time: new_main_pair_data?.blocktime,
@@ -412,7 +411,6 @@ watch(
               showMarket: showMarket.value,
               mcap: new BigNumber(migrate_uprice || 0).times(tokenStore?.token?.total || 0).toNumber(),
             }
-            console.log('----------migrate_uprice-1-----------',migrated.value)
             setTimeout(() => {
               onMarkChanged(true)
             }, 500)

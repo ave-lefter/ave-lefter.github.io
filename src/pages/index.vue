@@ -860,6 +860,7 @@ const categories: CategoryKey[] = ['new', 'soon', 'graduated']
 watch(
   () => categories.map(key => isPausedObj.value[key]),
   (newVals, oldVals) => {
+    if (route.name !== 'index') return
     newVals.forEach((newVal, index) => {
       const oldVal = oldVals?.[index]
       const category = categories[index]
@@ -973,6 +974,7 @@ pump_notice.value?.[activeChain.value]?.graduated
 //   getPumpList()
 // })
 watch(activeChain, (val, old) => {
+  if (route.name !== 'index') return
   if (old) {
     fourmemeListObj[old] = {
       new: [],
@@ -1639,6 +1641,7 @@ async function getPump(rawParams: PumpRequestParams, isFilter = false) {
   }
 
   // 2. 状态拦截
+  if (isLeave) return
   const isInactive = route.name !== 'index'
   if (isInactive) return
   const isPaused = isPausedObj.value?.[category]
@@ -1744,6 +1747,8 @@ async function getPump(rawParams: PumpRequestParams, isFilter = false) {
     }
     // HTTP 请求完成后刷新对应类别
     requestRefresh(finalParams.category as 'new' | 'soon' | 'graduated')
+    // 页面已切走则不再设置下次轮询
+    if (isLeave) return
     const isTrue = getFilterNumber(state.pumpFilter || {}, platforms.value, baseTokensAllStr.value) > 0
     if (isTrue) {
       Timer[category] = setTimeout(() => getPump(rawParams),  category ==='graduated' ? 45000 : 5000)
@@ -2012,6 +2017,12 @@ function getFilterData(list: PumpObj[], conditions: any) {
     if(conditions?.rstax) {
       pass = pass && Number(i.sell_tax|| 0) <= Number(conditions.rstax)
     }
+    if(conditions?.ltcs) {
+      pass = pass && (Number(i?.commission_sum ?? 0) + Number(i?.gas_fee_sum ?? 0)) >= Number(conditions.ltcs)
+    }
+    if(conditions?.rtcs) {
+      pass = pass && (Number(i?.commission_sum ?? 0) + Number(i?.gas_fee_sum ?? 0)) <= Number(conditions.rtcs)
+    }
     return pass
   })
 }
@@ -2043,6 +2054,7 @@ const documentVisible = computed(() => {
 
 
 watch(()=>currentAddress.value, (val) => {
+  if (route.name !== 'index') return
   getPumpConfig().then(() => {
     getPumpList()
   })

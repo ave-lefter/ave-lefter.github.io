@@ -351,6 +351,8 @@ const limitData = {
   rccr: '',
   lfans: '',  //推特粉丝数
   rfans: '',
+  ltcs: '',
+  rtcs: ''
 
 }
 const initForm = {
@@ -420,6 +422,8 @@ const initForm = {
 
   lfans: '',  //推特粉丝数
   rfans: '',
+  ltcs: '',
+  rtcs: ''
   // tx_24h_count_min: '',
   // tx_24h_count_max: '',
 
@@ -609,6 +613,13 @@ const columns = computed(() => {
     {
       label: `${t('sellTxs')}`,
       prop: ['lstx', 'rstx'],
+      placeholder: [t('minor'), t('max1')],
+      type: 'inputRange',
+      tab: Tabs2Enum.indicator
+    },
+    {
+      label: `${t('totalTax')}`,
+      prop: ['ltcs', 'rtcs'],
       placeholder: [t('minor'), t('max1')],
       type: 'inputRange',
       tab: Tabs2Enum.indicator
