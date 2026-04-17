@@ -66,7 +66,7 @@
             <p class="text-12px color-[--third-text] absolute left-[-138px] mt-34px mb-0">{{ $t('fastModeDesc') }}</p>
             <el-switch
               v-model="form.isFastModel"
-              class="ml-auto"
+              class="ml-auto fast-mode-switch"
               style="--el-switch-on-color: #3c6cf6; zoom: 0.9; height: 14px"
             />
           </el-form-item>
@@ -988,6 +988,18 @@ function apply(type: 'low' | 'high') {
   box-shadow: none;
   color: var(--secondary-text);
   padding: 0;
+}
+
+/* 闪电模式开关 - 显示闪电图标 */
+:deep(.fast-mode-switch .el-switch__core .el-switch__action) {
+  background-image: url("data:image/svg+xml,%3Csvg width='9' height='12' viewBox='0 0 9 12' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M5.0625 4.90909H9L3.9375 12V7.09091H0L5.0625 0V4.90909Z' fill='%23999999'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 9px 12px;
+}
+/* 开启状态 - 蓝色闪电 */
+:deep(.fast-mode-switch.is-checked .el-switch__core .el-switch__action) {
+  background-image: url("data:image/svg+xml,%3Csvg width='9' height='12' viewBox='0 0 9 12' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M5.0625 4.90909H9L3.9375 12V7.09091H0L5.0625 0V4.90909Z' fill='%233F80F7'/%3E%3C/svg%3E");
 }
 
 </style>
