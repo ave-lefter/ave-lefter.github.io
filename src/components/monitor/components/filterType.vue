@@ -35,7 +35,7 @@ const props = defineProps({
   },
   minVol: {
     type: Number,
-    default: 0.01
+    default: 0
   }
 })
 

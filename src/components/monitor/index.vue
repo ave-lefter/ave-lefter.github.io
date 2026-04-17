@@ -8,7 +8,7 @@
         <template v-if="botStore.evmAddress">
           <div v-if="props.isLarge" v-loading="loading" class="text-12px m-table"
             element-loading-background="transparent">
-            <AveTable ref="aveTableRef" :showEmptyText="true" rowKey="id" :data="dataSource" :columns="columns" fixed :style="{
+            <AveTable ref="aveTableRef" :showEmptyText="true" rowKey="id" :data="filterDataSource" :columns="columns" fixed :style="{
               height: props.scrollHeight + 'px',
               // '--el-table-border':'1px solid var(--dialog-list-hover)',
               // '--el-table-bg-color':'transparent'
@@ -109,7 +109,7 @@
             </AveTable>
           </div>
           <div v-else v-loading="loading" class="text-12px m-table pt-14px" element-loading-background="transparent">
-            <AveTable ref="aveTableRef" rowKey="id" fixed :data="dataSource" :columns="columns" :headerHeight="54"  :showEmptyText="true"
+            <AveTable ref="aveTableRef" rowKey="id" fixed :data="filterDataSource" :columns="columns" :headerHeight="54"  :showEmptyText="true"
               :rowHeight="70" headerClass="bg-transparent" :style="{
                 height: props.scrollHeight + 'px',
                 // height:'500px',
@@ -272,7 +272,7 @@
                 <!-- <Icon name="ic:baseline-person-add-alt-1" class="text-12px  mr-5px" /> -->
                 {{ $t('add') }}
               </el-button>
-              <FilterType v-model="txType" :options="txTypeList" :minVol="minVol"/>
+              <FilterType v-model="txType" v-model:minVol="minVol" :options="txTypeList"/>
               <Icon ref="audioButtonRef" :name="audioSettings.audio.monitor ? 'custom:ad' : 'custom:admute'"
                 class="cursor-pointer color-[--secondary-text]" />
               <!-- <el-switch
@@ -377,6 +377,13 @@ const walletManageProps = computed(() => {
     scrollHeight: props.scrollHeight,
   }
 })
+const filterDataSource = computed(() => {
+  // return dataSource.value
+  return minVol.value?dataSource.value.filter((i: any) => {
+    return i?._main_Token?.totalNumber && (Number(i?._main_Token?.totalNumber)>=minVol.value)
+  }) : dataSource.value
+})
+
 onMounted(async () => {
   // console.log('monitor mounted')
   nextTick(() => {
@@ -394,7 +401,7 @@ useVisibilityChange(() => {
     updateDateSource()
   }
 })
-watch(() => txType.value, (val) => {
+watch([() => txType.value, () => selectedChain.value], ([val]) => {
   const monitor_type: Array<'sell' | 'buy'> = []
   if (val.includes(0)) {
     monitor_type.push('buy')
@@ -402,7 +409,7 @@ watch(() => txType.value, (val) => {
   if (val.includes(1)) {
     monitor_type.push('sell')
   }
-  batchPauseMonitor(monitor_type).then(() => {
+  batchPauseMonitor(monitor_type, selectedChain.value.map(i => i.id).join(',')).then(() => {
     getMonitorList()
   })
 })
@@ -497,6 +504,7 @@ const columns = computed(() => {
   ]
 })
 watch(() => wsStore.wsResult[WSEventType.MONITOR], (val) => {
+  if(loading.value) return 
   mergeDataSource(val)
   if (visible.value && (activeName.value === 0)&&!isHoverTable.value) {
     updateDateSource()
@@ -511,7 +519,7 @@ watch(() => isHoverTable.value, (val) => {
   }
 })
 
-watch(() => updateNum3.value + updateNum13.value, (val) => {
+watch(() => updateNum2.value+updateNum3.value + updateNum13.value, (val) => {
   if (val) {
     if(!monitor_count.value){
       getMonitorList()
@@ -577,7 +585,10 @@ function getMonitorList() {
   if (txType.value.length !== txTypeList.value.length) {
     filtered_type = txType.value.join(',')
   }
-  getHistoryMonitor(filtered_type ? { filtered_type } : {}).then((res) => {
+  getHistoryMonitor({
+     chain: selectedChain.value.map(i => i.id).join(','),
+     amt_u_min: String(minVol.value) || '',
+     filtered_type }).then((res) => {
     let result = res || res?.data || []
     const list: any[] = []
     const listObj: Record<string, boolean> = {}
@@ -688,6 +699,7 @@ const formateTxInfo = function (item: { [x: string]: any; maker_address?: any; w
     price: '$' + formatNumber2(item[isBuy ? 'from_price_usd' : 'to_price_usd'] || 0),
     symbol: item[isBuy ? 'from_symbol' : 'to_symbol'],
     total: '$' + formatNumber2(new BigNumber(item[isBuy ? 'from_amount' : 'to_amount'] || 0).times(item[isBuy ? 'from_price_usd' : 'to_price_usd'] || 0).toFixed(0) || 0, 2, 4, 4),
+    totalNumber: new BigNumber(item[isBuy ? 'from_amount' : 'to_amount'] || 0).times(item[isBuy ? 'from_price_usd' : 'to_price_usd'] || 0).toFixed(0) || 0,
     address: item[isBuy ? 'from_address' : 'to_address'],
     tags: item[isBuy ? 'from_tags' : 'to_tags'],
     signals: item[isBuy ? 'from_signals' : 'to_signals'],
