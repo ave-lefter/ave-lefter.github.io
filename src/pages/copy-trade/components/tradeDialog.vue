@@ -62,8 +62,8 @@
               </el-option>
             </el-select>
           </el-form-item>
-          <el-form-item v-if="form.chain=='bsc'" :label="$t('fastModeTitle')" label-position="left">
-            <p class="text-12px color-[--third-text] ml-[-214px] mt-20px mb-0">{{ $t('fastModeDesc') }}</p>
+          <el-form-item v-if="form.chain=='bsc'" class="relative" :label="$t('fastModeTitle')" label-position="left">
+            <p class="text-12px color-[--third-text] absolute left-[-138px] mt-34px mb-0">{{ $t('fastModeDesc') }}</p>
             <el-switch
               v-model="form.isFastModel"
               class="ml-auto"
