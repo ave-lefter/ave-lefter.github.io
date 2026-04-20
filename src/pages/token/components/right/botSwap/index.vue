@@ -117,7 +117,7 @@ import RefreshBalance from './refreshBalance.vue'
 import type { WalletTokenInfo } from '~/api/types/token'
 
 // 创建对子组件的引用
-const swap = ref(null)
+const swap = ref<InstanceType<typeof Swap>>()
 const { t } = useI18n()
 const route = useRoute()
 const botSettingStore = useBotSettingStore()

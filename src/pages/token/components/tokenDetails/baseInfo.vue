@@ -124,8 +124,8 @@ function _getTokenStatistics() {
           .multipliedBy(100).toNumber(), 100)
         : 0
       let unrealized_profit_ratio = 0
-      if (Number(res?.total_profit || 0) > 0) {
-        unrealized_profit_ratio = Number(res?.unrealized_profit || 0) / Number(res?.total_profit || 0) * 100
+      if (Number(res?.total_purchase_usd || 0) > 0) {
+        unrealized_profit_ratio = Number(res?.unrealized_profit || 0) / Number(res?.total_purchase_usd || 0) * 100
       }
       let balance_amount_ratio = 0
       if (Number(res?.balance_amount || 0) > 0) {
