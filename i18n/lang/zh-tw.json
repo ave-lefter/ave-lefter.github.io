@@ -2165,5 +2165,6 @@
   "fastModeTitle": "閃電模式，極速上鏈",
   "fastModeDesc": "速度更快（約快2秒），可能出現回滾或重複執行等。",
   "top100SellAvgMC": "前100賣出平均市值",
-  "top100PurchaseAvgMC": "前100大倉平均市值"
+  "top100PurchaseAvgMC": "前100大倉平均市值",
+  "contest": "交易賽"
 }
