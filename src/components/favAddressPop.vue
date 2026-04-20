@@ -61,7 +61,6 @@ import { CirclePlusFilled } from '@element-plus/icons-vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import { ElMessage } from 'element-plus'
 import { addFavoriteGroup2 } from '~/api/attention'
-import { useStorage } from '@vueuse/core'
 
 
 const { t } = useI18n()
@@ -130,12 +129,6 @@ const formRef=ref<FormInstance|undefined>()
 const form = ref({...props.formData})
 const isAdd=ref(false)
 
-const persistedFormData = useStorage('favAddressPop-formData', {
-  group: 0,
-  is_monitored: 1
-}) 
-
-
 const addGroupName=ref('')
 
 const visible=computed({
@@ -148,7 +141,7 @@ const visible=computed({
 
 watch(()=>visible.value, (val) => {
   console.log('visible', val,props.formData)
-  form.value = { ...props.formData,...persistedFormData.value }
+  form.value = { ...props.formData,...followStore.favAddressPopFormData }
 })
 watch(() => props.visible, (val) => {
   console.log('props.visible', val)
@@ -159,8 +152,8 @@ function handleSubmit(formEl: FormInstance | undefined) {
     if (valid) {
       loading.value = true
       emits('onConfirm',form.value,formRef.value?.resetFields,()=>loading.value=false)
-      persistedFormData.value.group = Number(form.value.group)
-      persistedFormData.value.is_monitored = Number(form.value.is_monitored)
+      followStore.favAddressPopFormData.group = Number(form.value.group)
+      followStore.favAddressPopFormData.is_monitored = Number(form.value.is_monitored)
       // close()
     } else {
       console.log('error submit!', fields)
