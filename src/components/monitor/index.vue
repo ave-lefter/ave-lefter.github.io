@@ -140,7 +140,7 @@
                       <quickSwapSetCustom2
                         v-model:quickBuyValue="quickBuyValue"
                         v-model:customSelected="swapSetSelected"
-                        :chain="getChainInfo(selectedChain[0]?.value, true)?.net_name"
+                        :chain="selectedChainVals"
                         displayType="select"
                         :height="24"
                       />
@@ -290,7 +290,7 @@
               v-if="(activeName === 0) && isLarge"
               v-model:quickBuyValue="quickBuyValue"
               v-model:customSelected="swapSetSelected"
-              :chain="getChainInfo(selectedChain[0]?.value, true)?.net_name"
+              :chain="selectedChainVals"
               displayType="select"
               :height="24"
             />
@@ -317,7 +317,7 @@ import { getHistoryMonitor, batchPauseMonitor, addAttention2, getFavCount as _ge
 import QuickBuyInput from './components/quickBuyInput.vue'
 import FilterType from './components/filterType.vue'
 import BatchWallet from '~/pages/token/components/right/botSwap/batchWallet.vue'
-import quickSwapSetCustom2 from '~/components/quickSwap/quickSwapSetCustom.vue'
+import quickSwapSetCustom2 from '~/components/quickSwap/quickSwapSetCustom2.vue'
 import type { AveTable } from '#components'
 import type { PopoverInstance } from 'element-plus'
 import type { BotChain, BotSettingKey } from '~/utils/types'
@@ -362,9 +362,36 @@ const selectedChain = useStorage('monitorSelectedChain', [{
   value: 'solana',
   id: 'solana'
 }, { label: 'BSC', value: '56', id: 'bsc' }])
+
+const selectedChainVals = computed(() => {
+  return selectedChain.value.map(i => getChainInfo(i.value, true)?.net_name)
+})
+
 // const activeName.value=ref(0)
 const quickBuyValue = useStorage('quickBuyValue', '0.01')
-const swapSetSelected = useStorage<BotSettingKey>('monitorSwapSetSelected', 's1')
+
+// 根据选中的链生成唯一的存储key
+const getChainStorageKey = (chains: BotChain[]) => {
+  const chainStr = chains.sort().join('_')
+  return `monitorSwapSetSelected_${chainStr}`
+}
+
+// 使用 ref 存储预设值
+const swapSetSelected = ref<BotSettingKey>('s1')
+
+// 监听链变化，加载对应的预设值
+watch(selectedChainVals, (newChains) => {
+  const key = getChainStorageKey(newChains)
+  const saved = localStorage.getItem(key)
+  swapSetSelected.value = (saved as BotSettingKey) || 's1'
+}, { immediate: true })
+
+// 监听预设值变化，保存到对应的key
+watch(swapSetSelected, (newValue) => {
+  const key = getChainStorageKey(selectedChainVals.value)
+  localStorage.setItem(key, newValue)
+})
+
 const txTypeList = computed(() => {
   return [
     // { label: t('all'), value: 0 },

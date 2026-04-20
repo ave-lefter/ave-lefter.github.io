@@ -1,9 +1,3 @@
-<!--
- * @Date: 2026-04-20 10:09:53
- * @LastEditors: Lewis
- * @FilePath: /ave_web/src/components/quickSwap/quickSwapSetCustom copy.vue
- * @Description: In User Settings Edit
--->
 <template>
   <div class="items-center inline-flex">
     <!-- Button 类型展示 -->
@@ -22,7 +16,7 @@
           class="cursor-pointer border-none font-400 rounded-4px min-w-24px py-5px px-5px text-center"
           :class="`${item.value === props.customSelected?'color-[--main-text1] bg-[--tab-active-bg]':'color-[--secondary-text] bg-transparent'}`"
           type="button"
-          @click.stop="emit('update:customSelected', item.value)"
+          @click.stop="handlePresetChange(item.value)"
           @mouseenter="showPopover(item.value)"
           @mouseleave="visible = false"
 
@@ -42,6 +36,7 @@
       popper-class="new-popover"
       :style="{ '--component-height': componentHeight + 'px' }"
       @visible-change="handleSelectVisibleChange"
+      @change="handlePresetChange"
       @mouseenter="handleSelectHover"
       @mouseleave="handleSelectLeave"
     >
@@ -66,36 +61,41 @@
       :show-after="0"
       :hide-after="0"
     >
-      <ul class="text-12px">
-        <li class="mb-4px flex-start">
-          <Icon name="custom:slippage" class="color-[--third-text] ml-0 mr-6px cursor-pointer min-w-16px"/>
-          <span class="mr-4px color-[--third-text]">{{ $t('slippage') }}</span>
-          <span v-if="botSettingStore.botSettings?.[chain]?.buy?.[optionSelected]?.slippage !== 'auto'">
-            {{ botSettingStore.botSettings?.[chain || '']?.buy?.[optionSelected]?.slippage }}%
-          </span>
-          <span v-else>{{ $t('auto') }}</span>
-        </li>
-        <li v-if="isEvmChain(chain || '')" class="mt-4px mb-4px flex-start">
-          <Icon v-tooltip="$t('estimatedGas')" name="custom:gas" class="color-[--third-text] ml-0 mr-3px cursor-pointer min-w-18px"/>
-          <span class="mr-5px color-[--third-text]">{{ $t('estimatedGas') }}</span>
-          <span>${{ getOptionEstimatedGas() }}</span>
-        </li>
-        <li v-if="chain === 'solana'" class="mt-4px mb-4px flex-start">
-          <Icon name="custom:gas" class="color-[--third-text] mr-3px cursor-pointer ml-0 min-w-18px"/>
-          <span class="mr-5px color-[--third-text] whitespace-nowrap block">{{ $t('priorityFee') }}</span>
-          <span class="whitespace-nowrap">{{ getOptionPriorityFee() }} SOL</span>
-        </li>
-        <li class="mt-4px mb-4px flex-start">
-          <Icon :name="`custom:half-${globalStore.mode}`" class="text-18px color-[--third-text] ml-0 mr-3px cursor-pointer min-w-18px"/>
-          <span class="mr-5px color-[--third-text] whitespace-nowrap">{{ $t('autoSellHalf') }}</span>
-          <span>{{ botSettingStore.autoSellConfigs?.autoSell ? $t('on') : $t('off') }}</span>
-        </li>
-        <li class="mt-4px flex-start">
-          <Icon name="custom:mev" class="text-14px color-[--third-text] ml-0 mt--2px mr-3px cursor-pointer min-w-18px"/>
-          <span class="mr-5px color-[--third-text]">{{ $t('mev') }}</span>
-          <span>{{ botSettingStore.botSettings?.[chain]?.buy?.[optionSelected]?.mev ? $t('on') : $t('off') }}</span>
-        </li>
-      </ul>
+      <div class="text-12px flex gap-16px">
+        <ul v-for="chainItem in chainList" :key="chainItem" class="min-w-120px">
+          <li class="mb-4px flex-start">
+            <span class="mr-4px color-[--third-text] font-500">{{ getChainLabel(chainItem) }}</span>
+          </li>
+          <li class="mb-4px flex-start">
+            <Icon name="custom:slippage" class="color-[--third-text] ml-0 mr-6px cursor-pointer min-w-16px"/>
+            <span class="mr-4px color-[--third-text]">{{ $t('slippage') }}</span>
+            <span v-if="botSettingStore.botSettings?.[chainItem]?.buy?.[optionSelected]?.slippage !== 'auto'">
+              {{ botSettingStore.botSettings?.[chainItem]?.buy?.[optionSelected]?.slippage }}%
+            </span>
+            <span v-else>{{ $t('auto') }}</span>
+          </li>
+          <li v-if="isEvmChain(chainItem)" class="mt-4px mb-4px flex-start">
+            <Icon v-tooltip="$t('estimatedGas')" name="custom:gas" class="color-[--third-text] ml-0 mr-3px cursor-pointer min-w-18px"/>
+            <span class="mr-5px color-[--third-text]">{{ $t('estimatedGas') }}</span>
+            <span>${{ getOptionEstimatedGas(chainItem) }}</span>
+          </li>
+          <li v-if="chainItem === 'solana'" class="mt-4px mb-4px flex-start">
+            <Icon name="custom:gas" class="color-[--third-text] mr-3px cursor-pointer ml-0 min-w-18px"/>
+            <span class="mr-5px color-[--third-text] whitespace-nowrap block">{{ $t('priorityFee') }}</span>
+            <span class="whitespace-nowrap">{{ getOptionPriorityFee(chainItem) }} SOL</span>
+          </li>
+          <li class="mt-4px mb-4px flex-start">
+            <Icon :name="`custom:half-${globalStore.mode}`" class="text-18px color-[--third-text] ml-0 mr-3px cursor-pointer min-w-18px"/>
+            <span class="mr-5px color-[--third-text] whitespace-nowrap">{{ $t('autoSellHalf') }}</span>
+            <span>{{ botSettingStore.autoSellConfigs?.autoSell ? $t('on') : $t('off') }}</span>
+          </li>
+          <li class="mt-4px flex-start">
+            <Icon name="custom:mev" class="text-14px color-[--third-text] ml-0 mt--2px mr-3px cursor-pointer min-w-18px"/>
+            <span class="mr-5px color-[--third-text]">{{ $t('mev') }}</span>
+            <span>{{ botSettingStore.botSettings?.[chainItem]?.buy?.[optionSelected]?.mev ? $t('on') : $t('off') }}</span>
+          </li>
+        </ul>
+      </div>
     </el-popover>
     <el-input
       v-model.trim="quickBuyValue1"
@@ -111,9 +111,9 @@
       >
       <template #prefix>
         <img
-          v-if="chain"
+          v-if="chainList.length > 0"
           class="rounded-full w-14px h-14px mr-4px!"
-          :src="`${configStore.token_logo_url}chain/${chain}.png`"
+          :src="`${configStore.token_logo_url}chain/${chainList[0]}.png`"
           alt=""
           onerror="this.src='/icon-default.png'"
           srcset=""
@@ -130,36 +130,41 @@
       popper-style="min-width: auto; width: auto;"
       :persistent="false"
     >
-      <ul class="text-12px">
-        <li class="mb-4px flex-start">
-          <Icon name="custom:slippage" class="color-[--third-text] ml-0 mr-6px cursor-pointer min-w-16px"/>
-          <span class="mr-4px color-[--third-text]">{{ $t('slippage') }}</span>
-          <span v-if="botSettingStore.botSettings?.[chain]?.buy?.[selected]?.slippage !== 'auto'">
-            {{ botSettingStore.botSettings?.[chain || '']?.buy?.[selected]?.slippage }}%
-          </span>
-          <span v-else>{{ $t('auto') }}</span>
-        </li>
-        <li v-if="isEvmChain(chain || '')" class="mt-4px mb-4px flex-start">
-          <Icon v-tooltip="$t('estimatedGas')" name="custom:gas" class="color-[--third-text] ml-0 mr-3px cursor-pointer min-w-18px"/>
-          <span class="mr-5px color-[--third-text]">{{ $t('estimatedGas') }}</span>
-          <span>${{ getEstimatedGas() }}</span>
-        </li>
-        <li v-if="chain === 'solana'" class="mt-4px mb-4px flex-start">
-          <Icon name="custom:gas" class="color-[--third-text] mr-3px cursor-pointer ml-0 min-w-18px"/>
-          <span class="mr-5px color-[--third-text] whitespace-nowrap block">{{ $t('priorityFee') }}</span>
-          <span class="whitespace-nowrap">{{ botPriorityFee }} SOL</span>
-        </li>
-        <li class="mt-4px mb-4px flex-start">
-          <Icon :name="`custom:half-${globalStore.mode}`" class="text-18px color-[--third-text] ml-0 mr-3px cursor-pointer min-w-18px"/>
-          <span class="mr-5px color-[--third-text] whitespace-nowrap">{{ $t('autoSellHalf') }}</span>
-          <span>{{ botSettingStore.autoSellConfigs?.autoSell ? $t('on') : $t('off') }}</span>
-        </li>
-        <li class="mt-4px flex-start">
-          <Icon name="custom:mev" class="text-14px color-[--third-text] ml-0 mt--2px mr-3px cursor-pointer min-w-18px"/>
-          <span class="mr-5px color-[--third-text]">{{ $t('mev') }}</span>
-          <span>{{ botSettingStore.botSettings?.[chain]?.buy?.[selected]?.mev ? $t('on') : $t('off') }}</span>
-        </li>
-      </ul>
+      <div class="text-12px flex gap-16px">
+        <ul v-for="chainItem in chainList" :key="chainItem" class="min-w-120px">
+          <li class="mb-4px flex-start">
+            <span class="mr-4px color-[--third-text] font-500">{{ getChainLabel(chainItem) }}</span>
+          </li>
+          <li class="mb-4px flex-start">
+            <Icon name="custom:slippage" class="color-[--third-text] ml-0 mr-6px cursor-pointer min-w-16px"/>
+            <span class="mr-4px color-[--third-text]">{{ $t('slippage') }}</span>
+            <span v-if="botSettingStore.botSettings?.[chainItem]?.buy?.[selected]?.slippage !== 'auto'">
+              {{ botSettingStore.botSettings?.[chainItem]?.buy?.[selected]?.slippage }}%
+            </span>
+            <span v-else>{{ $t('auto') }}</span>
+          </li>
+          <li v-if="isEvmChain(chainItem)" class="mt-4px mb-4px flex-start">
+            <Icon v-tooltip="$t('estimatedGas')" name="custom:gas" class="color-[--third-text] ml-0 mr-3px cursor-pointer min-w-18px"/>
+            <span class="mr-5px color-[--third-text]">{{ $t('estimatedGas') }}</span>
+            <span>${{ getEstimatedGas(chainItem) }}</span>
+          </li>
+          <li v-if="chainItem === 'solana'" class="mt-4px mb-4px flex-start">
+            <Icon name="custom:gas" class="color-[--third-text] mr-3px cursor-pointer ml-0 min-w-18px"/>
+            <span class="mr-5px color-[--third-text] whitespace-nowrap block">{{ $t('priorityFee') }}</span>
+            <span class="whitespace-nowrap">{{ getChainPriorityFee(chainItem) }} SOL</span>
+          </li>
+          <li class="mt-4px mb-4px flex-start">
+            <Icon :name="`custom:half-${globalStore.mode}`" class="text-18px color-[--third-text] ml-0 mr-3px cursor-pointer min-w-18px"/>
+            <span class="mr-5px color-[--third-text] whitespace-nowrap">{{ $t('autoSellHalf') }}</span>
+            <span>{{ botSettingStore.autoSellConfigs?.autoSell ? $t('on') : $t('off') }}</span>
+          </li>
+          <li class="mt-4px flex-start">
+            <Icon name="custom:mev" class="text-14px color-[--third-text] ml-0 mt--2px mr-3px cursor-pointer min-w-18px"/>
+            <span class="mr-5px color-[--third-text]">{{ $t('mev') }}</span>
+            <span>{{ botSettingStore.botSettings?.[chainItem]?.buy?.[selected]?.mev ? $t('on') : $t('off') }}</span>
+          </li>
+        </ul>
+      </div>
     </el-popover>
   </div>
 </template>
@@ -180,7 +185,7 @@ const tokenStore = useTokenStore()
 const walletStore = useWalletStore()
 const emit = defineEmits(['update:quickBuyValue', 'update:customSelected'])
 const props = withDefaults(defineProps<{
-  chain: BotChain
+  chain: BotChain | BotChain[]
   quickBuyValue?: string
   showQuickAmount?: boolean
   settingsButtonVisible?:boolean
@@ -197,8 +202,17 @@ const props = withDefaults(defineProps<{
   height: 28
 })
 const globalStore = useGlobalStore()
+
+// 统一将 chain 转换为数组
+const chainList = computed(() => {
+  return Array.isArray(props.chain) ? props.chain : [props.chain]
+})
+
+const gasPriceObj: Record<string, number> = reactive({})
+
 const gasPrice = computed(() => {
-  return gasPriceObj?.[props.chain] || 0
+  const firstChain = chainList.value[0]
+  return firstChain ? (gasPriceObj?.[firstChain] || 0) : 0
 })
 
 // 计算统一的高度值（转换为 px 单位）
@@ -223,16 +237,51 @@ const isWallet = computed(() => {
   return (walletStore.provider && walletStore.address && !botStore.evmAddress)
 })
 const isQuickSupported = computed(()=>{
-  return props.chain && botStore.isSupportChains.includes(props.chain) && !isWallet.value
+  return chainList.value.length > 0 && 
+         chainList.value.some(chain => botStore.isSupportChains.includes(chain)) && 
+         !isWallet.value
 })
 
 const settingsButtonVisible1 = computed(() => {
   return props.settingsButtonVisible && !isWallet.value
 })
 
+// 获取链的显示名称
+function getChainLabel(chain: BotChain) {
+  const labels: Record<BotChain, string> = {
+    eth: 'ETH',
+    base: 'Base',
+    bsc: 'BSC',
+    solana: 'Solana',
+    xlayer: 'XLayer',
+    ton: 'TON'
+  }
+  return labels[chain] || chain
+}
+
+// 处理预设变更 - 批量设置所有链
+function handlePresetChange(value: BotSettingKey) {
+  // 更新所有链的预设
+  chainList.value.forEach(chain => {
+    if (botStore.isSupportChains.includes(chain) && botSettingStore.botSettings[chain]) {
+      if (!botSettingStore.botSettings[chain].buy) {
+        botSettingStore.botSettings[chain].buy = {
+          selected: 's1',
+          s1: botSettingStore.botSettings[chain].s1,
+          s2: botSettingStore.botSettings[chain].s2,
+          s3: botSettingStore.botSettings[chain].s3
+        }
+      }
+      botSettingStore.botSettings[chain].buy!.selected = value
+    }
+  })
+  
+  // 触发事件通知父组件
+  emit('update:customSelected', value)
+}
+
 // 通用的 priority fee 计算函数
-function calculatePriorityFee(settingKey: BotSettingKey) {
-  const chain = props.chain
+function calculatePriorityFee(chain: BotChain, settingKey: BotSettingKey) {
   if (!botStore.isSupportChains.includes(chain)) {
     return ''
   }
@@ -247,7 +296,14 @@ function calculatePriorityFee(settingKey: BotSettingKey) {
   return priorityFee
 }
 
-const botPriorityFee = computed(() => calculatePriorityFee(selected.value))
+const botPriorityFee = computed(() => {
+  const firstChain = chainList.value[0]
+  return firstChain ? calculatePriorityFee(firstChain, selected.value) : ''
+})
+
+function getChainPriorityFee(chain: BotChain) {
+  return calculatePriorityFee(chain, selected.value)
+}
 
 
 const quickBuyValue1 = computed({
@@ -292,13 +348,23 @@ function showPopover(item: BotSettingKey) {
   selected.value = item
   currentBtnRef.value = btnRefs.value[item] || null
   visible.value = true
-  getGasPrice()
+  // 获取所有链的 Gas 价格
+  chainList.value.forEach(chain => {
+    if (isEvmChain(chain)) {
+      getGasPrice(chain)
+    }
+  })
 }
 
 function handleSelectVisibleChange(visible: boolean) {
   if (visible && customSelectedLocal.value) {
     selected.value = customSelectedLocal.value
-    getGasPrice()
+    // 获取所有链的 Gas 价格
+    chainList.value.forEach(chain => {
+      if (isEvmChain(chain)) {
+        getGasPrice(chain)
+      }
+    })
     // 当下拉框展开时，监听选项的 hover 事件
     nextTick(() => {
       attachOptionHoverListeners()
@@ -369,7 +435,12 @@ function handleSelectHover() {
     selected.value = customSelectedLocal.value
     currentBtnRef.value = selectEl as HTMLElement
     visible.value = true
-    getGasPrice()
+    // 获取所有链的 Gas 价格
+    chainList.value.forEach(chain => {
+      if (isEvmChain(chain)) {
+        getGasPrice(chain)
+      }
+    })
   }
 }
 
@@ -380,10 +451,7 @@ function handleSelectLeave() {
   }, 100)
 }
 
-const gasPriceObj: Record<string, number> = reactive({})
-
-function getGasPrice() {
-  const chain = props.chain
+function getGasPrice(chain: BotChain) {
   if (!isEvmChain(chain) || gasPriceObj[chain]) {
     return
   }
@@ -396,8 +464,7 @@ function getGasPrice() {
 }
 
 // 通用的 estimated gas 计算函数
-function calculateEstimatedGas(settingKey: BotSettingKey) {
-  const chain = props.chain
+function calculateEstimatedGas(chain: BotChain, settingKey: BotSettingKey) {
   if (isEvmChain(chain) && botStore?.isSupportChains?.includes(chain)) {
     const botSettings = botSettingStore.botSettings?.[chain]?.buy?.[settingKey]
     const mev = botSettings?.mev
@@ -407,21 +474,22 @@ function calculateEstimatedGas(settingKey: BotSettingKey) {
     const settings = mev ? botSettings?.gas[0] : botSettings?.gas[1]
     const extraGasPrice = settings?.customFee || gasTips?.[settings?.level as number] || '3'
     const gasLimit = botSwapStore.gasTip?.find?.(i => i.chain === chain && i.mev === !!mev)?.gasLimit || 200000
-    return formatNumber(new BigNumber(gasPrice.value).plus(new BigNumber(extraGasPrice).times(String(10 ** 9))).times(gasLimit).times(nativePrice).div(String(10 ** 18)).toFixed(), 2)
+    const currentGasPrice = gasPriceObj[chain] || 0
+    return formatNumber(new BigNumber(currentGasPrice).plus(new BigNumber(extraGasPrice).times(String(10 ** 9))).times(gasLimit).times(nativePrice).div(String(10 ** 18)).toFixed(), 2)
   }
   return 0
 }
 
-function getEstimatedGas() {
-  return calculateEstimatedGas(selected.value)
+function getEstimatedGas(chain: BotChain) {
+  return calculateEstimatedGas(chain, selected.value)
 }
 
-function getOptionEstimatedGas() {
-  return calculateEstimatedGas(optionSelected.value)
+function getOptionEstimatedGas(chain: BotChain) {
+  return calculateEstimatedGas(chain, optionSelected.value)
 }
 
-function getOptionPriorityFee() {
-  return calculatePriorityFee(optionSelected.value)
+function getOptionPriorityFee(chain: BotChain) {
+  return calculatePriorityFee(chain, optionSelected.value)
 }
 </script>
 
