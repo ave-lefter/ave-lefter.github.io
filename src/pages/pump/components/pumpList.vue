@@ -778,8 +778,9 @@
                     <div class="mr-2px color-[--third-text1]">F</div>
                     <img
                       v-if="row?.chain"
-                      class="icon-symbol rounded-100% h-14px mr-2px"
+                      class="icon-symbol rounded-100% text-12px mr-2px"
                       :src="`${token_logo_url}chain/${row?.chain}.png`"
+                      :width="12"
                     >
                     <span v-if="Number(row?.commission_sum ?? 0) + Number(row?.gas_fee_sum ?? 0) >0" class="color-[--main-text1]">
                         {{ formatNumber((Number(row?.commission_sum ?? 0) + Number(row?.gas_fee_sum ?? 0)) , 2) }}

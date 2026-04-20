@@ -352,6 +352,7 @@ export const useGlobalStore = defineStore('global', () => {
   const dialogVisible_search = ref(false)
   // 搜索框的文案
   const dialogSearchText = ref('')
+  const showBanner = useStorage('showBanner', true, localStorage)
    function sendFooterPriceWs() {
     const data = {
       jsonrpc: '2.0',
@@ -480,6 +481,7 @@ export const useGlobalStore = defineStore('global', () => {
     clickHolderCount,
     popVisible,
     tagsRatio,
-    toggleGrid
+    toggleGrid,
+    showBanner
   }
 })
