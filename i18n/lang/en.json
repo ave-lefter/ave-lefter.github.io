@@ -2178,5 +2178,6 @@
   "fastModeTitle": "Lightning Mode",
   "fastModeDesc": "Faster (about 2 seconds faster), may result in rollback or duplicate execution.",
   "top100SellAvgMC": "Top100 Sell Avg MC",
-  "top100PurchaseAvgMC": "Top100 Purchase Avg Price"
+  "top100PurchaseAvgMC": "Top100 Purchase Avg Price",
+  "contest": "Contest"
 }
