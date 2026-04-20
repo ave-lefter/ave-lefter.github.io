@@ -137,7 +137,7 @@
                         <!-- <span class="ml-3px">{{ $t('paused') }}</span> -->
                       </div>
                       <BatchWallet :chain=" getChainInfo(selectedChain[0]?.value,true)?.net_name" :boundary="null" />
-                      <QuickSwapSetCustom
+                      <quickSwapSetCustom2
                         v-model:quickBuyValue="quickBuyValue"
                         v-model:customSelected="swapSetSelected"
                         :chain="getChainInfo(selectedChain[0]?.value, true)?.net_name"
@@ -286,7 +286,7 @@
               </pro-tag>
             </template>
             <!-- <QuickBuyInput v-if="(activeName === 0) && isLarge" v-model="quickBuyValue" size="small" /> -->
-            <QuickSwapSetCustom
+            <quickSwapSetCustom2
               v-if="(activeName === 0) && isLarge"
               v-model:quickBuyValue="quickBuyValue"
               v-model:customSelected="swapSetSelected"
@@ -317,7 +317,7 @@ import { getHistoryMonitor, batchPauseMonitor, addAttention2, getFavCount as _ge
 import QuickBuyInput from './components/quickBuyInput.vue'
 import FilterType from './components/filterType.vue'
 import BatchWallet from '~/pages/token/components/right/botSwap/batchWallet.vue'
-import QuickSwapSetCustom from '~/components/quickSwap/quickSwapSetCustom.vue'
+import quickSwapSetCustom2 from '~/components/quickSwap/quickSwapSetCustom.vue'
 import type { AveTable } from '#components'
 import type { PopoverInstance } from 'element-plus'
 import type { BotChain, BotSettingKey } from '~/utils/types'
