@@ -21,7 +21,7 @@
           <!-- <span>{{ item.chain_show || '' }}</span> -->
         </div>
       </div>
-      <div class="bg-[--main-input-button-bg] rounded-4px mr-8px text-12px px-10px py-7px flex items-center justify-center gap-6px">
+      <!-- <div class="bg-[--main-input-button-bg] rounded-4px mr-8px text-12px px-10px py-7px flex items-center justify-center gap-6px">
         <div
           class="flex items-center justify-center cursor-pointer"
           v-for="item in tabsList"
@@ -34,70 +34,50 @@
             class="text-10px color-[--third-text1] ml-4px"
           />
         </div>
-      </div>
-      <!-- <el-popover
-        v-model:visible="visible_platforms"
+      </div> -->
+      <el-popover
         placement="bottom-start"
         popper-class="new-popover"
         :width="'auto'"
         :persistent="false"
         trigger="click"
+        v-model:visible="gridPopoverVisible"
       >
         <template #reference>
-          <el-button class="btn mr-16px">
-            <template v-for="(i, $index) in platformsList" :key="$index">
-              <el-image
-                class="mr-5px rounded w-14px"
-                :src="`${token_logo_url}${i.platform_icon?.replace(
-                  '/signals/',
-                  'signals/'
-                )}`"
-              />
-              <span v-if="platformsList?.length == 1">{{
-                i.platform_show
-              }}</span>
-            </template>
+          <div class="bg-[--main-input-button-bg] rounded-4px mr-8px text-12px px-10px py-7px flex items-center justify-center gap-6px cursor-pointer">
+            <span class="color-[--main-text1]">
+              {{ tabsList.every(i => pumpSetting.grid[i.id].show) ? $t('all') : (tabsList.filter(i => pumpSetting.grid[i.id].show).map(i => i.name).join('、') || '—') }}
+            </span>
             <Icon
-              :name="
-                isRotate
-                  ? 'radix-icons:triangle-up'
-                  : 'radix-icons:triangle-down'
-              "
-              class="text-16px color-[--main-text]"
+              :name="gridPopoverVisible ? 'radix-icons:triangle-up' : 'radix-icons:triangle-down'"
+              class="text-16px"
             />
-          </el-button>
+          </div>
         </template>
         <template #default>
-          <template v-for="item in pumpConfig" :key="item.chain">
-            <template v-if="item.chain === activeChain">
-              <el-checkbox-group
-                v-model="pumpV3[activeChain].platforms as string[]"
-                class="pump-platforms flex flex-col"
-              >
-                <el-checkbox
-                  v-for="i in item.platforms"
-                  :key="i.platform"
-                  :label="i.platform_show"
-                  :value="i.platform"
-                  :disabled="
-                    pumpV3[activeChain].platforms?.includes(i.platform) &&
-                    pumpV3[activeChain].platforms?.length === 1
-                  "
-                >
-                  <el-image
-                    class="mr-5px rounded w-14px"
-                    :src="`${token_logo_url}${i.platform_icon?.replace(
-                      '/signals/',
-                      'signals/'
-                    )}`"
-                  />
-                  {{ i.platform_show }}
-                </el-checkbox>
-              </el-checkbox-group>
-            </template>
-          </template>
+          <div class="flex flex-col">
+            <div
+              v-for="item in tabsList"
+              :key="item.id"
+              class="flex items-center gap-8px py-6px cursor-pointer hover:bg-[--main-input-button-bg] rounded-4px text-14px"
+              @click.stop="globalStore.toggleGrid(item.id)"
+            >
+              <span class="relative inline-flex items-center justify-center text-14px">
+                <Icon
+                  :name="pumpSetting.grid[item.id].show ? 'fluent:checkbox-checked-16-filled' : 'fluent:checkbox-unchecked-16-filled'"
+                  :class="pumpSetting.grid[item.id].show ? 'color-[--primary-color]' : 'color-[--third-text1]'"
+                />
+                <Icon
+                  v-if="pumpSetting.grid[item.id].show"
+                  name="fluent:checkmark-16-filled"
+                  class="absolute color-#fff text-8px pointer-events-none"
+                />
+              </span>
+              <span :class="pumpSetting.grid[item.id].show ? 'color-[--main-color]' : 'color-[--third-text1]'">{{ item.name }}</span>
+            </div>
+          </div>
         </template>
-      </el-popover> -->
+      </el-popover>
 
       <div class="flex-1" />
       <Setting :chain="(activeChain as BotChain)" :pumpConfig="pumpConfig"/>
@@ -178,7 +158,7 @@
             :swapSetSelected="swapSetSelected1"
             :loading="pumpV3[activeChain]['new']['loading']"
             :hasFilter="getFilterNumber(pumpV3Pointer[activeChain].new.pumpFilter || {},platforms,baseTokensAllStr) > 0"
-            @mouseover="isPausedObj.new = true"
+            @mouseenter="isPausedObj.new = true"
             @mouseleave="isPausedObj.new = false"
             @clearFilter="handleClearFilter('new')"
           />
@@ -263,8 +243,8 @@
             :swapSetSelected="swapSetSelected2"
             :loading="pumpV3[activeChain]['soon']['loading']"
             isSoon
-            :hasFilter="getFilterNumber(pumpV3Pointer[activeChain].soon.pumpFilter || {},platforms,baseTokensAllStr) > 0"
-            @mouseover="isPausedObj.soon = true"
+            :sortField="pumpV3Pointer[activeChain].soon?.pumpFilter?.sort || ''"
+            :hasFilter="getFilterNumber(pumpV3Pointer[activeChain].soon.pumpFilter || {},platforms,baseTokensAllStr) > 0"            @mouseenter="isPausedObj.soon = true"
             @mouseleave="isPausedObj.soon = false"
             @clearFilter="handleClearFilter('soon')"
           />
@@ -337,7 +317,7 @@
             :loading="pumpV3[activeChain]['graduated']['loading']"
             isOut
             :hasFilter="getFilterNumber(pumpV3Pointer[activeChain].graduated.pumpFilter || {},platforms,baseTokensAllStr) > 0"
-            @mouseover="isPausedObj.graduated = true"
+            @mouseenter="isPausedObj.graduated = true"
             @mouseleave="isPausedObj.graduated = false"
             @clearFilter="handleClearFilter('graduated')"
           />
@@ -380,8 +360,7 @@ import type {
   PumpObj,
   ChainKey,
   CategoryKey,
-  WSPumpObj,
-  pumpBlack
+  WSPumpObj
 } from '@/api/types/pump'
 import type { BotChain } from '@/utils/types'
 import AutoSellSetting from '@/components/autoSellSetting/index.vue'
@@ -390,9 +369,20 @@ import { getFilterNumber } from './pump/utils'
 
 import SlippageSetMarket from './token/components/right/botSwap/slippageSetMarket.vue'
 import QuickSwapSetCustom from '@/components/quickSwap/quickSwapSetCustom.vue'
+import { BusEventType, type IFavDialogEventArgs } from '@/utils/constants'
+import { useEventBus } from '@vueuse/core'
 defineOptions({
   name: 'pump' // 显式命名
 })
+
+const favDialogEvent = useEventBus<IFavDialogEventArgs>(BusEventType.FAV_DIALOG)
+favDialogEvent.on(handleFavDialogEvent)
+
+function handleFavDialogEvent({ type }: IFavDialogEventArgs) {
+  if (type === 'remark' && route.name === 'index') {
+    getPumpList()
+  }
+}
 let timerAutoFresh: number | null = null
 type TimeoutReturnType = ReturnType<typeof setTimeout> | number | null
 const Timer: {
@@ -436,7 +426,7 @@ const activeChain = useStorage<ChainKey>(
 const audioUrl = ref('')
 const globalStore = useGlobalStore()
 const { pumpSetting, token_logo_url, pumpBlackList } = storeToRefs(globalStore)
-const currentAddress = computed(() =>  botStore?.evmAddress || walletStore?.address ||'')
+const currentAddress = computed(() => botStore?.evmAddress || walletStore?.address || '')
 const orderNew = computed(() => {
   return pumpSetting.value.grid['new']?.order
 })
@@ -453,6 +443,7 @@ const listTab = computed(() => ([
 ]))
 const pumpConfig = useStorage<PumpConfig[]>('pumpConfigV2', [])
 // const isRotate = ref(false)
+const gridPopoverVisible = ref(false)
 const { pump_notice, pumpV3, pumpFilterDefault, pump_query} = storeToRefs(usePumpStore())
 const pumpAudio = useTemplateRef('pumpAudio')
 // const visible_platforms = shallowRef(false)
@@ -596,6 +587,8 @@ type StatisticsItem = {
   following: number
   summary_score: number
   colluded_cluster_ratio: number
+  commission_sum: string
+  gas_fee_sum: string
 }
 let portraitTimer: ReturnType<typeof setTimeout> | null = null
 let isPortraitSubscribed = false
@@ -680,7 +673,7 @@ const syncCategory = (category: 'new' | 'soon' | 'graduated') => {
       if (!obj) return item
       const merged = {
         ...item,
-        ...(obj.logo_url ? { logo_url: obj.logo_url } : {}),
+        ...(obj.logo_url && !item.logo_url ? { logo_url: obj.logo_url } : {}),
         ...(obj.buy_tax ? { buy_tax: obj.buy_tax } : {}),
         ...(obj.sell_tax ? { sell_tax: obj.sell_tax } : {}),
         ...(obj.name ? { name: obj.name } : {}),
@@ -710,9 +703,9 @@ const syncCategory = (category: 'new' | 'soon' | 'graduated') => {
       list = list.filter((i) => !tokenSet.has(i.target_token))
     }
 
-    if (pumpSetting.value.isBlacklist && pumpBlackList.value?.length) {
-      list = list.filter((item: any) => !pumpBlackList.value.some((black: any) => hitBlacklist(item, black)))
-    }
+    // if (pumpSetting.value.isBlacklist && pumpBlackList.value?.length) {
+    //   list = list.filter((item: any) => !pumpBlackList.value.some((black: any) => hitBlacklist(item, black)))
+    // }
 
     list = getFilterData(list, pumpFilter)
     fourmemeListObj[currentChain][category] = list.slice(0, 100)
@@ -772,7 +765,13 @@ function requestRefresh(category?: 'new' | 'soon' | 'graduated') {
   handleRefreshLists()
 }
 
-const list1 = computed(() => fourmemeListObj?.[activeChain.value]?.new || [])
+const list1 = computed(() =>
+  fourmemeListObj?.[activeChain.value]?.new?.sort((a, b) => {
+    const timeA = Number(a?.created_at) || Number(a?.time)
+    const timeB = Number(b?.created_at) || Number(b?.time)
+    return timeB - timeA
+  }) || []
+)
 const list2 = computed(() => {
   const sort = pumpV3Pointer.value[activeChain.value].soon.pumpFilter.sort as 'progress' | 'market_cap'
   if (sort) {
@@ -820,15 +819,82 @@ const playGraduatedAudio = useThrottleFn((val) => {
     pumpAudio.value.play().catch(() => {})
   }
 }, 300)
+// watch(() => isPausedObj.value.new, (newVal) => {
+//   if (!newVal) {
+//     const params = {
+//       category: 'new' as CategoryKey,
+//       chain: activeChain.value,
+//       platforms: pumpV3.value?.[activeChain.value]?.platforms?.join(',') || 'all',
+//       ...pumpStore.pumpV3[activeChain.value].new.pumpFilter,
+//     }
+//     getPump(params as any)
+//   }
+// })
 
+// watch(() => isPausedObj.value.soon, (newVal) => {
+//   if (!newVal) {
+//     const params = {
+//       category: 'soon' as CategoryKey,
+//       chain: activeChain.value,
+//       platforms: pumpV3.value?.[activeChain.value]?.platforms?.join(',') || 'all',
+//       ...pumpStore.pumpV3[activeChain.value].soon.pumpFilter,
+//     }
+//     getPump(params as any)
+//   }
+// })
+
+// watch(() => isPausedObj.value.graduated, (newVal) => {
+//   if (!newVal) {
+//     const params = {
+//       category: 'graduated' as CategoryKey,
+//       chain: activeChain.value,
+//       platforms: pumpV3.value?.[activeChain.value]?.platforms?.join(',') || 'all',
+//       ...pumpStore.pumpV3[activeChain.value].graduated.pumpFilter,
+//     }
+//     getPump(params as any)
+//   }
+// })
+
+
+const categories: CategoryKey[] = ['new', 'soon', 'graduated']
+watch(
+  () => categories.map(key => isPausedObj.value[key]),
+  (newVals, oldVals) => {
+    if (route.name !== 'index') return
+    newVals.forEach((newVal, index) => {
+      const oldVal = oldVals?.[index]
+      const category = categories[index]
+      const state = pumpV3.value[activeChain.value]?.[category]
+      const isTrue = getFilterNumber(state.pumpFilter || {}, platforms.value, baseTokensAllStr.value) > 0
+      if (oldVal && !newVal && isTrue) {
+        const params = {
+          category,
+          chain: activeChain.value,
+          platforms: pumpV3.value?.[activeChain.value]?.platforms?.join(',') || 'all',
+          ...state.pumpFilter,
+        }
+        getPump(params as any)
+      }
+    })
+  }
+)
 watch(()=>pumpV3Pointer.value[activeChain.value].new.pumpFilter.q,(val)=>{
   debouncedFetch('new')
+})
+
+// 记录已播放过声音的 token（按 category 隔离），45ms 后自动清除，避免接口延迟刷新重复播放
+const playedAudioTokens: Record<string, Map<string, number>> = { new: new Map(), soon: new Map(), graduated: new Map() }
+watch(activeChain, () => {
+  playedAudioTokens.new.clear()
+  playedAudioTokens.soon.clear()
+  playedAudioTokens.graduated.clear()
 })
 
 const stopWatchList1 = watch(
   () => list1.value?.[0]?.target_token,
   (newValue, oldValue)=>{
-    if (oldValue) {
+    if (oldValue && newValue) {
+      playedAudioTokens.new.set(newValue, Date.now())
       playNewAudio(newValue)
     }
   }
@@ -836,7 +902,8 @@ const stopWatchList1 = watch(
 const stopWatchList2 = watch(
   () => list2.value?.[0]?.target_token,
   (newValue, oldValue)=>{
-    if (oldValue) {
+    if (newValue && oldValue && (playedAudioTokens.soon?.size === 0 || !playedAudioTokens.soon.has(newValue))) {
+      playedAudioTokens.soon.set(newValue, Date.now())
       playSoonAudio(newValue)
     }
   }
@@ -844,12 +911,32 @@ const stopWatchList2 = watch(
 const stopWatchList3 = watch(
   () => list3.value?.[0]?.target_token,
   (newValue, oldValue)=>{
-    if (oldValue) {
+    if (newValue && oldValue && (playedAudioTokens.graduated?.size === 0 || !playedAudioTokens.graduated.has(newValue))) {
+      playedAudioTokens.graduated.set(newValue, Date.now())
       playGraduatedAudio(newValue)
     }
   }
 )
-
+let cleanerAudioTokens: number | null = null
+function startCleanerAudioTokens() {
+  if (cleanerAudioTokens) return // 防止重复开启
+  cleanerAudioTokens = window.setInterval(() => {
+    const now = Date.now()
+    Object.values(playedAudioTokens).forEach(map => {
+      map.forEach((time, key) => {
+        if (now - time > 45000) {
+          map.delete(key)
+        }
+      })
+    })
+  }, 50000)
+}
+function stopCleanerAudioTokens() {
+  if (cleanerAudioTokens) {
+    clearInterval(cleanerAudioTokens)
+    cleanerAudioTokens = null
+  }
+}
 let onCanPlayHandler: (() => void) | null = null
 
 function bindAudioCanPlay() {
@@ -887,6 +974,7 @@ pump_notice.value?.[activeChain.value]?.graduated
 //   getPumpList()
 // })
 watch(activeChain, (val, old) => {
+  if (route.name !== 'index') return
   if (old) {
     fourmemeListObj[old] = {
       new: [],
@@ -1151,6 +1239,7 @@ function initPage() {
 
 onBeforeMount(() => {
   // 初始化 Web Worker（非阻塞主线程处理 WS item 转换）
+  startCleanerAudioTokens()
   const worker = new PumpWsMappingWorker()
   pumpWsNativeWorker = worker
   pumpWsMappingWorker = wrap<PumpWorkerAPI>(worker)
@@ -1166,6 +1255,8 @@ onBeforeMount(() => {
 })
 
 onUnmounted(() => {
+  stopCleanerAudioTokens()
+  favDialogEvent.off(handleFavDialogEvent)
   if (timerAutoFresh) {
     clearInterval(timerAutoFresh)
     timerAutoFresh = null
@@ -1235,6 +1326,13 @@ onUnmounted(() => {
     cancelAnimationFrame(logoThrottledRafId)
     logoThrottledRafId = null
   }
+  const categories = ['new', 'soon', 'graduated'] as const
+  categories.forEach((category) => {
+    if (Timer[category]) {
+      clearTimeout(Timer[category] as number)
+      Timer[category] = null
+    }
+  })
 })
 const startPortraitTimer = () => {
   if (portraitTimer) {
@@ -1543,15 +1641,11 @@ async function getPump(rawParams: PumpRequestParams, isFilter = false) {
   }
 
   // 2. 状态拦截
+  if (isLeave) return
   const isInactive = route.name !== 'index'
-  // const isPaused = isPausedObj.value?.[category] || route.name !== 'index'
-
   if (isInactive) return
-
-  // if (!isFilter && isPaused) {
-  //   Timer[category] = setTimeout(() => getPump(rawParams), 5000)
-  //   return
-  // }
+  const isPaused = isPausedObj.value?.[category]
+  if (isPaused) return
 
   // 3. 构建参数 (浅拷贝避免污染)
   const queryParams: any = { ...rawParams, chain: currentChain }
@@ -1653,9 +1747,20 @@ async function getPump(rawParams: PumpRequestParams, isFilter = false) {
     }
     // HTTP 请求完成后刷新对应类别
     requestRefresh(finalParams.category as 'new' | 'soon' | 'graduated')
-    // Timer[category] = setTimeout(() => getPump(rawParams), 10000)
+    // 页面已切走则不再设置下次轮询
+    if (isLeave) return
+    const isTrue = getFilterNumber(state.pumpFilter || {}, platforms.value, baseTokensAllStr.value) > 0
+    if (isTrue) {
+      Timer[category] = setTimeout(() => getPump(rawParams),  category ==='graduated' ? 45000 : 5000)
+    } else {
+      if (Timer[category]) {
+        clearTimeout(Timer[category] as number)
+        Timer[category] = null
+      }
+    }
   }
 }
+
 
 /** 辅助函数：统一处理后端无效时间 */
 function parseDate(dateStr?: string | number, toSeconds = false) {
@@ -1912,6 +2017,12 @@ function getFilterData(list: PumpObj[], conditions: any) {
     if(conditions?.rstax) {
       pass = pass && Number(i.sell_tax|| 0) <= Number(conditions.rstax)
     }
+    if(conditions?.ltcs) {
+      pass = pass && (Number(i?.commission_sum ?? 0) + Number(i?.gas_fee_sum ?? 0)) >= Number(conditions.ltcs)
+    }
+    if(conditions?.rtcs) {
+      pass = pass && (Number(i?.commission_sum ?? 0) + Number(i?.gas_fee_sum ?? 0)) <= Number(conditions.rtcs)
+    }
     return pass
   })
 }
@@ -1943,6 +2054,7 @@ const documentVisible = computed(() => {
 
 
 watch(()=>currentAddress.value, (val) => {
+  if (route.name !== 'index') return
   getPumpConfig().then(() => {
     getPumpList()
   })
@@ -1951,12 +2063,14 @@ watch(documentVisible, (val) => {
   if (route.name !== 'index') return
   if (val) {
     initPage()
+    startCleanerAudioTokens()
     if (timerAutoFresh) {
       clearInterval(timerAutoFresh)
       timerAutoFresh = null
     }
     getPumpList()
   } else {
+    stopCleanerAudioTokens()
     unbindAudioCanPlay()
     isPausedObj.value.new = false
     isPausedObj.value.soon = false
@@ -2041,7 +2155,10 @@ const DIRECT_MAP: [keyof StatisticsItem, keyof PumpObj][] = [
   ['headline_en', 'headline_en'],
   ['summary_score', 'summary_score'],
   ['followers', 'followers'],
-  ['following', 'following']
+  ['following', 'following'],
+  ['commission_sum', 'commission_sum'],
+  ['gas_fee_sum', 'gas_fee_sum'],
+
 ]
 const NUMBER_MAP: [keyof StatisticsItem, keyof PumpObj][] = [
   ['holder_count', 'holders'],//dev_holder_count
@@ -2177,7 +2294,9 @@ const MERGE_KEYS = [
   'followers',
   'following',
   'summary_score',
-  'colluded_cluster_ratio'
+  'colluded_cluster_ratio',
+  'commission_sum',
+  'gas_fee_sum'
 ] as const
 
 function mergeStatistics(prev: any, next: any) {
@@ -2220,22 +2339,6 @@ function handleClearFilter(type: 'new' | 'soon' | 'graduated') {
   const baseTokensString = baseTokenMap.value?.values?.()?.toArray?.()?.map((i: any) => i.token)?.join(',') || ''
   pumpStore.pumpV3[activeChain.value][type].pumpFilter = {...pumpFilterDefault.value,platforms:platformsString,base_tokens:baseTokensString}
   getPumpList(true)
-}
-function hitBlacklist(item:PumpObj, black: pumpBlack) {
-  if (black.type === 'twitter') {
-    const address = black.address?.replace('@', '')
-    return item.medias?.some(m => m.url?.includes(address))
-  }
-
-  if (black.type === 'keyword') {
-    return black.address === item.symbol
-  }
-
-  if (black.type === 'ca' || black.type === 'dev') {
-    return black.address === item.token
-  }
-
-  return false
 }
 </script>
 

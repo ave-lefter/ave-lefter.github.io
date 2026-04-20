@@ -12,7 +12,7 @@
     <template #reference>
       <slot :visible="visible">
         <el-button class="btn mr-8px h-28px" :class="{ active: isExit }">
-          <Icon name="custom:customized" class="text-13px mr-4px" /> {{ $t('customize') }}
+          <Icon name="custom:customized" class="text-13px" />
           <Icon
             :name="visible ? 'radix-icons:triangle-up' : 'radix-icons:triangle-down'"
             class="text-16px ml-4px"
@@ -116,12 +116,17 @@
                       class="mr-8px"
                       :width="12"
                     />
-                    {{ $t('hideSearch') }}
+
+                    {{ $t('showSearch') }}
                   </template>
                   <template v-else>
                     <Icon name="custom:search" class="text-12px mr-8px" />
-                    {{ $t('showSearch') }}
+                    {{ $t('hideSearch') }}
                   </template>
+                </li>
+                <li @click="pumpSetting.isLang = !pumpSetting.isLang">
+                    <Icon :name="`${pumpSetting.isLang ? 'majesticons:translate' : 'tdesign:translate-1'}`" class="text-12px mr-8px" />
+                    {{ pumpSetting.isLang ? $t('autoTranslationOn'): $t('autoTranslationOFF') }}
                 </li>
                 <li @click="switchProgress">
                   <Icon
@@ -134,36 +139,37 @@
                 <li @click="switchAvatar">
                   <template v-if="pumpSetting.avatar_isCircle == 'circle'">
                     <Icon name="custom:progress-circle" class="text-12px mr-8px" />
-                    {{ $t('rectTokenImage') }}
+
+                    {{ $t('circleTokenImage') }}
                   </template>
                   <template v-else>
                     <Icon name="custom:avatar-rect" class="text-12px mr-8px" />
-                    {{ $t('circleTokenImage') }}
+                    {{ $t('rectTokenImage') }}
                   </template>
                 </li>
                 <li @click="pumpSetting.isGutter = !pumpSetting.isGutter">
                   <template v-if="pumpSetting.isGutter">
                     <Icon name="custom:gutter-big" class="text-12px mr-8px" />
-                    {{ $t('compactColumns') }}
+                    {{ $t('looseColumns') }}
                   </template>
                   <template v-else>
                     <Icon name="custom:gutter-small" class="text-12px mr-8px" />
-                    {{ $t('looseColumns') }}
+                    {{ $t('compactColumns') }}
                   </template>
                 </li>
                 <li @click="pumpSetting.isRight = !pumpSetting.isRight">
                   <Icon name="custom:right-key" class="text-12px mr-8px" />
-                  <template v-if="pumpSetting.isRight">{{ $t('noNewTabRightClick') }}</template>
-                  <template v-else>{{ $t('newTabRightClick') }}</template>
+                  <template v-if="pumpSetting.isRight">{{ $t('newTabRightClick') }}</template>
+                  <template v-else>{{ $t('noNewTabRightClick') }}</template>
                 </li>
                 <li @click="pumpSetting.isBlacklist = !pumpSetting.isBlacklist">
                   <template v-if="pumpSetting.isBlacklist">
                     <Icon name="custom:key-invisible" class="text-12px mr-8px" />
-                    {{ $t('showBlackList') }}
+                    {{ $t('hideBlackList') }}
                   </template>
                   <template v-else>
                     <Icon name="custom:key-visible" class="text-8px mr-8px" />
-                    {{ $t('hideBlackList') }}
+                    {{ $t('showBlackList') }}
                   </template>
                 </li>
                 <li @click="pumpSetting.isInt = !pumpSetting.isInt">

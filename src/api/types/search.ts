@@ -54,6 +54,11 @@ export interface SearchHot {
   tx_volume_u_24h: number
   risk_level: number,
   badges: { tag: string, icon_url: string }[],
+  t_price_change_24h?: string;
+  t_price_change_1d?: string;
+  m_price_change_24h?: string;
+  m_price_change_1d?: string;
+  support_aggr_kline?: 1|0;
 }
 
 export interface SearchInfo {

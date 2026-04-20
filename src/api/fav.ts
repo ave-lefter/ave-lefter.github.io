@@ -40,6 +40,11 @@ interface GetFavListResponse {
   pool_size: number;
   remark?: string;
   issue_platform?:string
+  t_price_change_24h?: string;
+  t_price_change_1d?: string;
+  m_price_change_24h?: string;
+  m_price_change_1d?: string;
+  support_aggr_kline?: 1|0;
 }
 
 // Get user favorite tokens
@@ -82,6 +87,19 @@ function changeFavoritesIndex(token1: string, token2: string, group = 0, address
       group,
       token1,
       token2
+    }
+  })
+}
+
+// change user favorite tokens batch
+function batchChangeFavoritesIndex(address: string, group: number, moves: Array<{token_id: string, new_index: number}>) {
+  const { $api } = useNuxtApp()
+  return $api('/v1api/v3/tokens/favorite/changeIndex/batch', {
+    method: 'post',
+    body: {
+      address: address,
+      group,
+      moves
     }
   })
 }
@@ -275,5 +293,6 @@ export {
   getGroupChangeIndex,
   batchDeleteFavorite,
   batchFavRemarks,
+  batchChangeFavoritesIndex
 }
 export type { GetUserFavoriteGroupsResponse, GetFavListResponse }

@@ -1,81 +1,17 @@
-import {useStorage, useThrottleFn, useWindowSize} from '@vueuse/core'
 import type {GetSignalV2ListResponse} from '~/api/signal'
-
+import { createPanelDraggableState } from '~/composables/usePanelDraggableStore'
+import {useStorage} from '@vueuse/core'
 export const useSignalStore = defineStore('signalStore', () => {
   const route = useRoute()
   const shouldHide = computed(()=>{
     return route.path.includes('/smart')
   })
-  const signalVisible = useStorage('signalVisible', false)
-  const signalBoundingRect = useStorage('signalBoundingRect', {
-    width: 360,
-    height: 500,
-    x: 100,
-    y: 100
+
+  // Use the generic draggable state composable
+  const draggableState = createPanelDraggableState({
+    prefix: 'signal',
+    defaultFixedWidth: 360
   })
-  // const isLeftFixed = computed(() => {
-  //   return signalBoundingRect.value.x <= 0
-  // })
-  const {width: winWidth, height: winHeight} = useWindowSize()
-  const isLeftFixed = useStorage('isSignalLeft', false)
-  const isRightFixed = useStorage('isSignalRight', false)
-  const fixedWidth = useStorage('signalFixedWidth', 360)
-  // watch(() => [winWidth.value, signalBoundingRect.value.width, signalBoundingRect.value.x], () => {
-  //   if (!isRightFixed.value) {
-  //     const {width, x} = signalBoundingRect.value
-  //     isRightFixed.value = x + width >= winWidth.value
-  //   } else {
-  //     isRightFixed.value = signalBoundingRect.value.x + fixedWidth.value >= winWidth.value
-  //   }
-  // })
-
-  const translateStyle = shallowRef(0)
-  const onDrag = useThrottleFn((x: number) => {
-    if (x <= 0) {
-      translateStyle.value = 12
-    } else {
-      translateStyle.value =
-          x + signalBoundingRect.value.width >= winWidth.value ? -12 : 0
-    }
-  }, 100, false, true)
-  function onDragStop(x: number, y: number) {
-    signalBoundingRect.value.x = x
-    signalBoundingRect.value.y = y
-    isLeftFixed.value = x <= 0
-    if (x > 0) {
-      isRightFixed.value = x + signalBoundingRect.value.width >= winWidth.value
-    }
-    setTimeout(() => {
-      translateStyle.value = 0
-    })
-  }
-
-  function onResizing(width: number, height: number) {
-    signalBoundingRect.value.width = width
-    signalBoundingRect.value.height = height
-  }
-
-  function onLeftDragStop(x: number, y: number) {
-    isLeftFixed.value = Math.abs(x) < 1
-    if (!isLeftFixed.value) {
-      signalBoundingRect.value.x = x
-      signalBoundingRect.value.y = y
-    }
-  }
-
-  function onRightDragStop(x: number, y: number) {
-    isRightFixed.value = Math.abs(x) < 1
-    const _x = winWidth.value - fixedWidth.value + x
-    if (!isRightFixed.value) {
-      // signalBoundingRect.value.x = _x
-      signalBoundingRect.value.x = x
-      signalBoundingRect.value.y = y
-    }
-  }
-
-  function onFixedResizing(width: number) {
-    fixedWidth.value = width
-  }
 
   const activeChain = shallowRef('bsc')
 
@@ -106,39 +42,16 @@ export const useSignalStore = defineStore('signalStore', () => {
     triggerRef(signalList)
   }
 
-  const placement=computed(()=>{
-    if(!isLeftFixed.value&&!isRightFixed.value){
-      return 'center'
-    }else if(isLeftFixed.value){
-      return 'left'
-    } else if(isRightFixed.value){
-      return 'right'
-    } else {
-      return 'center'
-    }
-  })
   return {
-    signalVisible,
-    signalBoundingRect,
-    isLeftFixed,
-    isRightFixed,
-    fixedWidth,
-    winHeight,
-    winWidth,
-    onDragStop,
-    onLeftDragStop,
-    onRightDragStop,
-    onResizing,
-    onFixedResizing,
-    onDrag,
-    translateStyle,
+    ...draggableState,
+    signalVisible: draggableState.visible,
+    signalBoundingRect: draggableState.boundingRect,
     activeChain,
     filterParams,
     signalList,
     listStatus,
     pageParams,
     updateList,
-    shouldHide,
-    placement
+    shouldHide
   }
 })

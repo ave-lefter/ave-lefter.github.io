@@ -93,13 +93,13 @@
                     <div v-if="+props.item.original_type!==typeEnum.retweet" :class="[
                     { 'line-11': !contentExpanded && isContentOverflow },'my-8px'
                 ]">
-                        <div class="cursor-pointer w-p-box text-[--main-text1]" @click="handleContentClick" v-html="processedContent" />
+                        <div class="cursor-pointer w-p-box text-[--main-text1]" @click="handleContentClick" v-html="processedContent?.html" />
                     </div>
                   
                     <div v-if="+props.item.original_type!==typeEnum.retweet" :class="index !== -1 ? 'ml-0px' : ''"
                         class="justify-between items-center flex">
                         <div class="flex items-center gap-4px cursor-pointer text-12px color-[--third-text]" @click="translationVisible=!translationVisible">
-                            <template v-if="props.item.content&&showTranslation">
+                            <template v-if="props.item.content&&showTranslation&&processedContent?.needsTranslation">
                                 <Icon name="custom:translation" class="text-14px"/>{{ t(translationVisible ? 'viewOrigin':'viewTranslation') }}
                             </template>
                         </div>
@@ -110,8 +110,8 @@
                         </span>
                     </div>
                     <template v-if="(+props.item.original_type!==typeEnum.retweet)&&translationVisible&&showTranslation">
-                        <div v-if="processedContentZh" class="mt-8px bg-[--main-list-hover] px-12px py-6px rounded-4px text-[--main-text1]" v-html="processedContentZh" @click="handleContentClick"></div>
-                        <el-skeleton v-else animated class="mt-8px">
+                        <div v-if="processedContentZh?.html&&processedContent?.needsTranslation" class="mt-8px bg-[--main-list-hover] px-12px py-6px rounded-4px text-[--main-text1]" v-html="processedContentZh?.html" @click="handleContentClick"></div>
+                        <el-skeleton v-else-if="processedContent?.needsTranslation" animated class="mt-8px">
                             <template #template>
                                 <el-skeleton-item variant="p" style="width: 100%" />
                             </template>
@@ -128,7 +128,7 @@
                     </div>
                 </div>
                 <div ref="measureEl" class="text-14px lh-22px break-words absolute opacity-0 pointer-events-none"
-                    style="width: 100%; top: 0; left: 0; z-index: -1;" v-html="processedContent" />
+                    style="width: 100%; top: 0; left: 0; z-index: -1;" v-html="processedContent?.html" />
             </div>
             <div v-for="(media, mediaIndex) in item.medias?.slice?.(0, 1)" :key="mediaIndex"
                 :class="index !== -1 ? 'ml-0px' : ''" class="relative">

@@ -122,7 +122,7 @@ export const NATIVE_TOKENS = [
 ]
 
 export interface IFavDialogEventArgs {
-  type: 'confirmSwitchGroup' | 'remark' | 'order' | 'changeFavoriteGroupName'|'removeFavoriteGroup' |'delete',
+  type: 'confirmSwitchGroup' | 'remark' | 'order' | 'changeFavoriteGroupName'|'removeFavoriteGroup' |'delete' | 'pump_remark_edit',
   tokenId?: string,
   groupId?: string,
 }
@@ -133,6 +133,9 @@ export const BusEventType = {
   SCROLL_TO_TOP: 'scroll-to-top',
   TOP_ADD_GROUP: 'top-add-group',
   DEV_TOKENS_TAB: 'dev-tokens-tab',
+  PUMP_REMARK_EDIT: 'pump_remark_edit',
+  TOKEN_BLACKLIST_CHANGE: 'token-blacklist-change',
+  SWAP_COMPLETED: 'swap-completed',
 }
 
 export const ProvideType = {
@@ -147,6 +150,7 @@ export const SupportTokenKlineLaunchpad = [
   'bsc-four.meme',
   'bsc-flap.sh',
   'bsc-four_agent_meme',
+  'bsc-web3.binance.com',
   'solana-dexscreener.com',
   'solana-pump.fun',
   'solana-time.fun',

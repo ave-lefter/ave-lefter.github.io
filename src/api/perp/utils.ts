@@ -46,6 +46,33 @@ export const approve = async (tokenAddress: string) => {
   })
 }
 
+export const estimateApproveGas = async (tokenAddress: string) => {
+  const walletStore = useWalletStore()
+  const chain = walletStore.chain
+  const chain_id = getChainInfo(chain).chain_id
+  const perpStore = usePerpStore()
+  const tokenInfo = perpStore.metadata?.multiChain?.chainList?.find(item => item.chainId === chain_id)?.tokenList?.find?.(i => i.tokenAddress === tokenAddress)
+  const signer = await getSigner()
+  const ERC20 = new Contract(tokenAddress, PerpABI, signer)
+  const spender = tokenInfo?.contractAddress || ''
+  const amount = MAX_UINT_AMOUNT
+  return ERC20.approve.estimateGas(spender, amount).then(gas => {
+    return getGasPrice(chain).then(res => {
+      return BigNumber(gas.toString()).times(res || 0).shiftedBy(-18).toFixed()
+    })
+  }).catch(err => {
+    if (!(err?.code === 'CALL_EXCEPTION' || err?.message === 'execution reverted')) {
+      throw err
+    }
+    return ERC20.approve(spender, '0').then(res => res.wait()).then(async () =>{
+      const gas = await ERC20.approve.estimateGas(spender, amount)
+      return getGasPrice(chain).then(res => {
+        return BigNumber(gas.toString()).times(res || 0).shiftedBy(-18).toFixed()
+      })
+    })
+  })
+}
+
 export const deposit = async (tokenAddress: string, amount: string) => {
   const walletStore = useWalletStore()
   const chain = walletStore.chain
@@ -248,6 +275,3 @@ export async function createOrder(data: PerpOrderParams) {
     body: params
   })
 }
-
-
-

@@ -515,6 +515,7 @@
   "unKnown": "ダメージ",
   "unKnown1": "未知",
   "mine": "私の",
+  "myWatchlist": "ウォッチリスト",
   "bought": "買い",
   "sold": "売り",
   "seemsNoProblem": "問題なさそう",
@@ -931,7 +932,7 @@
   "oneOfficial": "至少有一个官方账号",
   "sellTxs": "24h売り取引数",
   "buyTxs": "24h買い取引数",
-  "chainToken": "链上画像チェーン上画像",
+  "chainToken": "チェーン上画像",
   "marketIndices": "市场指数市場指数",
   "snipers": "狙击人数",
   "KOLTraders": "KOL取引人数",
@@ -1514,5 +1515,7 @@
   "symbol": "シンボル",
   "symbolDesc": "$SOL、$ETH、その他のトークンを強調表示します",
   "tokenAddressDesc": "トークン CA を強調表示する",
-  "newMessage": "新しいメッセージ"
+  "newMessage": "新しいメッセージ",
+  "fastModeTitle": "ライトニングモード、即時オンチェーン",
+  "fastModeDesc": "より高速（約2秒速い）、ロールバックや重複実行が発生する可能性があります。"
 }

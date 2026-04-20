@@ -97,9 +97,10 @@
 
 <script setup lang='ts'>
 import { getBalance } from '~/api/swap'
+import { NATIVE_TOKEN } from '~/utils/constants'
 import { usePerpStore } from '~/stores/perp'
 import { switchEthereumChain } from '~/utils/wallet/evm'
-import { allowance, approve, deposit } from '~/api/perp/utils'
+import { allowance, approve, deposit , estimateApproveGas} from '~/api/perp/utils'
 import BigNumber from 'bignumber.js'
 const props = defineProps({
   getVisible: {
@@ -266,9 +267,24 @@ watch(() => depositForm.chain, (val) => {
 const loadingApprove = ref(false)
 
 async function _approve() {
-  // const isApprove = await getIsApprove()
+  //const isApprove = await getIsApprove()
   const tokenInfo = getTokenInfo()
   loadingApprove.value = true
+  const gas = await estimateApproveGas(tokenInfo?.tokenAddress || '')
+  //检查原生币余额是否足够支付 gas
+  const nativeBalanceRaw = await getBalance(NATIVE_TOKEN).catch(() => '0')
+  const nativeBalance = formatUnits(nativeBalanceRaw || '0', 18)
+  if (new BigNumber(nativeBalance).lt(gas)) {
+    const chainInfo = getChainInfo(walletStore.chain)
+    const symbol = chainInfo?.main_name || 'ETH'
+    ElMessageBox.alert(
+      t('insufficentGas', { symbol, min: gas }),
+      t('tips'),
+      { confirmButtonText: t('okay') }
+    )
+    loadingApprove.value = false
+    return
+  }
   const notifyDom = ElNotification({ icon: h('div', {class: 'el-loading-spinner', style: '--el-loading-spinner-size: 24px'}, [h('svg', { viewBox: '0 0 50 50', class: 'circular' }, [h('circle', { class: 'path', style: 'stroke-width: 3', cx: '25', cy: '25', r: '20', fill: 'none' })])]), message: t('approving') + '...', duration: 0 })
   approve(tokenInfo?.tokenAddress || '').then(res => {
     return res.wait()
@@ -291,6 +307,12 @@ async function handleDeposit() {
   const minDeposit = perpStore.metadata?.multiChain?.minDeposit || 0
   if (new BigNumber(depositForm.amount || 0).lt(minDeposit)) {
     ElMessage.error(t('minDeposit', { amount: minDeposit }))
+    return
+  }
+  // 检查 token 余额是否足够
+  const tokenBalance = new BigNumber(balance.value || 0)
+  if (tokenBalance.lt(depositForm.amount || 0)) {
+    ElMessage.error(t('insufficentFunds'))
     return
   }
   loading.value = true

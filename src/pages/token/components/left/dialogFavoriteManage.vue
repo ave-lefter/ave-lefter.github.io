@@ -9,7 +9,8 @@ import {
 } from '~/api/fav'
 import TokenImg from '~/components/tokenImg.vue'
 import {useEventBus} from '@vueuse/core'
-import {BusEventType} from '~/utils/constants'
+import { BusEventType } from '~/utils/constants'
+const favTokenStore = useFavTokenStore()
 
 const props = defineProps({
   list: {
@@ -19,6 +20,8 @@ const props = defineProps({
   visible: Boolean
 })
 const favDialogEvent = useEventBus(BusEventType.FAV_DIALOG)
+const pumpRemarkEditEvent = useEventBus<IFavDialogEventArgs>(BusEventType.PUMP_REMARK_EDIT)
+pumpRemarkEditEvent.on(handleFavDialogEvent)
 const {t} = useI18n()
 const botStore = useBotStore()
 const walletStore = useWalletStore()
@@ -36,6 +39,9 @@ const listStatus = shallowRef({
 
 onMounted(() => {
   _getFavoriteList()
+})
+onUnmounted(() => {
+  pumpRemarkEditEvent.off(handleFavDialogEvent)
 })
 
 function setActiveTab(val: number) {
@@ -177,6 +183,11 @@ async function confirmEditRemark(remark: string, tokenId: string, item: GetFavLi
     })
   } catch (e) {
     console.log('=>(dialogFavoriteManage.vue:149) e', e)
+  }
+}
+function handleFavDialogEvent({ type }: IFavDialogEventArgs) {
+  if (type === 'pump_remark_edit' && favTokenStore.visible) {
+    _getFavoriteList()
   }
 }
 </script>

@@ -31,6 +31,7 @@ export const useCopyTradeStore = defineStore('copyTrade', () => {
     slippage: 9, //滑点
     isPrivate: false, //防夹
     priorityFee: '', //优先费/gas费
+    isFastModel: false, //快速模式
   })
   const advancedForm = ref({
     minBuyValue: '',

@@ -38,7 +38,7 @@
           </div>
           <el-scrollbar :height="scrollbarHeight" @scroll="centerScroll" wrap-class="bg-[--secondary-bg]">
             <div
-              ref="centerContainer" 
+              ref="centerContainer"
               :class="orderBookVisible ? 'grid gap-1px' : 'grid grid-cols-1 gap-1px'"
               :style="
                 orderBookVisible ? { gridTemplateColumns: `1fr 4px ${orderBookWidth}px`,'will-change': 'gridTemplateColumns' } : {}
@@ -83,7 +83,6 @@ import { BelowChartTable } from './components/belowChartTable'
 import KLine from '~/pages/token/components/kLine/index.vue'
 import { OrderBook } from './components/orderBook'
 import { getAiSummary } from '@/api/token'
-import { SupportTokenKlineLaunchpad } from '~/utils/constants'
 
 definePageMeta({
   name: 'token-id',
@@ -266,9 +265,7 @@ function _getTokenInfo() {
     .then((res) => {
       tokenStore.tokenInfo = res
       tokenStore.pairAddress = res?.pairs?.[0].pair || ''
-      const isSupportTokenKlineLaunchpad = SupportTokenKlineLaunchpad?.includes?.(res?.token?.chain + '-' + (res?.token?.launchpad || ''))
-      const isTokenKline = (SupportTokenKlineChains?.includes?.(res?.token?.chain || '') || isSupportTokenKlineLaunchpad)
-      if (isTokenKline) {
+      if (tokenStore.tokenInfo?.token?.support_aggr_kline) {
         tokenStore.selectedToken = true
       } else {
         tokenStore.selectedToken = false
@@ -412,7 +409,7 @@ function drag(e: MouseEvent) {
       document.getElementById('tv_chart_container')!.style.pointerEvents = 'none'
       const _kHeight =
         e.clientY < dy ? kHeight.value - (dy - e.clientY) : kHeight.value + e.clientY - dy
-  
+
       if (_kHeight <= wHeight.value - 164) {
         kHeight.value = _kHeight
       }

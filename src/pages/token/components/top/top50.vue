@@ -54,18 +54,25 @@
             name="mi:circle-warning"
           />
         </div>
-        <div class="border mt-20px">
+        <div class="border mt-20px" @mouseleave="closeMarkerTooltip">
           <div class="holder">
             <div v-for="(item, $index) in list" :key="$index">
-              <NuxtLink v-if="filterTag(item.tag_type)" v-tooltip="{
-                content: filterTag(item.tag_type)?.text,
-                props: {
-                  placement: 'top',
-                  hideAfter: 0,
-                  persistent: false
-                }
-              }" :to="`/address/${item.account_address}/${chain}`">
-                <div class="item">
+              <NuxtLink 
+                v-if="filterTag(item.tag_type)" 
+                v-tooltip="{
+                  content: filterTag(item.tag_type)?.text,
+                  props: {
+                    placement: 'top',
+                    hideAfter: 0,
+                    persistent: false
+                  }
+                }" 
+                :to="`/address/${item.account_address}/${chain}`"
+              >
+                <div 
+                  class="item"
+                  @mouseenter="openMarkerTooltip(item, $event)"
+                >
                   <Icon
                     class="dot iconfont font-10 mr-5px color-red-6"
                     :name="filterTag(item.tag_type)?.icon"
@@ -145,12 +152,21 @@
       </div>
     </template>
   </el-popover>
+  
+  <MarkerTooltip
+    v-model="markerTooltipVisible"
+    :virtual-ref="makerTooltip"
+    :currentRow="currentRow"
+    :addressAndChain="addressAndChain"
+    trigger="manual"
+  />
 </template>
 
 <script setup lang="ts">
 import { _getEarlyholders, type EarlyHolders } from '@/api/top50'
 import { formatNewTags, getAddressAndChainFromId } from '@/utils/index'
 import type { content } from 'html2canvas/dist/types/css/property-descriptors/content'
+import MarkerTooltip from '../belowChartTable/transactions/markerTooltip.vue'
 const { t } = useI18n()
 const route = useRoute()
 // const router = useRouter()
@@ -160,6 +176,25 @@ const list = shallowRef<Array<EarlyHolders>>([])
 const id = computed(() => route.params?.id as string)
 const { chain } = getAddressAndChainFromId(route.params?.id as string)
 
+// MarkerTooltip 相关的状态
+const tokenStore = useTokenStore()
+const markerTooltipVisible = shallowRef(false)
+const makerTooltip = ref<HTMLElement>()
+const currentRow = shallowRef<any>({})
+const addressAndChain = computed(() => {
+  const id = route.params.id as string
+  if (id) {
+    return getAddressAndChainFromId(id)
+  }
+  return {
+    address: tokenStore.token?.token || '',
+    chain: tokenStore.token?.chain || ''
+  }
+})
+
+// 缓存所有地址的 row 数据，最多 50 个
+const rowCache = new Map<string, any>()
+
 onMounted(() => {
   getEarlyholders()
 })
@@ -167,6 +202,21 @@ onMounted(() => {
 watch(()=>route.params.id, () => {
   getEarlyholders()
 })
+
+// 监听 list 变化，更新缓存
+watch(list, (newList) => {
+  rowCache.clear()
+  newList.forEach(item => {
+    rowCache.set(item.account_address, {
+      wallet_address: item.account_address,
+      chain: chain,
+      newTags: item.new_tags,
+      senderProfile: null,
+      maker_bal: 0
+    })
+  })
+}, { deep: true })
+
 function jumpBalance(row: {account_address: string}) {
     const { chain } = getAddressAndChainFromId(route.params?.id as string)
     // const targetRoute = router.resolve({
@@ -218,11 +268,37 @@ function getEarlyholders() {
           (y) => ['25', '30', '31'].includes(y?.type ?? '')
         ),
       }))
+      
+      // 预缓存所有地址的 row 数据
+      rowCache.clear()
+      list.value.forEach(item => {
+        rowCache.set(item.account_address, {
+          wallet_address: item.account_address,
+          chain: chain,
+          newTags: item.new_tags,
+          senderProfile: null,
+          maker_bal: 0
+        })
+      })
     })
     .catch((err) => {
       console.log(err)
     })
     .finally(() => {})
+}
+
+function openMarkerTooltip(item: EarlyHolders, e: MouseEvent) {
+  // 从缓存中获取数据，避免重复创建对象
+  const cachedRow = rowCache.get(item.account_address)
+  if (!cachedRow) return
+  
+  makerTooltip.value = e.currentTarget as HTMLElement
+  currentRow.value = cachedRow
+  markerTooltipVisible.value = true
+}
+
+function closeMarkerTooltip() {
+  markerTooltipVisible.value = false
 }
 </script>
 

@@ -10,73 +10,45 @@ export const useDragStore = defineStore('drag', () => {
   const leftArr = useStorage<Array<'monitor' | 'pump' | 'signal' | 'twitter' |'position'|'favToken'>>('dragLeft', [])
   const rightArr = useStorage<Array<'monitor' | 'pump' | 'signal' | 'twitter' |'position'|'favToken'>>('dragRight', [])
 
-  watch(() => monitorStore.placement,(val) => {
-     console.log('monitorStore.placement', val)
-     if(val==='left'){
-       leftArr.value.push('monitor')
-     } else if (val==='right'){
-       rightArr.value.push('monitor')
-     } else{ 
-       leftArr.value = leftArr.value.filter(el => el !== 'monitor')
-       rightArr.value = rightArr.value.filter(el => el !== 'monitor')
-     }
+  // 通用的 placement 变化处理函数
+  const handlePlacementChange = (panelKey: 'monitor' | 'pump' | 'signal' | 'twitter' | 'position' | 'favToken', val: string) => {
+    // 先从两个数组中都移除该面板
+    leftArr.value = leftArr.value.filter(el => el !== panelKey)
+    rightArr.value = rightArr.value.filter(el => el !== panelKey)
+    
+    // 然后根据新的 placement 添加到对应数组
+    if (val === 'left') {
+      leftArr.value.push(panelKey)
+    } else if (val === 'right') {
+      rightArr.value.push(panelKey)
     }
-  )
-  watch(() => pumpStore.placement,(val) => {
-     console.log('pumpStore.placement', val)
-    if(val==='left'){
-       leftArr.value.push('pump')
-     }else if (val==='right'){
-       rightArr.value.push('pump')
-     } else{
-       leftArr.value = leftArr.value.filter(el => el !== 'pump')
-       rightArr.value = rightArr.value.filter(el => el !== 'pump')
-     }
-    }
-  )
-  watch(() => signalStore.placement,(val) => {
-     console.log('pumpStore.placement', val)
-    if(val==='left'){
-       leftArr.value.push('signal')
-     }else if (val==='right'){
-       rightArr.value.push('signal')
-     } else{
-       leftArr.value = leftArr.value.filter(el => el !== 'signal')
-       rightArr.value = rightArr.value.filter(el => el !== 'signal')
-     }
-    }
-  )
+  }
 
-  watch(()=> twitterTrackerStore.placement,val=>{
-    if(val==='left'){
-      leftArr.value.push('twitter')
-    }else if (val==='right'){
-      rightArr.value.push('twitter')
-    } else{
-      leftArr.value = leftArr.value.filter(el => el !== 'twitter')
-      rightArr.value = rightArr.value.filter(el => el !== 'twitter')
-    }
+  watch(() => monitorStore.placement, (val) => {
+    console.log('monitorStore.placement', val)
+    handlePlacementChange('monitor', val)
+  })
+  
+  watch(() => pumpStore.placement, (val) => {
+    console.log('pumpStore.placement', val)
+    handlePlacementChange('pump', val)
+  })
+  
+  watch(() => signalStore.placement, (val) => {
+    console.log('signalStore.placement', val)
+    handlePlacementChange('signal', val)
   })
 
-  watch(()=> positionStore.placement,val=>{
-    if(val==='left'){
-      leftArr.value.push('position')
-    }else if (val==='right'){
-      rightArr.value.push('position')
-    } else{
-      leftArr.value = leftArr.value.filter(el => el !== 'position')
-      rightArr.value = rightArr.value.filter(el => el !== 'position')
-    }
+  watch(() => twitterTrackerStore.placement, (val) => {
+    handlePlacementChange('twitter', val)
   })
-  watch(()=> favTokenStore.placement,val=>{
-    if(val==='left'){
-      leftArr.value.push('favToken')
-    }else if (val==='right'){
-      rightArr.value.push('favToken')
-    } else{
-      leftArr.value = leftArr.value.filter(el => el !== 'favToken')
-      rightArr.value = rightArr.value.filter(el => el !== 'favToken')
-    }
+
+  watch(() => positionStore.placement, (val) => {
+    handlePlacementChange('position', val)
+  })
+  
+  watch(() => favTokenStore.placement, (val) => {
+    handlePlacementChange('favToken', val)
   })
 
   const fixedWidth = computed(() => {

@@ -1,6 +1,6 @@
 <template>
   <el-dialog align-center v-model="localVisible" header-class="hidden"
-    class="[--el-bg-color:--pump-bg] border-1px border-solid border-[--main-divider] dialog color-[--main-text1]" title="" :width="488"
+    class="[--el-bg-color:--d-0E0F10-l-FFF] border-1px border-solid border-[--main-divider] dialog color-[--main-text1]" title="" :width="488"
     style="padding: 0" append-to-body :persistent="false" :show-close="false">
     <template #default>
       <div
@@ -138,10 +138,7 @@
                 <el-checkbox v-for="item in deployerPlatforms" :key="item.platform" :label="item.platform"
                   class="[&&]:mr-0 [&&]:[--el-checkbox-height:28px]">
                   <span class="flex items-center gap-8px color-[--main-text1]">
-                    <el-image class="rounded w-14px" :src="`${configStore.token_logo_url}${item.logo_url?.replace(
-                      '/signals/',
-                      'signals/'
-                    )}`" />
+                    <el-image class="rounded w-14px" :src="formatIconTag('j7tracker.com')" />
                     {{ item.name }}
                   </span>
                 </el-checkbox>
@@ -354,6 +351,8 @@ const limitData = {
   rccr: '',
   lfans: '',  //推特粉丝数
   rfans: '',
+  ltcs: '',
+  rtcs: ''
 
 }
 const initForm = {
@@ -423,6 +422,8 @@ const initForm = {
 
   lfans: '',  //推特粉丝数
   rfans: '',
+  ltcs: '',
+  rtcs: ''
   // tx_24h_count_min: '',
   // tx_24h_count_max: '',
 
@@ -612,6 +613,13 @@ const columns = computed(() => {
     {
       label: `${t('sellTxs')}`,
       prop: ['lstx', 'rstx'],
+      placeholder: [t('minor'), t('max1')],
+      type: 'inputRange',
+      tab: Tabs2Enum.indicator
+    },
+    {
+      label: `${t('totalTax')}`,
+      prop: ['ltcs', 'rtcs'],
       placeholder: [t('minor'), t('max1')],
       type: 'inputRange',
       tab: Tabs2Enum.indicator

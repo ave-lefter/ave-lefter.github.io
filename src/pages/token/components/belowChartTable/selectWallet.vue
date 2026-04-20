@@ -9,7 +9,7 @@
     :popper-options="{ modifiers: [{ name: 'preventOverflow', options: { boundary: boundary, padding: 0 } }] }"
   >
     <template #reference>
-      <div class="ml-20px flex items-center clickable">
+      <div class="ml-20px flex items-center clickable" :class="contentClass">
         <Icon name="ri:wallet-fill"  class="color-[--secondary-text] text-14px" />
         <span class="text-12px color-[--main-text] mx-3px whitespace-nowrap">{{ botStore.walletList?.find(i => i.evmAddress === _evmAddress)?.name || botStore.userInfo?.name || '' }}</span>
         <span class="text-10px color-[--third-text]">{{ getAddressFromChain(chain, _wallet?.addresses || [])?.address?.replace(new RegExp('(.{6})(.+)(.{4})'), '$1...$3') }}</span>
@@ -49,6 +49,7 @@
 
 <script setup lang='ts'>
 
+
 defineProps({
   chain: {
     type: String as PropType<BotChain>,
@@ -57,6 +58,10 @@ defineProps({
   boundary: {
     type: HTMLElement as PropType<HTMLElement | null>,
     default: null
+  },
+  contentClass: {
+    type: String,
+    default: ''
   }
 })
 

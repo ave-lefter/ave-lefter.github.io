@@ -688,5 +688,7 @@
   "symbol": "Símbolo",
   "symbolDesc": "Resalte $SOL, $ETH y otros tokens",
   "tokenAddressDesc": "Resaltar token CA",
-  "newMessage": "Nuevo mensaje"
+  "newMessage": "Nuevo mensaje",
+  "fastModeTitle": "Modo Relámpago, Instantáneo en Cadena",
+  "fastModeDesc": "Más rápido (aproximadamente 2 segundos más rápido), puede resultar en reversión o ejecución duplicada."
 }

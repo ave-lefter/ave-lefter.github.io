@@ -177,12 +177,12 @@
         </ul>
         <div class="section-title mt-80px">
           <span>{{ $t('tieredCommission') }}</span>
-          <Icon v-tooltip="{
+          <!-- <Icon v-tooltip="{
             content: $t('tieredCommissionTips'),
             props: {
               'popper-class': 'max-w-200px',
             }
-          }" name="line-md:question-circle" color="#697F95" class="ml-5px text-18px clickable" />
+          }" name="line-md:question-circle" color="#697F95" class="ml-5px text-18px clickable" /> -->
         </div>
         <ul class="flex items-center justify-between gap-30px">
           <li class="bg-#FFFFFF0D p-24px rd-4px mt-8px flex-1">

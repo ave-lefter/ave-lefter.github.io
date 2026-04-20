@@ -1,261 +1,3 @@
-<script setup lang="ts">
-import { computed, ref, nextTick, onActivated, onUnmounted } from 'vue'
-import { useBotStore } from '@/stores/bot'
-import { getChainInfo } from '@/utils'
-import unified from './unified.vue'
-import { bot_getUserWalletTxInfo } from '@/api/token'
-import { formatNumber } from '@/utils/formatNumber'
-import { useSessionStorage } from '@vueuse/core'
-import type { WalletTokenInfo } from '~/api/types/token'
-import type { IPriceV2Response } from '~/api/types/ws'
-import SelectWallet from '../selectWallet.vue'
-import BigNumber from 'bignumber.js'
-
-// const props = defineProps({
-//   currentActiveTab: {
-//     type: String,
-//     default: ''
-//   }
-// })
-let timerArr=[null,null,null] as Array<null | ReturnType<typeof setTimeout>>
-// const {  refreshTokenBalance: refreshTokenBalance0 } = useBotSwap(0, true)
-// const {  refreshTokenBalance: refreshTokenBalance1 } = useBotSwap(1, true)
-
-const botStore = useBotStore()
-const walletStore = useWalletStore()
-const { t } = useI18n()
-const tokenStore = useTokenStore()
-const route = useRoute()
-const wsStore = useWSStore()
-
-const unifiedRef = ref()
-const _chain = getAddressAndChainFromId(route.params.id as string)?.chain
-const activeTab = ref(_chain || walletStore.chain || 'solana')
-const botOrderOnlyCurrentToken = useSessionStorage('mySwapBotOrderOnlyCurrentToken', true)
-const walletTxData = ref<WalletTokenInfo | null>()
-const boundary = useTemplateRef('mySwap')
-useSwapUpdate(walletTxData)
-const tabs = computed(() => {
-  // 获取原始地址数组
-  const addresses = botStore.userInfo?.addresses || []
-  // 自定义排序，确保 Solana 在第一位，BSC 在第二位
-  return [...addresses].sort((a, b) => {
-    if (a.chain === 'solana') return -1  // Solana 排在最前面
-    if (b.chain === 'solana') return 1
-    if (a.chain === 'bsc') return -1     // BSC 排在 Solana 之后
-    if (b.chain === 'bsc') return 1
-    return 0  // 其他链保持原来的顺序
-  })
-})
-
-const balance = computed(() => {
-  return walletTxData.value ? parseFloat(walletTxData.value.balance_usd || 0) : 0
-})
-const changePercentage = computed(() => {
-  return walletTxData.value ? parseFloat((walletTxData.value.balance_ratio * 100).toString() || '0') : 0
-})
-
-const totalProfit = computed(() => {
-  return walletTxData.value ? parseFloat(walletTxData.value.total_profit || 0) : 0
-})
-const profitPercentage = computed(() => {
-  return walletTxData.value ? BigNumber(walletTxData.value.total_profit_ratio || 0).times(100).toFixed() : 0
-})
-
-const tokenSymbol = computed(() => {
-  return walletTxData.value ? walletTxData.value.symbol : tokenStore.tokenInfo?.token?.symbol
-})
-const realizedProfit = computed(() => {
-  return walletTxData.value ? parseFloat((walletTxData.value.realized_profit || 0).toString() || '0') : 0
-})
-
-const realizedProfitPercentage = computed(() => {
-  const ratio = walletTxData.value && walletTxData.value.realized_ratio !== '--' ?
-    (BigNumber(walletTxData.value?.realized_ratio || 0).times(100).toString()) : 0
-  return ratio
-})
-
-const unrealizedProfit = computed(() => {
-  return walletTxData.value ? parseFloat(walletTxData.value.unrealized_profit || 0) : 0
-})
-const unrealizedProfitPercentage = computed(() => {
-  return walletTxData.value ? parseFloat((walletTxData.value.unrealized_ratio * 100).toString() || '0') : 0
-})
-
-const buyTokenAmount = computed(() => {
-  return walletTxData.value && walletTxData.value.total_purchase > 0 ? formatNumber(walletTxData.value.bought, 4) : '0'
-})
-
-const buyUsdAmount = computed(() => {
-  const avgPrice = walletTxData.value ? parseFloat(walletTxData.value.average_purchase_price_usd || 0) : 0
-  return avgPrice > 0 ? `$${formatNumber(avgPrice, 8)}` : '--'
-})
-
-// 卖出代币数量
-const sellTokenAmount = computed(() => {
-  return walletTxData.value && walletTxData.value.total_sold > 0 ?
-    formatNumber(walletTxData.value.sold || 0, 4) : '0'
-})
-
-// 卖出美元金额
-const sellUsdAmount = computed(() => {
-  const avgPrice = walletTxData.value && walletTxData.value.average_sold_price_usd !== '--' ?
-    parseFloat(walletTxData.value.average_sold_price_usd || 0) : 0
-  return avgPrice > 0 ?
-    `$${formatNumber(avgPrice, 8)}` :
-    '--'
-})
-
-const selectWalletRef = useTemplateRef<typeof SelectWallet>('selectWallet')
-
-const userAddress = computed(() => {
-  if (selectWalletRef.value?.evmAddress) {
-    return botStore?.walletList?.find?.(i => i.evmAddress === selectWalletRef.value?.evmAddress)?.addresses?.find?.(i => i.chain === activeTab.value)?.address || ''
-  } else if (botStore?.userInfo?.evmAddress) {
-    return tabs.value.find(i => i?.chain === activeTab.value)?.address
-  } else {
-    return walletStore.address || ''
-  }
-})
-
-function setActiveTab(val: string) {
-  activeTab.value = val
-  nextTick(() => {
-    getWalletTxData()
-  })
-}
-
-// 定义移除字符串开头负号的函数
-const removeLeadingMinus = (str: string) => str.startsWith('-') ? str.slice(1) : str
-
-const getWalletTxData = async () => {
-  // const supportedChains = ['solana', 'bsc']
-  const chain = walletStore.address ? walletStore.chain : activeTab.value
-  if (![...SupportFullDataChain, 'ton', 'polygon'].includes(chain)) {
-    walletTxData.value = null
-    return
-  }
-
-  const token = getAddressAndChainFromId((route.params.id as string) || '')?.address || ''
-  if (!userAddress.value || !token) return
-
-
-  const params = {
-    user_address: userAddress.value,
-    chain: chain,
-    user_token: token
-  }
-  const txInfo = await bot_getUserWalletTxInfo(params)
-  walletTxData.value = txInfo[0]
-}
-
-function getTxHistoryForEvm() {
-  const delays = [5000, 7000, 9000]; // 定义延迟时间数组
-  for (let i = 0; i < delays.length; i++) {
-      timerArr[i] = setTimeout(() => {
-          unifiedRef.value?.getTxHistory();
-          // isBuy?refreshTokenBalance0():refreshTokenBalance1();
-      }, delays[i]);
-  }
-}
-
-
-
-
-let timer: null | ReturnType<typeof setInterval> = null
-let lastUpdateTime = 0
-const maxUpdateNum = 15
-
-watch(() => wsStore.wsResult[WSEventType.TGBOT], (val) => {
-  console.log('wsStore.wsResult[WSEventType.TGBOT]', val)
-  if(!val){
-    return
-  }
-  const chain = getAddressAndChainFromId(String(route.params.id))?.chain
-  if (tabs.value.find(i => i?.chain === chain)) {
-    activeTab.value = chain
-  }
-  getWalletTxData()
-  unifiedRef.value?.getTxHistory()
-  setTimeout(() => {
-    unifiedRef.value?.getTxHistory()
-  }, 3000)
-  if(val.chain && isEvmChain(val.chain)){
-    getTxHistoryForEvm()
-    // getTxHistoryForEvm(val.swapType===1)
-  }
-  if (!timer) {
-    timer = setInterval(() => {
-      if (lastUpdateTime >= maxUpdateNum) {
-        if (timer) {
-          clearInterval(timer)
-          timer = null
-        }
-        lastUpdateTime = 0
-        return
-      }
-      getWalletTxData()
-      lastUpdateTime += 1
-    }, 2000)
-  } else {
-    lastUpdateTime = 0
-  }
-},{immediate:true})
-
-watch([() => route.params.id], () => {
-
-  const chain = getAddressAndChainFromId(String(route.params.id))?.chain
-  if (tabs.value.find(i => i?.chain === chain)) {
-    activeTab.value = chain
-  }
-  clearIntervalAll()
-  refreshData()
-})
-
-function refreshData() {
-  getWalletTxData()
-
-  if (unifiedRef.value) {
-    unifiedRef.value.getTxHistory()
-  }
-}
-
-watch(userAddress, () => {
-  getWalletTxData()
-
-  clearIntervalAll()
-})
-
-onMounted(() => {
-  const chain = getAddressAndChainFromId(String(route.params.id))?.chain
-  if (tabs.value.find(i => i?.chain === chain)) {
-    activeTab.value = chain
-  }
-  getWalletTxData()
-})
-
-onUnmounted(() => {
-  clearIntervalAll()
-})
-
-function clearIntervalAll() {
-  if (timer) {
-    clearInterval(timer)
-    timer = null
-  }
-  timerArr.forEach((timerId) => {
-    if (timerId) {
-      clearInterval(timerId)
-      timerId = null
-    }
-  })
-}
-// onActivated(() => {
-//    refreshData()
-// })
-
-</script>
-
 <template>
   <div ref="mySwap">
     <div v-if="botStore?.userInfo?.evmAddress || walletStore.address" class="px-12px mb-10px flex justify-between items-center">
@@ -282,61 +24,154 @@ function clearIntervalAll() {
     </div>
 
     <!-- 顶部交易统计区域 -->
-    <div class="transaction-stats">
-      <div class="stat-item">
-        <div class="stat-label text-[--third-text]">{{ t('balance1') }}</div>
-        <div class="stat-value table-field-text text-[--secondary-text]">${{ formatNumber(balance, 2) }}</div>
-        <div class="stat-change table-field-text text-[--secondary-text]">
-          {{ formatNumber(walletTxData?.balance_amount || 0, 4) }} {{ tokenSymbol }}
-          <!-- <span :style="{ color: changePercentage >= 0 ? '#12B886' : '#ff646d' }">
-            ({{ changePercentage >= 0 ? '+' : '' }}{{ formatNumber(changePercentage, 2) }}%)
-          </span> -->
-        </div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-label text-[--third-text]">{{ t('totalProfit') }}</div>
-        <div class="stat-value table-field-text text-[--secondary-text]" :style="{ color: totalProfit >= 0 ? '#12B886' : '#ff646d' }">
-          {{ totalProfit >= 0 ? '+' : '-' }}${{ removeLeadingMinus(formatNumber(totalProfit, 2)) }}
-        </div>
-        <div class="stat-change text-[--secondary-text]" :style="{ color: profitPercentage >= 0 ? '#12B886' : '#ff646d' }">
-          {{ profitPercentage >= 0 ? '+' : '' }}{{ formatNumber(profitPercentage, 2) }}%
-        </div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-label text-[--third-text]">{{ t('realizedProfit') }}</div>
-        <div class="stat-value table-field-text text-[--secondary-text]" :style="{ color: realizedProfit >= 0 ? '#12B886' : '#ff646d' }">
-          {{ realizedProfit >= 0 ? '+' : '-' }}${{ removeLeadingMinus(formatNumber(realizedProfit, 2)) }}
-        </div>
-        <div class="stat-change text-[--secondary-text]" :style="{ color: realizedProfitPercentage >= 0 ? '#12B886' : '#ff646d' }">
-          {{ realizedProfitPercentage >= 0 ? '+' : '' }}{{ formatNumber(realizedProfitPercentage, 2) }}%
-        </div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-label text-[--third-text]">{{ t('unrealizedProfit') }}</div>
-        <div class="stat-value table-field-text text-[--secondary-text]" :style="{ color: unrealizedProfit >= 0 ? '#12B886' : '#ff646d' }">
-          {{ unrealizedProfit >= 0 ? '+' : '-' }}${{ removeLeadingMinus(formatNumber(unrealizedProfit, 2)) }}
-        </div>
-        <div class="stat-change text-[--secondary-text]" :style="{ color: unrealizedProfitPercentage >= 0 ? '#12B886' : '#ff646d' }">
-          {{ unrealizedProfitPercentage >= 0 ? '+' : '' }}{{ formatNumber(unrealizedProfitPercentage, 2) }}%
-        </div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-label text-[--third-text]">{{ t('buyPriceWithSlash') }}</div>
-        <div class="stat-value table-field-text text-[--secondary-text]">{{ buyTokenAmount }} {{
-          tokenSymbol }}</div>
-        <div class="stat-change table-field-text text-[--secondary-text]">{{ buyUsdAmount }}</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-label text-[--third-text]">{{ t('sellPriceWithSlash') }}</div>
-        <div class="stat-value table-field-text text-[--secondary-text]">{{ sellTokenAmount }} {{
-          tokenSymbol }}</div>
-        <div class="stat-change table-field-text text-[--secondary-text]">{{ sellUsdAmount }}</div>
-      </div>
-    </div>
+    <TopPnl :chain="activeTab" :userAddress="userAddress || ''" />
 
     <unified v-if="botStore?.userInfo?.evmAddress || walletStore.address" ref="unifiedRef" :chain="activeTab" :currentToken="botOrderOnlyCurrentToken" :userAddress="userAddress || ''"/>
   </div>
 </template>
+
+<script setup lang="ts">
+import { computed, ref, onUnmounted } from 'vue'
+import { useBotStore } from '@/stores/bot'
+import { getChainInfo } from '@/utils'
+import unified from './unified.vue'
+// import { bot_getUserWalletTxInfo } from '@/api/token'
+// import { formatNumber } from '@/utils/formatNumber'
+import { useSessionStorage } from '@vueuse/core'
+import type { WalletTokenInfo } from '~/api/types/token'
+// import type { IPriceV2Response } from '~/api/types/ws'
+import SelectWallet from '../selectWallet.vue'
+import TopPnl from './topPnl.vue'
+
+// const props = defineProps({
+//   currentActiveTab: {
+//     type: String,
+//     default: ''
+//   }
+// })
+const timerArr=[null,null,null] as Array<null | ReturnType<typeof setTimeout>>
+// const {  refreshTokenBalance: refreshTokenBalance0 } = useBotSwap(0, true)
+// const {  refreshTokenBalance: refreshTokenBalance1 } = useBotSwap(1, true)
+
+const botStore = useBotStore()
+const walletStore = useWalletStore()
+const { t } = useI18n()
+// const tokenStore = useTokenStore()
+const route = useRoute()
+const wsStore = useWSStore()
+
+const unifiedRef = ref()
+const _chain = getAddressAndChainFromId(route.params.id as string)?.chain
+const activeTab = ref(_chain || walletStore.chain || 'solana')
+const botOrderOnlyCurrentToken = useSessionStorage('mySwapBotOrderOnlyCurrentToken', true)
+const walletTxData = ref<WalletTokenInfo | null>()
+const boundary = useTemplateRef('mySwap')
+useSwapUpdate(walletTxData)
+const tabs = computed(() => {
+  // 获取原始地址数组
+  const addresses = botStore.userInfo?.addresses || []
+  // 自定义排序，确保 Solana 在第一位，BSC 在第二位
+  return [...addresses].sort((a, b) => {
+    if (a.chain === 'solana') return -1  // Solana 排在最前面
+    if (b.chain === 'solana') return 1
+    if (a.chain === 'bsc') return -1     // BSC 排在 Solana 之后
+    if (b.chain === 'bsc') return 1
+    return 0  // 其他链保持原来的顺序
+  })
+})
+
+
+const selectWalletRef = useTemplateRef<typeof SelectWallet>('selectWallet')
+
+const userAddress = computed(() => {
+  if (selectWalletRef.value?.evmAddress) {
+    return botStore?.walletList?.find?.(i => i.evmAddress === selectWalletRef.value?.evmAddress)?.addresses?.find?.(i => i.chain === activeTab.value)?.address || ''
+  } else if (botStore?.userInfo?.evmAddress) {
+    return tabs.value.find(i => i?.chain === activeTab.value)?.address
+  } else {
+    return walletStore.address || ''
+  }
+})
+
+function setActiveTab(val: string) {
+  activeTab.value = val
+}
+
+function getTxHistoryForEvm() {
+  const delays = [5000, 7000, 9000]; // 定义延迟时间数组
+  for (let i = 0; i < delays.length; i++) {
+      timerArr[i] = setTimeout(() => {
+          unifiedRef.value?.getTxHistory();
+          // isBuy?refreshTokenBalance0():refreshTokenBalance1();
+      }, delays[i]);
+  }
+}
+
+watch(() => wsStore.wsResult[WSEventType.TGBOT], (val) => {
+  console.log('wsStore.wsResult[WSEventType.TGBOT]', val)
+  if(!val){
+    return
+  }
+  const chain = getAddressAndChainFromId(String(route.params.id))?.chain
+  if (tabs.value.find(i => i?.chain === chain)) {
+    activeTab.value = chain
+  }
+  unifiedRef.value?.getTxHistory()
+  setTimeout(() => {
+    unifiedRef.value?.getTxHistory()
+  }, 3000)
+  if(val.chain && isEvmChain(val.chain)){
+    getTxHistoryForEvm()
+    // getTxHistoryForEvm(val.swapType===1)
+  }
+},{immediate:true})
+
+watch([() => route.params.id], () => {
+
+  const chain = getAddressAndChainFromId(String(route.params.id))?.chain
+  if (tabs.value.find(i => i?.chain === chain)) {
+    activeTab.value = chain
+  }
+  clearIntervalAll()
+  refreshData()
+})
+
+function refreshData() {
+
+  if (unifiedRef.value) {
+    unifiedRef.value.getTxHistory()
+  }
+}
+
+watch(userAddress, () => {
+
+  clearIntervalAll()
+})
+
+onMounted(() => {
+  const chain = getAddressAndChainFromId(String(route.params.id))?.chain
+  if (tabs.value.find(i => i?.chain === chain)) {
+    activeTab.value = chain
+  }
+})
+
+onUnmounted(() => {
+  clearIntervalAll()
+})
+
+function clearIntervalAll() {
+  timerArr.forEach((timerId) => {
+    if (timerId) {
+      clearInterval(timerId)
+      timerId = null
+    }
+  })
+}
+// onActivated(() => {
+//    refreshData()
+// })
+
+</script>
 
 <style lang="scss" scoped>
 /* 顶部交易统计样式 */

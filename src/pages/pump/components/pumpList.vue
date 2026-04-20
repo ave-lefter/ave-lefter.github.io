@@ -6,7 +6,6 @@
             v-for="({data: row}, $index) in list"
             :id="row?.target_token + '-' + row?.chain"
             :key="row?.pair + '-' + row?.chain"
-
             class="pump-item_item relative item-row"
             :style="{ background:  pumpSetting.bgList?.includes(row.platform)? pumpSetting?.bg?.[row.platform]?.bg : '' }"
             @click.stop="tableRowClick(row)"
@@ -67,15 +66,11 @@
                     </span>
                     <span
                       v-if="hasTwitterXUser(row?.medias)"
-                      v-tooltip="pumpBlackList?.findIndex(i => i.address == row.token && i.type == 'twitter') !== -1 ? $t('cancel') + $t('BlackListTwitter') : $t('BlackListTwitter')"
+                      v-tooltip="pumpBlackList?.findIndex(i => hitBlacklist(row, i) && i.type == 'twitter') !== -1 ? $t('cancel') + $t('BlackListTwitter') : $t('BlackListTwitter')"
                       class="bg-[--d-000-l-FFF] cursor-pointer px-2px py-2px color-[--third-text1] block rounded-2px mt-4px hover:color-[--primary-color] w-16px h-16px flex items-center justify-center"
                     >
                       <Icon
-                        v-if="
-                          pumpBlackList?.findIndex(
-                            (i) => i.address == row.token && i.type == 'twitter'
-                          ) !== -1
-                        "
+                        v-if="pumpBlackList?.findIndex(i => hitBlacklist(row, i) && i.type == 'twitter') !== -1"
                         name="custom:twitter-unvisible"
                         class="text-12px color-[#F6465D]"
                         @click.stop="addOrRemoveBlaclList(row, 'twitter')"
@@ -90,17 +85,13 @@
                   </div>
                   <div class="token-logo">
                     <el-image
+                      v-memo="row.target_token + '-' + row.chain+'-' + (row.logo_url || '')"
                       class="token-icon"
                       :class="{ small: pumpSetting.Progress_isCircle == 'horizontal' }"
                       fit="cover"
-                      :src="
-                        getSymbolDefaultIcon(
-                          row,
-                          pumpSetting.avatar_isCircle == 'circle' ? 'circle' : 'rect'
-                        )
-                      "
+                      :src="srcMap[row.target_token + '-' + row.chain] || getSymbolDefaultIcon(row, pumpSetting.avatar_isCircle == 'circle' ? 'circle' : 'rect')"
                       :style="{
-                        'border-radius': pumpSetting.avatar_isCircle == 'circle' ? '100%' : '4px',
+                        'border-radius': pumpSetting.avatar_isCircle == 'circle' ? '100%' : '4px'
                       }"
                     >
                       <template #error>
@@ -118,7 +109,7 @@
                           :style="{
                             'border-radius': pumpSetting.avatar_isCircle == 'circle' ? '100%' : '0',
                           }"
-                          :src="getChainDefaultIcon(row.chain, row.symbol, pumpSetting.avatar_isCircle == 'circle' ? 'circle' : 'rect')"
+                          :src="srcMap[row.target_token + '-' + row.chain] || getChainDefaultIcon(row.chain, row.symbol, pumpSetting.avatar_isCircle == 'circle' ? 'circle' : 'rect')"
                         >
                       </template>
                     </el-image>
@@ -142,7 +133,7 @@
                     >
                       <Icon class="text-16px text-#fff" name="custom:search" />
                     </a>
-                    <div v-if="!isOut" class="bg-btn bg-[--secondary-bg] absolute bottom--8px left--10px !rounded-4px border border-1 border-solid border-[--border] color-[--yellow] text-9px">
+                    <div v-show="!isOut" class="bg-btn bg-[--secondary-bg] absolute bottom--8px left--10px !rounded-4px border border-1 border-solid border-[--border] color-[--yellow] text-9px">
                       {{(row?.progress || 0).toFixed(0)}}%
                     </div>
                     <el-image
@@ -180,6 +171,7 @@
                       v-copy="row.name"
                       class="name text-12px font-500 mr-5px color-[--third-text1] symbol-ellipsis ellipsis-auto block"
                       >{{ row.name }}</span>
+                      <RemarkEditor :token="row.token" :chain="row.chain" :remark="row.remark" @update:remark="row.remark = $event" />
                       <img
                         v-if="row.is_cloned"
                         @mouseover.stop="onEnter($event, row, props.type,getDataColor, true)"
@@ -198,47 +190,48 @@
                         :width="12"
                       >
                     <span
-                      v-if="row.buy_tax && row.sell_tax"
+                      v-if="Number(row.buy_tax) && Number(row.sell_tax)"
                     >
                       <span
-                        v-if="row.buy_tax == row.sell_tax"
-                        class="bg-[--d-1E2025-l-E8F1FF] rounded-4px px-2px text-10px"
+                        v-if="Number(row.buy_tax) == Number(row.sell_tax)"
+                        class="bg-[--d-1E2025-l-E8F1FF] rounded-4px px-2px text-10px mr-4px"
                         :style="{
-                              color:(Number(row?.sell_tax) > 5 ? '#F6465D' : 'var(--secondary-text1)'),
+                              color:(Number(row?.sell_tax) > 0 ? '#F6465D' : 'var(--secondary-text1)'),
                           }"
                       >
-                        Tax {{ formatNumber(row?.sell_tax || 0, 2) }}%
+                        {{ $t('tax') }} {{ formatNumber(row?.sell_tax || 0, 2) }}%
                       </span>
                       <span
                         v-else
                         class="bg-[--d-1E2025-l-E8F1FF] rounded-4px px-2px text-10px"
                           :style="{
-                              color: (Number(row?.sell_tax) > 5 || Number(row?.buy_tax) > 5  ? '#F6465D' :'var(--secondary-text1)'),
+                              color: (Number(row?.sell_tax) > 0 || Number(row?.buy_tax) > 0  ? '#F6465D' :'var(--secondary-text1)'),
                           }"
                       >
                       B {{ formatNumber(row?.buy_tax || 0, 2) }}%&nbsp;&nbsp;S {{ formatNumber(row?.sell_tax || 0, 2) }}%
                       </span>
                     </span>
                     <span
-                      v-else-if="row.buy_tax"
-                      class="bg-[--d-1E2025-l-E8F1FF] rounded-4px px-2px text-10px"
+                      v-else-if="Number(row.buy_tax)"
+                      class="bg-[--d-1E2025-l-E8F1FF] rounded-4px px-2px text-10px mr-4px"
                       :style="{
-                            color:(Number(row?.buy_tax) > 5 ? '#F6465D' : 'var(--secondary-text1)'),
+                            color:(Number(row?.buy_tax) > 0 ? '#F6465D' : 'var(--secondary-text1)'),
                         }"
                     >
                       B {{ formatNumber(row?.buy_tax || 0, 2) }}%
                     </span>
                     <span
-                      v-else-if="row.sell_tax"
-                      class="bg-[--d-1E2025-l-E8F1FF] rounded-4px text-10px"
+                      v-else-if="Number(row.sell_tax)"
+                      class="bg-[--d-1E2025-l-E8F1FF] rounded-4px text-10px mr-4px"
                         :style="{
-                            color:(Number(row?.sell_tax) > 5 ? '#F6465D' : 'var(--secondary-text1)'),
+                            color:(Number(row?.sell_tax) > 0 ? '#F6465D' : 'var(--secondary-text1)'),
                         }"
                     >
                       S {{ formatNumber(row?.sell_tax || 0, 2) }}%
                     </span>
+                    <!-- <span  class="py-1px px-4px rounded-4px; bg-#ffa6221a color-[--yellow] text-9px lh-12px">持仓</span> -->
                   </div>
-                  <div v-if="(lang === 'zh-cn' || lang === 'zh-tw') && (row.symbol_zh || row.name_zh) && row.symbol_zh !== row.symbol || (!(lang === 'zh-cn' || lang === 'zh-tw')) && (row.symbol_en || row.name_en) && row.symbol_en !== row.symbol" class="flex-start text-11px line-height-14px mt-2px color-[--yellow] whitespace-nowrap overflow-hidden">
+                  <div v-if="pumpSetting.isLang && (lang === 'zh-cn' || lang === 'zh-tw') && (row.symbol_zh || row.name_zh) && row.symbol_zh !== row.symbol || (!(lang === 'zh-cn' || lang === 'zh-tw')) && (row.symbol_en || row.name_en) && row.symbol_en !== row.symbol" class="flex-start text-11px line-height-14px mt-2px color-[--yellow] whitespace-nowrap overflow-hidden">
                     <template v-if="lang === 'zh-cn' || lang === 'zh-tw'">
                       {{ row.symbol_zh || '' }}&nbsp;&nbsp;{{ row.name_zh || '' }}
                     </template>
@@ -281,7 +274,7 @@
                           </template>
                       </div>
                       <img
-                        v-if="row.baseToken"
+                        v-show="row.baseToken"
                           v-tooltip="{
                           content:getLiqTooltip(row),
                           props: { 'raw-content': true, 'popper-class': 'pump-tooltip' }
@@ -577,7 +570,7 @@
                     </div>
                   </div>
                   <div class="flex-start text-12px absolute bottom-0"
-                  :class=" ((lang === 'zh-cn' || lang === 'zh-tw') && (row.symbol_zh || row.name_zh) && row.symbol_zh !== row.symbol || (!(lang === 'zh-cn' || lang === 'zh-tw')) && (row.symbol_en || row.name_en) && row.symbol_en !== row.symbol) && hasTwitterXUser(row.medias)? '' : 'absolute bottom-0px'"
+                  :class="pumpSetting.isLang && ((lang === 'zh-cn' || lang === 'zh-tw') && (row.symbol_zh || row.name_zh) && row.symbol_zh !== row.symbol || (!(lang === 'zh-cn' || lang === 'zh-tw')) && (row.symbol_en || row.name_en) && row.symbol_en !== row.symbol) && hasTwitterXUser(row.medias)? '' : 'absolute bottom-0px'"
                   >
                     <div
                       v-show="pumpSetting?.define?.some((i) => i === 'top')"
@@ -725,7 +718,7 @@
                   </div>
                 </div>
               </div>
-              <div class="pump-right">
+              <div class="pump-right" @click.stop="handlePumpRightClick(row)">
                 <div
                  v-show="(pumpSetting.border && pumpSetting.size_swap === '16px') || pumpSetting.bgList?.includes(row.platform)"
                  class="w-160px h-120px absolute z-2 top--12px right--8px border border-solid rounded-8px" :style="{background:  pumpSetting.bgList?.includes(row.platform)? pumpSetting?.bg?.[row.platform]?.bg : ( pumpSetting.border &&  pumpSetting.size_swap ==='16px'? '#12B88614': ''), 'border-color': pumpSetting.border &&  pumpSetting.size_swap ==='16px'? (pumpSetting.border =='border_hight' ? '#12B886': 'var(--border)') : 'transparent' ,'box-shadow': pumpSetting.border &&  pumpSetting.size_swap ==='16px'? (pumpSetting.border =='border_hight' ? '0px 0px 10px 0px #12B88699': '0px 2px 10px 0px var(--border)') : ''}"
@@ -735,7 +728,7 @@
                   v-if="
                     (isSoon && row.progress > 99) || pumpSetting?.define?.some((i) => i === 'mcap')
                   "
-                  class="flex-end text-12px pr-12px bg-1"
+                  class="flex-end text-12px bg-1"
                   :class="pumpSetting.fontSize_mc =='12px'? 'mb-2px' : 'mb-0px'"
                 >
                   <div v-if="isSoon && row.progress >= 99.99" class="bg-1 flex-end py-2px">
@@ -779,8 +772,20 @@
                 </div>
                 <div
                   v-show="pumpSetting?.define?.some((i) => i === 'txs')"
-                  class="flex-end text-12px pr-12px bg-1 py-2px"
+                  class="flex-end text-12px bg-1 py-2px"
                 >
+                  <div class="flex-end bg-1 cursor-pointer" v-tooltip="$t('totalTaxTip')">
+                    <div class="mr-2px color-[--third-text1]">F</div>
+                    <img
+                      v-if="row?.chain"
+                      class="icon-symbol rounded-100% h-14px mr-2px"
+                      :src="`${token_logo_url}chain/${row?.chain}.png`"
+                    >
+                    <span v-if="Number(row?.commission_sum ?? 0) + Number(row?.gas_fee_sum ?? 0) >0" class="color-[--main-text1]">
+                        {{ formatNumber((Number(row?.commission_sum ?? 0) + Number(row?.gas_fee_sum ?? 0)) , 2) }}
+                    </span>
+                    <span v-else class="color-[--third-text1]" >0</span>
+                  </div>
                   <div v-tooltip.raw="{
                         content: `<div class='max-w-[400px] color-[--secondary-text]'>${$t('netInflow')}: <span class=${ 'color-'+(Number(row?.net_flow_vol) === 0 || row?.net_flow_vol == null? '' : ((row?.net_flow_vol||0)>0?'[--up-color]':'[--down-color]'))}>${Number(row?.net_flow_vol) === 0 || row?.net_flow_vol == null? 0 : ( (row?.net_flow_vol > 0 ? '+$' : '-$')+ formatNumber(Math.abs(row?.net_flow_vol ?? 0), { decimals: 2, l: 4, limit: 3, locale: 'en' }))}</span> </div>`,
                         props: {
@@ -821,7 +826,7 @@
                     />
                   </div>
                 </div>
-                <div class="btns-swap flex-end pr-12px" :style="{ background:  pumpSetting.bgList?.includes(row.platform)? pumpSetting?.bg?.[row.platform]?.bg : '' }">
+                <div class="btns-swap flex-end pr-12px" :style="{ background:  pumpSetting.bgList?.includes(row.platform)? pumpSetting?.bg?.[row.platform]?.bg : '' }" @click.stop="handlePumpRightClick(row)">
                   <div
                     v-if="row?.state === 'migrating'"
                     style="
@@ -848,10 +853,11 @@
                   </div>
                   <QuickSwap
                     v-if="parseInt(pumpSetting?.size_swap|| '0') > 0"
+                    :ref="el => el && (quickSwapRefs[row.target_token + '-' + row.chain] = el)"
                     :quickBuyValue="quickBuyValue"
                     :swapSetSelected="props.swapSetSelected"
                     :row="row"
-                    :classNames="pumpSetting.border &&  pumpSetting.size_swap ==='16px' ? '' :'bg-[--up-color] color-#fff'"
+                    :classNames="pumpSetting.border &&  pumpSetting.size_swap ==='16px' ? 'bg-[transparent]' :'bg-[--up-color] color-#fff'"
                     :size="pumpSetting.size_swap"
                     @jump="jump(row)"
                   />
@@ -915,7 +921,7 @@ import {
 } from '@/utils/index'
 import { formatNumber } from '@/utils/formatNumber'
 import { Icon } from '#components'
-import type { PumpObj } from '@/api/types/pump'
+import type { PumpObj, pumpBlack } from '@/api/types/pump'
 import XIcon from '~/components/xPopup/xIcon.vue'
 import { useVirtualList } from '@vueuse/core'
 import ProgressPop from './progressPop.vue'
@@ -925,6 +931,7 @@ import HolderRank from './holderRank/index.vue'
 import { useSimilarTokenPopup } from '../utils'
 import { windowEndpoint } from 'comlink'
 import AiPop from './aiPop/index.vue'
+import RemarkEditor from './remarkEditor.vue'
 import qsImage from '@/assets/images/pump/qs.svg'
 const props = defineProps({
   tableList: {
@@ -977,19 +984,7 @@ const handleClearFilter = () => {
 const configStore = useConfigStore()
 const { quickBuyValue, loading, isOut, isSoon, type } = toRefs(props)
 const tableList = shallowRef<PumpObj[]>(props.tableList || [])
-const hover = ref(false)
-// 只监听数组引用变化，不深度监听对象
-watch(() => props.tableList, (newList) => {
-  if (dataSourceCache.value?.length > 0) {
-    dataSourceCache.value?.forEach(item => {
-      const index = newList.findIndex((i: PumpObj) => i.target_token === item.target_address && i.chain === item.chain)
-      if (index !== -1) {
-        newList[index].favorite_holder_count = 1
-      }
-    })
-  }
-  tableList.value = newList
-})
+const srcMap = ref<Record<string, string>>({})
 const router = useRouter()
 const route = useRoute()
 const { token_logo_url } = useConfigStore()
@@ -1080,8 +1075,9 @@ function addOrRemoveBlaclList(item: { token: string , medias: any[]}, type: 'ca'
   if (pumpBlackList.value) {
     if (type == 'twitter') {
       const twitter = item?.medias?.filter?.(i => i.icon === 'twitter')?.[0]
-      const twitterAccount = formatXUser(twitter?.url)
+      const twitterAccount = formatXUser(twitter?.url)?.slice(1)
       if (twitterAccount) {
+
         const findIndex = pumpBlackList.value?.findIndex(
         (i) => twitterAccount == i.address && i.type == type
         )
@@ -1218,6 +1214,14 @@ function getDataColor(type: string, num: number) {
     }
   }
 }
+const quickSwapRefs: Record<string, any> = {}
+
+function handlePumpRightClick(row: any) {
+  if (parseInt(pumpSetting?.value.size_swap || '0') <= 0) return
+  const key = row.target_token + '-' + row.chain
+  quickSwapRefs[key]?.submitBotSwap?.()
+}
+
 function jump (row: { target_token: string; chain: string }) {
   if (pumpSetting.value.jump == 'open') {
   router.push({
@@ -1271,6 +1275,37 @@ const newestId = ref('')
 
 // 监听原始列表数据 (假设 props.list 是 shallowRef)
 watch(() => props.tableList, (newList, oldList) => {
+  if (dataSourceCache.value?.length > 0) {
+    dataSourceCache.value?.forEach(item => {
+      const index = newList.findIndex((i: PumpObj) => i.target_token === item.target_address && i.chain === item.chain)
+      if (index !== -1) {
+        newList[index].favorite_holder_count = 1
+      }
+    })
+  }
+
+  if (pumpSetting.value.isBlacklist && pumpBlackList.value?.length) {
+    newList = newList.filter((item: any) => !pumpBlackList.value.some((black: any) => hitBlacklist(item, black)))
+  }
+  tableList.value = newList
+  const currentKeys = new Set<string>()
+  newList.forEach(row => {
+    const key = row.target_token + '-' + row.chain
+    currentKeys.add(key)
+    const logoUrl = String(row.logo_url || '').trim()
+    if (logoUrl) {
+      const src = /^https?:\/\//.test(logoUrl) ? logoUrl : token_logo_url + logoUrl
+      if (srcMap.value[key] !== src) {
+        srcMap.value[key] = src
+      }
+    }
+  })
+  // 移除不再存在的 key
+  for (const key in srcMap.value) {
+    if (!currentKeys.has(key)) {
+      delete srcMap.value[key]
+    }
+  }
   // 1. 判断是否是插入了新数据（长度增加，或第一个元素 ID 变了）
   const new1 = newList?.[0]
   const old1 = oldList?.[0]
@@ -1281,7 +1316,7 @@ watch(() => props.tableList, (newList, oldList) => {
     lastPushTime.value = Date.now()
     newestId.value = new1PairId
   }
-}, { deep: false }) // shallowRef 监听引用即可，性能最高
+}) // shallowRef 监听引用即可，性能最高
 
 // 动画判定函数
 const getAnimClass = (itemData: any) => {
@@ -1299,6 +1334,22 @@ const getAnimClass = (itemData: any) => {
   }
 
   return ''
+}
+function hitBlacklist(item:PumpObj, black: pumpBlack) {
+  if (black.type === 'twitter') {
+    const address = black.address?.replace('@', '')
+    return item.medias?.some(m => m.url?.includes(address))
+  }
+
+  if (black.type === 'keyword') {
+    return black.address === item.symbol
+  }
+
+  if (black.type === 'ca' || black.type === 'dev') {
+    return black.address === item.token
+  }
+
+  return false
 }
 function getLiqTooltip(row: PumpObj) {
   const isToken0 =
@@ -1365,7 +1416,7 @@ defineExpose({
     .pump-right {
       // box-shadow: -2px 0px 4px 0px #00000099;
       // background: var(--secondary-bg);
-      width: 0;
+      width: 160px;
       position: absolute;
       right: 0;
       top: 0;
@@ -1392,8 +1443,8 @@ defineExpose({
   }
   .token-logo {
     // margin-right: 12px;
-    // width: 64px;
-    // height: 64px;
+    width: 60px;
+    // height: 60px;
     position: relative;
     display: flex;
     align-items: center;

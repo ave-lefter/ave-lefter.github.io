@@ -5,6 +5,7 @@ import {
   type GetFavListResponse,
   getFavoriteList,
   getUserFavoriteGroups,
+  batchChangeFavoritesIndex,
 } from '~/api/fav'
 import TokenImg from '~/components/tokenImg.vue'
 import { formatNumber } from '~/utils/formatNumber'
@@ -13,6 +14,10 @@ import type { IPriceV2Response } from '~/api/types/ws'
 import { useEventBus, useLocalStorage, useStorage } from '@vueuse/core'
 import { BusEventType, type IFavDialogEventArgs } from '~/utils/constants'
 import type { ScrollbarInstance } from 'element-plus'
+const favTokenStore = useFavTokenStore()
+const pumpRemarkEditEvent = useEventBus<IFavDialogEventArgs>(BusEventType.PUMP_REMARK_EDIT)
+pumpRemarkEditEvent.on(handleFavDialogEvent)
+import { VueDraggable } from 'vue-draggable-plus'
 const topEventBus = useEventBus(BusEventType.TOP_FAV_CHANGE)
 topEventBus.on(refresh)
 const favDialogEvent = useEventBus<IFavDialogEventArgs>(BusEventType.FAV_DIALOG)
@@ -21,12 +26,15 @@ const topAddGroupEvent = useEventBus(BusEventType.TOP_ADD_GROUP)
 topAddGroupEvent.on(_getUserFavoriteGroups)
 
 const otherListArea = ref<ScrollbarInstance>()
-const {updateNum11,delTokenGroup} = storeToRefs(useFollowStore())
+const {updateNum4,updateNum11,delTokenGroup} = storeToRefs(useFollowStore())
+const isDragging = ref(false)
+const isDragModeEnabled = useStorage('fav-isDragModeEnabled', false)
 
 onUnmounted(() => {
   topEventBus.off(refresh)
   favDialogEvent.off(refresh)
   topAddGroupEvent.off(refresh)
+  pumpRemarkEditEvent.off(handleFavDialogEvent)
 })
 
 function refresh(data:any) {
@@ -68,6 +76,10 @@ watch(
           current_price_usd: item.uprice,
           price_change: item.price_change,
           price_change_v2: item.price_change_v2,
+          t_price_change_24h: item.tprice_change_24h,
+          t_price_change_1d: item.tprice_change_1d,
+          m_price_change_24h: i.support_aggr_kline == 1 ? item.tprice_change_24h : item.price_change_v2,
+          m_price_change_1d: i.support_aggr_kline == 1 ? item.tprice_change_1d : item.price_change,
           pool_circulating_supply:
             (i.total - i.lock_amount - i.burn_amount - i.other_amount) * item.uprice
         }
@@ -104,7 +116,7 @@ const activeTab = shallowRef(0)
 const favoriteCondition = useStorage('favoriteCondition', { currentMode: 'mcap' })
 const sort = shallowRef<{
   activeSort: number
-  sortBy: 'symbol' | 'current_price_usd' | 'price_change' | 'price_change_v2' | null
+  sortBy: 'symbol' | 'current_price_usd' | 'price_change' | 'price_change_v2' | 'm_price_change_24h' | 'm_price_change_1d' | null
 }>({
   activeSort: 0,
   sortBy: null,
@@ -153,7 +165,7 @@ const columns = computed(() => {
         (favoriteCondition.value.currentMode === 'mcap' ? t('mCap') : t('price')) +
         '{currentMode}/' +
         t('Chg')+'%',
-      value: zone.value === '24h' ? 'price_change_v2' : 'price_change',
+      value: zone.value === '24h' ? 'm_price_change_24h' : 'm_price_change_1d',
       currentMode: favoriteCondition.value.currentMode,
       flex: 'flex-1 justify-end',
       sort: true,
@@ -172,12 +184,14 @@ const sortedFavList = computed(() => {
   }
   if(sort.value.sortBy === 'symbol'){
     return favoritesList.value.toSorted((a: any, b: any) => {
-      const codeB = b.symbol[0].toLowerCase().charCodeAt(0) || 0
-      const codeA = a.symbol[0].toLowerCase().charCodeAt(0) || 0
+      const symbolB = b.symbol?.[0]?.toLowerCase() || ''
+      const symbolA = a.symbol?.[0]?.toLowerCase() || ''
+      const codeB = symbolB.charCodeAt(0) || 0
+      const codeA = symbolA.charCodeAt(0) || 0
       return (codeB - codeA) * sort.value.activeSort
     })
   }
-  else if(sort.value.sortBy === 'price_change'||sort.value.sortBy === 'price_change_v2'){
+  else if(sort.value.sortBy === 'm_price_change_24h'||sort.value.sortBy === 'm_price_change_1d'){
     return favoritesList.value.toSorted((a: any, b: any) => {
       return ((b[sort.value.sortBy!] || 0) - (a[sort.value.sortBy!] || 0)) * sort.value.activeSort
     })
@@ -214,9 +228,9 @@ watch(
 watch(
   ()=>zone.value,
   (val2) => {
-    if(sortParam.sort_dir&&(sortParam.sort==='price_change_v2' || sortParam.sort==='price_change')){
-      sortParam.sort=(val2==='24h'?'price_change_v2':'price_change')
-      sort.value.sortBy=(val2==='24h'?'price_change_v2':'price_change')
+    if(sortParam.sort_dir&&(sortParam.sort==='m_price_change_24h' || sortParam.sort==='m_price_change_1d')){
+      sortParam.sort=(val2==='24h'?'m_price_change_24h':'m_price_change_1d')
+      sort.value.sortBy=(val2==='24h'?'m_price_change_24h':'m_price_change_1d')
       resetListStatus()
       loadMoreFavorites()
     }
@@ -227,14 +241,25 @@ watch(
   () => sort.value,
   (val) => {
     console.log('sort changed', val)
-    if(val.sortBy==="price_change" || val.sortBy==="price_change_v2"){
+    if(val.sortBy==='m_price_change_24h' || val.sortBy==='m_price_change_1d'){
         sortParam.sort_dir=['asc', '', 'desc'][(val.activeSort||0)+1]
         sortParam.sort=val.sortBy
-       
+
     }else{
       sortParam.sort_dir=''
       sortParam.sort=''
     }
+
+    // 当 activeSort 为 0 时，重置 sortBy 以启用拖拽
+    if (val.activeSort === 0) {
+      sort.value.sortBy = null
+    }
+
+    // 点击排序后自动关闭拖拽模式
+    if (val.activeSort !== 0 || val.sortBy) {
+      isDragModeEnabled.value = false
+    }
+
     resetListStatus()
     loadMoreFavorites()
   }
@@ -371,6 +396,40 @@ function resetListStatus() {
   listStatus.value.finished = false
   listStatus.value.pageNo = 1
 }
+
+async function handleDragEnd(evt: any) {
+  isDragging.value = false
+
+  // 获取被拖拽的 item 信息
+  const draggedItem = favoritesList.value[evt.newIndex]
+  if (!draggedItem) return
+
+  const moves = [{
+    token_id: draggedItem.token + '-' + draggedItem.chain,
+    new_index: evt.newIndex + 1  // API 使用 1-based index
+  }]
+
+  // 更新排序
+  try {
+    await batchChangeFavoritesIndex(walletAddress.value, activeTab.value, moves)
+    updateNum4.value++
+    ElMessage.success(t('success'))
+    favDialogEvent.emit({
+      type: 'order',
+    })
+  } catch (e) {
+    console.log('=>(favoriteTable.vue) drag error', e)
+    ElMessage.error(t('fail'))
+    // 出错时重新加载列表以恢复原顺序
+    resetListStatus()
+    loadMoreFavorites()
+  }
+}
+
+function handleDragStart() {
+  isDragging.value = true
+}
+
 function toggleMode(mode: string) {
   if (favoriteCondition.value.currentMode === 'mcap') {
     favoriteCondition.value.currentMode = 'price'
@@ -378,6 +437,24 @@ function toggleMode(mode: string) {
     favoriteCondition.value.currentMode = 'mcap'
   }
   console.log('toggleMode', mode)
+}
+
+function toggleDragMode() {
+  isDragModeEnabled.value = !isDragModeEnabled.value
+    // 开启拖拽模式时，清除排序状态
+  if (isDragModeEnabled.value) {
+    sort.value.activeSort = 0
+    sort.value.sortBy = null
+    sortParam.sort = ''
+    sortParam.sort_dir = ''
+  }
+}
+
+function handleFavDialogEvent({ type }: IFavDialogEventArgs) {
+  if (type === 'pump_remark_edit' && favTokenStore.visible) {
+    resetListStatus()
+    loadMoreFavorites()
+  }
 }
 </script>
 
@@ -419,29 +496,45 @@ function toggleMode(mode: string) {
           <Icon name="material-symbols:arrow-forward-ios-rounded" />
         </span>
       </div>
-      <Icon
-        name="custom:remark"
-        class="shrink-0 text-12px mr-0 cursor-pointer color-[--third-text] hover:color-#286DFF"
-        @click.self="onEdit"
-      />
+      <div class="flex items-center gap-4px">
+        <Icon
+          v-tooltip="!isDragModeEnabled ? t('closeDragMode') : t('openSortMode')"
+          name="custom:move1"
+          class="shrink-0 text-11px cursor-pointer"
+          :class="isDragModeEnabled ? 'color-#286DFF' : 'color-[--third-text]'"
+          @click="toggleDragMode"
+        />
+        <Icon
+          name="custom:remark"
+          class="shrink-0 text-12px cursor-pointer color-[--third-text] hover:color-#286DFF"
+          @click.self="onEdit"
+        />
+      </div>
     </div>
     <THead v-model:sort="sort" :columns="columns" :toggleMode="toggleMode" />
     <el-scrollbar ref="otherListArea" :height="scrollbarHeight">
       <div
         v-infinite-scroll="loadMoreFavorites"
-        :infinite-scroll-disabled="listStatus.loading || listStatus.finished"
+        :infinite-scroll-disabled="listStatus.loading || listStatus.finished || isDragging"
         infinite-scroll-distance="200"
         :infinite-scroll-delay="10"
         :infinite-scroll-immediate="false"
       >
-        <div class="pb-0px" >
+        <VueDraggable
+          v-model="favoritesList"
+          :animation="300"
+          :disabled="!isDragModeEnabled"
+          @start="handleDragStart"
+          :force-fallback="true"
+          @end="handleDragEnd"
+        >
           <NuxtLink
-            v-for="(row, $index) in sortedFavList"
+            v-for="(row, $index) in isDragModeEnabled ? favoritesList : sortedFavList"
             :key="`${row.token}-${row.chain}`"
-            class="px-10px flex items-center h-40px cursor-pointer hover:bg-[--dialog-bg]"
+            class="px-10px flex items-center h-40px cursor-pointer hover:bg-[--dialog-bg] group"
             :to="`/token/${row.token}-${row.chain}`"
           >
-            <div class="flex items-center flex-1">
+              <div class="flex items-center flex-1">
               <TokenImg class="mr-8px" :row="{...row,issue_platform:''}" v-tooltip="{
                 content:{
                   is:TokenImg,
@@ -482,20 +575,25 @@ function toggleMode(mode: string) {
               <div v-else>${{ formatNumber(row.pool_circulating_supply || 0, 2) }}</div>
               <div
                 :class="`flex-1 text-right text-12px
-                ${getColorClass((zone==='24h'? row.price_change_v2 :row.price_change))}
-            `"
+                ${getColorClass((zone==='24h'? row.m_price_change_24h :row.m_price_change_1d) || 0)}`
+            "
               >
-                <template v-if="Number((zone==='24h'? row.price_change_v2 :row.price_change)) === 0">0%</template>
-                <template v-else-if="!(zone==='24h'? row.price_change_v2 :row.price_change) || (zone==='24h'? row.price_change_v2 :row.price_change) === '--'">--</template>
+                <template v-if="Number((zone==='24h'? row.m_price_change_24h :row.m_price_change_1d)) === 0">0%</template>
+                <template v-else-if="!(zone==='24h'? row.m_price_change_24h :row.m_price_change_1d) || (zone==='24h'? row.m_price_change_24h :row.m_price_change_1d) === '--'">--</template>
                 <template v-else>
-                  {{ Number((zone==='24h'? row.price_change_v2 :row.price_change)) > 0 ? '+' : '-'
-                  }}{{ formatNumber(Math.abs(Number((zone==='24h'? row.price_change_v2 :row.price_change))) || 0, 2) }}%
+                  {{ Number((zone==='24h'? row.m_price_change_24h :row.m_price_change_1d)) > 0 ? '+' : '-'
+                  }}{{ formatNumber(Math.abs(Number((zone==='24h'? row.m_price_change_24h :row.m_price_change_1d))) || 0, 2) }}%
                 </template>
               </div>
             </div>
+            <Icon
+              v-if="isDragModeEnabled"
+              name="material-symbols:dehaze"
+              class="text-14px text-[--third-text] cursor-move drag-handle3 ml-6px"
+            />
           </NuxtLink>
-          <AveEmpty v-if="sortedFavList.length === 0 && !listStatus.loading" />
-        </div>
+          <AveEmpty v-if="(isDragModeEnabled ? favoritesList.length : sortedFavList.length) === 0 && !listStatus.loading" />
+        </VueDraggable>
         <div
           v-if="listStatus.loading && listStatus.pageNo > 1"
           class="color-#959a9f text-12px text-center"
@@ -513,4 +611,12 @@ function toggleMode(mode: string) {
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+:deep(.sortable-ghost) {
+  opacity: 0.4;
+}
+
+:deep(.sortable-drag) {
+  cursor: move;
+}
+</style>

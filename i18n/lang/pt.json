@@ -666,5 +666,7 @@
   "symbol": "Símbolo",
   "symbolDesc": "Destaque $SOL, $ETH e outros tokens",
   "tokenAddressDesc": "Destacar Token CA",
-  "newMessage": "Nova mensagem"
+  "newMessage": "Nova mensagem",
+  "fastModeTitle": "Modo Relâmpago, Instantâneo na Cadeia",
+  "fastModeDesc": "Mais rápido (cerca de 2 segundos mais rápido), pode resultar em reversão ou execução duplicada."
 }

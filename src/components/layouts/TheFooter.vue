@@ -6,7 +6,7 @@
         {{ $t('pump1') }}
       </div> -->
       <div class="flex items-center mr-12px gap-4px cursor-pointer hover:color-[--main-text]" :class="globalStore.pnlTrackerVisible?'color-[--main-text]':'color-[--secondary-text]'" @click="globalStore.pnlTrackerVisible=!globalStore.pnlTrackerVisible">
-        <Icon name="custom:chart" class="text-12px" />
+        <Icon name="custom:pnl" class="text-14px" />
         {{ $t('PnlTracker') }}
       </div>
       <el-badge :is-dot="isDoted" class="mr-12px">
@@ -15,7 +15,7 @@
           :class="signalStore.signalVisible ? 'color-[--main-text]' : 'color-[--secondary-text]'"
           @click="handleClickDrag('signal')"
         >
-          <Icon name="ri:signal-tower-fill" />
+          <Icon name="custom:signal-tower-fill" class="text-14px" />
           {{ $t('signal') }}
         </div>
       </el-badge>
@@ -26,7 +26,7 @@
           :class="visible ? 'color-[--main-text]' : 'color-[--secondary-text]'"
           @click="handleClickDrag('monitor')"
         >
-          <Icon name="mingcute:wallet-fill" />
+          <Icon name="custom:wallet-footer" class="text-14px" />
           {{ $t('walletMonitor') }}
         </div>
       </el-badge>
@@ -49,7 +49,7 @@
           @click="handleClickDrag('position')"
         >
           <div class="flex items-center justify-center text-14px">
-            <Icon name="custom:holding" />
+            <Icon name="custom:postion2" />
           </div>
           {{t('position2')}}
         </div>
@@ -60,8 +60,8 @@
           :class="favTokenStore.visible ? 'color-[--main-text]' : 'color-[--secondary-text]'"
           @click="handleClickDrag('favToken')"
         >
-          <div class="flex items-center justify-center text-16px">
-            <Icon name="material-symbols:kid-star" />
+          <div class="flex items-center justify-center text-14px">
+            <Icon name="custom:star2" />
           </div>
           {{t('favorites')}}
         </div>
@@ -84,7 +84,7 @@
           v-for="item in mainCoins"
           :key="item.symbol || item.logo_url"
           class="flex items-center gap-4px text-12px"
-          :to="`/token/${item.id}`"
+          :to="`/perp/${item.symbol}USD`"
         >
           <img
             v-if="mainCoinLogos[item.symbol]"

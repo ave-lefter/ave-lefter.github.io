@@ -17,10 +17,10 @@
       <span class="color-[--third-text] text-12px mb-20px mt-4px">{{ t('emptyNoData') }}</span>
     </AveEmpty>
   </div>
-  <div v-else ref="parentRef" class="affix-container overflow-y-auto scrollbar-hide" @scroll="onScroll" style="height:calc(100% - 75px)">
+  <div v-else ref="parentRef" class="affix-container overflow-y-auto scrollbar-hide" style="height:calc(100% - 75px)" @scroll="onScroll">
     <el-affix v-if="hasTop"  target=".affix-container" :offset="100">
       <div class="flex justify-center">
-        <div class="flex items-center gap-0px py-6px px-4px rounded-4px bg-[--dialog-bg] text-[#37B270] text-12px clickable" @click="handleTop"><Icon name="custom:arrow-up"></Icon> {{ t('newMessage') }}</div>
+        <div class="flex items-center gap-0px py-6px px-4px rounded-4px bg-[--dialog-bg] text-[#37B270] text-12px clickable" @click="handleTop"><Icon name="custom:arrow-up"/>{{t('newMessage') }}</div>
       </div>
     </el-affix>
     <div :style="{
@@ -38,7 +38,7 @@
         <div :ref="(el) => virtualizer.measureElement(el)" :data-index="virtualRow.index"
           class="border-b-1px border-b-solid border-b-[--border]">
           <ListItem :item="getItem(virtualRow)" :index="virtualRow.index" @measureElement="virtualizer.measureElement(el)" />
-          <div v-if="['2', '3', '4'].includes(getItem(virtualRow).type) && (getItem(virtualRow).retweeted_tweet || getItem(virtualRow).quoted_tweet || getItem(virtualRow).replied_tweet)"
+          <div v-if="['2', '3', '4','5'].includes(getItem(virtualRow).type) && (getItem(virtualRow).retweeted_tweet || getItem(virtualRow).quoted_tweet || getItem(virtualRow).replied_tweet) &&((getItem(virtualRow).retweeted_tweet&&(getItem(virtualRow).retweeted_tweet?.created_at!=='0')) || (getItem(virtualRow).quoted_tweet&&(getItem(virtualRow).quoted_tweet?.created_at!=='0')) || (getItem(virtualRow).replied_tweet&&(getItem(virtualRow).replied_tweet?.created_at!=='0')))"
             class="border-1px border-solid border-[--dialog-divider] rounded-8px px-12px pt-16px ml-0px mb-16px">
             <ListItem :item="getItem(virtualRow).retweeted_tweet || getItem(virtualRow).quoted_tweet || getItem(virtualRow).replied_tweet" :index="-1" @measureElement="virtualizer.measureElement(el)" />
           </div>
@@ -94,7 +94,6 @@ const onScroll = useThrottleFn((e) => {
 }, 100, true, false)
 
 watch(() => trackerStore.unReader, (val) => {
-  // console.log('unReader', val,trackerStore.isPaused)
   if ((val > 0) && trackerStore.isPaused) {
     hasTop.value = true
   } else {

@@ -11,11 +11,11 @@
         <div class="icon-token-container relative flex mr-2 lh-0">
           <TokenImg
             :row="{
-              logo_url: row.logo_url ? `${s3BaseUrl}${row.logo_url}` : '',
-              chain: row.chain || row.network,
-              symbol: row.symbol,
+              logo_url: row?.logo_url ? `${s3BaseUrl}${row?.logo_url}` : '',
+              chain: row?.chain,
+              symbol: row?.symbol,
             }"
-            token-class="w-8 h-8"
+            :token-class="tokenClass"
           />
           <el-image
             v-if="row[subImgKey]" v-tooltip="row[subImgKey]"
@@ -79,6 +79,10 @@ const props = defineProps({
     type: String,
     default: 'amm',
   },
+  tokenClass: {
+    type: String,
+    default: 'w-8 h-8',
+  }
 })
 
 const router = useRouter()

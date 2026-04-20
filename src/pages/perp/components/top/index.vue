@@ -125,7 +125,7 @@
         <span class="text-12px block text-left color-[--main-text] mt-6px"
           >
           <span :class="Number(perp?.fundingRate) > 0 ? 'color-[--up-color]' : 'color-[--down-color]'">
-            {{ addSign(Number(perp?.fundingRate) * 100 || 0) }}{{ formatNumber(Number(perp?.fundingRate) * 100 || 0) }}%
+           {{ formatNumber(Number(perp?.fundingRate) * 100 || 0) }}%
           </span>
           <span class="text-12px color-[--third-text]">&nbsp;/&nbsp;</span>
           <TimerCount

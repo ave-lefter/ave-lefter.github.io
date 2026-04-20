@@ -1,35 +1,37 @@
 <!-- eslint-disable vue/no-parsing-error -->
 <template>
   <div class="relative">
-    <el-alert
-      v-if="(tokenStore?.token?.risk_level ?? 0) < 0"
-      class="myTxs-notice"
-      type="warning"
-      :title="$t('riskWarning') + ': ' + $t('riskWarningContent1')"
-      show-icon
-      :style="{
-        backgroundColor: mode === 'light' ? '#ffa94d0d' : '#36131C',
-        color: '#f00',
-        border: 'none',
-        fontSize: '12px'
-      }"
-      :closable="false"
-    />
-    <el-alert
-      v-else-if="tokenStore.warningStatus"
-      class="myTxs-notice"
-      type="warning"
-      :title="t('alertNotice')"
-      show-icon
-      closable
-      :style="{
-        backgroundColor: mode === 'light' ? '#ffa94d0d' : '#3b1e0c',
-        color: '#ED6A0C',
-        border: 'none',
-        fontSize: '12px'
-      }"
-      @close="handleNoticeClose"
-    />
+    <template v-if="!tokenStore.loadingToken">
+      <el-alert
+        v-if="(tokenStore?.token?.risk_level ?? 0) < 0"
+        class="myTxs-notice"
+        type="warning"
+        :title="$t('riskWarning') + ': ' + $t('riskWarningContent1')"
+        show-icon
+        :style="{
+          backgroundColor: mode === 'light' ? '#ffa94d0d' : '#36131C',
+          color: '#f00',
+          border: 'none',
+          fontSize: '12px'
+        }"
+        :closable="false"
+      />
+      <el-alert
+        v-else-if="tokenStore.warningStatus"
+        class="myTxs-notice"
+        type="warning"
+        :title="t('alertNotice')"
+        show-icon
+        closable
+        :style="{
+          backgroundColor: mode === 'light' ? '#ffa94d0d' : '#3b1e0c',
+          color: '#ED6A0C',
+          border: 'none',
+          fontSize: '12px'
+        }"
+        @close="handleNoticeClose"
+      />
+    </template>
     <div
       class="info flex items-center bg-[--secondary-bg] mb-.5px h-64px p-x-16px text-12px color-[--third-text]"
     >
@@ -138,8 +140,8 @@
               class="icon-token-container relative"
             >
             <el-image
-                class="token-icon rounded-100%"
-                :src="getSymbolDefaultIcon(token)"
+                class="token-icon rounded-8px"
+                :src="getSymbolDefaultIcon(token,'rect')"
                 lazy
               >
                 <template #error>
@@ -351,7 +353,7 @@
               <a
                 v-if="aiSummary?.headline || aiSummary?.summary"
                 v-tooltip.raw="{
-                  content: `<div class='max-w-[400px]'>${aiSummary.headline || aiSummary.summary}</div>`,
+                  content: `<div class='max-w-[400px] whitespace-pre-wrap'>${aiSummary.headline || aiSummary.summary}</div>`,
                   props:{
                     placement:'top-start'
                   }
@@ -894,8 +896,20 @@
           formatNumber(token?.holders || 0, { limit: 10 })
         }}</span>
       </div>
+      <div v-if="Number(tokenInfoExtra?.commission_sum ?? 0) + Number(tokenInfoExtra?.gas_fee_sum ?? 0) >0" class="item ml-24px">
+        <span class="border-b border-b-dashed inline-block w-fit cursor-pointer" v-tooltip="$t('totalTaxTip')">{{ $t('totalTax') }}</span>
+        <div class="flex-start mt-8px color-[--main-text1]">
+          <img
+            v-if="chain"
+            class="icon-symbol rounded-100% h-14px mr-2px"
+            :src="`${token_logo_url}chain/${chain}.png`"
+          >
+          <span>{{ formatNumber((Number(tokenInfoExtra?.commission_sum ?? 0) + Number(tokenInfoExtra?.gas_fee_sum ?? 0)), 2) }}</span>
+          <!-- <span v-if="getChainInfo(chain)?.name">{{ getChainInfo(chain)?.name }}</span> -->
+        </div>
+      </div>
       <div v-if="(tokenInfoExtra?.buy_tax??0) > 0 || (tokenInfoExtra?.sell_tax??0) > 0" class="item ml-24px">
-        <span>{{ $t('totalTax') }}</span>
+        <span>{{ $t('tokenTax') }}</span>
         <div class="block mt-8px color-[--third-text]">
           <span
             v-if="(tokenInfoExtra?.buy_tax??0) > 0"
@@ -911,7 +925,6 @@
             {{ formatNumber(tokenInfoExtra?.sell_tax ||0, 1) }}%
           </span>
         </div>
-
       </div>
       <!-- <div class="item ml-24px">
         <span>DEV</span>
@@ -1082,7 +1095,7 @@ import {
 import { formatNumber } from '@/utils/formatNumber'
 import { ElMessage } from 'element-plus'
 import { useEventBus } from '@vueuse/core'
-import { verifyLogin } from '@/utils'
+import { verifyLogin, getChainInfo } from '@/utils'
 const { token_logo_url } = useConfigStore()
 const tokenStore = useTokenStore()
 const globalStore = useGlobalStore()
@@ -1314,12 +1327,8 @@ const marketCap = computed(() => {
 })
 
 const volume24 = computed(() => {
-  const isSupportTokenKlineLaunchpad = SupportTokenKlineLaunchpad?.includes?.(
-    chain.value + '-' + (tokenStore?.token?.launchpad || '')
-  )
   const isTokenKline =
-    (SupportTokenKlineChains?.includes?.(chain.value) ||
-      isSupportTokenKlineLaunchpad) &&
+    tokenStore.tokenInfo?.token?.support_aggr_kline &&
     'tokenAllPair' in tokenStore &&
     tokenStore?.tokenAllPair &&
     tokenStore?.selectedToken
@@ -1356,6 +1365,7 @@ const chain = computed(() => {
 // console.log('-------tokenInfo---------', tokenInfo)
 // console.log('-------token---------', token)
 onMounted(() => {
+  // console.log('----5555555555------',getChainInfo(chain))
   if (walletAddress.value) {
     getTokenFavoriteCheck()
     getTokenUserFavoriteGroups() //获取分组数组

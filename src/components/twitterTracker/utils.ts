@@ -28,11 +28,74 @@ interface ParsedToken {
 /**
  * Escape HTML special characters to prevent XSS attacks
  */
+// 模块级缓存，仅创建一次
+const TEMP_DIV = document.createElement('div')
+
 function escapeHtml(str: string): string {
-  const div = document.createElement('div')
-  div.textContent = str
-  return div.innerHTML
+  TEMP_DIV.textContent = str
+  return TEMP_DIV.innerHTML
 }
+
+/**
+ * Check if text needs translation
+ * Returns false if text contains only numbers, symbols, emojis, whitespace, or any combination of these
+ * Returns true if text contains natural language characters (letters, Chinese, Japanese, Korean, etc.)
+ */
+function needsTranslation(text: string): boolean {
+  if (!text || text.trim().length === 0) {
+    return false
+  }
+  
+  // Remove whitespace
+  const trimmedText = text.trim()
+  
+  // Comprehensive regex to match ONLY: numbers, common symbols/punctuation, and emojis
+  // This excludes letters (a-z, A-Z) and non-Latin scripts (Chinese, Japanese, Korean, etc.)
+  // 
+  // Breakdown:
+  // \d - digits 0-9
+  // \s - whitespace
+  // \p{P} - all punctuation marks
+  // \p{S} - all symbols (includes most emojis, math symbols, currency symbols)
+  // \uFE0F - variation selector-16 (used by some emojis)
+  // \u200D - zero width joiner (used in combined emojis like family emojis)
+  // \u20E3 - combining enclosing keycap (used in keycap emojis like 1️⃣)
+  const noTranslationRegex = /^[\d\s\p{P}\p{S}\uFE0F\u200D\u20E3]*$/u
+  
+  // Check if text matches the "no translation needed" pattern
+  if (noTranslationRegex.test(trimmedText)) {
+    return false
+  }
+  
+  // If there are letters or other language characters, translation is needed
+  return true
+}
+
+/**
+ * Precompiled token regex patterns to avoid repeated compilation
+ */
+const COMPILED_TOKEN_PATTERNS = new Map<string, RegExp>()
+
+/**
+ * Get or create compiled regex for token symbol matching
+ */
+function getTokenRegex(symbol: string): RegExp {
+  if (!COMPILED_TOKEN_PATTERNS.has(symbol)) {
+    const escaped = symbol.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    COMPILED_TOKEN_PATTERNS.set(
+      symbol, 
+      new RegExp(`\\$?\\b${escaped}\\b|\\$?${escaped}`, 'gi')
+    )
+  }
+  const regex = COMPILED_TOKEN_PATTERNS.get(symbol)!
+  regex.lastIndex = 0 // Reset state for reuse
+  return regex
+}
+
+/**
+ * Fast check for plain text that doesn't need processing
+ */
+const PLAIN_TEXT_REGEX = /^[^#@$"'"'"'"'"'"'https:@[\]]+$/
 
 /**
  * Generate inline style for colors
@@ -91,7 +154,7 @@ export const BLACKLIST_KEYWORDS = ['axiom', 'gmgn', 'debot', 'binance', 'okx'] a
 
 // 🧩 加密货币哈希/地址正则
 // 移除 /g 避免 lastIndex 状态污染，match() 无需全局标志即可安全提取首个匹配
-const CRYPTO_HASH_REGEX = /(?:0x[a-fA-F0-9]{40,64}|[1-9A-HJ-NP-Za-km-z]{32,44}|[UQ][a-zA-Z0-9_-]{46}|T[1-9A-HJ-NP-Za-km-z]{33}|[13][a-km-zA-HJ-NP-Z1-9]{25,34}|bc1[a-z0-9]{39,59})(?=[\/?&#\s<]|$)/g
+const CRYPTO_HASH_REGEX = /(?:0x[a-fA-F0-9]{40,64}|[1-9A-HJ-NP-Za-km-z]{32,44}|[UQ][a-zA-Z0-9_-]{46}|T[1-9A-HJ-NP-Za-km-z]{33}|[13][a-km-zA-HJ-NP-Z1-9]{25,34}|bc1[a-z0-9]{39,59})(?=[/?&#\s<]|$)/g
 
 // ⚡ 预编译正则：匹配任意黑名单词，且前后不为字母/数字（防 mybinance 误杀）
 const BLACKLIST_URL_REGEX = new RegExp(
@@ -132,15 +195,24 @@ export function processUrlWithToken(url: string): {isBlacklisted: boolean, value
  * @param text Raw tweet text
  * @param tokens Optional array of tokens to match and process
  * @param colors Optional colors configuration { quoteColor, symbolColor, tokenAddressColor }
- * @returns Processed HTML content with clickable links
+ * @returns Object containing processed HTML and whether translation is needed
  */
 export function processTwitterText(
   text: string | null | undefined,
   tokens?: Token[],
   colors?: Colors
-): string {
+): { html: string; needsTranslation: boolean } {
   if (!text || typeof text !== 'string') {
-    return ''
+    return { html: '', needsTranslation: false }
+  }
+
+  // Performance optimization: Fast path for plain text without special characters
+  if ((!tokens || tokens.length === 0) && PLAIN_TEXT_REGEX.test(text)) {
+    // console.log('Using fast path for plain text', text,needsTranslation(text) )
+    return { 
+      html: escapeHtml(text), 
+      needsTranslation: needsTranslation(text) 
+    }
   }
 
   const linkClass = '[&&]:color-[--primary-color] hover:underline clickable'
@@ -245,10 +317,9 @@ export function processTwitterText(
   // Add token matches if tokens are provided
   if (tokens && tokens.length > 0) {
     for (const token of tokens) {
-      const escapedSymbol = token.symbol.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-      const tokenRegex = new RegExp(`\\$?\\b${escapedSymbol}\\b|\\$?${escapedSymbol}`, 'gi')
+      // Performance optimization: Use precompiled regex pattern
+      const tokenRegex = getTokenRegex(token.symbol)
       let match: RegExpExecArray | null
-      tokenRegex.lastIndex = 0
       while ((match = tokenRegex.exec(processedText)) !== null) {
         matches.push({
           start: match.index,
@@ -276,7 +347,8 @@ export function processTwitterText(
   const filteredMatches = matches.filter((match, index, arr) => {
     return !arr.some((m, i) => i < index && match.start < m.end && match.end > m.start)
   })
-
+  // 在函数内部定义一个数组来存储普通文本片段
+  const plainTextSegments: string[] = []
   // Build the HTML content
   let result = ''
   let currentIndex = 0
@@ -284,6 +356,7 @@ export function processTwitterText(
     // Add text before the matched region
     if (currentIndex < match.start) {
       const textBeforeMatch = processedText.substring(currentIndex, match.start)
+      plainTextSegments.push(textBeforeMatch) // 收集普通文本
       result += convertNewlines(escapeHtml(textBeforeMatch))
     }
     // Add the matched region as a link
@@ -293,22 +366,16 @@ export function processTwitterText(
   // Add remaining text after the last match
   if (currentIndex < processedText.length) {
     const remainingText = processedText.substring(currentIndex)
+    plainTextSegments.push(remainingText) // 收集剩余的普通文本
     result += convertNewlines(escapeHtml(remainingText))
   }
-
-  return result
-}
-
-/**
- * Convert an array of tweets into HTML
- */
-export function convertTweetsToHtml(
-  tweetsArray: (string | null | undefined)[],
-  tokens?: Token[],
-  colors?: Colors
-): string {
-  return tweetsArray
-    .filter((tweet): tweet is string => tweet != null && typeof tweet === 'string')
-    .map(tweet => `<div class="tweet-item">${processTwitterText(tweet, tokens, colors)}</div>`)
-    .join('')
+  
+  // Determine if translation is needed based on plain text segments
+  const plainTextContent = plainTextSegments.join('')
+  const shouldTranslate = needsTranslation(plainTextContent)
+  // console.log('Using fast path for plain text', plainTextContent,shouldTranslate )
+  return { 
+    html: result, 
+    needsTranslation: shouldTranslate 
+  }
 }

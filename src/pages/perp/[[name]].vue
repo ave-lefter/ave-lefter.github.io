@@ -59,7 +59,7 @@
                 </div>
                 <OrderBook v-show="show2" :kline-height="klineHeight" />
               </div>
-              <Bottom class="rounded-4px bg-[--d-000-l-F6F6F6]" :style="{ minHeight: height + 'px' }"/>
+              <Bottom class="rounded-4px bg-[--d-000-l-F6F6F6]" :style="{ minHeight: heightBottom + 'px' }"/>
             </el-scrollbar>
           </div>
         </div>
@@ -71,7 +71,7 @@
 </template>
 
 <script setup lang="ts">
-import { useStorage } from '@vueuse/core'
+import { useStorage, useWindowSize } from '@vueuse/core'
 import { useTokenStore } from '~/stores/token'
 import Top from './components/top/index.vue'
 import TokenRight from './components/right/index.vue'
@@ -90,14 +90,12 @@ const tokenStore = useTokenStore()
 const walletStore = useWalletStore()
 const show1 = useStorage('perpShow1', true, sessionStorage)
 const show2 = useStorage('perpShow2', true, sessionStorage)
+const { height } = useWindowSize()
 const scrollbarHeight = computed(() => {
   if (isCanNormalWithdrawableAmount.value) {
     return 'calc(100vh - 174px)'
   }
   return 'calc(100vh - 159px)'
-})
-const height = computed(() => {
-  return tokenStore.commonHeight - 160
 })
 const globalStore = useGlobalStore()
 const botStore = useBotStore()
@@ -116,6 +114,9 @@ provide(ProvideType.KLINE_DATE_FILTER, klineDateFilter)
 
 // KLine 高度监听
 const klineHeight = useStorage('kHeightPerp-v1', Math.max(DefaultHeight.KLINE, 564))
+const heightBottom = computed(() => {
+  return height.value - klineHeight.value - 160
+})
 // 订单簿宽度管理
 const DEFAULT_ORDERBOOK_WIDTH = 300
 const MAX_ORDERBOOK_WIDTH = 400
