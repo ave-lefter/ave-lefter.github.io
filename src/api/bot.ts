@@ -880,7 +880,7 @@ export function bot_createSwapEvmTx(params: {
   }>
   inTokenAddress: string
   outTokenAddress: string
-  swapType: 1 | 2
+  swapType: 1 | 2 | 3 | 4
   contractType: 0 | 1
   isPrivate: boolean
   gasTip: number
@@ -904,6 +904,15 @@ export function bot_createSwapEvmTx(params: {
   const isCanMev = getCanMev(params.chain)
   if (!isCanMev) {
     params.isPrivate = false
+  }
+
+  //  市价Wrap	3
+  // 市价Unwrap	4
+  const wrapAddress = getChainInfo(params.chain)?.wmain_wrapper || ''
+  if (params.inTokenAddress === wrapAddress && params.outTokenAddress === NATIVE_TOKEN) {
+    params.swapType = 4
+  } else if (params.inTokenAddress === NATIVE_TOKEN && params.outTokenAddress === wrapAddress) {
+    params.swapType = 3
   }
   return $api('/botapi/swap/createSwapEvmTxV2', {
     method: 'post',
