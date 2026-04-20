@@ -436,7 +436,7 @@ const swapBaseTokens = computed(() => {
   return (botSwapStore?.botSwapBaseTokens?.[chain.value || ''] || [])?.filter(item => item?.address !== tokenStore.swap.payToken?.address)
 })
 
-watch(() => tokenStore.swap.payToken, () => {
+watch(() => tokenStore.swap?.payToken?.address || '', () => {
   if (props.activeTab === 'buy') {
     amountNative.value = ''
     amountNativeOut.value = ''
@@ -640,7 +640,7 @@ async function quoteBot(chain: string, type = props.activeTab, isGetPrice = true
 
   const payToken = tokenStore.swap.payToken
 
-  const payTokenPrice = (BotNativeTokens?.includes(payToken?.address || '') ? nativePrice : tokenStore.swap.payToken.price) || 0
+  const payTokenPrice = (BotNativeTokens?.includes(payToken?.address || '') ? nativePrice : tokenStore.swap.payToken?.price) || 0
 
   let price: number = tokenStore.price || tokenStore.swap.token?.price || 0
   if (props.swapType === 'limit') {
@@ -730,7 +730,7 @@ const approve = async () => {
     batchId: Date.now().toString(),
     chain: chain.value || '',
     inTokenAddress: fromToken.value?.address || '',
-    outTokenAddress: (isBuyTab.value ? tokenStore.swap.token.address : tokenStore.swap.payToken.address) || '',
+    outTokenAddress: (isBuyTab.value ? (tokenStore.swap.token?.address || '') : tokenStore.swap.payToken?.address) || '',
     creatorAddress: [walletAddress.value || ''],
   }).then(res => {
     if (res) {

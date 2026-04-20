@@ -342,6 +342,19 @@ watch(() => wsStore.wsResult[WSEventType.ASSET], (val: IAssetResponse) => {
   }
 })
 
+watch(() => wsStore.wsResult[WSEventType.TGBOT], (val: any) => {
+  console.log('TGBOT', val)
+  const chain  = val?.chain || ''
+  const wrapper = getChainInfo(chain)?.wmain_wrapper
+  const tokens = [wrapper, NATIVE_TOKEN]
+  if (tokens.includes(val?.inTokenAddress || '') && tokens.includes(val?.outTokenAddress || '')) {
+    getTokenBalance(wrapper, chain)
+    setTimeout(()=>{
+      getTokenBalance(wrapper, chain)
+    },5000)
+  }
+})
+
 
 
 function resetHolderList(walletAddress: string | undefined) {
