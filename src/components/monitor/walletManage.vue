@@ -139,11 +139,13 @@
           </template>
           <template #cell-operate="{ row ,rowIndex}">
             <div class="flex justify-end items-center" @click.stop>
-              <!-- <div class=" color-#666 flex-end mr-2px">
-                <Icon name="material-symbols-light:notifications-rounded" class="text-15px"/>
-                <span>{{ $t('enableMonitor') }}</span>
-              </div> -->
-              <Icon name="custom:group" class="text-10px mr-4px text-[--third-text]"/>
+              <Icon 
+                :ref="(el) => groupIconRefs[rowIndex] = el" 
+                name="custom:group" 
+                class="text-10px mr-4px text-[--third-text] cursor-pointer"
+                @click.stop="handleGroupIconClick(row, rowIndex)"
+              />
+           
               <div
                 v-if="SupportMonitorChain.includes(row?.user_chain)"
                 class="flex items-center mr-4px cursor-pointer color-[--third-text]"
@@ -188,16 +190,28 @@
     </div>
      <AddFavAddressPop v-if="addButtonRef1" ref="addFavAddressPopRef" :buttonRef="addButtonRef1" @onConfirm="handleConfirmAdd"/>
      <AddFavAddressPop v-if="addButtonRef2" ref="addFavAddressPopRef" :buttonRef="addButtonRef2" @onConfirm="handleConfirmAdd"/>
+    <GroupSelect
+      v-if="currentRowData"
+      :visible="groupSelectVisible"
+      :model-value="currentRowData.group_id"
+      :trigger-ref="currentTriggerRef"
+      :address-groups="addressGroups"
+      @update:model-value="handleGroupChange"
+      @update:visible="(val) => groupSelectVisible = val"
+      @new-group="handleNewGroup"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { getAttentionPageList, moveFavoriteGroup2, deleteAttention ,addAttention2,addAddressMonitor,favUsersResumeMonitor,favUsersPauseMonitor} from '~/api/attention'
+import { getAttentionPageList, moveFavoriteGroup2, deleteAttention ,addAttention2,addAddressMonitor,favUsersResumeMonitor,favUsersPauseMonitor,addFavoriteGroup2} from '~/api/attention'
 import { defaultPaginationParams } from '@/utils/constants'
 import type {RowEventHandlerParams} from 'element-plus'
 import { throttle } from 'lodash-es'
 import { useStorage } from '@vueuse/core'
 import SuffixIcon from '../suffixIcon.vue'
+import GroupSelect from './components/groupSelect.vue'
+
 const { t } = useI18n()
 const $router = useRouter()
 const props=defineProps({
@@ -236,11 +250,18 @@ const addFavAddressPopRef = ref()
 const selectWrapperRef = ref<HTMLElement>()
 const selectWrapperWidth = ref(120)
 const AmountU = useStorage('walletManageAmountU', false)
+const groupIconRefs = ref<Record<string, any>>({})
+const currentRowData = ref<any>(null)
+const currentRowIndex = ref(0)
+const currentTriggerRef = ref<any>(null)
+const groupSelectVisible = ref(false)
 // 当前激活的按钮 ref（用于弹框定位）
 const currentButtonRef = ref()
 // const selectGroupId=ref(0)
 const {selectGroupId,paginationParams,user_chain,monitorList1} = storeToRefs(useMonitorStore())
 const {currentAddress ,showBatchAddressDetails, updateNum12,updateNum13,updateNum14,updateNum2,updateNum3,addressGroups} = storeToRefs(useFollowStore())
+
+const followStore = useFollowStore()
 const conditions = reactive({
   group: selectGroupId.value,
   activeTab: '7d',
@@ -456,6 +477,89 @@ const getRowGroupChange = async (val: number, row: any) => {
   updateNum2.value++
   getTableList()
 }
+
+const handleGroupIconClick = (row: any, rowIndex: number) => {
+  // 如果点击的是同一行，切换显示状态
+  if (currentRowData.value?.index === row.index) {
+    groupSelectVisible.value = !groupSelectVisible.value
+    return
+  }
+  
+  // 切换到新行
+  currentRowData.value = row
+  currentRowIndex.value = rowIndex
+  currentTriggerRef.value = groupIconRefs.value[rowIndex]
+  groupSelectVisible.value = true
+}
+
+const handleGroupChange = async (groupId: number) => {
+  if (!currentRowData.value) return
+  
+  try {
+    paginationParams.value = { ...defaultPaginationParams, pageSize: 50 }
+    await moveFavoriteGroup2({
+      user_chain: currentRowData.value.user_chain,
+      user_address: currentRowData.value.user_address,
+      group: groupId
+    })
+    
+    ElMessage.success(t('success'))
+    updateNum2.value++
+    getTableList()
+  } catch (error) {
+    ElMessage.error(String(error))
+  }
+}
+
+const handleNewGroup = async (name: string) => {
+  // 检查分组名称是否已存在
+  const existingGroup = addressGroups.value.find(group => group.name === name)
+  
+  if (existingGroup) {
+    // 如果分组已存在，直接切换到该分组
+    try {
+      paginationParams.value = { ...defaultPaginationParams, pageSize: 50 }
+      await moveFavoriteGroup2({
+        user_chain: currentRowData.value.user_chain,
+        user_address: currentRowData.value.user_address,
+        group: existingGroup.group_id
+      })
+      
+      ElMessage.success(t('success'))
+      updateNum2.value++
+      getTableList()
+    } catch (error) {
+      ElMessage.error(String(error))
+    }
+    return
+  }
+  
+  // 如果分组不存在，创建新分组
+  try {
+    await addFavoriteGroup2(name)
+    ElMessage.success(t('success'))
+    
+    // 刷新分组列表
+    await followStore.getUserFavoriteGroups2()
+    
+    // 找到新创建的分组并切换
+    const newGroup = addressGroups.value.find(group => group.name === name)
+    if (newGroup) {
+      paginationParams.value = { ...defaultPaginationParams, pageSize: 50 }
+      await moveFavoriteGroup2({
+        user_chain: currentRowData.value.user_chain,
+        user_address: currentRowData.value.user_address,
+        group: newGroup.group_id
+      })
+      
+      updateNum2.value++
+      getTableList()
+    }
+  } catch (error) {
+    ElMessage.error(String(error))
+  }
+}
+
 function tableRowClick(row: { user_address: string; user_chain: string }) {
   $router.push({
     path: `/address/${row.user_address}/${row.user_chain}`,
