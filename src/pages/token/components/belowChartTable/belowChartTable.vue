@@ -225,10 +225,10 @@ onUnmounted(() => {
     <!-- Removed KeepAlive: render the dynamic component directly and keep a ref to access its instance/lifecycle -->
     <component
       :is="Component"
-v-if="(activeTab !== 'Orders') && route.name === 'token-id'"
+      v-if="(activeTab !== 'Orders') && route.name === 'token-id'"
       v-bind="comProps"
       ref="activeChild"
-:currentActiveTab="activeTab"
+      :currentActiveTab="activeTab"
     />
   </div>
 </template>
