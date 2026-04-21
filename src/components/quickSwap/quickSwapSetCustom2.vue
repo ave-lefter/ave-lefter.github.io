@@ -103,7 +103,7 @@
       v-model:visible="amountDropdownVisible"
       popper-class="new-popover amount-dropdown-popover"
       placement="bottom-start"
-      popper-style="min-width: auto; width: auto; padding: 8px;"
+      popper-style="padding: 4px;"
       :persistent="false"
       :teleported="true"
       trigger="click"
@@ -118,9 +118,9 @@
           <div class="el-input__wrapper">
             <span class="el-input__prefix">
               <img
-                v-if="chainList.length > 0"
+                v-if="sortedChainList.length > 0"
                 class="rounded-full w-14px h-14px"
-                :src="`${configStore.token_logo_url}chain/${chainList[0]}.png`"
+                :src="`${configStore.token_logo_url}chain/${sortedChainList[0]}.png`"
                 alt=""
                 onerror="this.src='/icon-default.png'"
               >
@@ -134,34 +134,17 @@
           </div>
         </div>
       </template>
-      <div class="text-12px flex flex-col gap-8px min-w-150px">
-        <div v-for="chainItem in chainList" :key="chainItem" class="flex items-center gap-8px">
-          <img
-            class="rounded-full w-14px h-14px shrink-0"
-            :src="`${configStore.token_logo_url}chain/${chainItem}.png`"
-            alt=""
-            onerror="this.src='/icon-default.png'"
-          >
-          <span class="color-[--third-text] min-w-50px">{{ getChainLabel(chainItem) }}</span>
+      <div class="text-12px flex flex-col gap-4px" style="width: 100%;">
+        <template v-for="chainItem in sortedChainList" :key="chainItem">
           <el-input
             :model-value="chainAmountMap[chainItem] || ''"
-            class="flex-1"
+            class="chain-amount-input"
             placeholder="0"
             type="text"
             size="small"
+            :style="{ '--component-height': componentHeight + 'px' }"
             @update:model-value="(value: string | number) => {
-              const strValue = String(value ?? '')
-              // 只允许数字和小数点
-              const filtered = strValue.replace(/\-|[^\d.]/g, '')
-              // 防止多个小数点
-              const parts = filtered.split('.')
-              const result = parts.length > 2 
-                ? parts[0] + '.' + parts.slice(1).join('')
-                : filtered
-              chainAmountMap[chainItem] = result
-              
-              // 实时更新父组件（可选，如果希望实时同步）
-              // updateChainAmountAndEmit(chainItem, result)
+              chainAmountMap[chainItem] = formatInputValue(value)
             }"
             @blur="handleChainAmountBlur(chainItem)"
             @keydown.enter="(e: any) => {
@@ -169,8 +152,17 @@
               e?.target?.blur()
             }"
             @click.stop
-          />
-        </div>
+          >
+            <template #prefix>
+              <img
+                class="rounded-full w-14px h-14px mr-0px!"
+                :src="`${configStore.token_logo_url}chain/${chainItem}.png`"
+                alt=""
+                onerror="this.src='/icon-default.png'"
+              >
+            </template>
+          </el-input>
+        </template>
       </div>
     </el-popover>
     <!-- 单链模式：真实输入框 -->
@@ -252,6 +244,7 @@ import {formatBotGasTips} from '@/utils/bot'
 import {isEvmChain, getRpcProvider} from '@/utils'
 import type { BotChain, BotSettingKey } from '~/utils/types'
 import { CaretBottom } from '@element-plus/icons-vue'
+import { SupportMonitorChain } from '@/utils/constants'
 
 const botStore = useBotStore()
 const configStore = useConfigStore()
@@ -282,6 +275,22 @@ const globalStore = useGlobalStore()
 // 统一将 chain 转换为数组
 const chainList = computed(() => {
   return Array.isArray(props.chain) ? props.chain : [props.chain]
+})
+
+// 按照 SupportMonitorChain 的顺序排序当前选中的链
+const sortedChainList = computed(() => {
+  // 创建 SupportMonitorChain 的索引映射
+  const orderMap = new Map<string, number>()
+  SupportMonitorChain.forEach((chain, index) => {
+    orderMap.set(chain, index)
+  })
+  
+  // 对 chainList 进行排序
+  return [...chainList.value].sort((a, b) => {
+    const orderA = orderMap.get(a) ?? Number.MAX_SAFE_INTEGER
+    const orderB = orderMap.get(b) ?? Number.MAX_SAFE_INTEGER
+    return orderA - orderB
+  })
 })
 
 // 解析 quickBuyValue，兼容字符串和对象类型
@@ -340,12 +349,6 @@ const chainAmountMap = ref<Record<BotChain, string>>({} as Record<BotChain, stri
 
 // 从 props 解析并初始化 chainAmountMap
 function syncFromProps() {
-  console.log('[syncFromProps] 开始同步', {
-    quickBuyValueType: typeof props.quickBuyValue,
-    quickBuyValue: props.quickBuyValue,
-    chainList: chainList.value
-  })
-  
   const map: Record<BotChain, string> = {} as Record<BotChain, string>
   
   if (typeof props.quickBuyValue === 'string') {
@@ -365,7 +368,6 @@ function syncFromProps() {
     })
   }
   
-  console.log('[syncFromProps] 同步结果', map)
   chainAmountMap.value = map
 }
 
@@ -383,29 +385,18 @@ watch(() => props.customSelected, () => {
 
 // 监听 quickBuyValue prop 变化，只在弹框关闭时同步
 watch(() => props.quickBuyValue, (newValue, oldValue) => {
-  console.log('[watch quickBuyValue] 检测到变化', {
-    newValue,
-    oldValue,
-    amountDropdownVisible: amountDropdownVisible.value,
-    newValueType: typeof newValue,
-    oldValueType: typeof oldValue
-  })
-  
   // 如果弹框是打开的，不同步（避免覆盖用户正在编辑的值）
   if (amountDropdownVisible.value) {
-    console.log('[watch quickBuyValue] 弹框打开中，跳过同步')
     return
   }
   
   // 深度比较，如果内容相同也跳过
   if (typeof newValue === 'object' && typeof oldValue === 'object' && newValue !== null && oldValue !== null) {
     if (JSON.stringify(newValue) === JSON.stringify(oldValue)) {
-      console.log('[watch quickBuyValue] 内容相同，跳过同步')
       return
     }
   }
   
-  console.log('[watch quickBuyValue] 执行同步')
   syncFromProps()
 }, { deep: true })
 
@@ -481,11 +472,10 @@ function getChainPriorityFee(chain: BotChain) {
   return calculatePriorityFee(chain, selected.value)
 }
 
-// 获取第一个链的值（用于多链模式显示）
+// 获取第一个链的值（用于多链模式显示）- 使用排序后的第一个链
 function getFirstChainValue() {
-  if (chainList.value.length > 0) {
-    const firstChain = chainList.value[0]
-    // 优先从 chainAmountMap 读取，其次从 props 读取
+  if (sortedChainList.value.length > 0) {
+    const firstChain = sortedChainList.value[0]
     return chainAmountMap.value[firstChain] || 
            (typeof props.quickBuyValue === 'object' 
              ? (props.quickBuyValue as Record<BotChain, string>)[firstChain] 
@@ -493,6 +483,43 @@ function getFirstChainValue() {
            '0.01'
   }
   return '0.01'
+}
+
+// 格式化输入值：只允许数字和小数点，防止多个小数点
+function formatInputValue(value: string | number | undefined): string {
+  const strValue = String(value ?? '')
+  const filtered = strValue.replace(/\-|[^\d.]/g, '')
+  const parts = filtered.split('.')
+  return parts.length > 2 ? parts[0] + '.' + parts.slice(1).join('') : filtered
+}
+
+// 格式化金额（保留指定小数位）
+function formatAmount(value: string, decimals = 4): string {
+  const v1 = new BigNumber(value || 0)?.toFixed?.().match(new RegExp(`[0-9]*(\\.[0-9]{0,${decimals}})?`))?.[0] || ''
+  
+  if (value === '') return ''
+  if (Number(v1) === 0) return '0'
+  return v1
+}
+
+// 构建完整的 quickBuyValue 对象（保留所有原有链）
+function buildQuickBuyValueObject(): Record<BotChain, string> {
+  if (typeof props.quickBuyValue === 'object' && props.quickBuyValue !== null) {
+    // 基于 props 复制所有原有的键
+    const newValue = { ...(props.quickBuyValue as Record<BotChain, string>) }
+    // 更新 chainList 中的链
+    chainList.value.forEach(c => {
+      newValue[c] = chainAmountMap.value[c] || '0.01'
+    })
+    return newValue
+  } else {
+    // 如果 props 不是对象，只包含 chainList 中的链
+    const newValue = {} as Record<BotChain, string>
+    chainList.value.forEach(c => {
+      newValue[c] = chainAmountMap.value[c] || '0.01'
+    })
+    return newValue
+  }
 }
 
 const quickBuyValue1 = computed({
@@ -561,85 +588,27 @@ function setBtnRef(el: Element | ComponentPublicInstance | null) {
 
 // 处理金额输入框点击（多链模式下由 trigger="click" 自动处理）
 function handleAmountInputClick() {
-  console.log('[handleAmountInputClick] 点击主输入框', {
-    chainListLength: chainList.value.length,
-    quickBuyValue: props.quickBuyValue
-  })
-  
   if (chainList.value.length > 1) {
-    // 多链时，确保数据是最新的
     syncFromProps()
-    // trigger="click" 会自动打开弹框，不需要手动设置
-    console.log('[handleAmountInputClick] 准备打开弹框')
   }
 }
 
 // 处理弹框关闭 - 统一 emit 所有链的值
 function handleAmountDropdownHide() {
-  console.log('[handleAmountDropdownHide] 弹框关闭', {
-    chainAmountMap: chainAmountMap.value,
-    chainList: chainList.value
-  })
-  
   if (chainList.value.length > 1) {
     // 格式化所有链的值
     chainList.value.forEach(chain => {
-      const value = chainAmountMap.value[chain]
-      const decimals = 4
-      const v = value
-      const v1 = new BigNumber(v || 0)?.toFixed?.().match(new RegExp(`[0-9]*(\\.[0-9]{0,${decimals || 18}})?`))?.[0] || ''
-      
-      if (String(v) !== String(v1)) {
-        if (v === '') {
-          chainAmountMap.value[chain] = ''
-        } else if (Number(v1) === 0) {
-          chainAmountMap.value[chain] = '0'
-        } else {
-          chainAmountMap.value[chain] = v1
-        }
-      }
+      chainAmountMap.value[chain] = formatAmount(chainAmountMap.value[chain])
     })
     
-    // 基于 props.quickBuyValue 构建新对象，保留所有原有的链
-    let newValue: Record<BotChain, string>
-    
-    if (typeof props.quickBuyValue === 'object' && props.quickBuyValue !== null) {
-      // 如果 props 是对象，保留所有原有的键
-      newValue = { ...(props.quickBuyValue as Record<BotChain, string>) }
-      // 更新 chainList 中的链
-      chainList.value.forEach(c => {
-        newValue[c] = chainAmountMap.value[c] || '0.01'
-      })
-    } else {
-      // 如果 props 是字符串或其他类型，只包含 chainList 中的链
-      newValue = {} as Record<BotChain, string>
-      chainList.value.forEach(c => {
-        newValue[c] = chainAmountMap.value[c] || '0.01'
-      })
-    }
-    
-    console.log('[handleAmountDropdownHide] emit 新值', newValue)
-    emit('update:quickBuyValue', newValue)
+    // 构建完整对象并 emit
+    emit('update:quickBuyValue', buildQuickBuyValueObject())
   }
 }
 
 // 处理单个链的金额失焦（只格式化，不 emit）
 function handleChainAmountBlur(chain: BotChain) {
-  const value = chainAmountMap.value[chain]
-  const decimals = 4
-  const v = value
-  const v1 = new BigNumber(v || 0)?.toFixed?.().match(new RegExp(`[0-9]*(\\.[0-9]{0,${decimals || 18}})?`))?.[0] || ''
-  
-  if (String(v) !== String(v1)) {
-    if (v === '') {
-      chainAmountMap.value[chain] = ''
-    } else if (Number(v1) === 0) {
-      chainAmountMap.value[chain] = '0'
-    } else {
-      chainAmountMap.value[chain] = v1
-    }
-  }
-  // 不在这里 emit，等待弹框关闭时统一 emit
+  chainAmountMap.value[chain] = formatAmount(chainAmountMap.value[chain])
 }
 
 function showPopover(item: BotSettingKey) {
@@ -789,6 +758,7 @@ function getOptionEstimatedGas(chain: BotChain) {
 function getOptionPriorityFee(chain: BotChain) {
   return calculatePriorityFee(chain, optionSelected.value)
 }
+
 </script>
 
 <style scoped lang="scss">
@@ -924,6 +894,66 @@ function getOptionPriorityFee(chain: BotChain) {
     .el-input__wrapper {
       background-color: var(--main-input-button-bg-hover, var(--main-input-button-bg));
     }
+  }
+}
+
+// 下拉框中链金额输入框样式（与单链输入框保持一致）
+.chain-amount-input {
+  width: 100%;
+  
+  :deep(.el-input__wrapper) {
+    --el-input-text-color: var(--main-text1);
+    background-color: var(--main-input-button-bg);
+    border-radius: 4px;
+    height: calc(var(--component-height, 28px) - 4px);
+    min-height: calc(var(--component-height, 28px) - 4px);
+    padding: 0px 8px;
+    font-size: 12px;
+    box-shadow: none;
+    
+    &.is-focus {
+      box-shadow: none;
+    }
+    
+    &:hover {
+      box-shadow: none;
+    }
+    
+    .el-input__prefix {
+      margin-right: 4px;
+      display: flex;
+      align-items: center;
+      
+      img {
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+      }
+    }
+    
+    .el-input__inner {
+      font-size: 12px;
+      height: 24px;
+      line-height: 24px;
+    }
+  }
+}
+</style>
+
+<style lang="scss">
+// 多链金额下拉框 popover 样式（全局样式，因为 popper 是 teleported 的）
+.amount-dropdown-popover {
+  background-color: var(--secondary-bg, #1a1d21) !important;
+  border: 1px solid var(--dialog-list-hover, #2a2d35) !important;
+  border-radius: 4px !important;
+  padding: 4px !important;
+  width: 82px !important;
+  min-width: 82px !important;
+  max-width: 82px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+  
+  .el-popper__arrow {
+    display: none;
   }
 }
 </style>
