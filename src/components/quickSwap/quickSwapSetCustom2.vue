@@ -103,6 +103,8 @@
       v-model:visible="amountDropdownVisible"
       popper-class="new-popover amount-dropdown-popover"
       placement="bottom-start"
+      :offset="0"
+      :show-arrow="false"
       popper-style="padding: 4px;"
       :persistent="false"
       :teleported="true"
@@ -905,8 +907,8 @@ function getOptionPriorityFee(chain: BotChain) {
     --el-input-text-color: var(--main-text1);
     background-color: var(--main-input-button-bg);
     border-radius: 4px;
-    height: calc(var(--component-height, 28px) - 4px);
-    min-height: calc(var(--component-height, 28px) - 4px);
+    height: calc(var(--component-height, 28px) - 0px);
+    min-height: calc(var(--component-height, 28px) - 0px);
     padding: 0px 8px;
     font-size: 12px;
     box-shadow: none;
@@ -951,7 +953,8 @@ function getOptionPriorityFee(chain: BotChain) {
   min-width: 82px !important;
   max-width: 82px !important;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
-  
+  margin-top: -29px !important;  // 向上偏移，使第一个输入框与触发元素重合
+  margin-left: -5px !important;
   .el-popper__arrow {
     display: none;
   }
