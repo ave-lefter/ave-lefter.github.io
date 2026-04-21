@@ -579,95 +579,82 @@ export const bot_getChainsTokenBalance = createCacheRequest(async function(param
   const uniqueChains = [...new Set(paramsChains.map(i => i.chain))]
   const useGetBalances = paramsChains.length > 0 && uniqueChains.length === 1
 
+
   if (useGetBalances) {
-    // All params are for the same chain, use getBalances
-    const param = paramsChains[0]
-
-    // Convert token addresses for getBalances
-    const convertedTokens = param.tokens.map(token => {
-      if (token === getNativeToken(param.chain)) {
-        // For Solana, getBalances expects NATIVE_TOKEN instead of 'sol'
-        // For other chains, getNativeToken already returns the correct address
-        return param.chain === 'solana' ? NATIVE_TOKEN : token
-      }
-      return token
-    })
-
-    const result = await getBalances({
-      chain: param.chain,
-      creatorAddress: param.walletAddress,
-      tokens: convertedTokens,
-      showZero: true
-    })
-
-    // Handle case where tokens is null (when balance is 0)
-    const tokensWithBalance = result.tokens || []
-
-    // Create a map of tokens with balance for quick lookup
-    const tokenMap = new Map()
-    tokensWithBalance.forEach(token => {
-      // Map back to original token address for consistency
-      let originalToken = token.token
-      if (token.token === NATIVE_TOKEN && param.chain === 'solana') {
-        originalToken = getNativeToken(param.chain) // This returns 'sol' for Solana
-      }
-      tokenMap.set(originalToken, token)
-    })
-
-    // Convert back to original format, including tokens with 0 balance
-    const res: any[] = []
-    for (const tokenAddress of param.tokens) {
-      const tokenWithBalance = tokenMap.get(tokenAddress)
-
-      if (tokenWithBalance) {
-        // Token has balance, use the data from getBalances but keep original format
-        let balance = tokenWithBalance.balance
-        if (param.chain === 'ton') {
-          balance = await getTonWalletBalance({token: tokenAddress, wallet: param.walletAddress}).catch(async () => 0)
+    // 多个 paramsChains，遍历每个元素分别处理
+    const allResults: any[] = []
+    for (const param of paramsChains) {
+      // Convert token addresses for getBalances
+      const convertedTokens = param.tokens.map(token => {
+        if (token === getNativeToken(param.chain)) {
+          return param.chain === 'solana' ? NATIVE_TOKEN : token
         }
+        return token
+      })
 
-        res.push({
-          chain: param.chain,
-          token: tokenAddress,
-          walletAddress: param.walletAddress,
-          balance: balance,
-          decimals: tokenWithBalance.decimals,
-          symbol: tokenWithBalance.symbol,
-          logoUrl: tokenWithBalance.logoUrl,
-          price: tokenWithBalance.price
-        })
-      } else {
-        // Token has no balance, get token details and create default response
-        let balance: number | string = 0
-        if (param.chain === 'ton') {
-          balance = await getTonWalletBalance({token: tokenAddress, wallet: param.walletAddress}).catch(async () => 0)
+      const result = await getBalances({
+        chain: param.chain,
+        creatorAddress: param.walletAddress,
+        tokens: convertedTokens,
+        showZero: true
+      })
+
+      const tokensWithBalance = result.tokens || []
+      const tokenMap = new Map()
+      tokensWithBalance.forEach(token => {
+        let originalToken = token.token
+        if (token.token === NATIVE_TOKEN && param.chain === 'solana') {
+          originalToken = getNativeToken(param.chain)
         }
+        tokenMap.set(originalToken, token)
+      })
 
-        // Get token details for decimals and symbol
-        const tokenDetails = await getTokenDetails({
-          tokenAddress: tokenAddress,
-          chain: param.chain,
-          walletAddress: param.walletAddress
-        }).catch(async () => ({ decimals: 0, symbol: '', logoUrl: '' }))
-
-        return {
-          token: tokenAddress,
-          balance: balance.toString(),
-          initBalance: balance,
-          decimals: tokenDetails.decimals || 0,
-          chain: param.chain || '',
-          symbol: tokenDetails.symbol || '',
-          logoUrl: (tokenDetails as any).logoUrl || '',
-          price: '0',
+      for (const tokenAddress of param.tokens) {
+        const tokenWithBalance = tokenMap.get(tokenAddress)
+        if (tokenWithBalance) {
+          let balance = tokenWithBalance.balance
+          if (param.chain === 'ton') {
+            balance = await getTonWalletBalance({token: tokenAddress, wallet: param.walletAddress}).catch(async () => 0)
+          }
+          allResults.push({
+            chain: param.chain,
+            token: tokenAddress,
+            walletAddress: param.walletAddress,
+            balance: balance,
+            decimals: tokenWithBalance.decimals,
+            symbol: tokenWithBalance.symbol,
+            logoUrl: tokenWithBalance.logoUrl,
+            price: tokenWithBalance.price
+          })
+        } else {
+          let balance: number | string = 0
+          if (param.chain === 'ton') {
+            balance = await getTonWalletBalance({token: tokenAddress, wallet: param.walletAddress}).catch(async () => 0)
+          }
+          const tokenDetails = await getTokenDetails({
+            tokenAddress: tokenAddress,
+            chain: param.chain,
+            walletAddress: param.walletAddress
+          }).catch(async () => ({ decimals: 0, symbol: '', logoUrl: '' }))
+          allResults.push({
+            token: tokenAddress,
+            balance: balance.toString(),
+            initBalance: balance,
+            decimals: tokenDetails.decimals || 0,
+            chain: param.chain || '',
+            symbol: tokenDetails.symbol || '',
+            logoUrl: (tokenDetails as any).logoUrl || '',
+            price: '0',
+          })
         }
       }
     }
 
+    // 补充 exChains
     const paramsExChains = params?.filter((i) => exChains.includes(i.chain)) || []
     if (paramsExChains?.length > 0) {
       paramsExChains.forEach((i) => {
-        const k = params.findIndex((j) => j.chain === i.chain)
-        res.splice(k, 0, {
+        allResults.push({
           chain: i.chain,
           token: i.tokens[0],
           walletAddress: i.walletAddress,
@@ -680,7 +667,7 @@ export const bot_getChainsTokenBalance = createCacheRequest(async function(param
       })
     }
 
-    return Promise.all((res || []).map(async (i: { chain: string; token: any; walletAddress: any; balance: any }) => {
+    return Promise.all((allResults || []).map(async (i: { chain: string; token: any; walletAddress: any; balance: any }) => {
       if (i.chain === 'ton') {
         return {
           ...i,
