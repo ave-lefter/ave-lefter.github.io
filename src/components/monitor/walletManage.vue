@@ -157,7 +157,11 @@ const props=defineProps({
   isLarge:{
     type:Boolean,
     default:false
-  }
+  },
+  chain:{
+    type:String,
+    default:'AllChains'
+  },
 })
 const { mode, isDark, token_logo_url } = storeToRefs(useGlobalStore())
 const chainOptions=computed(()=>{
@@ -177,6 +181,7 @@ const visible = ref(false)
 const addButtonRef1 = ref() 
 const addButtonRef2 = ref() 
 const addFavAddressPopRef = ref()
+const aveTableRef = ref()
 // 当前激活的按钮 ref（用于弹框定位）
 const currentButtonRef = ref()
 // const selectGroupId=ref(0)
@@ -186,7 +191,7 @@ const conditions = reactive({
   group: selectGroupId.value,
   activeTab: '7d',
   isMonitor: false,
-  user_chain:user_chain.value,
+  user_chain: props.chain || 'AllChains',
   sort: '',
   sort_dir: '',
   keyword: '',
@@ -242,6 +247,14 @@ onMounted(() => {
 })
 watch(() => updateNum12.value+updateNum13.value+updateNum14.value+updateNum3.value, () => {
   paginationParams.value={...defaultPaginationParams,pageSize: 50}
+  if(aveTableRef.value){
+    aveTableRef.value.scrollToTop(0)
+  }
+  getTableList()
+})
+watch(() => props.chain, (newChain) => {
+  conditions.user_chain = newChain || 'AllChains'
+  if(aveTableRef.value) aveTableRef.value.scrollToTop(0)
   getTableList()
 })
 // watch(() => monitorStore.visible, (val) => {

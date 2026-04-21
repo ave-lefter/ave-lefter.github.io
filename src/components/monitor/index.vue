@@ -243,7 +243,7 @@
         </AveEmpty>
       </el-tab-pane>
       <el-tab-pane :label="$t('manage')" :name="1" lazy>
-        <WalletManage v-if="botStore.evmAddress" v-bind="walletManageProps" :isLarge="props.isLarge" />
+        <WalletManage v-if="botStore.evmAddress" v-bind="walletManageProps" :isLarge="props.isLarge" :chain='selectedChainStr' />
         <AveEmpty v-else :style="{ height: `${props.scrollHeight - 50}px` }" class="overflow-hidden">
           <span class="text-12px mt-10px color-[--third-text]">{{ $t('noBotWalletTip') }}</span>
           <el-button type="primary" class="mt-10px" @click="botStore.$patch({
@@ -369,6 +369,22 @@ const selectedChainVals = computed(() => {
   return selectedChain.value.map(i => getChainInfo(i.value, true)?.net_name)
 })
 
+const selectedChainStr = computed(() => {
+  const chains = selectedChainVals.value
+  
+  if (chains.length === 0) return 'AllChains'
+  
+  // 获取当前选中的链的 id 列表
+  const selectedChainIds = selectedChain.value.map(i => i.id)
+  
+  // 检查是否所有支持的监控链都被选中
+  const isAllSelected = SupportMonitorChain.length > 0 && 
+                       selectedChainIds.length >= SupportMonitorChain.length &&
+                       SupportMonitorChain.every(chain => selectedChainIds.includes(chain))
+  
+  console.log('selectedChainStr', chains, selectedChainIds, isAllSelected)
+  return isAllSelected ? 'AllChains' : chains.join(',')
+})
 // const activeName.value=ref(0)
 // 使用对象存储多个链的买入金额，key 为 SupportMonitorChain
 type MonitorChainType = typeof SupportMonitorChain[number]
