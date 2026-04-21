@@ -316,7 +316,7 @@ function startHoldersTimer() {
     if (route.name !== 'token-id') { stopHoldersTimer(); return }
     if (props.currentActiveTab !== 'Holders') { stopHoldersTimer(); return }
     getHoldersList(holderListSortObj.value[activeTab.value])
-  }, 5000)
+  }, 30000)
 }
 
 function stopHoldersTimer() {

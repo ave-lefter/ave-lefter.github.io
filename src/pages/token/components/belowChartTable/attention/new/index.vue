@@ -46,7 +46,7 @@ function startAttentionTimer() {
     if (route.name !== 'token-id') { stopAttentionTimer(); return }
     if (props.currentActiveTab !== 'Attention') { stopAttentionTimer(); return }
     getAttentionList(sort.value as any)
-  }, 5000)
+  }, 30000)
 }
 
 function stopAttentionTimer() {
