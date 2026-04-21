@@ -154,7 +154,7 @@
                     />
                   </div>
                   <div
-                    class="color-[--third-text1] text-12px hover:color-[--main-text1]"
+                    class="color-[--third-text1] text-12px hover:color-[--main-text1] absolute"
                     @click.stop="clickToken(row.token, row.chain)"
                     :class="pumpSetting.Progress_isCircle == 'horizontal' ? 'mt-25px' : 'mt-15px'">
                     {{row.token?.slice(0, 4) + '...' + row.token?.slice(-4)}}
