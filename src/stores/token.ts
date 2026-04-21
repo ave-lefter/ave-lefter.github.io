@@ -129,7 +129,7 @@ export const useTokenStore = defineStore('token', () => {
 
   // 从 sessionStorage 初始化 payToken
   const savedPayToken = sessionStorage.getItem('token_payToken')
-  if (savedPayToken) {
+  if (savedPayToken && savedPayToken !== 'undefined') {
     try {
       swap.payToken = JSON.parse(savedPayToken)
     } catch (e) {
