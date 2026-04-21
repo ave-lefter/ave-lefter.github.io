@@ -16,9 +16,10 @@
             <div class="w-full relative" :class="getAnimClass(row)">
               <div class="flex-start items-start relative">
                 <div class="mr-12px relative top-4px">
-                  <!-- <div class="flex items-center px-4px py-2px bg-[--secondary-bg] absolute z-2 right--2px top--7px !rounded-4px border border-1 border-solid border-[--border] color-[--secondary-text] text-9px">
-                      <Icon class="text-9px mr-2px" name="ix:image" />44
-                  </div> -->
+                  <div class="flex items-center px-4px py-2px bg-[--secondary-bg] absolute z-2 right--4px top--7px !rounded-4px border border-1 border-solid border-[--border] color-[--secondary-text] text-9px">
+                      <Icon class="text-9px mr-2px" name="ix:image" />
+                      {{ formatNumber(row?.similar_image_count || 0, 0) }}
+                  </div>
                   <div class="black-container">
                     <span
                       v-tooltip="pumpBlackList?.findIndex(i => (i.address == row.token && i.type == 'ca') || (i.address == row.symbol && i.type == 'keyword')) !== -1 ? $t('cancel') + $t('BlackListToken') : $t('BlackListToken')"

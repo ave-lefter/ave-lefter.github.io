@@ -1,5 +1,5 @@
 <template>
-  <New v-if="isNew" />
+  <New v-if="isNew" :currentActiveTab="props.currentActiveTab"/>
   <Old v-else />
 </template>
 
@@ -8,6 +8,12 @@ import { SupportFullDataChain } from '@/utils/constants.ts'
 import { getAddressAndChainFromId } from '@/utils/index.ts'
 import New from './new'
 import Old from './old'
+const props = defineProps({
+  currentActiveTab: {
+    type: String,
+    default: 'Transactions'
+  }
+})
 
 const route = useRoute()
 const isNew = computed(() => {

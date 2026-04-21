@@ -296,6 +296,47 @@ const route = useRoute()
 const botStore = useBotStore()
 const walletStore = useWalletStore()
 const { t } = useI18n()
+
+const props = defineProps({
+  currentActiveTab: {
+    type: String,
+    default: ''
+  }
+})
+
+let holdersTimer: ReturnType<typeof setTimeout> | null = null
+
+function startHoldersTimer() {
+  stopHoldersTimer()
+  if (searchKeyword.value) return
+  if (route.name !== 'token-id') { stopHoldersTimer(); return }
+  if (props.currentActiveTab !== 'Holders') { stopHoldersTimer(); return }
+  holdersTimer = setTimeout(() => {
+    if (searchKeyword.value) { stopHoldersTimer(); return }
+    if (route.name !== 'token-id') { stopHoldersTimer(); return }
+    if (props.currentActiveTab !== 'Holders') { stopHoldersTimer(); return }
+    getHoldersList(holderListSortObj.value[activeTab.value])
+  }, 5000)
+}
+
+function stopHoldersTimer() {
+  if (holdersTimer) {
+    clearTimeout(holdersTimer)
+    holdersTimer = null
+  }
+}
+
+watch(() => props.currentActiveTab, (val) => {
+  if (val === 'Holders') {
+    getHoldersList(holderListSortObj.value[activeTab.value])
+  } else {
+    stopHoldersTimer()
+  }
+})
+
+onUnmounted(() => {
+  stopHoldersTimer()
+})
 const activeTab = shallowRef<'all' | 'buy' |'sell' | 'buy24h' | 'sell24h' | '-100'>('all')
 const globalStore = useGlobalStore()
 
@@ -415,9 +456,7 @@ watch(
   }
 )
 watch(activeTab, (val) => {
-  // if (searchKeyword) {
-  //   this.filterAddress(this.searchKeyword)
-  // }
+  stopHoldersTimer()
   reLoad(val)
 })
 
@@ -518,6 +557,7 @@ function getHoldersList(sortObj?: { sort_by: string; order: string }) {
     })
     .finally(() => {
       loadingHolders.value = false
+      startHoldersTimer()
     })
 }
 function handleSortChange(obj: { prop: string; order: string }) {
@@ -534,6 +574,7 @@ function filterOriginAddress(row:{ address: string, type: string }) {
 }
 function filterAddress(val: string) {
   // Align with legacy: when there is a search keyword, use dedicated search API
+  stopHoldersTimer()
   searchKeyword.value = val || ''
   if (!searchKeyword.value) {
     getHoldersList()

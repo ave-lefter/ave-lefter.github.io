@@ -138,6 +138,7 @@ export interface PumpObj {
   favorite_holder_count: number
   commission_sum: string
   gas_fee_sum: string
+  similar_image_count: number
 }
 
 interface Pair {
