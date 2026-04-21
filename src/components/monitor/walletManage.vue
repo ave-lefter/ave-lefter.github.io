@@ -46,7 +46,10 @@
         @endReached="loadMore"
         >
           <template #header-wallet>
-            <span>{{ $t('wallet')+'/'+ $t('lastTx') }}</span>
+            <div class="flex items-center gap-2px">
+              <span>{{ $t('wallet') }}/<span class="cursor-pointer" :class="{ 'color-[--main-text]': lastTxSort }" @click="handleLastTxSortClick">{{ $t('lastTx') }}</span></span>
+              <HeadSort :default-sort="lastTxSort" @sort-change="handleLastTxSort" />
+            </div>
           </template>
           <template #cell-wallet="{ row, $index }">
             <UserAvatar :key="row.user_address+row.user_chain" class="mr-10px" :wallet_logo="row.wallet_logo" :address="row.user_address" :chain="row.user_chain" iconSize="24px" />
@@ -109,9 +112,18 @@
             </el-popover>
           </template> -->
           <template #header-group>
-            <Icon :name="`custom:${!AmountU ? 'amount2' : 'price2'}`"  :class="`color-[--third-text] cursor-pointer text-10px mr-4px`"
-              @click.self.stop="AmountU = !AmountU" />
-            <span>{{ $t('balance1') }}</span>
+            <div class="flex items-center gap-2px">
+              <Icon :name="`custom:${!AmountU ? 'amount2' : 'price2'}`"  :class="`color-[--third-text] cursor-pointer text-10px mr-4px`"
+                @click.self.stop="AmountU = !AmountU" />
+              <span 
+                class="cursor-pointer" 
+                :class="{ 'color-[--main-text]': balanceSort }"
+                @click="handleBalanceSortClick"
+              >
+                {{ $t('balance1') }}
+              </span>
+              <HeadSort :default-sort="balanceSort" @sort-change="handleBalanceSort" />
+            </div>
           </template>
           <template #cell-group="{ row }">
             <template v-if="!AmountU">
@@ -211,6 +223,7 @@ import { throttle } from 'lodash-es'
 import { useStorage } from '@vueuse/core'
 import SuffixIcon from '../suffixIcon.vue'
 import GroupSelect from './components/groupSelect.vue'
+import HeadSort from '~/components/headSort.vue'
 
 const { t } = useI18n()
 const $router = useRouter()
@@ -255,6 +268,8 @@ const currentRowData = ref<any>(null)
 const currentRowIndex = ref(0)
 const currentTriggerRef = ref<any>(null)
 const groupSelectVisible = ref(false)
+const balanceSort = ref('')
+const lastTxSort = ref('')
 // 当前激活的按钮 ref（用于弹框定位）
 const currentButtonRef = ref()
 // const selectGroupId=ref(0)
@@ -329,8 +344,8 @@ watch(() => updateNum12.value+updateNum13.value+updateNum14.value+updateNum3.val
 })
 watch(() => props.chain, (newChain) => {
   conditions.user_chain = newChain || 'AllChains'
-  if(aveTableRef.value) aveTableRef.value.scrollToTop(0)
-  getTableList()
+  // if(aveTableRef.value) aveTableRef.value.scrollToTop(0)
+  // getTableList()
 })
 // watch(() => monitorStore.visible, (val) => {
 //   // console.log('monitorStore.visible', monitorStore.visible)
@@ -429,6 +444,55 @@ watch([() => conditions], () => {
    paginationParams.value={...defaultPaginationParams,pageSize: 50}
    getTableList()
 },{deep: true})
+
+// 通用排序处理函数
+const handleSort = (
+  sortField: string,
+  currentSortRef: Ref<string>,
+  otherSortRef: Ref<string>
+) => {
+  return (sort: string) => {
+    // 清除其他排序
+    otherSortRef.value = ''
+    currentSortRef.value = sort
+    
+    if (!sort) {
+      conditions.sort = ''
+      conditions.sort_dir = ''
+    } else {
+      conditions.sort = sortField
+      conditions.sort_dir = sort
+    }
+  }
+}
+
+// 通用点击文本切换排序函数
+const handleSortClick = (
+  currentSortRef: Ref<string>,
+  sortHandler: (sort: string) => void
+) => {
+  return () => {
+    const nextSort = { asc: '', desc: 'asc', '': 'desc' }[currentSortRef.value] || ''
+    sortHandler(nextSort)
+  }
+}
+
+// 余额排序
+const handleBalanceSort = handleSort('total_balance', balanceSort, lastTxSort)
+const handleBalanceSortClick = handleSortClick(balanceSort, handleBalanceSort)
+
+// 最后交易时间排序
+const handleLastTxSort = handleSort('last_tx_time', lastTxSort, balanceSort)
+const handleLastTxSortClick = handleSortClick(lastTxSort, handleLastTxSort)
+
+// 监听 AmountU 变化，更新排序字段
+// watch(AmountU, () => {
+//   if (balanceSort.value) {
+//     conditions.sort = AmountU.value ? 'total_balance' : 'main_token_balance_amount'
+//     conditions.sort_dir = balanceSort.value
+//   }
+// })
+
 const getTableList = throttle(function() {
   if(paginationParams.value.pageNO===1)loading.value = true
   if (paginationParams.value.loaded) return
