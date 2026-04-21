@@ -97,15 +97,91 @@
         </ul>
       </div>
     </el-popover>
+    <!-- 多链金额输入下拉框 -->
+    <el-popover
+      v-if="chainList.length > 1"
+      v-model:visible="amountDropdownVisible"
+      popper-class="new-popover amount-dropdown-popover"
+      placement="bottom-start"
+      popper-style="min-width: auto; width: auto; padding: 8px;"
+      :persistent="false"
+      :teleported="true"
+      trigger="click"
+      @hide="handleAmountDropdownHide"
+    >
+      <template #reference>
+        <div
+          ref="amountInputRef"
+          class="quick-buy-input quick-buy-display"
+          :style="{ '--component-height': componentHeight + 'px' }"
+        >
+          <div class="el-input__wrapper">
+            <span class="el-input__prefix">
+              <img
+                v-if="chainList.length > 0"
+                class="rounded-full w-14px h-14px"
+                :src="`${configStore.token_logo_url}chain/${chainList[0]}.png`"
+                alt=""
+                onerror="this.src='/icon-default.png'"
+              >
+            </span>
+            <input
+              class="el-input__inner"
+              :value="getFirstChainValue()"
+              readonly
+              placeholder="0"
+            >
+          </div>
+        </div>
+      </template>
+      <div class="text-12px flex flex-col gap-8px min-w-150px">
+        <div v-for="chainItem in chainList" :key="chainItem" class="flex items-center gap-8px">
+          <img
+            class="rounded-full w-14px h-14px shrink-0"
+            :src="`${configStore.token_logo_url}chain/${chainItem}.png`"
+            alt=""
+            onerror="this.src='/icon-default.png'"
+          >
+          <span class="color-[--third-text] min-w-50px">{{ getChainLabel(chainItem) }}</span>
+          <el-input
+            :model-value="chainAmountMap[chainItem] || ''"
+            class="flex-1"
+            placeholder="0"
+            type="text"
+            size="small"
+            @update:model-value="(value: string | number) => {
+              const strValue = String(value ?? '')
+              // 只允许数字和小数点
+              const filtered = strValue.replace(/\-|[^\d.]/g, '')
+              // 防止多个小数点
+              const parts = filtered.split('.')
+              const result = parts.length > 2 
+                ? parts[0] + '.' + parts.slice(1).join('')
+                : filtered
+              chainAmountMap[chainItem] = result
+              
+              // 实时更新父组件（可选，如果希望实时同步）
+              // updateChainAmountAndEmit(chainItem, result)
+            }"
+            @blur="handleChainAmountBlur(chainItem)"
+            @keydown.enter="(e: any) => {
+              handleChainAmountBlur(chainItem)
+              e?.target?.blur()
+            }"
+            @click.stop
+          />
+        </div>
+      </div>
+    </el-popover>
+    <!-- 单链模式：真实输入框 -->
     <el-input
-      v-model.trim="quickBuyValue1"
+      v-else
+      ref="amountInputRef"
+      v-model="quickBuyValue1"
       class="quick-buy-input"
       placeholder="0"
       type="text"
       :style="{ '--component-height': componentHeight + 'px' }"
-      @input="(value) => {
-            quickBuyValue1 = value.replace(/\-|[^\d.]/g, '')
-      }"
       @blur="handleBlurBuyValue(quickBuyValue1)"
       @keydown.enter="(e: any) => e?.target?.blur()"
       >
@@ -186,7 +262,7 @@ const walletStore = useWalletStore()
 const emit = defineEmits(['update:quickBuyValue', 'update:customSelected'])
 const props = withDefaults(defineProps<{
   chain: BotChain | BotChain[]
-  quickBuyValue?: string
+  quickBuyValue?: string | Record<BotChain, string>
   showQuickAmount?: boolean
   settingsButtonVisible?:boolean
   quickTextVisible?:boolean
@@ -208,6 +284,30 @@ const chainList = computed(() => {
   return Array.isArray(props.chain) ? props.chain : [props.chain]
 })
 
+// 解析 quickBuyValue，兼容字符串和对象类型
+function parseQuickBuyValue(): Record<BotChain, string> {
+  const map: Record<BotChain, string> = {} as Record<BotChain, string>
+  
+  if (typeof props.quickBuyValue === 'string') {
+    // 字符串类型：所有链使用相同的值
+    chainList.value.forEach(chain => {
+      map[chain] = props.quickBuyValue || '0.01'
+    })
+  } else if (typeof props.quickBuyValue === 'object' && props.quickBuyValue !== null) {
+    // 对象类型：每个链有独立的值
+    chainList.value.forEach(chain => {
+      map[chain] = (props.quickBuyValue as Record<BotChain, string>)[chain] || '0.01'
+    })
+  } else {
+    // 默认值
+    chainList.value.forEach(chain => {
+      map[chain] = '0.01'
+    })
+  }
+  
+  return map
+}
+
 const gasPriceObj: Record<string, number> = reactive({})
 
 const gasPrice = computed(() => {
@@ -226,12 +326,88 @@ const selected = ref<BotSettingKey>('s1')
 const btnRefs = ref<Record<string, HTMLElement | null>>({})
 const currentBtnRef = ref<HTMLElement | null>(null)
 const selectRef = ref<any>(null)
+const amountInputRef = ref<any>(null)
 
 // 用于下拉选项的 popover
 const optionPopoverVisible = ref(false)
 const optionPopoverRef = ref<HTMLElement | null>(null)
 const optionSelected = ref<BotSettingKey>('s1')
 let optionPopoverHideTimer: ReturnType<typeof setTimeout> | null = null
+
+// 多链金额输入下拉框
+const amountDropdownVisible = ref(false)
+const chainAmountMap = ref<Record<BotChain, string>>({} as Record<BotChain, string>)
+
+// 从 props 解析并初始化 chainAmountMap
+function syncFromProps() {
+  console.log('[syncFromProps] 开始同步', {
+    quickBuyValueType: typeof props.quickBuyValue,
+    quickBuyValue: props.quickBuyValue,
+    chainList: chainList.value
+  })
+  
+  const map: Record<BotChain, string> = {} as Record<BotChain, string>
+  
+  if (typeof props.quickBuyValue === 'string') {
+    // 字符串类型：所有链使用相同的值
+    chainList.value.forEach(chain => {
+      map[chain] = props.quickBuyValue || '0.01'
+    })
+  } else if (typeof props.quickBuyValue === 'object' && props.quickBuyValue !== null) {
+    // 对象类型：每个链有独立的值
+    chainList.value.forEach(chain => {
+      map[chain] = (props.quickBuyValue as Record<BotChain, string>)[chain] || '0.01'
+    })
+  } else {
+    // 默认值
+    chainList.value.forEach(chain => {
+      map[chain] = '0.01'
+    })
+  }
+  
+  console.log('[syncFromProps] 同步结果', map)
+  chainAmountMap.value = map
+}
+
+// 监听链列表变化，完全重新初始化
+watch(() => chainList.value, (newChains, oldChains) => {
+  if (!oldChains || JSON.stringify(newChains) !== JSON.stringify(oldChains)) {
+    syncFromProps()
+  }
+}, { immediate: true })
+
+// 监听预设值变化，重新同步
+watch(() => props.customSelected, () => {
+  syncFromProps()
+})
+
+// 监听 quickBuyValue prop 变化，只在弹框关闭时同步
+watch(() => props.quickBuyValue, (newValue, oldValue) => {
+  console.log('[watch quickBuyValue] 检测到变化', {
+    newValue,
+    oldValue,
+    amountDropdownVisible: amountDropdownVisible.value,
+    newValueType: typeof newValue,
+    oldValueType: typeof oldValue
+  })
+  
+  // 如果弹框是打开的，不同步（避免覆盖用户正在编辑的值）
+  if (amountDropdownVisible.value) {
+    console.log('[watch quickBuyValue] 弹框打开中，跳过同步')
+    return
+  }
+  
+  // 深度比较，如果内容相同也跳过
+  if (typeof newValue === 'object' && typeof oldValue === 'object' && newValue !== null && oldValue !== null) {
+    if (JSON.stringify(newValue) === JSON.stringify(oldValue)) {
+      console.log('[watch quickBuyValue] 内容相同，跳过同步')
+      return
+    }
+  }
+  
+  console.log('[watch quickBuyValue] 执行同步')
+  syncFromProps()
+}, { deep: true })
 
 const isWallet = computed(() => {
   return (walletStore.provider && walletStore.address && !botStore.evmAddress)
@@ -305,15 +481,54 @@ function getChainPriorityFee(chain: BotChain) {
   return calculatePriorityFee(chain, selected.value)
 }
 
+// 获取第一个链的值（用于多链模式显示）
+function getFirstChainValue() {
+  if (chainList.value.length > 0) {
+    const firstChain = chainList.value[0]
+    // 优先从 chainAmountMap 读取，其次从 props 读取
+    return chainAmountMap.value[firstChain] || 
+           (typeof props.quickBuyValue === 'object' 
+             ? (props.quickBuyValue as Record<BotChain, string>)[firstChain] 
+             : '0.01') ||
+           '0.01'
+  }
+  return '0.01'
+}
 
 const quickBuyValue1 = computed({
   get() {
-    return props.quickBuyValue
+    // 单链模式，直接返回 props
+    return typeof props.quickBuyValue === 'string' 
+      ? props.quickBuyValue 
+      : '0.01'
   },
   set(value) {
+    // 单链模式，直接 emit 字符串
     emit('update:quickBuyValue', value)
   }
 })
+
+// 多链模式下，更新 chainAmountMap 并 emit 的辅助函数
+function updateChainAmountAndEmit(chain: BotChain, value: string) {
+  const filtered = String(value || '').replace(/\-|[^\d.]/g, '')
+  chainAmountMap.value[chain] = filtered
+  
+  // 基于 props.quickBuyValue 构建新对象，保留所有原有的链
+  let newValue: Record<BotChain, string>
+  
+  if (typeof props.quickBuyValue === 'object' && props.quickBuyValue !== null) {
+    // 保留所有原有的键
+    newValue = { ...(props.quickBuyValue as Record<BotChain, string>) }
+    // 更新当前链
+    newValue[chain] = chainAmountMap.value[chain] || '0.01'
+  } else {
+    // 如果 props 不是对象，只包含当前链
+    newValue = {} as Record<BotChain, string>
+    newValue[chain] = chainAmountMap.value[chain] || '0.01'
+  }
+  
+  emit('update:quickBuyValue', newValue)
+}
 
 const customSelectedLocal = computed({
   get() {
@@ -342,6 +557,89 @@ function setBtnRef(el: Element | ComponentPublicInstance | null) {
   if (el && 'id' in el && el.id) {
     btnRefs.value[el.id] = el as HTMLElement
   }
+}
+
+// 处理金额输入框点击（多链模式下由 trigger="click" 自动处理）
+function handleAmountInputClick() {
+  console.log('[handleAmountInputClick] 点击主输入框', {
+    chainListLength: chainList.value.length,
+    quickBuyValue: props.quickBuyValue
+  })
+  
+  if (chainList.value.length > 1) {
+    // 多链时，确保数据是最新的
+    syncFromProps()
+    // trigger="click" 会自动打开弹框，不需要手动设置
+    console.log('[handleAmountInputClick] 准备打开弹框')
+  }
+}
+
+// 处理弹框关闭 - 统一 emit 所有链的值
+function handleAmountDropdownHide() {
+  console.log('[handleAmountDropdownHide] 弹框关闭', {
+    chainAmountMap: chainAmountMap.value,
+    chainList: chainList.value
+  })
+  
+  if (chainList.value.length > 1) {
+    // 格式化所有链的值
+    chainList.value.forEach(chain => {
+      const value = chainAmountMap.value[chain]
+      const decimals = 4
+      const v = value
+      const v1 = new BigNumber(v || 0)?.toFixed?.().match(new RegExp(`[0-9]*(\\.[0-9]{0,${decimals || 18}})?`))?.[0] || ''
+      
+      if (String(v) !== String(v1)) {
+        if (v === '') {
+          chainAmountMap.value[chain] = ''
+        } else if (Number(v1) === 0) {
+          chainAmountMap.value[chain] = '0'
+        } else {
+          chainAmountMap.value[chain] = v1
+        }
+      }
+    })
+    
+    // 基于 props.quickBuyValue 构建新对象，保留所有原有的链
+    let newValue: Record<BotChain, string>
+    
+    if (typeof props.quickBuyValue === 'object' && props.quickBuyValue !== null) {
+      // 如果 props 是对象，保留所有原有的键
+      newValue = { ...(props.quickBuyValue as Record<BotChain, string>) }
+      // 更新 chainList 中的链
+      chainList.value.forEach(c => {
+        newValue[c] = chainAmountMap.value[c] || '0.01'
+      })
+    } else {
+      // 如果 props 是字符串或其他类型，只包含 chainList 中的链
+      newValue = {} as Record<BotChain, string>
+      chainList.value.forEach(c => {
+        newValue[c] = chainAmountMap.value[c] || '0.01'
+      })
+    }
+    
+    console.log('[handleAmountDropdownHide] emit 新值', newValue)
+    emit('update:quickBuyValue', newValue)
+  }
+}
+
+// 处理单个链的金额失焦（只格式化，不 emit）
+function handleChainAmountBlur(chain: BotChain) {
+  const value = chainAmountMap.value[chain]
+  const decimals = 4
+  const v = value
+  const v1 = new BigNumber(v || 0)?.toFixed?.().match(new RegExp(`[0-9]*(\\.[0-9]{0,${decimals || 18}})?`))?.[0] || ''
+  
+  if (String(v) !== String(v1)) {
+    if (v === '') {
+      chainAmountMap.value[chain] = ''
+    } else if (Number(v1) === 0) {
+      chainAmountMap.value[chain] = '0'
+    } else {
+      chainAmountMap.value[chain] = v1
+    }
+  }
+  // 不在这里 emit，等待弹框关闭时统一 emit
 }
 
 function showPopover(item: BotSettingKey) {
@@ -576,6 +874,55 @@ function getOptionPriorityFee(chain: BotChain) {
       font-size: 12px;
       height: calc(var(--component-height, 28px) - 4px);
       line-height: calc(var(--component-height, 28px) - 4px);
+    }
+  }
+}
+
+// 多链模式的伪输入框样式
+.quick-buy-display {
+  width: 65px;
+  cursor: pointer;
+  user-select: none;
+  
+  .el-input__wrapper {
+    --el-input-text-color: var(--main-text1);
+    background-color: var(--main-input-button-bg);
+    border-radius: 4px;
+    width: 65px;
+    height: var(--component-height, 28px);
+    min-height: var(--component-height, 28px);
+    padding: 2px 8px;
+    font-size: 12px;
+    box-shadow: none;
+    cursor: pointer;
+    
+    .el-input__prefix {
+      margin-right: 4px;
+      display: flex;
+      align-items: center;
+      
+      img {
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+      }
+    }
+    
+    .el-input__inner {
+      font-size: 12px;
+      height: calc(var(--component-height, 28px) - 4px);
+      line-height: calc(var(--component-height, 28px) - 4px);
+      cursor: pointer;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--main-text1);
+    }
+  }
+  
+  &:hover {
+    .el-input__wrapper {
+      background-color: var(--main-input-button-bg-hover, var(--main-input-button-bg));
     }
   }
 }

@@ -138,7 +138,7 @@
                       </div>
                       <BatchWallet :chain=" getChainInfo(selectedChain[0]?.value,true)?.net_name" :boundary="null" />
                       <quickSwapSetCustom2
-                        v-model:quickBuyValue="quickBuyValue"
+                        v-model:quickBuyValue="quickBuyValueMap"
                         v-model:customSelected="swapSetSelected"
                         :chain="selectedChainVals"
                         displayType="select"
@@ -288,7 +288,7 @@
             <!-- <QuickBuyInput v-if="(activeName === 0) && isLarge" v-model="quickBuyValue" size="small" /> -->
             <quickSwapSetCustom2
               v-if="(activeName === 0) && isLarge"
-              v-model:quickBuyValue="quickBuyValue"
+              v-model:quickBuyValue="quickBuyValueMap"
               v-model:customSelected="swapSetSelected"
               :chain="selectedChainVals"
               displayType="select"
@@ -357,6 +357,8 @@ const addFavAddressPopRef = ref()
 const isHoverTable = ref(false)
 const fav_count = ref(0)
 const monitor_count = ref(0)
+import { SupportMonitorChain } from '@/utils/constants'
+
 const selectedChain = useStorage('monitorSelectedChain', [{
   label: 'SOL',
   value: 'solana',
@@ -368,7 +370,51 @@ const selectedChainVals = computed(() => {
 })
 
 // const activeName.value=ref(0)
-const quickBuyValue = useStorage('quickBuyValue', '0.01')
+// 使用对象存储多个链的买入金额，key 为 SupportMonitorChain
+type MonitorChainType = typeof SupportMonitorChain[number]
+
+// 生成默认值对象，所有支持的链默认为 '0.01'
+const getDefaultQuickBuyValueMap = (): Record<MonitorChainType, string> => {
+  const defaultMap = {} as Record<MonitorChainType, string>
+  SupportMonitorChain.forEach(chain => {
+    defaultMap[chain as MonitorChainType] = '0.01'
+  })
+  return defaultMap
+}
+
+// 初始化 quickBuyValueMap，合并缓存值和默认值
+const initQuickBuyValueMap = (): Record<MonitorChainType, string> => {
+  const cached = localStorage.getItem('quickBuyValueMap')
+  const defaultMap = getDefaultQuickBuyValueMap()
+  
+  if (cached) {
+    try {
+      const parsed = JSON.parse(cached)
+      // 检查是否是有效的对象（排除字符串被错误解析的情况）
+      if (typeof parsed === 'object' && parsed !== null && !Array.isArray(parsed)) {
+        // 合并缓存值和默认值，确保所有链都有值
+        return { ...defaultMap, ...parsed }
+      }
+    } catch (e) {
+      console.error('Failed to parse quickBuyValueMap from localStorage', e)
+    }
+  }
+  
+  // 如果是无效数据或没有缓存，返回默认值并写入 localStorage
+  localStorage.setItem('quickBuyValueMap', JSON.stringify(defaultMap))
+  return defaultMap
+}
+
+const quickBuyValueMap = ref<Record<MonitorChainType, string>>(initQuickBuyValueMap())
+
+// 监听变化并同步到 localStorage
+watch(
+  quickBuyValueMap,
+  (newValue) => {
+    localStorage.setItem('quickBuyValueMap', JSON.stringify(newValue))
+  },
+  { deep: true }
+)
 
 // 根据选中的链生成唯一的存储key
 const getChainStorageKey = (chains: BotChain[]) => {

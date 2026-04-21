@@ -60,7 +60,7 @@
 
 <script setup lang="ts">
 import { CaretBottom } from '@element-plus/icons-vue'
-import { SupportFullDataChain } from '@/utils/constants'
+import { SupportMonitorChain } from '@/utils/constants'
 
 const { t } = useI18n()
 const { token_logo_url } = storeToRefs(useGlobalStore())
@@ -86,7 +86,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   modelValue: null,
   placeholder: '',
-  chains: () => [...SupportFullDataChain],
+  chains: () => [...SupportMonitorChain],
   showLabel: true,
   multiple: false,
   class: 'w-70px!',
