@@ -1123,7 +1123,7 @@ export function useBotLimitLine(getWidget: () => IChartingLibraryWidget | null, 
   }
 
   let Timer: ReturnType<typeof setTimeout> | null = null
-  watch([chain, tokenAddress, () => botStore?.userInfo?.evmAddress, () => tokenStore.placeOrderUpdate, () => wsStore.wsResult?.tgbot], () => {
+  watch([chain, tokenAddress, () => botStore?.evmAddress, () => tokenStore.placeOrderUpdate, () => wsStore.wsResult?.tgbot], () => {
     getDataTimer(500)
   })
 
@@ -1135,6 +1135,39 @@ export function useBotLimitLine(getWidget: () => IChartingLibraryWidget | null, 
 
   onMounted(() => {
     getData()
+  })
+
+  // 清理所有画线和相关状态
+  function resetAllLimitLines(reason = '') {
+    const _widget = getWidget()
+    const chart = _widget?.activeChart?.()
+    if (reason) {
+      // eslint-disable-next-line no-console
+      console.log('[resetAllLimitLines]', reason, {
+        priceLimitLineIds: [...priceLimitLineIds],
+        priceLimitLineIds2: [...priceLimitLineIds2],
+        chartExists: !!chart
+      })
+    }
+    if (_widget && chart) {
+      priceLimitLineIds.forEach(id => {
+        chart?.removeEntity?.(id)
+      })
+      priceLimitLineIds2.forEach(id => {
+        chart?.removeEntity?.(id)
+      })
+    }
+    priceLimitLineIds = []
+    priceLimitLineIds2 = []
+    textShapeMap.clear()
+    limitTxs.value = []
+  }
+
+  // 监听 accessToken 变化，退出登录时清空所有画线
+  watch(() => botStore.accessToken, (val, oldVal) => {
+    if (!val && oldVal) {
+      resetAllLimitLines('logout')
+    }
   })
 
   onUnmounted(() => {
@@ -1151,11 +1184,13 @@ export function useBotLimitLine(getWidget: () => IChartingLibraryWidget | null, 
       clearTimeout(Timer)
       Timer = null
     }
+    resetAllLimitLines('onUnmounted')
   })
 
   return {
     limitTxs,
-    getData
+    getData,
+    resetAllLimitLines
   }
 }
 
