@@ -15,7 +15,7 @@
             </div>
             <template #dropdown>
               <el-dropdown-menu>
-                <el-dropdown-item v-for="item in (botSwapStore?.botSwapBaseTokens?.[chain || ''] || [])?.filter(item => item?.address !== tokenStore.swap.payToken?.address)" :key="item.address" @click.stop="tokenStore.swap.payToken = item;$emit('getTokenBalance');amountNative='';amountNativeOut=''">
+                <el-dropdown-item v-for="item in (botSwapStore?.botSwapBaseTokens?.[chain || ''] || [])?.filter(item => item?.address !== tokenStore.swap.payToken?.address)" :key="item?.address || ''" @click.stop="tokenStore.swap.payToken = item;$emit('getTokenBalance');amountNative='';amountNativeOut=''">
                   <img :src="`${configStore.token_logo_url}${item.logo_url}`" class="rd-50% mr-8px" height="16"  alt="" srcset="" >
                   <span class="text-12px font-400">{{ item?.symbol }}</span>
                 </el-dropdown-item>
@@ -406,7 +406,7 @@ const walletAddress = computed(() => {
   const routeParams = getAddressAndChainFromId(route.params.id as string)
   const chain = routeParams?.chain || tokenInfo.value?.chain
 
-  return botStore?.userInfo?.addresses?.find?.(i => i?.chain === chain)?.address
+  return botStore?.userInfo?.addresses?.find?.(i => i?.chain === chain)?.address || ''
 })
 
 const fromToken = computed(() => {

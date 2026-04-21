@@ -803,6 +803,8 @@ export async function quoteBestRouterV2({from_token, to_token, amountIn, amountO
   const wmainWrapper = wrapper || chainInfo?.wmain_wrapper || ''
   const mainName = chainInfo?.main_name
   const wmainName = chainInfo?.wmain_name
+  from_token = from_token === NATIVE_TOKEN ? (chain === 'anubis' ? '0x83fd06F0846d9D90B3016bF670Efe2E0B11cDe14' : wmainWrapper) : from_token
+  to_token = to_token === NATIVE_TOKEN ? (chain === 'anubis' ? '0x83fd06F0846d9D90B3016bF670Efe2E0B11cDe14' : wmainWrapper) : to_token
   let fromToken = from_token
   let toToken = to_token
   let fromIsETH = false
