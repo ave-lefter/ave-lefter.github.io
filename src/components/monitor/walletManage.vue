@@ -1,18 +1,22 @@
 <template>
   <div class="w-walletManage">
-    <div class="flex justify-between items-center gap-8px h-54px">
-      <el-select v-model="selectGroupId" style="--el-fill-color-blank:var(--dialog-list-hover)" class="[&&]:[--el-text-color-regular:--d-E0E0E0-l-333]" :persistent="false" :mode="mode" @click.stop @change="(val) => filterGroup(val)">
-        <el-option :key="0" :value="0" :label="$t('defaultGroup')" class="[&&]:h-20px [&&]:lh-20px [&&]:text-12px"/>
-        <el-option v-for="item in addressGroups" :key="item.group_id" :label="item.name" :value="item.group_id"  class="[&&]:h-20px [&&]:lh-20px [&&]:text-12px"/>
-      </el-select>
-      <el-button ref="addButtonRef1" class="dialog-button"  style="height: 32px; padding: 8px 10px !important;font-size: 12px; color:var(--d-E0E0E0-l-333)">
-        <Icon name="ic:baseline-person-add-alt-1" class="text-12px  mr-5px"/>
-        {{ $t('addWallet') }}
-      </el-button>
-      <el-button class="dialog-button" style="height: 32px;padding: 8px 10px !important; margin-left: 0px;font-size: 12px; color:var(--d-E0E0E0-l-333)" @click.stop.prevent="showBatchAddressDetails=true" >
-        <Icon name="mingcute:new-folder-fill" class="text-12px mr-5px"/>
-        {{ $t('bulkImport') }}
-      </el-button>
+    <div class="flex flex-between items-center gap-8px h-48px">
+      <div ref="selectWrapperRef" class="wallet-manage-select-wrapper" :style="{ width: selectWrapperWidth + 'px' }">
+        <el-select v-model="selectGroupId" style="--el-fill-color-blank:var(--dialog-list-hover); width: 100%;" class="[&&]:[--el-text-color-regular:--d-E0E0E0-l-333]" :persistent="false" :mode="mode" @click.stop @change="(val) => filterGroup(val)" size="small">
+          <el-option :key="0" :value="0" :label="$t('defaultGroup')" class="[&&]:h-20px [&&]:lh-20px [&&]:text-12px"/>
+          <el-option v-for="item in addressGroups" :key="item.group_id" :label="item.name" :value="item.group_id"  class="[&&]:h-20px [&&]:lh-20px [&&]:text-12px"/>
+        </el-select>
+      </div>
+      <div class="flex items-center gap-8px">
+        <el-button ref="addButtonRef1" class="dialog-button"  style="height: 24px; padding: 4px 8px !important;font-size: 12px; color:var(--d-E0E0E0-l-333);--el-button-border-color:var(--third-text);--el-button-hover-border-color:var(--third-text)" size="small">
+          <!-- <Icon name="ic:baseline-person-add-alt-1" class="text-12px  mr-5px"/> -->
+          {{ $t('add') }}
+        </el-button>
+        <el-button class="dialog-button" style="height: 24px;padding: 4px 8px !important; margin-left: 0px;font-size: 12px; color:var(--d-E0E0E0-l-333);--el-button-border-color:var(--third-text);--el-button-hover-border-color:var(--third-text)" @click.stop.prevent="showBatchAddressDetails=true" size="small">
+          <!-- <Icon name="mingcute:new-folder-fill" class="text-12px mr-5px"/> -->
+          {{ $t('bulkImport') }}
+        </el-button>
+      </div>
     </div>
     <div v-loading="loading" class="text-12px m-table" element-loading-background="transparent">
       <!-- @scroll="onScroll" -->
@@ -25,7 +29,7 @@
         :footText="footText"
         :columns="columns"
         :headerHeight="36"
-        :rowHeight="40"
+        :rowHeight="44"
 
         headerClass="bg-transparent"
         :style="{
@@ -42,16 +46,38 @@
         @endReached="loadMore"
         >
           <template #header-wallet>
-            <span>{{ $t('wallet') }}</span>
+            <span>{{ $t('wallet')+'/'+ $t('lastTx') }}</span>
           </template>
-          <template #cell-wallet="{ row }">
+          <template #cell-wallet="{ row, $index }">
             <UserAvatar :key="row.user_address+row.user_chain" class="mr-10px" :wallet_logo="row.wallet_logo" :address="row.user_address" :chain="row.user_chain" iconSize="24px" />
             <div>
-              <!-- :formatAddress="(address) =>address?.slice(0, 4) + '...' + address?.slice(-4)" -->
-            <UserRemark :key="row.user_address+row.user_chain"  :remark="row.remark" :address="row.user_address" :chain="row.user_chain" addressClass="token-symbol ellipsis" addressStyle="max-width: 60px;font-size: 14px;color:var(--d-E0E0E0-l-333)" iconEditColor="var(--third-text)" iconEditSize="10px" showAddressTitle/>
+              <UserRemark :key="row.user_address+row.user_chain"  :remark="row.remark" :address="row.user_address" :chain="row.user_chain" addressClass="token-symbol ellipsis" addressStyle="max-width: 60px;font-size: 13px;color:var(--d-E0E0E0-l-333)" iconEditColor="var(--third-text)" iconEditSize="10px" showAddressTitle/>
+              <div :style="{
+                color:
+                  Number(formatTimeFromNow(row?.last_tx_time, true)) <= 600? '#FFA622': 'var(--third-text)',
+              }">
+                <span v-if="!row?.last_tx_time"  class="text-11px">-</span>
+                <TimerCount v-else-if="
+                  Number(formatTimeFromNow(row?.last_tx_time, true)) < 60
+                " :key="`${row.last_tx_time}${$index}`" :timestamp="row.last_tx_time" :end-time="60">
+                  <template #default="{ seconds }">
+                    <span class="color-#FFA622 text-11px">
+                      <template v-if="seconds < 60">
+                        {{ seconds }}s
+                      </template>
+                      <template v-else>
+                        {{ formatTimeFromNow(row.last_tx_time) }}
+                      </template>
+                    </span>
+                  </template>
+                </TimerCount>
+                <div v-else class="text-11px">
+                  {{ formatTimeFromNow(row.last_tx_time) }}
+                </div>
+              </div>
             </div>
-         </template>
-         <template #header-group>
+          </template>
+         <!-- <template #header-group>
             <span>{{ $t('group') }}</span>
           </template>
           <template #cell-group="{ row }">
@@ -59,8 +85,8 @@
               <el-option :key="0" :value="0" :label="$t('defaultGroup')" filterable class="[&&]:h-20px [&&]:lh-20px [&&]:text-12px"/>
               <el-option v-for="item in addressGroups" :key="item.group_id" :label="item.name" :value="item.group_id" class="[&&]:h-20px [&&]:lh-20px [&&]:text-12px"/>
             </el-select>
-          </template>
-          <template #header-chain>
+          </template> -->
+          <!-- <template #header-chain>
             <span>{{ $t('chain') }}</span>
             <el-popover v-model:visible="visible" popper-style="width: 133px;min-width: 133px;" trigger="click">
               <template #reference>
@@ -81,6 +107,29 @@
                 </li>
               </ul>
             </el-popover>
+          </template> -->
+          <template #header-group>
+            <Icon :name="`custom:${!AmountU ? 'amount2' : 'price2'}`"  :class="`color-[--third-text] cursor-pointer text-10px mr-4px`"
+              @click.self.stop="AmountU = !AmountU" />
+            <span>{{ $t('balance1') }}</span>
+          </template>
+          <template #cell-group="{ row }">
+            <template v-if="!AmountU">
+              <div v-if="row?.main_token_balance_amount > 0" :class="!row?.main_token_balance_amount ? 'color-[--third-text]' : ''" class="flex items-center justify-end">
+                <img :src="`${token_logo_url}chain/${row.user_chain}.png`" class="rd-50% inline-block mr-2px" width="14" height="14" lazy alt="">{{ formatNumber2(row?.main_token_balance_amount || 0, 2) }}&nbsp;{{row.main_token_symbol}}
+              </div>
+              <div v-else class="color-[--third-text] flex items-center justify-end">
+                0
+              </div>
+            </template>
+            <template v-else>
+              <div v-if="row?.total_balance > 0" :class="!row?.total_balance ? 'color-[--third-text]' : ''" class="flex items-center justify-end">
+                ${{formatNumber2(row?.total_balance || 0, 1)}}
+              </div>
+              <div v-else class="color-[--third-text] flex items-center justify-end">
+                $0
+              </div>  
+            </template>
           </template>
           <template #cell-chain="{ row }">
             <span class="text-12px">{{ getChainInfo(row.user_chain).name }}</span>
@@ -94,6 +143,7 @@
                 <Icon name="material-symbols-light:notifications-rounded" class="text-15px"/>
                 <span>{{ $t('enableMonitor') }}</span>
               </div> -->
+              <Icon name="custom:group" class="text-10px mr-4px text-[--third-text]"/>
               <div
                 v-if="SupportMonitorChain.includes(row?.user_chain)"
                 class="flex items-center mr-4px cursor-pointer color-[--third-text]"
@@ -146,6 +196,7 @@ import { getAttentionPageList, moveFavoriteGroup2, deleteAttention ,addAttention
 import { defaultPaginationParams } from '@/utils/constants'
 import type {RowEventHandlerParams} from 'element-plus'
 import { throttle } from 'lodash-es'
+import { useStorage } from '@vueuse/core'
 import SuffixIcon from '../suffixIcon.vue'
 const { t } = useI18n()
 const $router = useRouter()
@@ -177,11 +228,14 @@ const chainOptions=computed(()=>{
     })
   ]
 })
+const aveTableRef = ref()
 const visible = ref(false)
 const addButtonRef1 = ref() 
 const addButtonRef2 = ref() 
 const addFavAddressPopRef = ref()
-const aveTableRef = ref()
+const selectWrapperRef = ref<HTMLElement>()
+const selectWrapperWidth = ref(120)
+const AmountU = useStorage('walletManageAmountU', false)
 // 当前激活的按钮 ref（用于弹框定位）
 const currentButtonRef = ref()
 // const selectGroupId=ref(0)
@@ -407,6 +461,51 @@ function tableRowClick(row: { user_address: string; user_chain: string }) {
     path: `/address/${row.user_address}/${row.user_chain}`,
   })
 }
+
+// 计算选中值的显示文本
+const getSelectedLabel = computed(() => {
+  if (selectGroupId.value === 0) {
+    return t('defaultGroup')
+  }
+  const group = addressGroups.value.find(g => g.group_id === selectGroupId.value)
+  return group?.name || ''
+})
+
+// 动态计算宽度
+const updateSelectWidth = () => {
+  nextTick(() => {
+    const text = getSelectedLabel.value
+    
+    // 创建临时元素测量文本宽度
+    const tempSpan = document.createElement('span')
+    tempSpan.style.visibility = 'hidden'
+    tempSpan.style.position = 'absolute'
+    tempSpan.style.whiteSpace = 'nowrap'
+    tempSpan.style.fontSize = '12px'
+    tempSpan.style.fontFamily = 'inherit'
+    tempSpan.style.padding = '0 4px'
+    tempSpan.textContent = text
+    
+    document.body.appendChild(tempSpan)
+    const width = tempSpan.offsetWidth
+    document.body.removeChild(tempSpan)
+    
+    // 加上箭头空间(24px)和最小宽度限制
+    const calculatedWidth = Math.max(Math.min(width + 18, 120), 60)
+    selectWrapperWidth.value = calculatedWidth
+  })
+}
+
+// 监听选中值变化
+watch(selectGroupId, () => {
+  updateSelectWidth()
+}, { immediate: true })
+
+// 监听地址组变化（可能影响显示文本）
+watch(addressGroups, () => {
+  updateSelectWidth()
+}, { deep: true })
+
 const columns = computed(() => {
   return [
     {
@@ -423,13 +522,13 @@ const columns = computed(() => {
       minWidth: 90,
       align: 'right',
     },
-    {
-      title: t('chain'),
-      dataKey: 'chain',
-      key: 'chain',
-      align: 'right',
-      minWidth: 55,
-    },
+    // {
+    //   title: t('chain'),
+    //   dataKey: 'chain',
+    //   key: 'chain',
+    //   align: 'right',
+    //   minWidth: 55,
+    // },
     {
       title: t('operate'),
       dataKey: 'operate',
@@ -448,6 +547,11 @@ const columns = computed(() => {
   .el-virtual-scrollbar{
     display: none;
   }
+}
+
+.wallet-manage-select-wrapper {
+  transition: width 0.2s ease;
+  flex-shrink: 0;
 }
 </style>
 
