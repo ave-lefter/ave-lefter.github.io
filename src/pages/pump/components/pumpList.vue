@@ -284,7 +284,6 @@
                         :src="row.baseToken?.logo_url ? `${configStore.token_logo_url}${row.baseToken?.logo_url}` : qsImage"
                         alt=""
                         :width="12"
-                        style="border-radius: 100%"
                       >
                       <!-- <a
                       v-if="
