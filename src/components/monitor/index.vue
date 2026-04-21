@@ -92,7 +92,7 @@
                 <span />
               </template>
               <template #cell-operate="{ row }">
-                <QuickSwap :quickBuyValue="quickBuyValue"
+                <QuickSwap :quickBuyValue="quickBuyValueMap[row.chain]"
                   :row="{ ...row, ...{ target_token: row?.target_address, token0_address: row?.from_address, token1_address: row?.to_address, symbol: row?._target_Token?.symbol } }"
                   classNames="min-w-70px h-24px! w-quickSwap" />
               </template>
@@ -169,7 +169,7 @@
                         <div v-else :class="row._profit>0 ? `color-[--up-color]` : `color-[--down-color]`">{{ `${Number(row._profit) > 0 ? '+' : '-'}$${formatNumber2(Math.abs(row?._profit || 0) || 0, 2)}` }}</div>
                       </template>
                     </div>
-                    <QuickSwap :quickBuyValue="quickBuyValue"
+                    <QuickSwap :quickBuyValue="quickBuyValueMap[row.chain]"
                       :row="{ ...row, ...{ target_token: row?.target_address, token0_address: row?.from_address, token1_address: row?.to_address, symbol: row?._target_Token?.symbol } }"
                       classNames="min-w-70px h-24px!  hidden! group-hover:block! w-quickSwap" />
                     <div v-tooltip="formatDate(row?.created_at || row?.time)" class="time"
