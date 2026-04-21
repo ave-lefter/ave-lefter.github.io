@@ -45,7 +45,8 @@
       <div class="ml-16px">
         <div class="inline-flex items-center clickable" @click.stop="isMC = !isMC">
           <span class="color-[--third-text]">{{ !isMC ? $t('top100PurchaseAvg') : $t('top100PurchaseAvgMC') }}</span>
-          <Icon name="custom:exchange-horizontal" class="ml-4px color-[--third-text] text-10px"/>:
+          <Icon name="custom:exchange-horizontal" class="ml-4px color-[--third-text] text-10px"/>
+          <span class="color-[--third-text] text-10px">:</span>
         </div>
         <span v-if="!isMC" class="ml-4px">${{ formatNumber(aggregateStats?.top100PurchaseAvg || 0, 2) }}</span>
         <span v-else class="ml-4px">${{   Number(aggregateStats?.top100PurchaseAvg) === 0
@@ -56,7 +57,8 @@
       <div class="ml-16px">
         <div class="inline-flex items-center clickable" @click.stop="isMC = !isMC">
           <span class="color-[--third-text]">{{ !isMC ? $t('top100SellAvg') : $t('top100SellAvgMC') }}</span>
-          <Icon name="custom:exchange-horizontal" class="ml-4px color-[--third-text] text-10px"/>:
+          <Icon name="custom:exchange-horizontal" class="ml-4px color-[--third-text] text-10px"/>
+          <span class="color-[--third-text] text-10px">:</span>
         </div>
         <span v-if="!isMC" class="ml-4px">${{ formatNumber(aggregateStats?.top100SellAvg || 0, 2) }}</span>
         <span v-else class="ml-4px">${{   Number(aggregateStats?.top100SellAvg) === 0
