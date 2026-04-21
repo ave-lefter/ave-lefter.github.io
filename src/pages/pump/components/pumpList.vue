@@ -280,11 +280,11 @@
                           content:getLiqTooltip(row),
                           props: { 'raw-content': true, 'popper-class': 'pump-tooltip' }
                         }"
+                        v-memo="row.target_token + '-' + row.chain"
                         class="rounded-100% cursor-pointer mr-8px"
                         :src="row.baseToken?.logo_url ? `${configStore.token_logo_url}${row.baseToken?.logo_url}` : qsImage"
                         alt=""
                         :width="12"
-                        style="border-radius: 100%"
                       >
                       <!-- <a
                       v-if="
