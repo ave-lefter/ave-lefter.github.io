@@ -41,7 +41,7 @@
             <Pairs @openFilterModal="openFilterModal" />
           </div>
           <Info :tagsRatio="tagsRatio" @getTagsRatio="_getTagsRatio"/>
-          <SimilarPic :tokens="similarpic" />
+          <SimilarPic :tokens="similarpic" :count="count"/>
           <SimilarTokens :tokens="similarTokenList" />
           <Overview class="px-15px pb-10px pr-0 bg-[--secondary-bg]" />
           <div class="bg-[--secondary-bg] flex-1" />
@@ -90,6 +90,7 @@ const { tagsRatio } = storeToRefs(useGlobalStore())
 const searchAmm = shallowRef('')
 const walletStore = useWalletStore()
 const tokenStore = useTokenStore()
+const count = shallowRef(0)
 
 const SwapCom = computed(() => {
   if (walletStore.address) {
@@ -244,5 +245,6 @@ const similarpic = ref([])
 async function _getSimilarpic() {
   const res = await getTokenSimilarpic(id.value)
   similarpic.value = res.tokens || []
+  count.value = res.count || 0
 }
 </script>
