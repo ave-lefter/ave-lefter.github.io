@@ -102,6 +102,10 @@
           }}</span>
         </NuxtLink>
       </div>
+      <span class="flex-start ml-12px flex items-center gap-4px cursor-pointer lh-16px hover:color-[--main-text] color-[--secondary-text]" href="" @click.prevent.stop="openBanner">
+        <img src="@/assets/images/composition.png" alt="" width="16">
+        {{ $t('contest') }}
+      </span>
     </div>
     <ul class="right">
       <li>
@@ -235,6 +239,7 @@ import { TokenImg, QuickSwap } from '#components'
 import Net from '@/components/net.vue'
 // import QuickSwap from '../quickSwapTsx.vue'
 import { useWindowSize } from '@vueuse/core'
+const { showBanner } = storeToRefs(useGlobalStore())
 const { width } = useWindowSize()
 
 const { t } = useI18n()
@@ -814,6 +819,9 @@ function handleClickDrag(type:'monitor'|'signal'|'tracker'|'position'|'favToken'
     default:
       break
   }
+}
+function openBanner() {
+  showBanner.value = !showBanner.value
 }
 </script>
 

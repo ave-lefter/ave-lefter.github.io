@@ -589,6 +589,7 @@ type StatisticsItem = {
   colluded_cluster_ratio: number
   commission_sum: string
   gas_fee_sum: string
+  similar_image_count: number
 }
 let portraitTimer: ReturnType<typeof setTimeout> | null = null
 let isPortraitSubscribed = false
@@ -2175,7 +2176,8 @@ const NUMBER_MAP: [keyof StatisticsItem, keyof PumpObj][] = [
   ['buyers_24h', 'buyers_24h'],
   ['kol_count', 'kol_tag_count'],
   ['smart_wallet_count', 'smart_wallet_tag_count'],
-  ['colluded_cluster_ratio', 'colluded_cluster_ratio']
+  ['colluded_cluster_ratio', 'colluded_cluster_ratio'],
+  ['similar_image_count', 'similar_image_count']
 
 ]
 function mergeStatisticsList(
@@ -2296,7 +2298,8 @@ const MERGE_KEYS = [
   'summary_score',
   'colluded_cluster_ratio',
   'commission_sum',
-  'gas_fee_sum'
+  'gas_fee_sum',
+  'similar_image_count'
 ] as const
 
 function mergeStatistics(prev: any, next: any) {

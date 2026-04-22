@@ -26,7 +26,7 @@ import { _getBannersAll, type Banner } from '@/api/banner.js'
 import { useStorage } from '@vueuse/core'
 const localeStore = useLocaleStore()
 const bannerList = useStorage<Banner[]>('bannerList_pro', [], localStorage)
-const showBanner = useStorage('showBanner', true, localStorage)
+const { showBanner } = storeToRefs(useGlobalStore())
 watch(() => localeStore.locale, () => {
   getBannersAll()
 })

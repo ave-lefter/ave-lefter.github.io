@@ -61,7 +61,7 @@
     </template>
     <div v-if="similarpic.length" class="p-12px">
       <div class="flex justify-between">
-        <div class="text-12px lh-12px color-[--third-text] mb-12px">{{ t('similarPic') }}({{ similarpic.length }})</div>
+        <div class="text-12px lh-12px color-[--third-text] mb-12px">{{ t('similarPic') }}({{ row.similar_image_count || count }})</div>
         <div class="text-12px lh-12px color-[--third-text] mb-12px">{{ t('mcap') }}</div>
       </div>
       <div class="flex flex-col gap-8px">
@@ -119,13 +119,14 @@ const { t } = useI18n()
 
 const props = defineProps({
   row: {
-    type: Object as PropType<{ chain: string, symbol: string,  is_cloned: number, deployer_platform: string, }>,
+    type: Object as PropType<{ chain: string, symbol: string,  is_cloned: number, deployer_platform: string, similar_image_count: number }>,
     default: () => {
       return {
         chain: '',
         symbol: '',
         is_cloned: 0,
-        deployer_platform: ''
+        deployer_platform: '',
+        similar_image_count: 0,
       }
     }
   },
@@ -145,12 +146,14 @@ const props = defineProps({
 })
 const tokens = ref([])
 const similarpic = ref([])
+const count = shallowRef(0)
 const isEmpty = computed(() => {
   return tokens.value.length === 0
 })
 async function _getSimilarToken() {
   const res = await getSimilarTokens(props.row.id)
   tokens.value = res.tokens || []
+  count.value = res.count || 0
 }
 
 async function _getSimilarpic() {
