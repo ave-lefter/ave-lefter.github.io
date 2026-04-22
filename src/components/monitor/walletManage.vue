@@ -135,8 +135,8 @@
               </div>
             </template>
             <template v-else>
-              <div v-if="row?.total_balance > 0" :class="!row?.total_balance ? 'color-[--third-text]' : ''" class="flex items-center justify-end">
-                ${{formatNumber2(row?.total_balance || 0, 1)}}
+              <div v-if="row?.main_token_balance_amount > 0" :class="!row?.main_token_balance_amount ? 'color-[--third-text]' : ''" class="flex items-center justify-end">
+                ${{formatNumber2(getAmountU(row), 2)}}
               </div>
               <div v-else class="color-[--third-text] flex items-center justify-end">
                 $0
@@ -219,6 +219,7 @@
 import { getAttentionPageList, moveFavoriteGroup2, deleteAttention ,addAttention2,addAddressMonitor,favUsersResumeMonitor,favUsersPauseMonitor,addFavoriteGroup2} from '~/api/attention'
 import { defaultPaginationParams } from '@/utils/constants'
 import type {RowEventHandlerParams} from 'element-plus'
+import BigNumber from 'bignumber.js'
 import { throttle } from 'lodash-es'
 import { useStorage } from '@vueuse/core'
 import SuffixIcon from '../suffixIcon.vue'
@@ -274,7 +275,7 @@ const lastTxSort = ref('')
 const currentButtonRef = ref()
 // const selectGroupId=ref(0)
 const {selectGroupId,paginationParams,user_chain,monitorList1} = storeToRefs(useMonitorStore())
-const {currentAddress ,showBatchAddressDetails, updateNum12,updateNum13,updateNum14,updateNum2,updateNum3,addressGroups} = storeToRefs(useFollowStore())
+const {currentAddress ,showBatchAddressDetails, updateNum12,updateNum13,updateNum14,updateNum2,updateNum3,addressGroups,delWalletGroup} = storeToRefs(useFollowStore())
 
 const followStore = useFollowStore()
 const conditions = reactive({
@@ -445,6 +446,19 @@ watch([() => conditions], () => {
    getTableList()
 },{deep: true})
 
+watch(() => delWalletGroup.value, (val) => {
+  if(val) {
+    if(selectGroupId.value===val){
+      selectGroupId.value=0
+      conditions.group=0
+      console.log('delWalletGroup', val)
+    }
+    // getTableList()
+    // delWalletGroup.value = false
+  }
+})
+
+
 // 通用排序处理函数
 const handleSort = (
   sortField: string,
@@ -478,7 +492,7 @@ const handleSortClick = (
 }
 
 // 余额排序
-const handleBalanceSort = handleSort('total_balance', balanceSort, lastTxSort)
+const handleBalanceSort = handleSort('main_token_balance_amount', balanceSort, lastTxSort)
 const handleBalanceSortClick = handleSortClick(balanceSort, handleBalanceSort)
 
 // 最后交易时间排序
@@ -705,6 +719,10 @@ const columns = computed(() => {
       minWidth: 40,
     }]
 })
+
+function getAmountU(row: any) {
+  return new BigNumber(row.main_token_balance_amount).times(row.main_token_price).toNumber()
+}
 
 </script>
 
