@@ -485,9 +485,10 @@ watch(klineMarkerAddress, () => {
   }
 })
 
-// 当筛选地址的交易列表更新时，刷新 K 线打点
+// 当筛选地址的交易列表更新时，清除旧打点并刷新 K 线打点
 watch(klineFilterTxs, () => {
   if (isReady.value && route.name === 'token-id' && klineMarkerAddress.value) {
+    _widget?.activeChart?.()?.clearMarks?.()
     _widget?.activeChart?.()?.refreshMarks?.()
   }
 })

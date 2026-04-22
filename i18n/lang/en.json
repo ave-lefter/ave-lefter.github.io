@@ -633,7 +633,7 @@
   "transferIn1": "TRANSFER_IN",
   "transferOut1": "TRANSFER_OUT",
   "value": "Value",
-  "filterCancel": "cancel filtering",
+  "filterCancel": "Cancel filtering",
   "returnToLogin": "Return to login",
   "startBotFooter21": "Don't have an account yet?",
   "transactionsDetails": "Transactions Details",

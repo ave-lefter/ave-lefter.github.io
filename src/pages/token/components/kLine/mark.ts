@@ -615,22 +615,24 @@ export function useKlineMarks() {
     if (migrated?.migrate_time && isTokenKline) {
       getMigrated(onDataCallback, migrated, Number(interval))
     }
-    if (!markTabsVisible.value) return
-    const now = Date.now()
-    const isMyPortraitOnlyRefresh = now < myPortraitOnlyRefreshUntil
-    const isPortraitCacheOnlyRefresh = now < portraitCacheOnlyRefreshUntil
+
     const filterAddress = klineMarkerAddress.value
     const isFilteringByAddress = !!filterAddress
-    const isMyWatchlistChecked = isFilteringByAddress || !!markTabsChecked.value?.['-100']
-    const isMyRemarkChecked = isFilteringByAddress || !!markTabsChecked.value?.['-101']
-
-    // 当按地址筛选时，直接将 filterTableList 的交易数据显示为 K 线打点
+    // 当按地址筛选时，直接将 filterTableList 的交易数据显示为 K 线打点，跳过画像打点避免重复（不受 markTabsVisible 控制）
     if (isFilteringByAddress && klineFilterTxs.value.length > 0) {
       const filterMarks = formatFilterTxsToMarks(klineFilterTxs.value, interval, from, to)
       if (filterMarks.length > 0) {
         onDataCallback(filterMarks)
       }
+      return
     }
+
+    if (!markTabsVisible.value) return
+    const now = Date.now()
+    const isMyPortraitOnlyRefresh = now < myPortraitOnlyRefreshUntil
+    const isPortraitCacheOnlyRefresh = now < portraitCacheOnlyRefreshUntil
+    const isMyWatchlistChecked = isFilteringByAddress || !!markTabsChecked.value?.['-100']
+    const isMyRemarkChecked = isFilteringByAddress || !!markTabsChecked.value?.['-101']
 
     if ((isMyWatchlistChecked || isMyRemarkChecked) && !isPortraitCacheOnlyRefresh) {
       Promise.all([
