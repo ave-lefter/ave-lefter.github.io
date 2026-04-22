@@ -29,7 +29,7 @@ const props = withDefaults(defineProps<{
   buttonType?: number
 }>(), {
   appendTo: '#__nuxt',
-  buttonBg: 'rgba(18, 184, 134, 0.15)',
+  buttonBg: '',
   classNames: '',
   size: '14px',
   buttonType: 0,

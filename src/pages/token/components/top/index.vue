@@ -45,7 +45,7 @@
         <Collect iconClass="text-16px cursor-pointer" :isCollected="collected" :userFavoriteGroups="userFavoriteGroups" @confirmSwitchGroup="confirmSwitchGroup" @collect="collect" @newGroupAndCollect="newGroupAndCollect"/>
       </div>
 
-      <div class="pump-item_item token-info ml-16px flex items-center color-[--third-text] ">
+      <div class="pump-item_item token-info ml-8px flex items-center color-[--third-text] ">
         <div class="black-container">
           <span
             v-tooltip="pumpBlackList?.findIndex(i => (i.address == token?.token && i.type == 'ca') || (i.address == token?.symbol && i.type == 'keyword')) !== -1 ? $t('cancel') + $t('BlackListToken') : $t('BlackListToken')"
@@ -1780,9 +1780,9 @@ async function handleSearchTokenName() {
     width: 40px;
   }
   .icon-symbol {
-    width: 20px;
+    width: 15px;
     position: absolute;
-    bottom: 3px;
+    bottom: 2px;
     right: 0px;
   }
 }
