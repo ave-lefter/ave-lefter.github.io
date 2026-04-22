@@ -2186,5 +2186,10 @@
   "monitorNum": "Monitor wallet count",
   "favTotal": "Follow wallet total count",
   "emptyButtonText": "Please monitor the wallet first",
-  "emptyButtonText1": "Please pay attention to the wallet first"
+  "emptyButtonText1": "Please pay attention to the wallet first",
+  "allWalletsInsufficientBalance": "Insufficient balance in all wallets: {wallets}",
+  "someWalletsSkipped": "{count} wallets were skipped due to insufficient balance: {wallets}",
+  "walletsWillExecute": "wallet will execute the transaction",
+  "allTradeSuccess": "All {count} trades successful",
+  "partialTradeResult": "{success} successful, {fail} failed"
 }

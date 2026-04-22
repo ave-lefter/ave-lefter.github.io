@@ -99,15 +99,35 @@ const emit = defineEmits<{
   (e: 'change', value: ChainOption | ChainOption[] | null): void
 }>()
 
+// 按照 SupportMonitorChain 的顺序排序链选项
+function sortChainsBySupportOrder(chains: ChainOption[]): ChainOption[] {
+  return chains.sort((a, b) => {
+    const indexA = SupportMonitorChain.indexOf(a.id)
+    const indexB = SupportMonitorChain.indexOf(b.id)
+    // 如果找不到对应的索引，保持原有顺序
+    if (indexA === -1 && indexB === -1) return 0
+    if (indexA === -1) return 1
+    if (indexB === -1) return -1
+    return indexA - indexB
+  })
+}
+
 const selectedChain = computed({
   get: () => {
     if (props.multiple) {
-      return Array.isArray(props.modelValue) ? props.modelValue : []
+      const value = Array.isArray(props.modelValue) ? props.modelValue : []
+      return sortChainsBySupportOrder(value)
     } else {
       return Array.isArray(props.modelValue) ? null : props.modelValue
     }
   },
-  set: (val) => emit('update:modelValue', val)
+  set: (val) => {
+    if (props.multiple && Array.isArray(val)) {
+      emit('update:modelValue', sortChainsBySupportOrder(val))
+    } else {
+      emit('update:modelValue', val)
+    }
+  }
 })
 
 const chainOptions = computed(() => {

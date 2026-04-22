@@ -274,25 +274,27 @@ const props = withDefaults(defineProps<{
 })
 const globalStore = useGlobalStore()
 
-// 统一将 chain 转换为数组
+// 统一将 chain 转换为数组，并按照 SupportMonitorChain 的顺序排序
 const chainList = computed(() => {
-  return Array.isArray(props.chain) ? props.chain : [props.chain]
-})
-
-// 按照 SupportMonitorChain 的顺序排序当前选中的链
-const sortedChainList = computed(() => {
+  const chains = Array.isArray(props.chain) ? props.chain : [props.chain]
+  
   // 创建 SupportMonitorChain 的索引映射
   const orderMap = new Map<string, number>()
   SupportMonitorChain.forEach((chain, index) => {
     orderMap.set(chain, index)
   })
   
-  // 对 chainList 进行排序
-  return [...chainList.value].sort((a, b) => {
+  // 对链进行排序
+  return [...chains].sort((a, b) => {
     const orderA = orderMap.get(a) ?? Number.MAX_SAFE_INTEGER
     const orderB = orderMap.get(b) ?? Number.MAX_SAFE_INTEGER
     return orderA - orderB
   })
+})
+
+// 按照 SupportMonitorChain 的顺序排序当前选中的链（保留用于兼容）
+const sortedChainList = computed(() => {
+  return chainList.value
 })
 
 // 解析 quickBuyValue，兼容字符串和对象类型

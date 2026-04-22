@@ -92,9 +92,9 @@
                 <span />
               </template>
               <template #cell-operate="{ row }">
-                <QuickSwap :quickBuyValue="quickBuyValueMap[row.chain]"
+                <QuickSwap2 :quickBuyValue="quickBuyValueMap[row.chain]"
                   :row="{ ...row, ...{ target_token: row?.target_address, token0_address: row?.from_address, token1_address: row?.to_address, symbol: row?._target_Token?.symbol } }"
-                  classNames="min-w-70px h-24px! w-quickSwap" />
+                  classNames="min-w-70px h-24px! w-quickSwap" :enable-batch-swap="true"/>
               </template>
               <template v-if="monitor_count===0" #empty>
                 <div v-if="!loading" class="h-full flex flex-col items-center justify-center pt-0px">
@@ -136,7 +136,7 @@
                         <Icon name="custom:stop" />
                         <!-- <span class="ml-3px">{{ $t('paused') }}</span> -->
                       </div>
-                      <BatchWallet :chain=" getChainInfo(selectedChain[0]?.value,true)?.net_name" :boundary="null" />
+                      <QuickBatchWallet :chains="selectedChainVals" :boundary="null" />
                       <quickSwapSetCustom2
                         v-model:quickBuyValue="quickBuyValueMap"
                         v-model:customSelected="swapSetSelected"
@@ -169,9 +169,9 @@
                         <div v-else :class="row._profit>0 ? `color-[--up-color]` : `color-[--down-color]`">{{ `${Number(row._profit) > 0 ? '+' : '-'}$${formatNumber2(Math.abs(row?._profit || 0) || 0, 2)}` }}</div>
                       </template>
                     </div>
-                    <QuickSwap :quickBuyValue="quickBuyValueMap[row.chain]"
+                    <QuickSwap2 :quickBuyValue="quickBuyValueMap[row.chain]"
                       :row="{ ...row, ...{ target_token: row?.target_address, token0_address: row?.from_address, token1_address: row?.to_address, symbol: row?._target_Token?.symbol } }"
-                      classNames="min-w-70px h-24px!  hidden! group-hover:block! w-quickSwap" />
+                      classNames="min-w-70px h-24px!  hidden! group-hover:block! w-quickSwap" :enable-batch-swap="true"/>
                     <div v-tooltip="formatDate(row?.created_at || row?.time)" class="time"
                       className="group-hover:hidden!" :style="{
                         color:
@@ -363,8 +363,13 @@ const selectedChain = useStorage('monitorSelectedChain', [{
   label: 'SOL',
   value: 'solana',
   id: 'solana'
-}, { label: 'BSC', value: '56', id: 'bsc' }])
+}, { label: 'BSC', value: '56', id: 'bsc' },{
+    label: "ETH",
+    value: "1",
+    id: "eth"
+}])
 
+// ... existing code ...
 const selectedChainVals = computed(() => {
   return selectedChain.value.map(i => getChainInfo(i.value, true)?.net_name)
 })

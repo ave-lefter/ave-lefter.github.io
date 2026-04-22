@@ -2173,5 +2173,10 @@
   "monitorNum": "監控錢包數",
   "favTotal": "關注錢包總數",
   "emptyButtonText": "请先监控钱包",
-  "emptyButtonText1": "請先關注錢包"
+  "emptyButtonText1": "請先關注錢包",
+  "allWalletsInsufficientBalance": "所有錢包餘額不足: {wallets}",
+  "someWalletsSkipped": "{count} 個錢包因餘額不足而被跳過: {wallets}",
+  "walletsWillExecute": "個錢包將執行交易",
+  "allTradeSuccess": "所有 {count} 筆交易均成功",
+  "partialTradeResult": "{success}成功，{fail}失敗"
 }
