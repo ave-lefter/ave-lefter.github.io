@@ -16,9 +16,10 @@
             <div class="w-full relative" :class="getAnimClass(row)">
               <div class="flex-start items-start relative">
                 <div class="mr-12px relative top-4px">
-                  <!-- <div class="flex items-center px-4px py-2px bg-[--secondary-bg] absolute z-2 right--2px top--7px !rounded-4px border border-1 border-solid border-[--border] color-[--secondary-text] text-9px">
-                      <Icon class="text-9px mr-2px" name="ix:image" />44
-                  </div> -->
+                  <div v-if="Number(row?.similar_image_count)> 0" class="flex items-center px-4px py-2px bg-[--secondary-bg] absolute z-2 right--4px top--7px !rounded-4px border border-1 border-solid border-[--border] color-[--secondary-text] text-9px">
+                      <Icon class="text-9px mr-2px" name="ix:image" />
+                      {{ formatNumber(row?.similar_image_count || 0, 0) }}
+                  </div>
                   <div class="black-container">
                     <span
                       v-tooltip="pumpBlackList?.findIndex(i => (i.address == row.token && i.type == 'ca') || (i.address == row.symbol && i.type == 'keyword')) !== -1 ? $t('cancel') + $t('BlackListToken') : $t('BlackListToken')"
@@ -154,7 +155,7 @@
                     />
                   </div>
                   <div
-                    class="color-[--third-text1] text-12px hover:color-[--main-text1]"
+                    class="color-[--third-text1] text-12px hover:color-[--main-text1] absolute"
                     @click.stop="clickToken(row.token, row.chain)"
                     :class="pumpSetting.Progress_isCircle == 'horizontal' ? 'mt-25px' : 'mt-15px'">
                     {{row.token?.slice(0, 4) + '...' + row.token?.slice(-4)}}
@@ -279,11 +280,11 @@
                           content:getLiqTooltip(row),
                           props: { 'raw-content': true, 'popper-class': 'pump-tooltip' }
                         }"
+                        v-memo="row.target_token + '-' + row.chain"
                         class="rounded-100% cursor-pointer mr-8px"
                         :src="row.baseToken?.logo_url ? `${configStore.token_logo_url}${row.baseToken?.logo_url}` : qsImage"
                         alt=""
                         :width="12"
-                        style="border-radius: 100%"
                       >
                       <!-- <a
                       v-if="
@@ -778,8 +779,9 @@
                     <div class="mr-2px color-[--third-text1]">F</div>
                     <img
                       v-if="row?.chain"
-                      class="icon-symbol rounded-100% h-14px mr-2px"
+                      class="icon-symbol rounded-100% text-12px mr-2px"
                       :src="`${token_logo_url}chain/${row?.chain}.png`"
+                      :width="12"
                     >
                     <span v-if="Number(row?.commission_sum ?? 0) + Number(row?.gas_fee_sum ?? 0) >0" class="color-[--main-text1]">
                         {{ formatNumber((Number(row?.commission_sum ?? 0) + Number(row?.gas_fee_sum ?? 0)) , 2) }}

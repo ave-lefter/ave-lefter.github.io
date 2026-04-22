@@ -61,8 +61,8 @@ function handleClick() {
     width: 14px;
     height: 14px;
     text-align: center;
-    background-color: var(--third-text);
-    color: var(--main-text);
+    background-color: var(--tab-active-bg);
+    color: var(--main-text1);
     margin-left: 4px;
     font-size: 10px;
   }

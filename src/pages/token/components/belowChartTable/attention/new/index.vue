@@ -34,6 +34,31 @@ const searchOriginType = shallowRef('')
 const searchKeyword = shallowRef('')
 const filterList = ref<any[]>([])
 const globalStore = useGlobalStore()
+let attentionTimer: ReturnType<typeof setTimeout> | null = null
+
+function startAttentionTimer() {
+  stopAttentionTimer()
+  if (searchKeyword.value) return
+  if (route.name !== 'token-id') { stopAttentionTimer(); return }
+  if (props.currentActiveTab !== 'Attention') { stopAttentionTimer(); return }
+  attentionTimer = setTimeout(() => {
+    if (searchKeyword.value) { stopAttentionTimer(); return }
+    if (route.name !== 'token-id') { stopAttentionTimer(); return }
+    if (props.currentActiveTab !== 'Attention') { stopAttentionTimer(); return }
+    getAttentionList(sort.value as any)
+  }, 30000)
+}
+
+function stopAttentionTimer() {
+  if (attentionTimer) {
+    clearTimeout(attentionTimer)
+    attentionTimer = null
+  }
+}
+
+onUnmounted(() => {
+  stopAttentionTimer()
+})
 const id = computed(() => {
   return route.params?.id as string
 })
@@ -47,6 +72,13 @@ const holderList = computed(() => {
     }
   }
   return base || []
+})
+watch(() => props.currentActiveTab, (val) => {
+  if (val === 'Attention') {
+    getAttentionList(sort.value as any)
+  } else {
+    stopAttentionTimer()
+  }
 })
 watch(() => globalStore.headFollowsNum.all, () => {
   if (props.currentActiveTab == 'Attention') {
@@ -95,13 +127,14 @@ function getAttentionList(sortObj?: { sort_by: string; order: string }) {
     .then((res) => {
       const list = res?.holderStats || []
       attentionList.value = list || []
-      console.log('--------getAttentionList---------', list)
     })
     .catch(() => {
       attentionList.value = []
     })
     .finally(() => {
       loadingAttention.value = false
+      if (route.name !== 'token-id') return
+      startAttentionTimer()
     })
 }
 
@@ -109,6 +142,7 @@ function handleSortChange(obj: { prop: string; order: string }) {
     getAttentionList({ sort_by: obj.prop, order: obj.order?.replace('ending', '') })
 }
 function filterAddress(keyword: string) {
+  stopAttentionTimer()
   searchKeyword.value = keyword || ''
   if (!searchKeyword.value) {
     getAttentionList(sort.value as any)
