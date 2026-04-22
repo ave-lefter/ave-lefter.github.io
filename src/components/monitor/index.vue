@@ -255,7 +255,7 @@
       </el-tab-pane>
       <el-tab-pane disabled>
         <template #label>
-          <ChainSelector class="w-32px!" v-model="selectedChain" :show-label="false" wrapper-class="w-ChainSelector" popper-class="monitor-chain-selector-popper" :multiple="true" :teleported="true"/>
+          <ChainSelector class="w-55px!" v-model="selectedChain" :show-label="false" wrapper-class="w-ChainSelector" popper-class="monitor-chain-selector-popper" :multiple="true" :teleported="true"/>
         </template>
       </el-tab-pane>
       <el-tab-pane disabled>
@@ -311,7 +311,7 @@
 <script setup lang="ts">
 import WalletManage from './walletManage.vue'
 import { throttle } from 'lodash-es'
-import { useStorage } from '@vueuse/core'
+import { useStorage,useDebounceFn } from '@vueuse/core'
 import BigNumber from 'bignumber.js'
 import { getHistoryMonitor, batchPauseMonitor, addAttention2, getFavCount as _getFavCount } from '~/api/attention'
 import QuickBuyInput from './components/quickBuyInput.vue'
@@ -497,7 +497,7 @@ useVisibilityChange(() => {
 })
 
 // 抽取通用的监控刷新逻辑
-function refreshMonitorList() {
+const refreshMonitorList = useDebounceFn(() => {
   const monitor_type: Array<'sell' | 'buy'> = []
   if (txType.value.includes(0)) {
     monitor_type.push('buy')
@@ -508,7 +508,7 @@ function refreshMonitorList() {
   batchPauseMonitor(monitor_type, selectedChain.value.map(i => i.id).join(',')).then(() => {
     getMonitorList()
   })
-}
+}, 500)
 
 watch(() => txType.value, () => {
   refreshMonitorList()
