@@ -61,6 +61,8 @@ import { CirclePlusFilled } from '@element-plus/icons-vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import { ElMessage } from 'element-plus'
 import { addFavoriteGroup2 } from '~/api/attention'
+
+
 const { t } = useI18n()
 const {lang,isDark} = storeToRefs(useGlobalStore())
 const followStore = useFollowStore()
@@ -79,12 +81,12 @@ const props=defineProps({
   formData:{
     type: Object as PropType<{ group: number|string ,is_monitored?:number|string}>,
     required: false,
-    default:()=>{
-      return {
-        group: 0,
-        is_monitored: 0
-      }
-    }
+    // default:()=>{
+    //   return {
+    //     group: 0,
+    //     is_monitored: 0
+    //   }
+    // }
   }, 
   groupOptions: {
     type: Array as PropType<Array<{ group_id: number; name: string; show_index: number}>>,
@@ -126,6 +128,7 @@ const loading=ref(false)
 const formRef=ref<FormInstance|undefined>()
 const form = ref({...props.formData})
 const isAdd=ref(false)
+
 const addGroupName=ref('')
 
 const visible=computed({
@@ -137,7 +140,8 @@ const visible=computed({
 })
 
 watch(()=>visible.value, (val) => {
-  console.log('visible', val)
+  console.log('visible', val,props.formData)
+  form.value = { ...props.formData,...followStore.favAddressPopFormData }
 })
 watch(() => props.visible, (val) => {
   console.log('props.visible', val)
@@ -148,6 +152,8 @@ function handleSubmit(formEl: FormInstance | undefined) {
     if (valid) {
       loading.value = true
       emits('onConfirm',form.value,formRef.value?.resetFields,()=>loading.value=false)
+      followStore.favAddressPopFormData.group = Number(form.value.group)
+      followStore.favAddressPopFormData.is_monitored = Number(form.value.is_monitored)
       // close()
     } else {
       console.log('error submit!', fields)
