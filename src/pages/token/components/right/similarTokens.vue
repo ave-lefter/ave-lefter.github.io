@@ -1,13 +1,13 @@
 <template>
   <div class="px-15px pr-0 bg-[--secondary-bg]" v-if="!isEmpty">
     <div
-      class="flex-start border-b border-b-solid border-[--d-151A22-l-E8F1FF] pb-12px pt-12px mr-15px cursor-pointer color-[--main-text1]"
+      class="flex-start border-b border-b-solid border-[--d-151A22-l-E8F1FF] pb-12px pt-12px mr-15px cursor-pointer color-[--main-text1] items-center"
       @click="isExpand = !isExpand"
     >
       <span class="text-14px">{{ t('similarTokens') }}({{ tokens?.length || 0 }})</span>
       <Icon class="ml-4px" :name= " isExpand? 'material-symbols:keyboard-arrow-up': 'material-symbols:keyboard-arrow-down'" />
       <div class="flex-1"></div>
-      <div class="text-12px lh-12px color-[--third-text] mb-12px">{{ t('mcap') }}</div>
+      <div class="text-12px lh-12px color-[--third-text] mb-0px">{{ t('mcap') }}</div>
     </div>
     <div class="mt-12px mb-10px mr-15px" v-if="isExpand">
       <div class="flex flex-col gap-8px">
