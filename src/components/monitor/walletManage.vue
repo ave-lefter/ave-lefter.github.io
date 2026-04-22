@@ -147,7 +147,7 @@
             <span class="text-12px">{{ getChainInfo(row.user_chain).name }}</span>
           </template>
           <template #header-operate>
-            <span>{{ $t('operate') }}</span>
+            <span>{{ $t('push') }}</span>
           </template>
           <template #cell-operate="{ row ,rowIndex}">
             <div class="flex justify-end items-center" @click.stop>
@@ -673,7 +673,7 @@ const updateSelectWidth = () => {
     document.body.removeChild(tempSpan)
     
     // 加上箭头空间(24px)和最小宽度限制
-    const calculatedWidth = Math.max(Math.min(width + 18, 120), 60)
+    const calculatedWidth = Math.max(Math.min(width + 20, 120), 60)
     selectWrapperWidth.value = calculatedWidth
   })
 }
@@ -712,7 +712,7 @@ const columns = computed(() => {
     //   minWidth: 55,
     // },
     {
-      title: t('operate'),
+      title: t('push'),
       dataKey: 'operate',
       key: 'operate',
       align: 'right',

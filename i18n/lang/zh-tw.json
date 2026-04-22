@@ -42,7 +42,7 @@
   "removeFavGroupTips": "刪除分組會將分組內的 token 移入默認分組中，是否繼續？",
   "tips": "提示",
   "profit2": "盈虧",
-  "closePosition": "平仓",
+  "closePosition": "清倉",
   "openPrice": "開盤價格",
   "24Exchange": "24H換手率",
   "theChain": "所屬鏈",

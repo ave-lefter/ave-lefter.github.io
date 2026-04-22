@@ -13,6 +13,7 @@
     :popper-class="`${props.popperClass} w-103px chain-selector-popper`"
     :persistent="false"
     @change="handleChange"
+    @remove-tag="handleRemoveTag"
   >
     <template #prefix>
       <div class="inline-flex items-center">
@@ -123,7 +124,13 @@ const selectedChain = computed({
   },
   set: (val) => {
     if (props.multiple && Array.isArray(val)) {
-      emit('update:modelValue', sortChainsBySupportOrder(val))
+      // 确保至少有一个选项被选中
+      if (val.length === 0 && chainOptions.value.length > 0) {
+        // 如果尝试清空所有选项，则保留第一个选项
+        emit('update:modelValue', sortChainsBySupportOrder([chainOptions.value[0]]))
+      } else {
+        emit('update:modelValue', sortChainsBySupportOrder(val))
+      }
     } else {
       emit('update:modelValue', val)
     }
@@ -143,6 +150,16 @@ const chainOptions = computed(() => {
 
 function handleChange(value: ChainOption | ChainOption[] | null) {
   emit('change', value)
+}
+
+// 处理标签移除事件，确保至少保留一个选项
+function handleRemoveTag() {
+  if (props.multiple && Array.isArray(selectedChain.value) && selectedChain.value.length === 0) {
+    // 如果移除了最后一个标签，恢复第一个选项
+    if (chainOptions.value.length > 0) {
+      selectedChain.value = [chainOptions.value[0]]
+    }
+  }
 }
 </script>
 
