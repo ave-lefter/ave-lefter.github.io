@@ -378,7 +378,7 @@ function filterGroup(val: number) {
 }
 
 const handleDeleteAttention=throttle((item: any)=>{
-  deleteAttention({address: currentAddress.value, user_chain: item.chain,user_address: item.user_address}).then(() => {
+  deleteAttention({address: currentAddress.value, user_chain: item.user_chain,user_address: item.user_address}).then(() => {
     ElMessage.success(t('success'))
     getTableList()
     updateNum2.value++

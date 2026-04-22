@@ -495,18 +495,30 @@ useVisibilityChange(() => {
     updateDateSource()
   }
 })
-watch([() => txType.value, () => selectedChain.value], ([val]) => {
+
+// 抽取通用的监控刷新逻辑
+function refreshMonitorList() {
   const monitor_type: Array<'sell' | 'buy'> = []
-  if (val.includes(0)) {
+  if (txType.value.includes(0)) {
     monitor_type.push('buy')
   }
-  if (val.includes(1)) {
+  if (txType.value.includes(1)) {
     monitor_type.push('sell')
   }
   batchPauseMonitor(monitor_type, selectedChain.value.map(i => i.id).join(',')).then(() => {
     getMonitorList()
   })
+}
+
+watch(() => txType.value, () => {
+  refreshMonitorList()
 })
+
+watch(() => selectedChain.value, (val, oldVal) => {
+  if (JSON.stringify(val) === JSON.stringify(oldVal)) return
+  refreshMonitorList()
+})
+
 watch(() => visible.value, (val) => {
   if (!val) return
   if (activeName.value === 0) {
