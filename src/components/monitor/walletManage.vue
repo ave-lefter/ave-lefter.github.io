@@ -8,11 +8,11 @@
         </el-select>
       </div>
       <div class="flex items-center gap-8px">
-        <el-button ref="addButtonRef1" class="dialog-button"  style="height: 24px; padding: 4px 8px !important;font-size: 12px; color:var(--d-E0E0E0-l-333);--el-button-border-color:var(--third-text);--el-button-hover-border-color:var(--third-text)" size="small">
+        <el-button ref="addButtonRef1" class="dialog-button"  style="height: 24px; padding: 4px 8px !important;font-size: 12px; color:var(--d-E0E0E0-l-333);--el-button-border-color:var(--third-text); --el-button-hover-border-color:var(--third-text)" size="small" :dark="isDark" :color="isDark ? '#0E0F10' : '#F6F9FF'">
           <!-- <Icon name="ic:baseline-person-add-alt-1" class="text-12px  mr-5px"/> -->
           {{ $t('add') }}
         </el-button>
-        <el-button class="dialog-button" style="height: 24px;padding: 4px 8px !important; margin-left: 0px;font-size: 12px; color:var(--d-E0E0E0-l-333);--el-button-border-color:var(--third-text);--el-button-hover-border-color:var(--third-text)" @click.stop.prevent="showBatchAddressDetails=true" size="small">
+        <el-button class="dialog-button" style="height: 24px;padding: 4px 8px !important; margin-left: 0px;font-size: 12px; color:var(--d-E0E0E0-l-333);--el-button-border-color:var(--third-text);--el-button-hover-border-color:var(--third-text)" @click.stop.prevent="showBatchAddressDetails=true" size="small" :dark="isDark" :color="isDark ? '#0E0F10' : '#F6F9FF'">
           <!-- <Icon name="mingcute:new-folder-fill" class="text-12px mr-5px"/> -->
           {{ $t('bulkImport') }}
         </el-button>
@@ -127,18 +127,18 @@
           </template>
           <template #cell-group="{ row }">
             <template v-if="!AmountU">
-              <div v-if="row?.main_token_balance_amount > 0" :class="!row?.main_token_balance_amount ? 'color-[--third-text]' : ''" class="flex items-center justify-end">
-                <img :src="`${token_logo_url}chain/${row.user_chain}.png`" class="rd-50% inline-block mr-2px" width="14" height="14" lazy alt="">{{ formatNumber2(row?.main_token_balance_amount || 0, 2) }}&nbsp;{{row.main_token_symbol}}
+              <div v-if="row?.main_token_balance_amount > 0" :class="!row?.main_token_balance_amount ? 'color-[--third-text]' : ''" class="flex items-center justify-end text-13px">
+                <img :src="`${token_logo_url}chain/${row.user_chain}.png`" class="rd-50% inline-block mr-4px" width="10" height="10" lazy alt="">{{ formatNumber2(row?.main_token_balance_amount || 0, 2) }}&nbsp;{{row.main_token_symbol}}
               </div>
-              <div v-else class="color-[--third-text] flex items-center justify-end">
+              <div v-else class="color-[--third-text] flex items-center justify-end text-13px">
                 0
               </div>
             </template>
             <template v-else>
-              <div v-if="row?.main_token_balance_amount > 0" :class="!row?.main_token_balance_amount ? 'color-[--third-text]' : ''" class="flex items-center justify-end">
+              <div v-if="row?.main_token_balance_amount > 0" :class="!row?.main_token_balance_amount ? 'color-[--third-text]' : ''" class="flex items-center justify-end text-13px">
                 ${{formatNumber2(getAmountU(row), 2)}}
               </div>
-              <div v-else class="color-[--third-text] flex items-center justify-end">
+              <div v-else class="color-[--third-text] flex items-center justify-end text-13px">
                 $0
               </div>  
             </template>
@@ -732,6 +732,11 @@ function getAmountU(row: any) {
   --el-table-header-bg-color:transparent;
   .el-virtual-scrollbar{
     display: none;
+  }
+  .el-table-v2__header-cell,.el-table-v2__row-cell{
+    &:nth-child(1),&:last-child{
+      padding: 0px;
+    }
   }
 }
 

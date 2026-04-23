@@ -6,14 +6,15 @@
     <el-tabs v-model="activeName" style="" class="m-tabs" @tab-change="handleClick">
       <el-tab-pane :label="$t('insidersActivity')" :name="0" lazy>
         <template v-if="botStore.evmAddress">
-          <div v-if="props.isLarge" v-loading="loading" class="text-12px m-table"
+          <div v-if="props.isLarge" v-loading="loading" class="text-13px m-table"
             element-loading-background="transparent">
             <AveTable ref="aveTableRef" :showEmptyText="true" rowKey="id" :data="filterDataSource" :columns="columns" fixed :style="{
               height: props.scrollHeight + 'px',
+              fontSize: '13px',
               // '--el-table-border':'1px solid var(--dialog-list-hover)',
               // '--el-table-bg-color':'transparent'
               // height:'500px',
-            }" row-class='cursor-pointer' :rowEventHandlers="{
+            }" row-class='cursor-pointer group' :rowEventHandlers="{
                 onClick: (row: any) => jumpToken(row)
               }">
               <template #header-wallet>
@@ -22,7 +23,7 @@
               <template #cell-wallet="{ row }">
                 <UserRemark :key="row._marker.maker_address" :address="row._marker.maker_address" :chain="row.chain"
                   :remark="row.maker_alias || ''" :showIcon="true" :teleported="true"
-                  :wallet_logo="row.maker_logo ? { logo: row.maker_logo, vip_logo: 'https://www.iconaves.com/address_portrait/KOL_V.png' } : {}"
+                  :wallet_logo="row.maker_logo ? { logo: row.maker_logo, vip_logo: 'https://www.iconaves.com/address_portrait/KOL_V.png' } : {}" addressClass="color-[--main-text1]"
                   iconSize="24px" :formatAddress="(address) =>
                       address?.slice(0, 4) + '...' + address?.slice(-4)
                     " @updateRemark="getMonitorList" @click="(e: any) => jumpBalance(row, e)" />
@@ -51,7 +52,10 @@
                 <span>{{ $t('time') }}</span>
               </template>
               <template #cell-time="{ row }">
-                <div v-tooltip="formatDate(row?.created_at || row?.time)" class="time" :style="{
+                <QuickSwap2 :quickBuyValue="quickBuyValueMap[row.chain]"
+                  :row="{ ...row, ...{ target_token: row?.target_address, token0_address: row?.from_address, token1_address: row?.to_address, symbol: row?._target_Token?.symbol } }"
+                  classNames="min-w-70px h-24px! w-quickSwap hidden! group-hover:block!" :enable-batch-swap="true"/>
+                <div v-tooltip="formatDate(row?.created_at || row?.time)" class="time group-hover:hidden!" :style="{
                   color:
                     Number(formatTimeFromNow(row?.created_at || row?.time, true)) <= 600
                       ? '#FFA622'
@@ -63,7 +67,7 @@
                     :key="`${row.created_at || row?.time}`"
                     :timestamp="Math.min(+(row.created_at || row?.time), dayjs().unix() - 1)" :end-time="60">
                     <template #default="{ seconds }">
-                      <span class="color-#FFA622 text-12px">
+                      <span class="color-#FFA622 text-13px">
                         <template v-if="seconds < 60"> {{ seconds }}s </template>
                         <template v-else>
                           {{ formatTimeFromNow(row.created_at || row?.time) }}
@@ -71,7 +75,7 @@
                       </span>
                     </template>
                   </TimerCount>
-                  <span v-else class="text-12px">
+                  <span v-else class="text-13px">
                     {{ formatTimeFromNow(row.created_at || row?.time) }}
                   </span>
                 </div>
@@ -89,14 +93,14 @@
                 <img v-if="row?.amm == 'pump'" src="https://www.iconaves.com/signals/pump_king.png"
                   style="width:12px;height:12px">
               </template>
-              <template #header-operate>
+              <!-- <template #header-operate>
                 <span />
-              </template>
-              <template #cell-operate="{ row }">
+              </template> -->
+              <!-- <template #cell-operate="{ row }">
                 <QuickSwap2 :quickBuyValue="quickBuyValueMap[row.chain]"
                   :row="{ ...row, ...{ target_token: row?.target_address, token0_address: row?.from_address, token1_address: row?.to_address, symbol: row?._target_Token?.symbol } }"
                   classNames="min-w-70px h-24px! w-quickSwap" :enable-batch-swap="true"/>
-              </template>
+              </template> -->
               <template v-if="monitor_count===0" #empty>
                 <div v-if="!loading" class="h-full flex flex-col items-center justify-center pt-0px">
                   <img v-if="themeStore.theme==='light'" src="@/assets/images/empty-white.svg" alt="">
@@ -109,10 +113,11 @@
               </template>
             </AveTable>
           </div>
-          <div v-else v-loading="loading" class="text-12px m-table pt-14px" element-loading-background="transparent">
+          <div v-else v-loading="loading" class="text-13px m-table pt-12px" element-loading-background="transparent">
             <AveTable ref="aveTableRef" rowKey="id" fixed :data="filterDataSource" :columns="columns" :headerHeight="54"  :showEmptyText="true"
               :rowHeight="70" headerClass="bg-transparent" :style="{
                 height: props.scrollHeight + 'px',
+                fontSize: '13px',
                 // height:'500px',
                 '--el-table-border': '1px solid transparent'
               }" row-class='cursor-pointer group' :rowEventHandlers="{
@@ -121,7 +126,7 @@
                 onMouseleave:()=>isHoverTable=false
               }">
               <template #header-wallet>
-                <div class="flex flex-col w-100% gap-14px"> 
+                <div class="flex flex-col w-100% gap-12px"> 
                   <div class="flex-between w-100%">
                     <div class="flex-start gap-8px">
                       <!-- <FilterType v-model="txType" :options="txTypeList" />
@@ -158,13 +163,13 @@
                 <div class="flex flex-col w-100% gap-8px">
                   <div class="flex-between">
                     <div class="flex-start gap-4px">
-                      <UserRemark :key="row._marker.maker_address" :address="row._marker.maker_address" :chain="row.chain"
+                      <UserRemark :key="row._marker.maker_address" :address="row._marker.maker_address" :chain="row.chain" addressClass="color-[--main-text1]"
                         :remark="row.maker_alias || ''" :showIcon="true" :teleported="true"
                         :wallet_logo="row.maker_logo ? { logo: row.maker_logo, vip_logo: 'https://www.iconaves.com/address_portrait/KOL_V.png' } : {}"
                         iconSize="24px" :formatAddress="(address) =>
                             address?.slice(0, 4) + '...' + address?.slice(-4)
                           " @updateRemark="getMonitorList" @click="(e: any) => jumpBalance(row, e)" />
-                      <div class="color-[--third-text]">{{ getTxType(row) }}</div>
+                      <div class="color-[--main-text1]">{{ getTxType(row) }}</div>
                       <template v-if="row.position_type=='3'">
                         <div v-if="(row._profit==='--')||!row._profit"  class="color-[--third-text]"></div>
                         <div v-else :class="row._profit>0 ? `color-[--up-color]` : `color-[--down-color]`">{{ `${Number(row._profit) > 0 ? '+' : '-'}$${formatNumber2(Math.abs(row?._profit || 0) || 0, 2)}` }}</div>
@@ -186,7 +191,7 @@
                         :key="`${row.created_at || row?.time}`"
                         :timestamp="Math.min(+(row.created_at || row?.time), dayjs().unix() - 1)" :end-time="60">
                         <template #default="{ seconds }">
-                          <span class="color-#FFA622 text-12px">
+                          <span class="color-#FFA622 text-13px">
                             <template v-if="seconds < 60"> {{ seconds }}s </template>
                             <template v-else>
                               {{ formatTimeFromNow(row.created_at || row?.time) }}
@@ -195,7 +200,7 @@
                         </template>
                       </TimerCount>
                       <span v-else v-tooltip="formatDate(row.created_at || row?.time, 'YYYY-MM-DD HH:mm:ss')"
-                        class="text-12px">
+                        class="text-13px">
                         {{ formatTimeFromNow(row.created_at || row?.time) }}
                       </span>
                     </div>
@@ -270,7 +275,7 @@
           <div class="m-op flex-end gap-8px w-100% h-100%">
             <template v-if="activeName === 0">
               <el-button v-if="(activeName === 0) && botStore.evmAddress" :ref="(ref) => addButtonRef = ref" size="small"
-                style="height: 20px;color:var(--d-E0E0E0-l-333);--el-button-border-color:var(--third-text);--el-button-hover-border-color:var(--third-text)" class="dialog-button" :dark="isDark">
+                style="height: 20px;color:var(--d-E0E0E0-l-333);--el-button-border-color:var(--third-text);--el-button-hover-border-color:var(--third-text)" class="dialog-button" :dark="isDark" :color="isDark ? '#0E0F10' : '#F6F9FF'">
                 <!-- <Icon name="ic:baseline-person-add-alt-1" class="text-12px  mr-5px" /> -->
                 {{ $t('add') }}
               </el-button>
@@ -288,12 +293,12 @@
               </pro-tag>
             </template>
             <!-- <QuickBuyInput v-if="(activeName === 0) && isLarge" v-model="quickBuyValue" size="small" /> -->
+            <QuickBatchWallet v-if="(activeName === 0) && isLarge" :chains="selectedChainVals" :boundary="null" />
             <quickSwapSetCustom2
               v-if="(activeName === 0) && isLarge"
               v-model:quickBuyValue="quickBuyValueMap"
               v-model:customSelected="swapSetSelected"
               :chain="selectedChainVals"
-              displayType="select"
               :height="24"
             />
             <Icon class="text-14px color-[--secondary-text] hover:color-[--main-text] cursor-pointer"
@@ -494,8 +499,8 @@ const columns = computed(() => {
     { title: t('value'), dataKey: 'amount', key: 'amount', align: 'right', minWidth: 80 },
     { title: t('token'), dataKey: 'symbol', key: 'symbol', align: 'right', minWidth: 150 },
     { title: t('mcap'), dataKey: 'mc', key: 'mc', align: 'right', minWidth: 70 },
-    { title: t('time'), dataKey: 'time', key: 'time', align: 'right', minWidth: 40 },
-    { title: '', dataKey: 'operate', key: 'operate', align: 'right', minWidth: 100 }
+    { title: t('time'), dataKey: 'time', key: 'time', align: 'right', minWidth: 60 },
+    // { title: '', dataKey: 'operate', key: 'operate', align: 'right', minWidth: 100 }
   ] : [
     { title: t('wallet'), dataKey: 'wallet', key: 'wallet', align: 'left', minWidth: 240 }
   ]
