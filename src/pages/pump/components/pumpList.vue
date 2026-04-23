@@ -1,5 +1,5 @@
 <template>
-  <div class="mt-10px mb-10px relative">
+  <div class="mt-15px mb-10px relative">
     <ul  v-bind="containerProps" class="pump-item_list scroller-container"  :style="{height: scrollHeight}" @scroll="handleScroll">
       <div v-bind="wrapperProps">
           <li
@@ -11,7 +11,7 @@
             @click.stop="tableRowClick(row)"
             @contextmenu="handleContextMenu($event, row)"
             @mouseenter="() => currentRow = row "
-            @mouseleave="currentRow = null"
+            @mouseleave="() => { if (!showPopSearch) currentRow = null }"
           >
             <div class="w-full relative" :class="getAnimClass(row)">
               <div class="flex-start items-start relative">
@@ -396,8 +396,7 @@
                       :ref="(el: any) => $refs.currentBtnRef[$index] = el"
                       class="media-item h-12px block leading-12px"
                       target="_blank"
-                      @mouseenter="showPopoverSearch(row, $index)"
-                      @mouseleave="showPopSearch = false"
+                      @mouseover="showPopoverSearch(row, $index)"
                       @click.stop.prevent
                     >
                       <Icon class="text-[--third-text1] h-12px w-12px mr-8px" name="custom:search" />
@@ -884,31 +883,33 @@
     </transition>
     <el-popover
       v-if="showPopSearch"
-      v-model:visible="showPopSearch"
       :virtual-ref="$refs.currentBtnRef[currentIndex]"
       virtual-triggering
-      :persistent="false"
+      trigger="hover"
+      :show-arrow="false"
+      :offset="0"
+      :enterable="true"
       popper-class="[--el-popover-bg-color:--border]"
     >
-    <div class="py-4px [&&]:m--12px flex flex-col">
-      <a :href="`https://x.com/search?q=${currentRow?.target_token}`" target="_blank" class="text-12px py-4px px-8px color-[--main-text1] hover:bg-[--dialog-tab-active]">
-        {{ $t('tweetSearchContractAddress') }}
-      </a>
-      <a :href="`https://x.com/search?q=$${currentRow?.symbol}`" target="_blank" class="text-12px py-4px px-8px color-[--main-text1] hover:bg-[--dialog-tab-active]">
-        {{ $t('tweetSearchContractAddress2') }}
-      </a>
-      <!-- <a :href="`https://www.google.com/search?q=${currentRow?.symbol}&tbm=nws`" target="_blank" class="text-12px py-4px px-8px color-[--main-text1] hover:bg-[--dialog-tab-active]">
-        {{ $t('tweetSearchContractAddress3') }}
-      </a> -->
-      <a :href="`https://www.tiktok.com/search?q=${currentRow?.symbol}`" target="_blank" class="text-12px py-4px px-8px color-[--main-text1] hover:bg-[--dialog-tab-active]">
-        {{ $t('TikTokSearchName') }}
-      </a>
-      <a :href="`https://www.google.com/search?q=${currentRow?.symbol}&tbm=nws`" target="_blank" class="text-12px py-4px px-8px color-[--main-text1] hover:bg-[--dialog-tab-active]">
-        {{ $t('GoogleSearchName') }}
-      </a>
-      <span class="text-12px py-4px px-8px color-[--main-text1] hover:bg-[--dialog-tab-active] cursor-pointer" @click="handleSearchTokenName">{{ $t('tweetSearchContractAddress4') }}</span>
-    </div>
-  </el-popover>
+      <div class="py-4px [&&]:m--12px flex flex-col">
+        <a :href="`https://x.com/search?q=${currentRow?.target_token}`" target="_blank" class="text-12px py-4px px-8px color-[--main-text1] hover:bg-[--dialog-tab-active]">
+          {{ $t('tweetSearchContractAddress') }}
+        </a>
+        <a href="" @click.stop.prevent="globalStore.searchTwitter(currentRow?.target_token)" class="text-12px py-4px px-8px color-[--main-text1] hover:bg-[--dialog-tab-active]">
+          {{ $t('tweetSearchContractAddressMediaTracker') }}
+        </a>
+        <a :href="`https://x.com/search?q=$${currentRow?.symbol}`" target="_blank" class="text-12px py-4px px-8px color-[--main-text1] hover:bg-[--dialog-tab-active]">
+          {{ $t('tweetSearchContractAddress2') }}
+        </a>
+        <a :href="`https://www.tiktok.com/search?q=${currentRow?.symbol}`" target="_blank" class="text-12px py-4px px-8px color-[--main-text1] hover:bg-[--dialog-tab-active]">
+          {{ $t('TikTokSearchName') }}
+        </a>
+        <a :href="`https://www.google.com/search?q=${currentRow?.symbol}&tbm=nws`" target="_blank" class="text-12px py-4px px-8px color-[--main-text1] hover:bg-[--dialog-tab-active]">
+          {{ $t('GoogleSearchName') }}
+        </a>
+        <span class="text-12px py-4px px-8px color-[--main-text1] hover:bg-[--dialog-tab-active] cursor-pointer" @click="handleSearchTokenName">{{ $t('tweetSearchContractAddress4') }}</span>
+      </div>
+    </el-popover>
   </div>
 </template>
 
@@ -999,9 +1000,9 @@ const { $createTooltip } = useNuxtApp()
 const $refs = ref({
   currentBtnRef: {} as Record<number, any>,
 })
-const currentIndex = shallowRef(0)
 const currentRow = ref<PumpObj | null>(null)
-const showPopSearch= shallowRef(false)
+const currentIndex = shallowRef(0)
+const showPopSearch = shallowRef(false)
 
 const $tooltip = $createTooltip('bubble--tooltip')
 const { onEnter, hide: similarHide } = useSimilarTokenPopup()
@@ -1260,11 +1261,12 @@ const scrollToTop = () => {
   //   })
   // }
 }
-function showPopoverSearch(row: PumpObj,$index: number) {
+function showPopoverSearch(row: PumpObj, $index: number) {
   showPopSearch.value = true
   currentIndex.value = $index
   currentRow.value = row
 }
+
 async function handleSearchTokenName() {
   dialogVisible_search.value = true
   await Promise.resolve()
