@@ -1,6 +1,7 @@
 <template>
   <div class="items-center inline-flex">
-    <!-- Button 类型展示 -->
+    <!-- ==================== 预设按钮组（Button 模式）==================== -->
+    <!-- 当 displayType='button' 且满足显示条件时，渲染快速切换的预设按钮 -->
     <div
       v-if="isQuickSupported && settingsButtonVisible1 && displayType === 'button'"
       class="mr-8px flex justify-end items-center text-12px">
@@ -25,7 +26,9 @@
         </button>
       </div>
     </div>
-    <!-- Select 类型展示 -->
+    
+    <!-- ==================== 预设选择器（Select 模式）==================== -->
+    <!-- 当 displayType='select' 时，使用下拉选择器切换预设 -->
     <el-select
       v-else-if="isQuickSupported && settingsButtonVisible1 && displayType === 'select'"
       ref="selectRef"
@@ -47,7 +50,9 @@
         :value="item.value"
       />
     </el-select>
-    <!-- 用于下拉选项的独立 popover -->
+    
+    <!-- ==================== Select 选项 Hover 详情弹窗 ==================== -->
+    <!-- 鼠标悬停在下拉选项上时，显示该预设的详细配置信息（滑点、Gas费等） -->
     <el-popover
       v-model:visible="optionPopoverVisible"
       popper-class="new-popover"
@@ -97,7 +102,9 @@
         </ul>
       </div>
     </el-popover>
-    <!-- 多链金额输入下拉框 -->
+    
+    <!-- ==================== 多链金额输入下拉框 ==================== -->
+    <!-- 当 chainList.length > 1 时，显示只读伪输入框，点击后弹出多链批量编辑框 -->
     <el-popover
       v-if="chainList.length > 1"
       v-model:visible="amountDropdownVisible"
@@ -112,6 +119,7 @@
       @hide="handleAmountDropdownHide"
     >
       <template #reference>
+        <!-- 只读伪输入框：显示第一个链的金额，作为触发元素 -->
         <div
           ref="amountInputRef"
           class="quick-buy-input quick-buy-display"
@@ -136,6 +144,8 @@
           </div>
         </div>
       </template>
+      
+      <!-- 多链批量编辑区域：每个链一个独立输入框 -->
       <div class="text-12px flex flex-col gap-4px" style="width: 100%;">
         <template v-for="chainItem in sortedChainList" :key="chainItem">
           <el-input
@@ -167,7 +177,9 @@
         </template>
       </div>
     </el-popover>
-    <!-- 单链模式：真实输入框 -->
+    
+    <!-- ==================== 单链模式真实输入框 ==================== -->
+    <!-- 当 chainList.length <= 1 时，直接渲染可编辑的输入框 -->
     <el-input
       v-else
       ref="amountInputRef"
@@ -190,6 +202,9 @@
         >
       </template>
     </el-input>
+    
+    <!-- ==================== Button 模式 Hover 详情弹窗 ==================== -->
+    <!-- 鼠标悬停在预设按钮上时，显示该预设的详细配置信息 -->
     <el-popover
       v-model:visible="visible"
       popper-class="new-popover"
@@ -255,14 +270,24 @@ const botSettingStore = useBotSettingStore()
 const tokenStore = useTokenStore()
 const walletStore = useWalletStore()
 const emit = defineEmits(['update:quickBuyValue', 'update:customSelected'])
+
+// ==================== Props 定义 ====================
 const props = withDefaults(defineProps<{
+  /** 链配置：可以是单个链或链数组 */
   chain: BotChain | BotChain[]
+  /** 快速买入金额：单链模式为字符串，多链模式为对象 Record<BotChain, string> */
   quickBuyValue?: string | Record<BotChain, string>
+  /** 是否显示快速金额输入框 */
   showQuickAmount?: boolean
+  /** 是否显示设置按钮 */
   settingsButtonVisible?:boolean
+  /** 是否显示快捷文本 */
   quickTextVisible?:boolean
+  /** 当前选中的预设值（s1/s2/s3） */
   customSelected?: BotSettingKey
+  /** 预设切换器的显示类型：button 或 select */
   displayType?: 'button' | 'select'
+  /** 组件高度（px） */
   height?: number | string
 }>(), {
   quickBuyValue: '0.01',
@@ -274,7 +299,11 @@ const props = withDefaults(defineProps<{
 })
 const globalStore = useGlobalStore()
 
-// 统一将 chain 转换为数组，并按照 SupportMonitorChain 的顺序排序
+// ==================== 链列表处理 ====================
+/**
+ * 将 chain prop 统一转换为数组，并按照 SupportMonitorChain 的顺序排序
+ * 支持单个链字符串或链数组两种输入格式
+ */
 const chainList = computed(() => {
   const chains = Array.isArray(props.chain) ? props.chain : [props.chain]
   
@@ -292,12 +321,18 @@ const chainList = computed(() => {
   })
 })
 
-// 按照 SupportMonitorChain 的顺序排序当前选中的链（保留用于兼容）
+/**
+ * 排序后的链列表（保留用于兼容，当前与 chainList 相同）
+ */
 const sortedChainList = computed(() => {
   return chainList.value
 })
 
-// 解析 quickBuyValue，兼容字符串和对象类型
+// ==================== 数据解析与初始化 ====================
+/**
+ * 解析 quickBuyValue prop，兼容字符串和对象类型
+ * @returns 统一的链金额映射对象
+ */
 function parseQuickBuyValue(): Record<BotChain, string> {
   const map: Record<BotChain, string> = {} as Record<BotChain, string>
   
@@ -323,17 +358,23 @@ function parseQuickBuyValue(): Record<BotChain, string> {
 
 const gasPriceObj: Record<string, number> = reactive({})
 
+/**
+ * 获取第一个链的 Gas 价格（用于显示）
+ */
 const gasPrice = computed(() => {
   const firstChain = chainList.value[0]
   return firstChain ? (gasPriceObj?.[firstChain] || 0) : 0
 })
 
-// 计算统一的高度值（转换为 px 单位）
+/**
+ * 计算统一的高度值（转换为 px 单位）
+ */
 const componentHeight = computed(() => {
   const h = typeof props.height === 'number' ? props.height : parseInt(props.height, 10)
   return isNaN(h) ? 28 : h
 })
 
+// ==================== 状态管理 ====================
 const visible = ref(false)
 const selected = ref<BotSettingKey>('s1')
 const btnRefs = ref<Record<string, HTMLElement | null>>({})
@@ -351,7 +392,11 @@ let optionPopoverHideTimer: ReturnType<typeof setTimeout> | null = null
 const amountDropdownVisible = ref(false)
 const chainAmountMap = ref<Record<BotChain, string>>({} as Record<BotChain, string>)
 
-// 从 props 解析并初始化 chainAmountMap
+// ==================== 数据同步逻辑 ====================
+/**
+ * 从 props.quickBuyValue 同步到 chainAmountMap
+ * 支持字符串和对象两种格式
+ */
 function syncFromProps() {
   const map: Record<BotChain, string> = {} as Record<BotChain, string>
   
@@ -375,19 +420,27 @@ function syncFromProps() {
   chainAmountMap.value = map
 }
 
-// 监听链列表变化，完全重新初始化
+/**
+ * 监听链列表变化，完全重新初始化 chainAmountMap
+ * 确保链数量或顺序改变时数据正确重置
+ */
 watch(() => chainList.value, (newChains, oldChains) => {
   if (!oldChains || JSON.stringify(newChains) !== JSON.stringify(oldChains)) {
     syncFromProps()
   }
 }, { immediate: true })
 
-// 监听预设值变化，重新同步
+/**
+ * 监听预设值变化，重新同步金额数据
+ */
 watch(() => props.customSelected, () => {
   syncFromProps()
 })
 
-// 监听 quickBuyValue prop 变化，只在弹框关闭时同步
+/**
+ * 监听 quickBuyValue prop 变化
+ * 关键：只在弹框关闭时同步，避免覆盖用户正在编辑的值
+ */
 watch(() => props.quickBuyValue, (newValue, oldValue) => {
   // 如果弹框是打开的，不同步（避免覆盖用户正在编辑的值）
   if (amountDropdownVisible.value) {
@@ -404,9 +457,15 @@ watch(() => props.quickBuyValue, (newValue, oldValue) => {
   syncFromProps()
 }, { deep: true })
 
+// ==================== 业务逻辑计算 ====================
 const isWallet = computed(() => {
   return (walletStore.provider && walletStore.address && !botStore.evmAddress)
 })
+
+/**
+ * 判断是否支持快速交易功能
+ * 条件：有链配置 && 至少有一个链受支持 && 非钱包直连模式
+ */
 const isQuickSupported = computed(()=>{
   return chainList.value.length > 0 && 
          chainList.value.some(chain => botStore.isSupportChains.includes(chain)) && 
@@ -417,7 +476,9 @@ const settingsButtonVisible1 = computed(() => {
   return props.settingsButtonVisible && !isWallet.value
 })
 
-// 获取链的显示名称
+/**
+ * 获取链的显示名称
+ */
 function getChainLabel(chain: BotChain) {
   const labels: Record<BotChain, string> = {
     eth: 'ETH',
@@ -430,7 +491,10 @@ function getChainLabel(chain: BotChain) {
   return labels[chain] || chain
 }
 
-// 处理预设变更 - 批量设置所有链
+/**
+ * 处理预设变更 - 批量设置所有链的预设值
+ * @param value 新的预设值（s1/s2/s3）
+ */
 function handlePresetChange(value: BotSettingKey) {
   // 更新所有链的预设
   chainList.value.forEach(chain => {
@@ -451,7 +515,13 @@ function handlePresetChange(value: BotSettingKey) {
   emit('update:customSelected', value)
 }
 
-// 通用的 priority fee 计算函数
+// ==================== Priority Fee 计算 ====================
+/**
+ * 通用的 priority fee 计算函数
+ * @param chain 链标识
+ * @param settingKey 预设键（s1/s2/s3）
+ * @returns priority fee 值
+ */
 function calculatePriorityFee(chain: BotChain, settingKey: BotSettingKey) {
   if (!botStore.isSupportChains.includes(chain)) {
     return ''
@@ -476,7 +546,10 @@ function getChainPriorityFee(chain: BotChain) {
   return calculatePriorityFee(chain, selected.value)
 }
 
-// 获取第一个链的值（用于多链模式显示）- 使用排序后的第一个链
+/**
+ * 获取第一个链的值（用于多链模式显示）
+ * 使用排序后的第一个链作为代表值
+ */
 function getFirstChainValue() {
   if (sortedChainList.value.length > 0) {
     const firstChain = sortedChainList.value[0]
@@ -489,7 +562,9 @@ function getFirstChainValue() {
   return '0.01'
 }
 
-// 格式化输入值：只允许数字和小数点，防止多个小数点
+/**
+ * 格式化输入值：只允许数字和小数点，防止多个小数点
+ */
 function formatInputValue(value: string | number | undefined): string {
   const strValue = String(value ?? '')
   const filtered = strValue.replace(/\-|[^\d.]/g, '')
@@ -497,7 +572,12 @@ function formatInputValue(value: string | number | undefined): string {
   return parts.length > 2 ? parts[0] + '.' + parts.slice(1).join('') : filtered
 }
 
-// 格式化金额（保留指定小数位）
+/**
+ * 格式化金额（保留指定小数位，去除末尾零）
+ * @param value 原始值
+ * @param decimals 小数位数
+ * @returns 格式化后的字符串
+ */
 function formatAmount(value: string, decimals = 4): string {
   const v1 = new BigNumber(value || 0)?.toFixed?.().match(new RegExp(`[0-9]*(\\.[0-9]{0,${decimals}})?`))?.[0] || ''
   
@@ -506,7 +586,10 @@ function formatAmount(value: string, decimals = 4): string {
   return v1
 }
 
-// 构建完整的 quickBuyValue 对象（保留所有原有链）
+/**
+ * 构建完整的 quickBuyValue 对象（保留所有原有链）
+ * 用于多链模式下关闭弹框时统一提交
+ */
 function buildQuickBuyValueObject(): Record<BotChain, string> {
   if (typeof props.quickBuyValue === 'object' && props.quickBuyValue !== null) {
     // 基于 props 复制所有原有的键
@@ -526,20 +609,62 @@ function buildQuickBuyValueObject(): Record<BotChain, string> {
   }
 }
 
+/**
+ * 单链/多链模式统一的金额输入绑定
+ * 
+ * 核心逻辑：
+ * - 真正的单链模式（props.chain 为字符串）：使用字符串格式
+ * - 多链模式（props.chain 为数组，即使只有一个元素）：使用对象格式
+ */
 const quickBuyValue1 = computed({
   get() {
-    // 单链模式，直接返回 props
-    return typeof props.quickBuyValue === 'string' 
-      ? props.quickBuyValue 
-      : '0.01'
+    // 单链模式（props.chain 不是数组），直接返回字符串
+    if (!Array.isArray(props.chain)) {
+      return typeof props.quickBuyValue === 'string' 
+        ? props.quickBuyValue 
+        : '0.01'
+    }
+    
+    // 多链模式（即使是单个链），从对象中提取对应链的值
+    if (typeof props.quickBuyValue === 'object' && props.quickBuyValue !== null) {
+      const firstChain = chainList.value[0]
+      return (props.quickBuyValue as Record<BotChain, string>)?.[firstChain] || '0.01'
+    }
+    
+    return '0.01'
   },
   set(value) {
-    // 单链模式，直接 emit 字符串
-    emit('update:quickBuyValue', value)
+    // 单链模式（props.chain 不是数组），emit 字符串
+    if (!Array.isArray(props.chain)) {
+      emit('update:quickBuyValue', value)
+      return
+    }
+    
+    // 多链模式（即使是单个链），保持对象格式
+    const firstChain = chainList.value[0]
+    
+    // 基于当前 props 构建新对象，保留所有原有的链
+    let newValue: Record<BotChain, string>
+    
+    if (typeof props.quickBuyValue === 'object' && props.quickBuyValue !== null) {
+      // 保留所有原有的键
+      newValue = { ...(props.quickBuyValue as Record<BotChain, string>) }
+    } else {
+      // 如果 props 不是对象，创建新对象
+      newValue = {} as Record<BotChain, string>
+    }
+    
+    // 更新当前链的值
+    newValue[firstChain] = value
+    
+    emit('update:quickBuyValue', newValue)
   }
 })
 
-// 多链模式下，更新 chainAmountMap 并 emit 的辅助函数
+/**
+ * 多链模式下，更新 chainAmountMap 并 emit 的辅助函数
+ * （当前未使用，保留用于未来扩展）
+ */
 function updateChainAmountAndEmit(chain: BotChain, value: string) {
   const filtered = String(value || '').replace(/\-|[^\d.]/g, '')
   chainAmountMap.value[chain] = filtered
@@ -569,6 +694,10 @@ const customSelectedLocal = computed({
     emit('update:customSelected', value)
   }
 })
+
+/**
+ * 单链模式失焦处理：格式化数值
+ */
 function handleBlurBuyValue(value: string) {
   const decimals = 4
   const v = value
@@ -590,14 +719,20 @@ function setBtnRef(el: Element | ComponentPublicInstance | null) {
   }
 }
 
-// 处理金额输入框点击（多链模式下由 trigger="click" 自动处理）
+/**
+ * 处理金额输入框点击（多链模式下由 trigger="click" 自动处理）
+ * 打开弹框前同步最新数据
+ */
 function handleAmountInputClick() {
   if (chainList.value.length > 1) {
     syncFromProps()
   }
 }
 
-// 处理弹框关闭 - 统一 emit 所有链的值
+/**
+ * 处理多链金额弹框关闭
+ * 关键时机：在此处统一格式化并提交所有链的值
+ */
 function handleAmountDropdownHide() {
   if (chainList.value.length > 1) {
     // 格式化所有链的值
@@ -610,11 +745,16 @@ function handleAmountDropdownHide() {
   }
 }
 
-// 处理单个链的金额失焦（只格式化，不 emit）
+/**
+ * 处理单个链的金额失焦（只格式化，不 emit）
+ */
 function handleChainAmountBlur(chain: BotChain) {
   chainAmountMap.value[chain] = formatAmount(chainAmountMap.value[chain])
 }
 
+/**
+ * 显示预设按钮的 Hover 弹窗
+ */
 function showPopover(item: BotSettingKey) {
   selected.value = item
   currentBtnRef.value = btnRefs.value[item] || null
@@ -627,6 +767,9 @@ function showPopover(item: BotSettingKey) {
   })
 }
 
+/**
+ * 处理 Select 下拉框展开/收起
+ */
 function handleSelectVisibleChange(visible: boolean) {
   if (visible && customSelectedLocal.value) {
     selected.value = customSelectedLocal.value
@@ -650,6 +793,10 @@ function handleSelectVisibleChange(visible: boolean) {
   }
 }
 
+/**
+ * 为 Select 下拉选项附加 Hover 事件监听
+ * 实现鼠标悬停时显示该预设的详细信息
+ */
 function attachOptionHoverListeners() {
   // 查找 el-select 的下拉弹窗
   const popper = document.querySelector('.el-select-dropdown')
@@ -699,6 +846,10 @@ function handleOptionMouseLeave() {
   }, 200)
 }
 
+/**
+ * 处理 Select 组件 Hover 事件
+ * 显示当前选中项的详细信息弹窗
+ */
 function handleSelectHover() {
   // hover select 框时显示当前选中项的 popover
   const selectEl = selectRef.value?.$el
@@ -722,6 +873,9 @@ function handleSelectLeave() {
   }, 100)
 }
 
+/**
+ * 获取指定链的 Gas 价格
+ */
 function getGasPrice(chain: BotChain) {
   if (!isEvmChain(chain) || gasPriceObj[chain]) {
     return
@@ -734,7 +888,13 @@ function getGasPrice(chain: BotChain) {
   })
 }
 
-// 通用的 estimated gas 计算函数
+// ==================== Estimated Gas 计算 ====================
+/**
+ * 通用的 estimated gas 计算函数
+ * @param chain 链标识
+ * @param settingKey 预设键（s1/s2/s3）
+ * @returns 估算的 Gas 费用（美元）
+ */
 function calculateEstimatedGas(chain: BotChain, settingKey: BotSettingKey) {
   if (isEvmChain(chain) && botStore?.isSupportChains?.includes(chain)) {
     const botSettings = botSettingStore.botSettings?.[chain]?.buy?.[settingKey]
@@ -852,7 +1012,7 @@ function getOptionPriorityFee(chain: BotChain) {
   }
 }
 
-// 多链模式的伪输入框样式
+// 多链模式的伪输入框样式（只读，不可编辑）
 .quick-buy-display {
   width: 65px;
   cursor: pointer;

@@ -23,7 +23,7 @@
             :key="chain.id"
             :src="`${token_logo_url}chain/${chain.id}.png`"
             class="rd-50%"
-            :class="['rounded-50% mr--4px relative','z-'+(index+1), (index === selectedChain.length - 1) && 'mr-0']"
+            :class="['rounded-50% mr--4px relative','z-'+(index+1), (index === selectedChain.length) && 'mr-0']"
             width="12"
             lazy
             alt=""
