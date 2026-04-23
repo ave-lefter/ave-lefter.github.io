@@ -238,8 +238,10 @@ const tableView = ref({
 watch(filterTableList, (val) => {
   if (tableFilter.value.markerAddress) {
     klineFilterTxs.value = [...val]
+    klineMarkerAddress.value = tableFilter.value.markerAddress
   } else {
     klineFilterTxs.value = []
+    klineMarkerAddress.value = ''
   }
 }, { deep: false })
 const tableFilterVisible = ref({
@@ -1116,7 +1118,7 @@ onUnmounted(() => {
           <div
             v-html="$t('filterTip', {
             address: `<span class='color-#3F80F7'>&nbsp;${tableFilter.markerAddress.slice(0, 4)}...${tableFilter.markerAddress.slice(-4)}&nbsp;</span>`,
-            count: `<span>&nbsp;${filterTableList[0]?.count || 0}&nbsp;</span>`
+            count: `<span>&nbsp;${filterTableList.length}&nbsp;</span>`
           })" />
           <span class='color-#3F80F7 decoration-underline cursor-pointer ml-2px' @click.stop="resetMakerAddress">
             {{ $t('filterCancel') }}
