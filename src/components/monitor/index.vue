@@ -321,6 +321,9 @@ import quickSwapSetCustom2 from '~/components/quickSwap/quickSwapSetCustom2.vue'
 import type { AveTable } from '#components'
 import type { BotChain, BotSettingKey } from '~/utils/types'
 import dayjs from 'dayjs'
+import { formatNumber2, formatNumberS } from '@/utils/formatNumber'
+import { formatDate, formatTimeFromNow, getChainInfo, format4Str4 } from '@/utils'
+import { WSEventType } from '@/utils/constants'
 
 const { t } = useI18n()
 
@@ -343,7 +346,7 @@ const props = defineProps({
 const dataSource = ref<any[]>([])
 const loading = ref(false)
 const firstActivated = ref(true)
-const addButtonRef = ref<HTMLElement | null>(null)
+const addButtonRef = ref<any>(null)
 const audioButtonRef = ref<HTMLElement | null>(null)
 const toggleMc = ref(false)
 const addFavAddressPopRef = ref<any>(null)
@@ -519,12 +522,6 @@ const existingIdsCache = computed(() => {
  * ✅ 优化4：JSON.parse 缓存
  * 限制缓存大小防止内存泄漏
  */
-interface ParsedMsgCache {
-  id: string
-  data: any
-  timestamp: number
-}
-
 const parsedMsgCache = new Map<string, { data: any; timestamp: number }>()
 const PARSED_CACHE_MAX_SIZE = 500
 const PARSED_CACHE_TTL = 5 * 60 * 1000 // 5分钟过期
@@ -551,7 +548,9 @@ function getCachedParsedMsg(id: string, msgContent: string): any {
     // 限制缓存大小
     if (parsedMsgCache.size > PARSED_CACHE_MAX_SIZE) {
       const oldestKey = parsedMsgCache.keys().next().value
-      parsedMsgCache.delete(oldestKey)
+      if (oldestKey) {
+        parsedMsgCache.delete(oldestKey)
+      }
     }
     
     return parsed
@@ -588,14 +587,16 @@ function getCachedBigNumberCalc(item: any, isBuy: boolean): BigNumberCalcResult 
     const product = bnAmount.times(bnPrice)
     
     const result: BigNumberCalcResult = {
-      total: '$' + formatNumber2(product.toFixed(0) || 0, 2, 4, 4),
-      totalNumber: product.toFixed(0) || 0
+      total: '$' + formatNumber2(product.toFixed(0) || '0', 2, 4, 4),
+      totalNumber: product.toFixed(0) || '0'
     }
     
     // 限制缓存大小
     if (bigNumberCalcCache.size > BIG_NUMBER_CACHE_MAX_SIZE) {
       const oldestKey = bigNumberCalcCache.keys().next().value
-      bigNumberCalcCache.delete(oldestKey)
+      if (oldestKey) {
+        bigNumberCalcCache.delete(oldestKey)
+      }
     }
     
     bigNumberCalcCache.set(cacheKey, result)
@@ -989,7 +990,6 @@ watch(() => botStore.evmAddress, (val) => {
   }
 })
 </script>
-
 <style scoped lang="scss">
 .m-table {
   :deep() .el-table.el-table-v2 {
