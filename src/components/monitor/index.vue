@@ -1,6 +1,6 @@
 <template>
-  <div class="w-monitor bg-[--secondary-bg] w-100% h-100% pl-12px pr-6px relative overflow-hidden"
-    :class="{ 'pr-10px!': isLeftFixed, 'pl-10px!': isRightFixed }">
+  <div class="w-monitor bg-[--secondary-bg] w-100% h-100% relative overflow-hidden">
+    <!-- :class="{ 'pr-10px!': isLeftFixed, 'pl-10px!': isRightFixed }" -->
     <!-- <div class="w-100% h-40px absolute pointer-events-auto z-999 drag-handle left-0"/> -->
     <Icon name="custom:drag2" class="absolute top-3px left-50% ml--6px text-6px bg-[--dialog-list-hover] drag-handle z-10 cursor-move pointer-events-auto" />
     <el-tabs v-model="activeName" style="" class="m-tabs" @tab-change="handleClick">
@@ -1005,6 +1005,12 @@ watch(() => botStore.evmAddress, (val) => {
     /* .el-table-v2__table{
       --el-table-border:1px solid;
     } */
+    .el-table-v2__header-cell{
+      padding: 0 6px 0 12px;
+    }
+    .el-table-v2__row-cell{
+      padding: 0 6px 0 12px;
+    }
     .el-virtual-scrollbar {
       display: none;
     }
@@ -1013,6 +1019,7 @@ watch(() => botStore.evmAddress, (val) => {
 
 .m-tabs {
   :deep() .el-tabs__header {
+    padding: 0 12px;
     --el-border-color-light: var(--dialog-list-hover);
     --el-color-primary: var(--d-E0E0E0-l-333);
     --el-text-color-primary: var(--third-text);
@@ -1049,7 +1056,10 @@ watch(() => botStore.evmAddress, (val) => {
     width: 100%;
 
     .el-tabs__item {
-      padding: 0 12px;
+      &:not(:last-child) {
+        padding: 0;
+        padding-right: 16px;
+      }
 
       &:nth-child(2),
       &:nth-child(3),

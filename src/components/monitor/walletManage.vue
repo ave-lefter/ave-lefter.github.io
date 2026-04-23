@@ -1,6 +1,6 @@
 <template>
   <div class="w-walletManage">
-    <div class="flex flex-between items-center gap-8px h-48px">
+    <div class="flex flex-between items-center gap-8px h-48px px-12px">
       <div ref="selectWrapperRef" class="wallet-manage-select-wrapper" :style="{ width: selectWrapperWidth + 'px' }">
         <el-select v-model="selectGroupId" style="--el-fill-color-blank:var(--dialog-list-hover); width: 100%;" class="[&&]:[--el-text-color-regular:--d-E0E0E0-l-333]" :persistent="false" :mode="mode" @click.stop @change="(val) => filterGroup(val)" size="small">
           <el-option :key="0" :value="0" :label="$t('defaultGroup')" class="[&&]:h-20px [&&]:lh-20px [&&]:text-12px"/>
@@ -733,9 +733,18 @@ function getAmountU(row: any) {
   .el-virtual-scrollbar{
     display: none;
   }
+  //  .el-table-v2__header-cell{
+  //     padding: 0 6px 0 12px;
+  //   }
+    // .el-table-v2__row-cell{
+    //   padding: 0 6px 0 12px;
+    // }
   .el-table-v2__header-cell,.el-table-v2__row-cell{
-    &:nth-child(1),&:last-child{
-      padding: 0px;
+    &:nth-child(1){
+      padding-left: 12px;
+    }
+    &:last-child{
+      padding-right: 6px;
     }
   }
 }
