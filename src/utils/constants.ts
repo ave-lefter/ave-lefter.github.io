@@ -141,6 +141,8 @@ export const BusEventType = {
 export const ProvideType = {
   HOT_TOKENS: 'hot-tokens',
   KLINE_DATE_FILTER: 'kline-date-filter',
+  KLINE_MARKER_ADDRESS: 'kline-marker-address',
+  KLINE_FILTER_TXS: 'kline-filter-txs',
 }
 export const SupportFullDataChain = ['solana', 'bsc','eth','base','xlayer','fsc']
 export const SupportMonitorChain = ['solana', 'bsc', 'xlayer','eth']
