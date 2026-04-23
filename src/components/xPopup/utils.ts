@@ -21,7 +21,7 @@ export function useXPopup() {
       getXData(tokenId, type)
     }
     const targetEl = (e.target as HTMLElement) || null
-    const containerEl = targetEl?.parentElement?.parentElement?.parentElement || targetEl?.parentElement?.parentElement || targetEl?.parentElement || undefined
+    const containerEl = targetEl?.closest('.el-table') || targetEl?.parentElement?.parentElement?.parentElement || targetEl?.parentElement?.parentElement || targetEl?.parentElement || undefined
     $tooltip.show({
       content: {
         is: XIndex,
