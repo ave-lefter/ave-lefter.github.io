@@ -17,7 +17,7 @@ const globalStore = useGlobalStore()
 const configStore = useConfigStore()
 const botSettingStore = useBotSettingStore()
 const localeStore = useLocaleStore()
-const chainOptions = shallowRef(['solana', 'bsc'])
+const chainOptions = shallowRef(['solana', 'bsc', 'eth'])
 function setActiveChain(chain: string) {
   signalStore.activeChain = chain
   resetAndGet()
