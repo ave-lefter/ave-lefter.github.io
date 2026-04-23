@@ -143,7 +143,7 @@ export const ProvideType = {
   KLINE_DATE_FILTER: 'kline-date-filter',
 }
 export const SupportFullDataChain = ['solana', 'bsc','eth','base','xlayer','fsc']
-export const SupportMonitorChain = ['solana', 'bsc', 'xlayer','eth']
+export const SupportMonitorChain = ['solana', 'bsc', 'eth', 'base', 'xlayer']
 
 export const SupportTokenKlineChains = ['juchain', 'arbitrum', 'optimism']
 export const SupportTokenKlineLaunchpad = [
