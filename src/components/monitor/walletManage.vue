@@ -492,7 +492,7 @@ const handleSortClick = (
 }
 
 // 余额排序
-const handleBalanceSort = handleSort('main_token_balance_amount', balanceSort, lastTxSort)
+const handleBalanceSort = handleSort('main_token_balance', balanceSort, lastTxSort)
 const handleBalanceSortClick = handleSortClick(balanceSort, handleBalanceSort)
 
 // 最后交易时间排序
