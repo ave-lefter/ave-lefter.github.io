@@ -312,8 +312,8 @@
 
 <script setup lang="ts">
 import WalletManage from './walletManage.vue'
-import { throttle } from 'lodash-es'
-import { useStorage,useDebounceFn } from '@vueuse/core'
+import { throttle, debounce } from 'lodash-es'
+import { useStorage, useDebounceFn } from '@vueuse/core'
 import BigNumber from 'bignumber.js'
 import { getHistoryMonitor, batchPauseMonitor, addAttention2, getFavCount as _getFavCount } from '~/api/attention'
 import FilterType from './components/filterType.vue'
@@ -321,12 +321,13 @@ import quickSwapSetCustom2 from '~/components/quickSwap/quickSwapSetCustom2.vue'
 import type { AveTable } from '#components'
 import type { BotChain, BotSettingKey } from '~/utils/types'
 import dayjs from 'dayjs'
+
 const { t } = useI18n()
 
-const { hasRing, monitorList2: dataSourceCache, visible, activeName, txType, minVol,isLeftFixed, isRightFixed } = storeToRefs(useMonitorStore())
-
-const { updateNum2,updateNum3,updateNum13,currentAddress } = storeToRefs(useFollowStore())
+const { hasRing, monitorList2: dataSourceCache, visible, activeName, txType, minVol, isLeftFixed, isRightFixed } = storeToRefs(useMonitorStore())
+const { updateNum2, updateNum3, updateNum13, currentAddress } = storeToRefs(useFollowStore())
 const { isDark, audioSettings } = storeToRefs(useGlobalStore())
+
 const props = defineProps({
   scrollHeight: {
     type: Number,
@@ -338,39 +339,40 @@ const props = defineProps({
   }
 })
 
+// ==================== 响应式状态定义 ====================
 const dataSource = ref<any[]>([])
-// const dataSourceCache = monitorList2
 const loading = ref(false)
+const firstActivated = ref(true)
+const addButtonRef = ref<HTMLElement | null>(null)
+const audioButtonRef = ref<HTMLElement | null>(null)
+const toggleMc = ref(false)
+const addFavAddressPopRef = ref<any>(null)
+const isHoverTable = ref(false)
+const fav_count = ref(0)
+const monitor_count = ref(0)
+
 const botStore = useBotStore()
 const themeStore = useThemeStore()
 const wsStore = useWSStore()
 const aveTableRef = ref<InstanceType<typeof AveTable> | null>(null)
-const firstActivated = ref(true)
-// const txType = ref([0,1])
-const addButtonRef = ref()
 
-const audioButtonRef = ref()
-
-const toggleMc = ref(false)
-const addFavAddressPopRef = ref()
-const isHoverTable = ref(false)
-const fav_count = ref(0)
-const monitor_count = ref(0)
 import { SupportMonitorChain } from '@/utils/constants'
 
-const selectedChain = useStorage('monitorSelectedChain', [{
-  label: 'SOL',
-  value: 'solana',
-  id: 'solana'
-}, { label: 'BSC', value: '56', id: 'bsc' },{
-    label: "ETH",
-    value: "1",
-    id: "eth"
-}])
+// ==================== 链选择管理 ====================
+interface ChainOption {
+  label: string
+  value: string
+  id: string
+}
 
-// ... existing code ...
-const selectedChainVals = computed(() => {
-  return selectedChain.value.map(i => getChainInfo(i.value, true)?.net_name)
+const selectedChain = useStorage<ChainOption[]>('monitorSelectedChain', [
+  { label: 'SOL', value: 'solana', id: 'solana' },
+  { label: 'BSC', value: '56', id: 'bsc' },
+  { label: 'ETH', value: '1', id: 'eth' }
+])
+
+const selectedChainVals = computed<BotChain[]>(() => {
+  return selectedChain.value.map(i => getChainInfo(i.value, true)?.net_name).filter(Boolean) as BotChain[]
 })
 
 const selectedChainStr = computed(() => {
@@ -378,22 +380,18 @@ const selectedChainStr = computed(() => {
   
   if (chains.length === 0) return 'AllChains'
   
-  // 获取当前选中的链的 id 列表
   const selectedChainIds = selectedChain.value.map(i => i.id)
   
-  // 检查是否所有支持的监控链都被选中
   const isAllSelected = SupportMonitorChain.length > 0 && 
                        selectedChainIds.length >= SupportMonitorChain.length &&
                        SupportMonitorChain.every(chain => selectedChainIds.includes(chain))
   
-  console.log('selectedChainStr', chains, selectedChainIds, isAllSelected)
   return isAllSelected ? 'AllChains' : chains.join(',')
 })
-// const activeName.value=ref(0)
-// 使用对象存储多个链的买入金额，key 为 SupportMonitorChain
+
+// ==================== 快速买入金额管理 ====================
 type MonitorChainType = typeof SupportMonitorChain[number]
 
-// 生成默认值对象，所有支持的链默认为 '0.01'
 const getDefaultQuickBuyValueMap = (): Record<MonitorChainType, string> => {
   const defaultMap = {} as Record<MonitorChainType, string>
   SupportMonitorChain.forEach(chain => {
@@ -402,7 +400,6 @@ const getDefaultQuickBuyValueMap = (): Record<MonitorChainType, string> => {
   return defaultMap
 }
 
-// 初始化 quickBuyValueMap，合并缓存值和默认值
 const initQuickBuyValueMap = (): Record<MonitorChainType, string> => {
   const cached = localStorage.getItem('quickBuyValueMap')
   const defaultMap = getDefaultQuickBuyValueMap()
@@ -410,9 +407,7 @@ const initQuickBuyValueMap = (): Record<MonitorChainType, string> => {
   if (cached) {
     try {
       const parsed = JSON.parse(cached)
-      // 检查是否是有效的对象（排除字符串被错误解析的情况）
       if (typeof parsed === 'object' && parsed !== null && !Array.isArray(parsed)) {
-        // 合并缓存值和默认值，确保所有链都有值
         return { ...defaultMap, ...parsed }
       }
     } catch (e) {
@@ -420,335 +415,255 @@ const initQuickBuyValueMap = (): Record<MonitorChainType, string> => {
     }
   }
   
-  // 如果是无效数据或没有缓存，返回默认值并写入 localStorage
   localStorage.setItem('quickBuyValueMap', JSON.stringify(defaultMap))
   return defaultMap
 }
 
 const quickBuyValueMap = ref<Record<MonitorChainType, string>>(initQuickBuyValueMap())
 
-// 监听变化并同步到 localStorage
+// ✅ 优化1：使用防抖减少 localStorage 写入频率（从每次变为500ms）
+const debouncedSaveQuickBuyValue = debounce((value: Record<MonitorChainType, string>) => {
+  try {
+    localStorage.setItem('quickBuyValueMap', JSON.stringify(value))
+  } catch (e) {
+    console.error('Failed to save quickBuyValueMap', e)
+  }
+}, 500)
+
 watch(
   quickBuyValueMap,
   (newValue) => {
-    localStorage.setItem('quickBuyValueMap', JSON.stringify(newValue))
+    debouncedSaveQuickBuyValue(newValue)
   },
   { deep: true }
 )
 
-// 根据选中的链生成唯一的存储key
-const getChainStorageKey = (chains: BotChain[]) => {
+// ==================== 预设值管理 ====================
+const getChainStorageKey = (chains: BotChain[]): string => {
   const chainStr = chains.sort().join('_')
   return `monitorSwapSetSelected_${chainStr}`
 }
 
-// 使用 ref 存储预设值
 const swapSetSelected = ref<BotSettingKey>('s1')
 
-// 监听链变化，加载对应的预设值
 watch(selectedChainVals, (newChains) => {
-  const key = getChainStorageKey(newChains)
-  const saved = localStorage.getItem(key)
-  swapSetSelected.value = (saved as BotSettingKey) || 's1'
+  try {
+    const key = getChainStorageKey(newChains)
+    const saved = localStorage.getItem(key)
+    swapSetSelected.value = (saved as BotSettingKey) || 's1'
+  } catch (e) {
+    console.error('Failed to load swap preset', e)
+  }
 }, { immediate: true })
 
-// 监听预设值变化，保存到对应的key
 watch(swapSetSelected, (newValue) => {
-  const key = getChainStorageKey(selectedChainVals.value)
-  localStorage.setItem(key, newValue)
-})
-
-const txTypeList = computed(() => {
-  return [
-    // { label: t('all'), value: 0 },
-    { label: t('onlyBuy'), value: 0 },
-    { label: t('onlySell'), value: 1 },
-  ]
-})
-const walletManageProps = computed(() => {
-  return {
-    scrollHeight: props.scrollHeight,
+  try {
+    const key = getChainStorageKey(selectedChainVals.value)
+    localStorage.setItem(key, newValue)
+  } catch (e) {
+    console.error('Failed to save swap preset', e)
   }
 })
+
+// ==================== 计算属性 ====================
+const txTypeList = computed(() => [
+  { label: t('onlyBuy'), value: 0 },
+  { label: t('onlySell'), value: 1 },
+])
+
+const walletManageProps = computed(() => ({
+  scrollHeight: props.scrollHeight,
+}))
+
+// ✅ 优化2：缓存过滤结果，避免重复遍历
 const filterDataSource = computed(() => {
-  // return dataSource.value
-  return minVol.value?dataSource.value.filter((i: any) => {
-    return i?._main_Token?.totalNumber && (Number(i?._main_Token?.totalNumber)>=minVol.value)
-  }) : dataSource.value
-})
-
-onMounted(async () => {
-  // console.log('monitor mounted')
-  nextTick(() => {
-    // const el = document.querySelector('.m-tabs .el-tabs__header.is-top')
-    // if (el) el.className = 'el-tabs__header is-top drag-handle'
-    // console.log('monitor visible', el)
+  if (!minVol.value) return dataSource.value
+  
+  return dataSource.value.filter((item: any) => {
+    return item?._main_Token?.totalNumber && (Number(item._main_Token.totalNumber) >= minVol.value)
   })
-  init()
-
-
-})
-useVisibilityChange(() => {
-  botStore.bot_subscribe()
-  if (visible.value && (activeName.value === 0)) {
-    updateDateSource()
-  }
 })
 
-// 抽取通用的监控刷新逻辑
-const refreshMonitorList = useDebounceFn(() => {
-  const monitor_type: Array<'sell' | 'buy'> = []
-  if (txType.value.includes(0)) {
-    monitor_type.push('buy')
-  }
-  if (txType.value.includes(1)) {
-    monitor_type.push('sell')
-  }
-  batchPauseMonitor(monitor_type, selectedChain.value.map(i => i.id).join(',')).then(() => {
-    getMonitorList()
-  })
-}, 500)
-
-watch(() => txType.value, () => {
-  refreshMonitorList()
-})
-
-watch(() => selectedChain.value, (val, oldVal) => {
-  if (JSON.stringify(val) === JSON.stringify(oldVal)) return
-  refreshMonitorList()
-})
-
-watch(() => visible.value, (val) => {
-  if (!val) return
-  if (activeName.value === 0) {
-    updateDateSource()
-    nextTick(() => {
-      if (!firstActivated.value && aveTableRef.value) {
-        aveTableRef.value.scrollToTop(0)
-      }
-      firstActivated.value = false
-    })
-  }
-})
-
-function handleClick(name: number | string) {
-  if (name === 1) {
-    updateDateSource()
-  }
-}
-function handleConfirmAdd(formData?: any, resetFields?: () => void, stopLoading?: () => void) {
-  addAttention2({ address: botStore.evmAddress, user_chain: formData?.user_chain?.id, user_address: formData?.address, remark: formData?.remark, group: formData?.group_id, is_monitored: 0 }).then(() => {
-    // init2()
-    resetFields?.()
-    stopLoading?.()
-    addFavAddressPopRef.value?.close?.()
-    updateNum3.value++
-  }).catch((err) => {
-    console.error(err)
-  })
-}
 const columns = computed(() => {
   return props.isLarge ? [
-    {
-      title: t('wallet'),
-      dataKey: 'wallet',
-      key: 'wallet',
-      align: 'left',
-      minWidth: 125,
-    },
-    {
-      title: t('type'),
-      dataKey: 'type',
-      key: 'type',
-      minWidth: 110,
-      align: 'right',
-    },
-    {
-      title: t('value'),
-      dataKey: 'amount',
-      key: 'amount',
-      align: 'right',
-      minWidth: 80,
-    },
-    {
-      title: t('token'),
-      dataKey: 'symbol',
-      key: 'symbol',
-      align: 'right',
-      minWidth: 150,
-    },
-    {
-      title: t('mcap'),
-      dataKey: 'mc',
-      key: 'mc',
-      align: 'right',
-      minWidth: 70,
-    },
-    {
-      title: t('time'),
-      dataKey: 'time',
-      key: 'time',
-      align: 'right',
-      minWidth: 40,
-    },
-    {
-      title: '',
-      dataKey: 'operate',
-      key: 'operate',
-      align: 'right',
-      minWidth: 100,
-    }
+    { title: t('wallet'), dataKey: 'wallet', key: 'wallet', align: 'left', minWidth: 125 },
+    { title: t('type'), dataKey: 'type', key: 'type', minWidth: 110, align: 'right' },
+    { title: t('value'), dataKey: 'amount', key: 'amount', align: 'right', minWidth: 80 },
+    { title: t('token'), dataKey: 'symbol', key: 'symbol', align: 'right', minWidth: 150 },
+    { title: t('mcap'), dataKey: 'mc', key: 'mc', align: 'right', minWidth: 70 },
+    { title: t('time'), dataKey: 'time', key: 'time', align: 'right', minWidth: 40 },
+    { title: '', dataKey: 'operate', key: 'operate', align: 'right', minWidth: 100 }
   ] : [
-    {
-      title: t('wallet'),
-      dataKey: 'wallet',
-      key: 'wallet',
-      align: 'left',
-      minWidth: 240,
-    },
+    { title: t('wallet'), dataKey: 'wallet', key: 'wallet', align: 'left', minWidth: 240 }
   ]
 })
-watch(() => wsStore.wsResult[WSEventType.MONITOR], (val) => {
-  if(loading.value) return 
-  mergeDataSource(val)
-  if (visible.value && (activeName.value === 0)&&!isHoverTable.value) {
-    updateDateSource()
-  }
-})
 
-watch(() => isHoverTable.value, (val) => {
-  if (val) {
-    nextTick(() => {
-      updateDateSource()
-    })
-  }
-})
+// ==================== 性能优化：缓存机制 ====================
 
-watch(() => updateNum2.value+updateNum3.value + updateNum13.value, (val) => {
-  if (val) {
-    if(!monitor_count.value){
-      getMonitorList()
+/**
+ * ✅ 优化3：使用 Set 替代 O(n²) 去重
+ * 将时间复杂度从 O(n*m) 降低到 O(n+m)
+ */
+const existingIdsCache = computed(() => {
+  const ids = new Set<string>()
+  const data = dataSourceCache.value
+  for (let i = 0; i < data.length; i++) {
+    if (data[i]?.id) {
+      ids.add(data[i].id)
     }
-    getFavCount()
   }
+  return ids
 })
-// onMounted(() => {
 
-// })
+/**
+ * ✅ 优化4：JSON.parse 缓存
+ * 限制缓存大小防止内存泄漏
+ */
+interface ParsedMsgCache {
+  id: string
+  data: any
+  timestamp: number
+}
 
-const mergeDataSource = (msg: any) => {
-  if (msg?.length > 0) {
-    const data = dataSourceCache?.value || []
-    const wsData = msg?.filter?.((i: { id: any }) => {
-      return !data.some(j => j.id === i.id)
-    })?.map?.((i: any) => {
-      return {
-        ...i,
-        ...formateTxInfo(i)
-      }
-    }) || []
-    const list = [...wsData, ...data]
-    if (list.length > 200) {
-      list?.splice?.(100)
+const parsedMsgCache = new Map<string, { data: any; timestamp: number }>()
+const PARSED_CACHE_MAX_SIZE = 500
+const PARSED_CACHE_TTL = 5 * 60 * 1000 // 5分钟过期
+
+function getCachedParsedMsg(id: string, msgContent: string): any {
+  const cached = parsedMsgCache.get(id)
+  
+  if (cached) {
+    // 检查是否过期
+    if (Date.now() - cached.timestamp < PARSED_CACHE_TTL) {
+      return cached.data
+    } else {
+      // 过期则删除
+      parsedMsgCache.delete(id)
     }
-    dataSourceCache.value.splice(0, dataSourceCache.value?.length, ...list)
-    // console.log('dataSourceCache', dataSourceCache.value?.length)
+  }
+  
+  try {
+    const parsed = JSON.parse(msgContent)
+    
+    // 设置缓存
+    parsedMsgCache.set(id, { data: parsed, timestamp: Date.now() })
+    
+    // 限制缓存大小
+    if (parsedMsgCache.size > PARSED_CACHE_MAX_SIZE) {
+      const oldestKey = parsedMsgCache.keys().next().value
+      parsedMsgCache.delete(oldestKey)
+    }
+    
+    return parsed
+  } catch (e) {
+    console.error('Failed to parse msg_content:', e)
+    return null
   }
 }
 
-const updateDateSource = throttle(function () {
-  if (!visible.value || (activeName.value !== 0)) return
-  dataSource.value.splice(0, dataSource.value?.length, ...dataSourceCache.value)
+/**
+ * ✅ 优化5：BigNumber 计算结果缓存
+ */
+interface BigNumberCalcResult {
+  total: string
+  totalNumber: string
+}
 
-  // dataSource.value=dataSource.value.map(i=>{
-  //   console.log('i', i)
-  //   return {
-  //     time:1758044700,
-  //     ...i
-  //   }
-  // })
-}, 500)
+const bigNumberCalcCache = new Map<string, BigNumberCalcResult>()
+const BIG_NUMBER_CACHE_MAX_SIZE = 300
 
-// watch(()=>props.data, (val) => {
-// })
-
-watch(() => botStore.evmAddress, (val) => {
-  if (!val) {
-    dataSource.value = []
-  } else {
-    init()
+function getCachedBigNumberCalc(item: any, isBuy: boolean): BigNumberCalcResult {
+  const cacheKey = `${item.id}_${isBuy ? 'buy' : 'sell'}`
+  const cached = bigNumberCalcCache.get(cacheKey)
+  
+  if (cached) {
+    return cached
   }
-})
-function init() {
-  getMonitorList()
-  getFavCount()
-}
-function getMonitorList() {
-  if (!botStore.evmAddress) return
-  loading.value = true
-  let filtered_type = ''
-  if (txType.value.length !== txTypeList.value.length) {
-    filtered_type = txType.value.join(',')
+  
+  try {
+    const amount = item[isBuy ? 'from_amount' : 'to_amount'] || 0
+    const price = item[isBuy ? 'from_price_usd' : 'to_price_usd'] || 0
+    const bnAmount = new BigNumber(amount)
+    const bnPrice = new BigNumber(price)
+    const product = bnAmount.times(bnPrice)
+    
+    const result: BigNumberCalcResult = {
+      total: '$' + formatNumber2(product.toFixed(0) || 0, 2, 4, 4),
+      totalNumber: product.toFixed(0) || 0
+    }
+    
+    // 限制缓存大小
+    if (bigNumberCalcCache.size > BIG_NUMBER_CACHE_MAX_SIZE) {
+      const oldestKey = bigNumberCalcCache.keys().next().value
+      bigNumberCalcCache.delete(oldestKey)
+    }
+    
+    bigNumberCalcCache.set(cacheKey, result)
+    return result
+  } catch (e) {
+    console.error('BigNumber calculation error:', e)
+    return { total: '$0', totalNumber: '0' }
   }
-  getHistoryMonitor({
-     chain: selectedChain.value.map(i => i.id).join(','),
-     amt_u_min: String(minVol.value) || '',
-     filtered_type }).then((res) => {
-    let result = res || res?.data || []
-    const list: any[] = []
-    const listObj: Record<string, boolean> = {}
-    result = Array.isArray(result) ? result : []
-    result?.forEach?.((i: { msg_content: string }) => {
-      const j = JSON.parse(i.msg_content)
-      if (!listObj[j.id]) {
-        list.push({
-          ...j,
-          ...formateTxInfo(j)
-        })
-        listObj[j.id] = true
-      }
-    })
-    dataSourceCache.value = list.filter(i => {
-      return txType.value.includes(i.tx_type)
-    })
-    updateDateSource()
-  }).catch((err) => {
-    console.error(err)
-  }).finally(() => {
-    loading.value = false
-  })
-
 }
 
-function getFavCount() {
-  _getFavCount({
-    self_address:currentAddress.value
-  }).then((res) => {
-    fav_count.value = res?.fav_count || 0
-    monitor_count.value = res?.monitor_count
- || 0
-  })
-}
-function getIsBuy(item: { position_type?: string | number; tx_type?: string | number }) {
-  // console.log('item', item)
+// ==================== 数据处理函数 ====================
+
+function getIsBuy(item: { position_type?: string | number; tx_type?: string | number }): boolean {
   if (item.position_type !== undefined) {
     return item.position_type === 0 || item.position_type === 1
-  } else {
-    return item.tx_type === 0
   }
-}
-function getTxType(item: { position_type?: string | number; tx_type?: string | number }) {
-  if (item.position_type !== undefined) {
-    const types = [t('createPosition'), t('addPosition'), t('reducePosition'), t('closePosition')]
-    return types?.[Number(item?.position_type)] || ''
-  } else {
-    const types = [t('buy'), t('sell')]
-    return types?.[Number(item.tx_type)] || ''
-  }
+  return item.tx_type === 0
 }
 
-const formateTxInfo = function (item: { [x: string]: any; maker_address?: any; wallet_address?: any; maker_alias?: any; maker_logo?: any; maker_tags?: any; pnl_usd?: any; pnl_ratio?: any; target_mcap?: any; position_type?: string | number | undefined; tx_type?: string | number }) {
-  // const {
+function getTxType(item: { position_type?: string | number; tx_type?: string | number }): string {
+  if (item.position_type !== undefined) {
+    const types = [t('createPosition'), t('addPosition'), t('reducePosition'), t('closePosition')]
+    return types?.[Number(item.position_type)] || ''
+  }
+  const types = [t('buy'), t('sell')]
+  return types?.[Number(item.tx_type)] || ''
+}
+
+/**
+ * ✅ 优化6：格式化交易信息（使用缓存）
+ */
+interface FormattedTxInfo {
+  _marker: {
+    maker_address: string
+    maker_alias?: string
+    maker_logo?: string
+    maker_tags?: any[]
+    isBuy: boolean
+  }
+  _profit: string | number
+  _profit_ratio: string | number
+  _mc: string
+  _type: string
+  _rise: boolean
+  _main_Token: {
+    amount: string
+    price: string
+    symbol: string
+    total: string
+    totalNumber: string
+    address: string
+    tags: any[]
+    signals: any[]
+  }
+  _target_Token: {
+    amount: string
+    price: string
+    total: string
+    symbol: string
+    address: string
+    tags: any[]
+    signals: any[]
+    logo_url?: string
+  }
+  [key: string]: any
+}
+
+ // const {
   // from_address = '',
   // from_symbol = '',
   // from_logo = '',
@@ -778,8 +693,13 @@ const formateTxInfo = function (item: { [x: string]: any; maker_address?: any; w
   // position_usd = '', // 当前持仓金额,
   // target_mcap='', // 主币市值，
   // } = item
+function formateTxInfo(item: any): FormattedTxInfo {
   const isBuy = getIsBuy(item)
-  const data: any = {
+  
+  // 使用缓存的 BigNumber 计算结果
+  const calcResult = getCachedBigNumberCalc(item, isBuy)
+  
+  return {
     ...item,
     _marker: {
       maker_address: item?.maker_address || item?.wallet_address,
@@ -789,55 +709,285 @@ const formateTxInfo = function (item: { [x: string]: any; maker_address?: any; w
       isBuy
     },
     _profit: item?.pnl_usd == '--' ? '--' : item?.pnl_usd,
-    // _profit: item?.pnl_usd == '--' ? '--' : '$' + formatNumber2(Math.abs(item?.pnl_usd || 0) || 0, 2),
     _profit_ratio: item?.pnl_usd == '--' ? '--' : item?.pnl_ratio,
-    // _profit_ratio: item?.pnl_usd == '--' ? '--' : formatNumber2((item?.pnl_ratio || 0) * 100 || 0, 2, 4, 4),
-    _mc: Number(item?.target_mcap) ? ('$' + formatNumberS(item?.target_mcap || 0, {
-      decimals: 0,
-      limit: 3
-    })) : '--',
+    _mc: Number(item?.target_mcap) 
+      ? ('$' + formatNumberS(item?.target_mcap || 0, { decimals: 0, limit: 3 }))
+      : '--',
     _type: getTxType(item),
-    _rise: item?.pnl_usd == '--' ? true : item?.pnl_usd >= 0
+    _rise: item?.pnl_usd == '--' ? true : item?.pnl_usd >= 0,
+    _main_Token: {
+      amount: formatNumber2(item[isBuy ? 'from_amount' : 'to_amount'] || 0, 1),
+      price: '$' + formatNumber2(item[isBuy ? 'from_price_usd' : 'to_price_usd'] || 0),
+      symbol: item[isBuy ? 'from_symbol' : 'to_symbol'],
+      total: calcResult.total,
+      totalNumber: calcResult.totalNumber,
+      address: item[isBuy ? 'from_address' : 'to_address'],
+      tags: item[isBuy ? 'from_tags' : 'to_tags'],
+      signals: item[isBuy ? 'from_signals' : 'to_signals'],
+    },
+    _target_Token: {
+      amount: formatNumber2(item[!isBuy ? 'from_amount' : 'to_amount'] || 0, 1),
+      price: '$' + formatNumber2(item[!isBuy ? 'from_price_usd' : 'to_price_usd'] || 0),
+      total: '',
+      symbol: item[!isBuy ? 'from_symbol' : 'to_symbol'],
+      address: item[!isBuy ? 'from_address' : 'to_address'],
+      tags: item[!isBuy ? 'from_tags' : 'to_tags'],
+      signals: item[!isBuy ? 'from_signals' : 'to_signals'],
+      logo_url: item[!isBuy ? 'from_logo' : 'to_logo'],
+    }
   }
-  data['_main_Token'] = {
-    amount: formatNumber2(item[isBuy ? 'from_amount' : 'to_amount'] || 0, 1),
-    price: '$' + formatNumber2(item[isBuy ? 'from_price_usd' : 'to_price_usd'] || 0),
-    symbol: item[isBuy ? 'from_symbol' : 'to_symbol'],
-    total: '$' + formatNumber2(new BigNumber(item[isBuy ? 'from_amount' : 'to_amount'] || 0).times(item[isBuy ? 'from_price_usd' : 'to_price_usd'] || 0).toFixed(0) || 0, 2, 4, 4),
-    totalNumber: new BigNumber(item[isBuy ? 'from_amount' : 'to_amount'] || 0).times(item[isBuy ? 'from_price_usd' : 'to_price_usd'] || 0).toFixed(0) || 0,
-    address: item[isBuy ? 'from_address' : 'to_address'],
-    tags: item[isBuy ? 'from_tags' : 'to_tags'],
-    signals: item[isBuy ? 'from_signals' : 'to_signals'],
-  }
-  data['_target_Token'] = {
-    amount: formatNumber2(item[!isBuy ? 'from_amount' : 'to_amount'] || 0, 1),
-    price: '$' + formatNumber2(item[!isBuy ? 'from_price_usd' : 'to_price_usd'] || 0),
-    total: '',
-    symbol: item[!isBuy ? 'from_symbol' : 'to_symbol'],
-    address: item[!isBuy ? 'from_address' : 'to_address'],
-    tags: item[!isBuy ? 'from_tags' : 'to_tags'],
-    signals: item[!isBuy ? 'from_signals' : 'to_signals'],
-    logo_url: item[!isBuy ? 'from_logo' : 'to_logo'],
-  }
-  return data
 }
-function jumpBalance(row: { chain: string; _marker: { maker_address: any }; wallet_address: any }, e: { stopPropagation: () => void }) {
-  if (e) {
-    e.stopPropagation()
+
+/**
+ * ✅ 优化7：WebSocket 数据合并（使用 Set 去重）
+ * 性能提升：O(n*m) → O(n+m)
+ */
+function mergeDataSource(msg: any[]): void {
+  if (!msg?.length) return
+  
+  const existingIds = existingIdsCache.value
+  const newData: any[] = []
+  
+  // 单次遍历，O(n) 复杂度
+  for (let i = 0; i < msg.length; i++) {
+    const item = msg[i]
+    if (!existingIds.has(item.id)) {
+      newData.push({
+        ...item,
+        ...formateTxInfo(item)
+      })
+    }
   }
+  
+  if (!newData.length) return
+  
+  // 合并并限制数据量
+  const combined = [...newData, ...dataSourceCache.value]
+  if (combined.length > 200) {
+    combined.length = 100  // 直接截断，比 splice 快
+  }
+  
+  // 直接赋值，避免 splice 的性能开销
+  dataSourceCache.value = combined
+}
+
+/**
+ * ✅ 优化8：使用 requestAnimationFrame 批量更新视图
+ * 减少不必要的 DOM 操作
+ */
+let updateFrameId: number | null = null
+
+const updateDateSource = throttle(function () {
+  if (!visible.value || activeName.value !== 0) return
+  
+  // 取消之前的帧更新请求
+  if (updateFrameId !== null) {
+    cancelAnimationFrame(updateFrameId)
+  }
+  
+  // 在下一帧更新，批量处理
+  updateFrameId = requestAnimationFrame(() => {
+    dataSource.value = dataSourceCache.value  // 直接赋值
+    updateFrameId = null
+  })
+}, 500, { leading: true, trailing: true })
+
+// ==================== API 调用函数 ====================
+
+const refreshMonitorList = useDebounceFn(() => {
+  const monitor_type: Array<'sell' | 'buy'> = []
+  if (txType.value.includes(0)) monitor_type.push('buy')
+  if (txType.value.includes(1)) monitor_type.push('sell')
+  
+  batchPauseMonitor(monitor_type, selectedChain.value.map(i => i.id).join(','))
+    .then(() => getMonitorList())
+    .catch(err => console.error('Failed to refresh monitor list:', err))
+}, 500)
+
+function getMonitorList(): void {
+  if (!botStore.evmAddress) return
+  
+  loading.value = true
+  let filtered_type = ''
+  
+  if (txType.value.length !== txTypeList.value.length) {
+    filtered_type = txType.value.join(',')
+  }
+  
+  getHistoryMonitor({
+    chain: selectedChain.value.map(i => i.id).join(','),
+    amt_u_min: String(minVol.value) || '',
+    filtered_type
+  })
+    .then((res) => {
+      let result = res || res?.data || []
+      const list: any[] = []
+      const seenIds = new Set<string>()
+      
+      result = Array.isArray(result) ? result : []
+      
+      // ✅ 使用缓存的 JSON.parse
+      for (let i = 0; i < result.length; i++) {
+        const item = result[i]
+        const parsed = getCachedParsedMsg(item.id, item.msg_content)
+        
+        if (!parsed || seenIds.has(parsed.id)) continue
+        
+        list.push({
+          ...parsed,
+          ...formateTxInfo(parsed)
+        })
+        seenIds.add(parsed.id)
+      }
+      
+      dataSourceCache.value = list.filter(i => txType.value.includes(i.tx_type))
+      updateDateSource()
+    })
+    .catch((err) => {
+      console.error('Failed to get monitor list:', err)
+    })
+    .finally(() => {
+      loading.value = false
+    })
+}
+
+function getFavCount(): void {
+  _getFavCount({ self_address: currentAddress.value })
+    .then((res) => {
+      fav_count.value = res?.fav_count || 0
+      monitor_count.value = res?.monitor_count || 0
+    })
+    .catch(err => console.error('Failed to get fav count:', err))
+}
+
+function init(): void {
+  getMonitorList()
+  getFavCount()
+}
+
+// ==================== 事件处理函数 ====================
+
+function handleClick(name: number | string): void {
+  if (name === 1) {
+    updateDateSource()
+  }
+}
+
+function handleConfirmAdd(formData?: any, resetFields?: () => void, stopLoading?: () => void): void {
+  addAttention2({
+    address: botStore.evmAddress,
+    user_chain: formData?.user_chain?.id,
+    user_address: formData?.address,
+    remark: formData?.remark,
+    group: formData?.group_id,
+    is_monitored: 0
+  })
+    .then(() => {
+      resetFields?.()
+      stopLoading?.()
+      addFavAddressPopRef.value?.close?.()
+      updateNum3.value++
+    })
+    .catch((err) => {
+      console.error('Failed to add attention:', err)
+    })
+}
+
+function jumpBalance(row: any, e: Event): void {
+  e.stopPropagation()
   const chain = row?.chain || 'eth'
   const address = row?._marker?.maker_address || row?.wallet_address
   if (address) {
     navigateTo(`/address/${address}/${chain}`)
   }
 }
-function jumpToken({ e, rowData }: { e: Event; rowData: any }) {
-  if (e) {
-    e.stopPropagation()
-  }
+
+function jumpToken({ e, rowData }: { e: Event; rowData: any }): void {
+  e.stopPropagation()
   const addr = rowData?._target_Token?.address + '-' + rowData.chain
   navigateTo(`/token/${addr}`, { replace: true })
 }
+
+// ==================== 生命周期钩子 ====================
+
+onMounted(() => {
+  nextTick(() => {
+    // 初始化逻辑
+  })
+  init()
+})
+
+useVisibilityChange(() => {
+  botStore.bot_subscribe()
+  if (visible.value && activeName.value === 0) {
+    updateDateSource()
+  }
+})
+
+// ✅ 优化9：组件卸载时清理缓存，防止内存泄漏
+onBeforeUnmount(() => {
+  parsedMsgCache.clear()
+  bigNumberCalcCache.clear()
+  if (updateFrameId !== null) {
+    cancelAnimationFrame(updateFrameId)
+  }
+  debouncedSaveQuickBuyValue.cancel()
+})
+
+// ==================== Watchers ====================
+
+watch(() => wsStore.wsResult[WSEventType.MONITOR], (val) => {
+  if (loading.value) return
+  mergeDataSource(val)
+  if (visible.value && activeName.value === 0 && !isHoverTable.value) {
+    updateDateSource()
+  }
+})
+
+watch(isHoverTable, (val) => {
+  if (val) {
+    nextTick(() => updateDateSource())
+  }
+})
+
+watch(() => updateNum2.value + updateNum3.value + updateNum13.value, (val) => {
+  if (val) {
+    if (!monitor_count.value) {
+      getMonitorList()
+    }
+    getFavCount()
+  }
+})
+
+watch(txType, () => {
+  refreshMonitorList()
+})
+
+watch(selectedChain, (val, oldVal) => {
+  if (JSON.stringify(val) === JSON.stringify(oldVal)) return
+  refreshMonitorList()
+})
+
+watch(visible, (val) => {
+  if (!val) return
+  if (activeName.value === 0) {
+    updateDateSource()
+    nextTick(() => {
+      if (!firstActivated.value && aveTableRef.value) {
+        aveTableRef.value.scrollToTop(0)
+      }
+      firstActivated.value = false
+    })
+  }
+})
+
+watch(() => botStore.evmAddress, (val) => {
+  if (!val) {
+    dataSource.value = []
+  } else {
+    init()
+  }
+})
 </script>
 
 <style scoped lang="scss">
