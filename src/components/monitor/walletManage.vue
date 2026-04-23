@@ -147,7 +147,7 @@
             <span class="text-12px">{{ getChainInfo(row.user_chain).name }}</span>
           </template>
           <template #header-operate>
-            <span>{{ $t('push') }}</span>
+            <span>{{ $t('operate') }}</span>
           </template>
           <template #cell-operate="{ row ,rowIndex}">
             <div class="flex justify-end items-center" @click.stop>
@@ -712,11 +712,11 @@ const columns = computed(() => {
     //   minWidth: 55,
     // },
     {
-      title: t('push'),
+      title: t('operate'),
       dataKey: 'operate',
       key: 'operate',
       align: 'right',
-      minWidth: 40,
+      minWidth: 52,
     }]
 })
 

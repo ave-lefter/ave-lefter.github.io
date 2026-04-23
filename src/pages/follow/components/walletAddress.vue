@@ -495,7 +495,7 @@
         </template>
       </el-table-column>
 
-       <el-table-column :label="t('push')" align="right" :width="!isMonitor ? 180 : 250" fixed="right">
+       <el-table-column :label="t('operate')" align="right" :width="!isMonitor ? 180 : 250" fixed="right">
         <template #default="{ row ,$index}">
           <div class="flex flex-row-reverse  items-center" @click.stop>
             <a v-if="judgeIsCopyTrade(row)" href="" class="flex items-center color-[--secondary-text] trade" @click.stop.prevent="jumpCopyTrade(row)">

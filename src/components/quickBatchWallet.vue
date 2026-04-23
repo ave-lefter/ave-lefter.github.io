@@ -19,29 +19,34 @@
       <template #default>
         <div class="color-[--third-text] text-12px max-h-500px overflow-y-auto">
           <div class="flex items-center px-12px py-8px b-b-solid b-b-1px b-b-[--border]">
-            <el-checkbox
-              v-model="checkAll"
-              :indeterminate="isIndeterminate"
-              style="--el-checkbox-font-size: 12px;"
-              @change="handleCheckAllChange"
-            >
-              <!-- {{ $t('all1') }} -->
-            </el-checkbox>
-            <div class="flex items-center gap-4px">
-              <div
-                v-for="chainItem in availableChains"
-                :key="chainItem.id"
-                class="chain-icon-btn w-20px h-20px rd-50% flex items-center justify-center cursor-pointer transition-all-200"
-                :class="selectedChainValue === chainItem.id ? 'chain-icon-active' : 'chain-icon-inactive'"
-                @click="handleChainSelect(chainItem.id)"
+            <div class="flex items-center">
+              <el-checkbox
+                v-model="checkAll"
+                :indeterminate="isIndeterminate"
+                style="--el-checkbox-font-size: 12px;"
+                @change="handleCheckAllChange"
               >
-                <img
-                  :src="`${configStore.token_logo_url}chain/${chainItem.icon}.png`"
-                  class="w-14px h-14px rounded-full"
-                  lazy
-                  alt=""
+                <!-- {{ $t('all1') }} -->
+              </el-checkbox>
+              <div class="flex items-center gap-4px">
+                <div
+                  v-for="chainItem in availableChains"
+                  :key="chainItem.id"
+                  class="chain-icon-btn w-20px h-20px rd-50% flex items-center justify-center cursor-pointer transition-all-200"
+                  :class="selectedChainValue === chainItem.id ? 'chain-icon-active' : 'chain-icon-inactive'"
+                  @click="handleChainSelect(chainItem.id)"
                 >
+                  <img
+                    :src="`${configStore.token_logo_url}chain/${chainItem.icon}.png`"
+                    class="w-14px h-14px rounded-full"
+                    lazy
+                    alt=""
+                  >
+                </div>
               </div>
+            </div>
+            <div class="ml-auto lh-16px flex items-center color-[--third-text] text-11px font-400">
+              {{ $t('bal') }}
             </div>
           </div>
           <div :key="botStore.evmAddress" class="px-12px">
@@ -61,7 +66,7 @@
                   </div>
                 </div>
                 <div class="ml-auto lh-14px flex items-center color-[--main-text1] text-12px">
-                  <img :src="`${configStore.token_logo_url}chain/${selectedChainValue}.png`" class="rd-50% mr-2px" height="12" alt="" srcset="" >
+                  <img :src="`${configStore.token_logo_url}chain/${selectedChainValue}.png`" class="rd-50% mr-4px" height="12" alt="" srcset="" >
                   <span>{{ formatNumber(getAddressFromChainBalance(selectedChainValue, item.addresses, tokenStore.swap.payToken?.address) || 0) }}</span>
                 </div>
               </div>
@@ -140,9 +145,17 @@ const currentAddress = useFollowStore().currentAddress
 watch(() => currentAddress, (newAddress) => {
   if (!newAddress) {
     // 清空选中钱包
+    console.log('currentAddress', newAddress)
     chainSelectedWallets.value = {}
   }
 })
+
+onBeforeUnmount(() => {
+  console.log('quickBatchWallet unmounted')
+  chainSelectedWallets.value = {}
+  selectedChainValue.value = ''
+})
+
 
 // 获取当前链的选中钱包列表
 const currentChainSelectedWallets = computed({
