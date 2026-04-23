@@ -69,9 +69,21 @@ export const useFollowStore = defineStore('follow', () => {
   const updateNum4=ref(0)
   // 自选地址弹框分组
   const delTokenGroup=ref(0)
+
+   // 关注地址弹窗表单数据持久化
+  const favAddressPopFormData = useStorage('favAddressPop-formData', {
+    group: 0,
+    is_monitored: 1
+  })
   const {t} = useI18n()
   watch(currentAddress, (val) => {
-    if(!val)addressGroups.value = []
+    if(!val){
+      addressGroups.value = []
+      favAddressPopFormData.value = {
+        group: 0,
+        is_monitored: 1
+      }
+    }
   })
   const loading = ref(false)
   const handleAddAttention = ref()
@@ -178,6 +190,7 @@ export const useFollowStore = defineStore('follow', () => {
     loading,
     addressConditions,
     addressConditions2,
-    favAddressChain
+    favAddressChain,
+    favAddressPopFormData
   }
 })
