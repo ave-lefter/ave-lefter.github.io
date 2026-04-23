@@ -4,11 +4,11 @@ import { getXType, getXContent } from '@/api/x'
 export function useXPopup() {
   const { $createTooltip } = useNuxtApp()
 
-  const $tooltip = $createTooltip('x--tooltip')
+  const $tooltip = $createTooltip('x--tooltip--t')
 
   const contentProps = reactive<{
     type: 0 | 1 | 2 | 3
-    info: Awaited<ReturnType<typeof getXContent>> | null,
+    info: Awaited<ReturnType<typeof getXContent>> | null | '',
     loading: boolean
   }>({
     type: 0,
@@ -20,17 +20,20 @@ export function useXPopup() {
     if (isGetData || !contentProps?.info) {
       getXData(tokenId, type)
     }
+    const targetEl = (e.target as HTMLElement) || null
+    const containerEl = targetEl?.parentElement?.parentElement?.parentElement || targetEl?.parentElement?.parentElement || targetEl?.parentElement || undefined
     $tooltip.show({
       content: {
         is: XIndex,
         props: contentProps
       },
-      target: e.target,
+      target: targetEl,
       props: {
         showArrow: false,
         placement: 'bottom',
         trigger: 'hover',
         'popper-class': 'x--tooltip',
+        'append-to': containerEl,
         'onUpdate:visible': (v: boolean) => {
           if (v) return
           $tooltip.hide()
@@ -89,3 +92,34 @@ export function convertTextToHtml(str: string) {
 
   return html
 }
+
+
+export function needsTranslation(text: string): boolean {
+  if (!text || text.trim().length === 0) {
+    return false
+  }
+  // Remove whitespace
+  const trimmedText = text.trim()
+  // strip @mentions like @username so they don't affect translation detection
+  const withoutMentions = trimmedText.replace(/@[A-Za-z0-9_]{1,15}/g, '').trim()
+  let withoutLinks = withoutMentions
+  // remove Markdown links [text](url)
+  withoutLinks = withoutLinks.replace(/\[.*?\]\((?:https?:\/\/\S+|www\.\S+)\)/gi, '').trim()
+  // remove emails
+  withoutLinks = withoutLinks.replace(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/g, '').trim()
+  // remove explicit URLs and common short domains (t.co, bit.ly, etc.)
+  withoutLinks = withoutLinks.replace(/https?:\/\/\S+|www\.\S+|\b(?:t\.co|bit\.ly|goo\.gl|lnkd\.in|tinyurl\.com|ow\.ly)\b/gi, '').trim()
+  // remove bare domain-like tokens (e.g. example.com)
+  withoutLinks = withoutLinks.replace(/\b\S+\.[a-z]{2,}\b/gi, '').trim()
+
+  const noTranslationRegex = /^[\d\s\p{P}\p{S}\uFE0F\u200D\u20E3]*$/u
+
+
+  // Check if text without mentions/links matches the "no translation needed" pattern
+  if (noTranslationRegex.test(withoutLinks)) {
+    return false
+  }
+  // If there are letters or other language characters, translation is needed
+  return true
+}
+
