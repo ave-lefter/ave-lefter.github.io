@@ -29,7 +29,7 @@
     </div>
     <ul v-show="botSettingStore.autoSellConfigs.isAutoSellConfig">
       <li v-for="(item, index) in autoSellConfig" :key="index" class="mt-8px flex items-center gap-4px">
-        <el-input-number v-model="item.priceChange" class="input-number-limit" :min="1" :controls="false" placeholder="--" @update:model-value="triggerAutoSellConfig">
+        <el-input-number v-model="item.priceChange" class="input-number-limit" :min="1" :max="item.isUp ? undefined : 99" :controls="false" placeholder="--" @update:model-value="triggerAutoSellConfig">
           <template #prefix>
             <div class="flex items-center">
               <Icon v-if="item.isUp" name="ri:arrow-up-long-fill" class="color-#12B886" />

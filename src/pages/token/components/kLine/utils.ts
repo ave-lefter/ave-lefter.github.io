@@ -768,7 +768,7 @@ export function useBotLimitLine(getWidget: () => IChartingLibraryWidget | null, 
     return getAddressAndChainFromId(token.value)?.address || tokenStore?.token?.token
   })
 
-  function getSwapTypeLabel(swapType: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 12 | 13 | 14 | -1) {
+  function getSwapTypeLabel(item: GetUserPendingTxRes[number]) {
     // const swapTypeMap = {
     //   1: t('buy'),
     //   2: t('sell'),
@@ -786,10 +786,98 @@ export function useBotLimitLine(getWidget: () => IChartingLibraryWidget | null, 
     // if (swapTypeMap[swapType]) {
     //   return swapTypeMap[swapType]
     // }
+    const { swapType, PriceLimit, inValue, inPrice, inAmount, inTokenDecimals, outTokenDecimals, triggerConfig } = item
+
+    //  base transaction type
+    let actionType = ''
+    let isBuy = false
     if (swapType === 1 || swapType === 5 || swapType === 7) {
-      return t('limitBuy1')
+      actionType = t('limitBuy1') + ' $' + formatNumber(inValue, 2)
+      return actionType
+    } else {
+      actionType = 'SELL'
     }
-    return t('limitSell1')
+
+    //  calculate percentage and profit/loss
+    const priceLimit = Number(PriceLimit) || 0
+    const inValueNum = Number(inValue) || 0
+    const inPriceNum = Number(inPrice) || 0
+    const inAmountNum = Number(inAmount) || 0
+
+    //  calculate percentage based on amount vs balance
+    let percentage = ''
+    if (inAmountNum > 0) {
+      if (!triggerConfig) {
+        const decimals = Number(inTokenDecimals || 18)
+        const actualAmount = BigNumber(inAmountNum).div(new BigNumber(10).pow(decimals)).toNumber()
+        return t('limitSell1') + ' ' + formatNumber(actualAmount, 3)
+      }
+      percentage = formatNumber(BigNumber(triggerConfig?.sellRatio || 0).div(100).toFixed(), 2) + '%'
+    }
+
+    //  calculate profit/loss
+    let profitLoss = ''
+    let profitLossPercentage = ''
+
+    if (priceLimit > 0 && inPriceNum > 0) {
+      const profitLossAmount = priceLimit - inPriceNum
+      const profitLossPercent = BigNumber(triggerConfig?.priceChange || 0).div(100).toFixed()
+
+      //  计算实际数量用于盈亏计算
+      let actualAmount = 0
+      if (isBuy) {
+        //  买入交易使用原始数量
+        actualAmount = inAmountNum
+      } else {
+        //  卖出交易需要除以decimals得到实际数量
+        const decimals = Number(inTokenDecimals || 18)
+        actualAmount = inAmountNum / Math.pow(10, decimals)
+      }
+
+      //  总盈亏金额 = 单位盈亏 × 数量
+      const totalProfitLoss = profitLossAmount * actualAmount
+
+      if (totalProfitLoss >= 0) {
+        profitLoss = `+${formatNumber(totalProfitLoss, 2)}USD`
+        profitLossPercentage = `(+${formatNumber(profitLossPercent, 0)}%)`
+      } else {
+        profitLoss = `${formatNumber(totalProfitLoss, 2)}USD`
+        profitLossPercentage = `(${formatNumber(profitLossPercent, 0)}%)`
+      }
+    }
+
+    //  determine TP (take profit) or SL (stop loss)
+    let profitType = ''
+    if (priceLimit > 0 && inPriceNum > 0) {
+      if (isBuy) {
+        //  buy order: price limit > entry price is TP, < entry price is SL
+        profitType = priceLimit > inPriceNum ? 'TP' : 'SL'
+      } else {
+        //  sell order: price limit > entry price is TP, < entry price is SL
+        profitType = priceLimit > inPriceNum ? 'TP' : 'SL'
+      }
+    }
+
+    //  build final label
+    let label = actionType
+
+    //  buy orders only show the basic label
+    if (isBuy) {
+      return actionType
+    }
+
+    //  sell orders show detailed information
+    if (percentage) {
+      label += ` ${percentage}`
+    }
+    if (profitType) {
+      label += ` ${profitType}`
+    }
+    if (profitLoss) {
+      label += ` ${profitLoss}${profitLossPercentage}`
+    }
+
+    return label
   }
 
 
@@ -834,11 +922,13 @@ export function useBotLimitLine(getWidget: () => IChartingLibraryWidget | null, 
     const _widget = getWidget()
     const chart = _widget?.activeChart?.()
     if (!_widget || !chart) return
-    let priceList = priceList1?.map(i => {
+    let priceList: (GetUserPendingTxRes[number] & { price: number })[] = priceList1?.map(i => {
       return {
         ...i,
         price: Number(i?.PriceLimit || 0)
       }
+    })?.filter(i => {
+      return ![12, 13, 14].includes(i.swapType)
     })
     if (showMarket.value) {
       priceList = priceList1.map(i => {
@@ -878,7 +968,7 @@ export function useBotLimitLine(getWidget: () => IChartingLibraryWidget | null, 
           disableSelection: true, // 允许选中
           disableSave: true,
           disableUndo: true,
-          text: getSwapTypeLabel(item.swapType as 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 12 | 13 | 14) || t('limitSell1'),
+          text: getSwapTypeLabel(item),
           overrides: {
             linecolor: '#FFBE3C',  // 线的颜色
             linewidth: 1,          // 线的粗细
@@ -1033,7 +1123,7 @@ export function useBotLimitLine(getWidget: () => IChartingLibraryWidget | null, 
   }
 
   let Timer: ReturnType<typeof setTimeout> | null = null
-  watch([chain, tokenAddress, () => botStore?.userInfo?.evmAddress, () => tokenStore.placeOrderUpdate, () => wsStore.wsResult?.tgbot], () => {
+  watch([chain, tokenAddress, () => botStore?.evmAddress, () => tokenStore.placeOrderUpdate, () => wsStore.wsResult?.tgbot], () => {
     getDataTimer(500)
   })
 
@@ -1045,6 +1135,39 @@ export function useBotLimitLine(getWidget: () => IChartingLibraryWidget | null, 
 
   onMounted(() => {
     getData()
+  })
+
+  // 清理所有画线和相关状态
+  function resetAllLimitLines(reason = '') {
+    const _widget = getWidget()
+    const chart = _widget?.activeChart?.()
+    if (reason) {
+      // eslint-disable-next-line no-console
+      console.log('[resetAllLimitLines]', reason, {
+        priceLimitLineIds: [...priceLimitLineIds],
+        priceLimitLineIds2: [...priceLimitLineIds2],
+        chartExists: !!chart
+      })
+    }
+    if (_widget && chart) {
+      priceLimitLineIds.forEach(id => {
+        chart?.removeEntity?.(id)
+      })
+      priceLimitLineIds2.forEach(id => {
+        chart?.removeEntity?.(id)
+      })
+    }
+    priceLimitLineIds = []
+    priceLimitLineIds2 = []
+    textShapeMap.clear()
+    limitTxs.value = []
+  }
+
+  // 监听 accessToken 变化，退出登录时清空所有画线
+  watch(() => botStore.accessToken, (val, oldVal) => {
+    if (!val && oldVal) {
+      resetAllLimitLines('logout')
+    }
   })
 
   onUnmounted(() => {
@@ -1061,11 +1184,13 @@ export function useBotLimitLine(getWidget: () => IChartingLibraryWidget | null, 
       clearTimeout(Timer)
       Timer = null
     }
+    resetAllLimitLines('onUnmounted')
   })
 
   return {
     limitTxs,
-    getData
+    getData,
+    resetAllLimitLines
   }
 }
 
