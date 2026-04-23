@@ -227,15 +227,16 @@
                   </div>
                 </div>
               </template>
-              <template v-if="monitor_count===0" #empty>
+              <template #empty>
                 <div v-if="!loading" class="h-full flex flex-col items-center justify-center pt-0px">
                   <img v-if="themeStore.theme==='light'" src="@/assets/images/empty-white.svg" alt="">
                   <img v-else src="@/assets/images/empty-black.svg" alt="">
                   <span class="mt-10px">
                     {{ $t('emptyNoData') }}
                   </span>
-                  <el-button class="mt-10px" type="primary" size="small" @click="activeName=1">{{ $t('emptyButtonText') }}</el-button>
+                  <el-button v-if="monitor_count===0" class="mt-10px" type="primary" size="small" @click="activeName=1">{{ $t('emptyButtonText') }}</el-button>
                 </div>
+                <div v-else></div>
               </template>
             </AveTable>
           </div>
@@ -874,7 +875,8 @@ function init(): void {
 // ==================== 事件处理函数 ====================
 
 function handleClick(name: number | string): void {
-  if (name === 1) {
+  console.log('handleClick', name)
+  if (name === 0) {
     updateDateSource()
   }
 }
