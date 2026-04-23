@@ -2,7 +2,7 @@
   <div class="w-monitor bg-[--secondary-bg] w-100% h-100% pl-12px pr-6px relative overflow-hidden"
     :class="{ 'pr-10px!': isLeftFixed, 'pl-10px!': isRightFixed }">
     <!-- <div class="w-100% h-40px absolute pointer-events-auto z-999 drag-handle left-0"/> -->
-    <Icon name="custom:drag2" class="absolute top-3px left-50% ml--6px text-6px bg-[--dialog-list-hover] drag-handle" />
+    <Icon name="custom:drag2" class="absolute top-3px left-50% ml--6px text-6px bg-[--dialog-list-hover] drag-handle z-10 cursor-move pointer-events-auto" />
     <el-tabs v-model="activeName" style="" class="m-tabs" @tab-change="handleClick">
       <el-tab-pane :label="$t('insidersActivity')" :name="0" lazy>
         <template v-if="botStore.evmAddress">
