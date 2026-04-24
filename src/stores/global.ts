@@ -57,6 +57,8 @@ export const useGlobalStore = defineStore('global', () => {
     show_search: boolean
     isLang: boolean
     isInt: boolean
+    isSimilarTokens: boolean
+    swapColor: string
     define: string[]
     data: Record<
       string,
@@ -83,7 +85,7 @@ export const useGlobalStore = defineStore('global', () => {
     >
     jump: 'close' | 'open' | 'open_jump'
     border: string
-  }>('pumpSetting10', {
+  }>('pumpSetting11', {
     fontSize_mc: '12px',
     size_swap: '12px',
     Progress_isCircle: 'circle',
@@ -94,6 +96,8 @@ export const useGlobalStore = defineStore('global', () => {
     show_search: true,
     isLang: true,
     isInt: false,
+    isSimilarTokens: true,
+    swapColor: '#12B886',
     define: [
       'name',
       'txs',

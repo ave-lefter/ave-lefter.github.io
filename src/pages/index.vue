@@ -366,6 +366,7 @@ import type { BotChain } from '@/utils/types'
 import AutoSellSetting from '@/components/autoSellSetting/index.vue'
 import AudioSelect from './pump/components/audioSelect.vue'
 import { getFilterNumber } from './pump/utils'
+import { getPumpBgColor } from '@/utils/index'
 
 import SlippageSetMarket from './token/components/right/botSwap/slippageSetMarket.vue'
 import QuickSwapSetCustom from '@/components/quickSwap/quickSwapSetCustom.vue'
@@ -425,7 +426,7 @@ const activeChain = useStorage<ChainKey>(
 )
 const audioUrl = ref('')
 const globalStore = useGlobalStore()
-const { pumpSetting, token_logo_url, pumpBlackList } = storeToRefs(globalStore)
+const { pumpSetting, token_logo_url, pumpBlackList, mode } = storeToRefs(globalStore)
 const currentAddress = computed(() => botStore?.evmAddress || walletStore?.address || '')
 const orderNew = computed(() => {
   return pumpSetting.value.grid['new']?.order
@@ -442,6 +443,23 @@ const listTab = computed(() => ([
   { name: 'MC', value: 'market_cap' }
 ]))
 const pumpConfig = useStorage<PumpConfig[]>('pumpConfigV2', [])
+
+// 切换黑白模式时，非用户自定义的 platform 用当前模式默认色
+watch(mode, () => {
+  const allPlatforms = pumpConfig.value?.flatMap((i) => i.platforms) || []
+  // 一次性构建新对象，避免多次赋值 useStorage 产生时序竞争
+  const newBg: Record<string, pumpObjColor> = { ...pumpSetting.value.bg }
+  let changed = false
+  allPlatforms.forEach((p) => {
+    const existing = newBg[p.platform]
+    if (existing && typeof existing === 'object' && existing.custom) return
+    newBg[p.platform] = getPumpBgColor(p.platform)
+    changed = true
+  })
+  if (changed) {
+    pumpSetting.value.bg = newBg
+  }
+}, { immediate: true })
 // const isRotate = ref(false)
 const gridPopoverVisible = ref(false)
 const { pump_notice, pumpV3, pumpFilterDefault, pump_query} = storeToRefs(usePumpStore())

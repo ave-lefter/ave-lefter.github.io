@@ -84,7 +84,7 @@
         </div>
       </div>
     </div>
-    <div v-if="!isEmpty" class="p-12px">
+    <div v-if="!isEmpty && pumpSetting.isSimilarTokens" class="p-12px">
       <div class="flex justify-between">
         <div class="text-12px lh-12px color-[--third-text] mb-12px">{{ t('similarTokens') }}({{ tokens.length }})</div>
         <div class="text-12px lh-12px color-[--third-text] mb-12px">{{ t('mcap') }}</div>
@@ -116,7 +116,8 @@
 <script setup lang='ts'>
 import { getSimilarTokens, getTokenSimilarpic } from '~/api/token'
 const { t } = useI18n()
-
+const globalStore = useGlobalStore()
+const { pumpSetting } = storeToRefs(globalStore)
 const props = defineProps({
   row: {
     type: Object as PropType<{ chain: string, symbol: string,  is_cloned: number, deployer_platform: string, similar_image_count: number }>,

@@ -1,5 +1,6 @@
 <template>
-  <div @click.stop.prevent>
+  <div class="border-t border-t-solid border-t-[--border]" @click.stop.prevent>
+    <span class="text-12px color-[--main-text] py-12px block">{{ $t('dataHighlight') }}</span>
     <span class="text-12px color-[--main-text]">{{ $t('MC') }}($)</span>
     <div class="flex-between mt-8px gap-9px">
       <div class="item flex-1">
@@ -475,10 +476,10 @@ function reset(type: string, dir: string) {
     }
     if (dir === 'middle') {
       pumpSetting.value.data.mc.middleSize = 100000
-      pumpSetting.value.data.mc.middleColor = '#FFA622'
+      pumpSetting.value.data.mc.middleColor = '#12B886'
     }
     if (dir === 'max') {
-      pumpSetting.value.data.mc.maxColor = '#12B886'
+      pumpSetting.value.data.mc.maxColor = '#FFA622'
     }
   }
   if (type === 'vol') {
@@ -488,10 +489,10 @@ function reset(type: string, dir: string) {
     }
     if (dir === 'middle') {
       pumpSetting.value.data.vol.middleSize = 50000
-      pumpSetting.value.data.vol.middleColor = '#FFA622'
+      pumpSetting.value.data.vol.middleColor = '#12B886'
     }
     if (dir === 'max') {
-      pumpSetting.value.data.vol.maxColor = '#12B886'
+      pumpSetting.value.data.vol.maxColor = '#FFA622'
     }
   }
   if (type === 'holders') {
@@ -501,10 +502,10 @@ function reset(type: string, dir: string) {
     }
     if (dir === 'middle') {
       pumpSetting.value.data.holders.middleSize = 500
-      pumpSetting.value.data.holders.middleColor = '#FFA622'
+      pumpSetting.value.data.holders.middleColor = '#12B886'
     }
     if (dir === 'max') {
-      pumpSetting.value.data.holders.maxColor = '#12B886'
+      pumpSetting.value.data.holders.maxColor = '#FFA622'
     }
   }
   if (type === 'twitter') {

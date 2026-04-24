@@ -1,6 +1,6 @@
 <template>
   <div v-if="Object.keys(pumpSetting.bg)?.length > 0">
-
+    <span class="text-12px color-[--main-text] mt-12px block mb-5px">{{ $t('defineBgColor') }}</span>
     <el-checkbox-group v-model="pumpSetting.bgList" class="checkbox-group">
       <el-checkbox
         v-for="i in platforms"
@@ -11,10 +11,11 @@
         <div class="flex-start flex-1" @click.stop.prevent>
           <div ref="el">
             <el-color-picker
-              v-model="pumpSetting.bg[i.platform]['bg']"
+              :model-value="pumpSetting.bg[i.platform]?.['bg'] || ''"
               persistent
               append-to="body"
               :teleported="true"
+              @update:model-value="(val: string | null) => val && handleColorChange(i.platform, val)"
               @blur="emit('blur')"
               @focus="emit('focus')"
             />
@@ -43,7 +44,7 @@
 
 <script lang="ts" setup>
 import type { PumpConfig } from '@/api/types/pump'
-import { getBgColor, getPumpBgColor,  getLightDarkValue, pumpMap, type PlatformsType} from '@/utils/index'
+import { getPumpBgColor } from '@/utils/index'
 const emit = defineEmits(['blur', 'focus'])
 const props = withDefaults(
   defineProps<{
@@ -53,42 +54,21 @@ const props = withDefaults(
   {}
 )
 const globalStore = useGlobalStore()
-const { pumpSetting, token_logo_url, mode , isDark} = storeToRefs(globalStore)
+const { pumpSetting, token_logo_url } = storeToRefs(globalStore)
+
 const platforms = computed(() => {
   const obj = props.pumpConfig?.find((i) => i.chain == props.chain)
   return obj?.platforms || []
 })
-watch(mode, (val) => {
-  // if (Object.keys(pumpSetting.value.bg)?.length > 0) {
-  //   const list = props.pumpConfig?.flatMap((i) => i.platforms) || []
-  //   list.forEach((i) => {
-  //     const platform = pumpMap[i.platform as PlatformsType]
-  //     if (platform) {
-  //     const defaultVars =  platform['bg']
-  //       const defaultObj = getLightDarkValue(defaultVars)
-  //       console.log('------isDark.value-----', isDark.value,pumpSetting.value.bg[i.platform].bg, defaultObj)
-  //       if (isDark.value && pumpSetting.value.bg[i.platform].bg == defaultObj?.light || !isDark.value && pumpSetting.value.bg[i.platform].bg == defaultObj?.dark) {
-  //           pumpSetting.value.bg[i.platform] = getPumpBgColor(i.platform)
-  //       }
-  //      }
-  //   })
-  // }
-    const list = props.pumpConfig?.flatMap((i) => i.platforms) || []
-    list.forEach((i) => {
-      pumpSetting.value.bg[i.platform]= getPumpBgColor(i.platform)
-    })
-})
-onMounted(() => {
-  init()
-})
-function init() {
-  if (Object.keys(pumpSetting.value.bg)?.length == 0) {
-  const list = props.pumpConfig?.flatMap((i) => i.platforms) || []
-    list.forEach((i) => {
-      pumpSetting.value.bg[i.platform]= getPumpBgColor(i.platform)
-    })
-   }
+
+function handleColorChange(platform: string, color: string) {
+  pumpSetting.value.bg[platform] = {
+    ...pumpSetting.value.bg[platform],
+    bg: color,
+    custom: true,
+  }
 }
+
 function reset(platform: string) {
   pumpSetting.value.bg[platform] = getPumpBgColor(platform)
 }
@@ -114,12 +94,12 @@ function reset(platform: string) {
     }
   }
 }
-:deep(.el-color-dropdown) {
+::deep(.el-color-dropdown) {
   background-color: var(--el-bg-color-overlay, #fff) !important;
   border-radius: 6px;
 }
 
-:deep(.el-color-dropdown__main-wrapper) {
+::deep(.el-color-dropdown__main-wrapper) {
   background-color: var(--el-bg-color-overlay, #fff) !important;
 }
 </style>

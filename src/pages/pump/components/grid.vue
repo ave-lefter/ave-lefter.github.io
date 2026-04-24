@@ -1,44 +1,53 @@
 <template>
-  <div @click.stop.prevent :key="key">
+  <div class="border-t border-t-solid border-t-[--border] mt-12px" @click.stop.prevent :key="key">
     <template v-if="!isFloat">
-      <span class="text-12px color-[--main-text]">{{ $t('threeLayout') }}</span>
+      <span class="text-12px color-[--main-text] mt-12px block">{{ $t('threeLayout') }}</span>
       <Draggable
         v-model="list"
         group="list"
-        class="flex gap-12px items-center justify-center mt-8px"
+        class="flex gap-12px items-center justify-center mt-12px"
         item-key="id"
       >
         <template #item="{ element }">
           <div
-            class="border-1px border-solid border-[--border]  py-13px relative flex-1 text-center"
+            class="border-1px border-solid border-[--border]  pt-38px pb-16px relative flex-1 text-center rounded-4px overflow-hidden"
             :style="{
-              'border-color': pumpSetting.grid[element.id].show ? '#3F80F7' : 'var(--border)',
+              'border-color': pumpSetting.grid[element.id].show ? 'var(--main-text)' : 'var(--border)',
             }"
           >
             <Icon
-              name="custom:move"
-              class="color-[--icon-color] text-7px cursor-pointer font-bold absolute left-[4px] top-[4px]"
+              name="custom:move2"
+              class="text-11px cursor-pointer font-bold absolute left-[12px] top-[16px]"
+              :style="{
+                'color': pumpSetting.grid[element.id].show ? 'var(--main-text)' : 'var(--icon-color)',
+              }"
             />
             <Icon
               name="custom:key-visible"
-              class="color-[--icon-color] text-8px cursor-pointer font-bold absolute right-[4px] top-[4px]"
+              class="text-10px cursor-pointer font-bold absolute right-[12px] top-[16px]"
+              :style="{
+                'color': pumpSetting.grid[element.id].show ? 'var(--main-text)' : 'var(--icon-color)',
+              }"
               v-if="pumpSetting.grid[element.id].show"
               @click.stop.prevent="globalStore.toggleGrid(element.id)"
             />
             <Icon
               name="custom:key-invisible"
-              class="color-[--icon-color] text-8px cursor-pointer font-bold absolute right-[4px] top-[4px]"
+              class="text-12px cursor-pointer font-bold absolute right-[12px] top-[16px]"
+              :style="{
+                'color': pumpSetting.grid[element.id].show ? 'var(--main-text)' : 'var(--icon-color)',
+              }"
               v-else
               @click.stop.prevent="globalStore.toggleGrid(element.id)"
             />
             <span
-              :style="{ color: pumpSetting.grid[element.id].show ? '#3F80F7' : 'var(--third-text)' }"
+              :style="{ color: pumpSetting.grid[element.id].show ? 'var(--main-text)' : 'var(--third-text)' }"
               >{{ $t(element.name) }}</span>
           </div>
         </template>
       </Draggable>
     </template>
-    <span class="text-12px color-[--main-text mt-30px block">{{ $t('detailsAfterPurchase') }}</span>
+    <!-- <span class="text-12px color-[--main-text mt-30px block">{{ $t('detailsAfterPurchase') }}</span>
     <div class="tabs pb-10px mt-8px">
       <button
         v-for="item in list_tabs"
@@ -50,7 +59,7 @@
       >
         <span class="text-14px">{{ item.name || '' }}</span>
       </button>
-    </div>
+    </div> -->
   </div>
 </template>
 
@@ -82,22 +91,22 @@ interface TabItem {
   name: string
 }
 
-const list_tabs = computed<TabItem[]>(() => {
-  return [
-    {
-      id: 'close',
-      name: t('undo'),
-    },
-    {
-      id: 'open',
-      name: t('open'),
-    },
-    {
-      id: 'open_jump',
-      name: t('jump'),
-    }
-  ]
-})
+// const list_tabs = computed<TabItem[]>(() => {
+//   return [
+//     {
+//       id: 'close',
+//       name: t('undo'),
+//     },
+//     {
+//       id: 'open',
+//       name: t('open'),
+//     },
+//     {
+//       id: 'open_jump',
+//       name: t('jump'),
+//     }
+//   ]
+// })
 watch(() => lang.value, (val) => {
   key.value++
 
