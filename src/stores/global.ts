@@ -16,6 +16,7 @@ export const useGlobalStore = defineStore('global', () => {
   const showLeft = useSessionStorage('token_show_left', false)
   const showRight = useSessionStorage('token_show_right', true)
   const isUSDT = useStorage('isUSDT', true)
+  const twitterTrackerStore = useTwitterTrackerStore()
   const footerTokensPrice = shallowRef([
     {
       token: '0x7130d2a12b9bcbfae4f2634d864a1ee1ce3ead9c',
@@ -57,6 +58,8 @@ export const useGlobalStore = defineStore('global', () => {
     show_search: boolean
     isLang: boolean
     isInt: boolean
+    isSimilarTokens: boolean
+    swapColor: string
     define: string[]
     data: Record<
       string,
@@ -83,7 +86,7 @@ export const useGlobalStore = defineStore('global', () => {
     >
     jump: 'close' | 'open' | 'open_jump'
     border: string
-  }>('pumpSetting10', {
+  }>('pumpSetting11', {
     fontSize_mc: '12px',
     size_swap: '12px',
     Progress_isCircle: 'circle',
@@ -94,6 +97,8 @@ export const useGlobalStore = defineStore('global', () => {
     show_search: true,
     isLang: true,
     isInt: false,
+    isSimilarTokens: true,
+    swapColor: '#12B886',
     define: [
       'name',
       'txs',
@@ -435,6 +440,14 @@ export const useGlobalStore = defineStore('global', () => {
     }
     pumpSetting.value.grid[category].show = !pumpSetting.value.grid[category].show
   }
+  function searchTwitter(tokenAddress?: string) {
+    twitterTrackerStore.visible = true
+    twitterTrackerStore.placement = 'left'
+    twitterTrackerStore.isLeftFixed = true
+    if (tokenAddress) {
+      twitterTrackerStore.query.token_keyword = tokenAddress
+    }
+  }
   return {
     lang: computed(() => localeStore.locale),
     token_logo_url: computed(() => configStore.token_logo_url),
@@ -482,6 +495,7 @@ export const useGlobalStore = defineStore('global', () => {
     popVisible,
     tagsRatio,
     toggleGrid,
-    showBanner
+    showBanner,
+    searchTwitter
   }
 })
