@@ -136,6 +136,7 @@ export interface Token {
   is_streaming?: boolean
   main_pair_tvl: number
   support_aggr_kline: number
+  badges: Array<{ tag: string; icon_url: string }>
 }
 
 export interface Volume {
