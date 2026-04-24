@@ -1467,6 +1467,7 @@
   "disableShowsReflected": "Disable shows reflected amount on hover",
   "myToken": "My Token",
   "tweetSearchContractAddress": "Search contract address",
+  "tweetSearchContractAddressMediaTracker": "Search Contract Address Flt Window",
   "tweetSearchContractAddress2": "Search token name",
   "tweetSearchContractAddress3": "Search name and contract",
   "TikTokSearchName": "Search Tik Tok name",

@@ -289,6 +289,9 @@
                     <a :href="`https://x.com/search?q=${token?.token}`" target="_blank" class="text-12px py-4px px-8px color-[--main-text] hover:bg-[--dialog-tab-active]">
                       {{ $t('tweetSearchContractAddress') }}
                     </a>
+                    <a href=""  @click.stop.prevent="globalStore.searchTwitter(token?.token)" class="text-12px py-4px px-8px color-[--main-text] hover:bg-[--dialog-tab-active]">
+                      {{ $t('tweetSearchContractAddressMediaTracker') }}
+                    </a>
                     <a :href="`https://x.com/search?q=$${token?.symbol}`" target="_blank" class="text-12px py-4px px-8px color-[--main-text] hover:bg-[--dialog-tab-active]">
                       {{ $t('tweetSearchContractAddress2') }}
                     </a>

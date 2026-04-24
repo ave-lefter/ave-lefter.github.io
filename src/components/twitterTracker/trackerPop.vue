@@ -181,6 +181,12 @@ const followIds = useStorage('twFollowIds', [])
 const dialogVisible=shallowRef(false)
 const {dataSource: dataSource2, getList:getList2,total:total2} = useNews({newsAudio,activeParentTab,isPaused:isPaused2})
 const query = ref({ ...trackerStore.query })
+
+// 外部（如 searchTwitter）通过 store.query.token_keyword 触发搜索
+watch(() => trackerStore.query.token_keyword, (val) => {
+  query.value.token_keyword = val
+  debouncedConfirmInput()
+})
 // defineProps({
 //   scrollHeight: {
 //     type: Number,
