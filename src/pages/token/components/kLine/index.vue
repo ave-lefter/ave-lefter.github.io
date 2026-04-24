@@ -626,7 +626,7 @@ function createToggleButton() {
     const isShowMarket = showMarket.value
     btn.innerHTML = `
         <span style="font-size: 12px; cursor: pointer;">
-          ${isShowMarket ? 'Price / <span style="color:#286DFF">MCap</span>' : '<span style="color:#286DFF">Price</span> / MCap'}
+          ${isShowMarket ? `${t('price')} / <span style="color:#286DFF">${t('mcap')}</span>` : `<span style="color:#286DFF">${t('price')}</span> / ${t('mcap')}`}
         </span>`
   }
 
