@@ -43,7 +43,7 @@
               }"
               @click.stop.prevent="handleFilterQuery('')"
             /> -->
-            <Icon v-if="searchKeyword" name="custom:filter" class="color-[--primary-color] cursor-pointer text-10px" @click.stop.prevent="handleFilterQuery('')" />
+            <Icon v-if="searchKeyword" name="custom:filter" class="color-[--primary-color] cursor-pointer text-10px ml-5px mt-0px" @click.stop.prevent="handleFilterQuery('')" />
             <el-popover
               v-else
               v-model:visible="visible"
@@ -53,7 +53,7 @@
               trigger="click"
             >
               <template #reference>
-                <div><Icon name="custom:filter" class="color-[--d-666-l-999] cursor-pointer text-10px" /></div>
+                <div><Icon name="custom:filter" class="ml-5px mt-8px color-[--d-666-l-999] cursor-pointer text-10px" /></div>
               </template>
               <template #default>
                 <div>
@@ -91,9 +91,9 @@
               effect="light"
               :persistent="false"
             >
-              <Icon name="mdi:information" class="color-[--d-666-l-999] cursor-pointer text-14px ml-4px"/>
+              <Icon name="mdi:information" class="color-[--d-666-l-999] cursor-pointer text-14px ml-1px"/>
             </el-tooltip>
-          <Icon v-if="['buy24h','all','30',30].indexOf(tabActive)>-1" name="fe:edit" class="text-14px clickable" ref="addButtonRef"/>
+          <Icon v-if="['buy24h','all','30',30].indexOf(tabActive)>-1" name="fe:edit" class="ml-1px text-14px clickable" ref="addButtonRef"/>
           </div>
         </template>
         <template #default="{ row, $index }">

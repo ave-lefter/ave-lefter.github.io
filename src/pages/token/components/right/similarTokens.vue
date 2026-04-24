@@ -7,7 +7,7 @@
       <span class="text-14px">{{ t('similarTokens') }}({{ tokens?.length || 0 }})</span>
       <Icon class="ml-4px" :name= " isExpand? 'material-symbols:keyboard-arrow-up': 'material-symbols:keyboard-arrow-down'" />
       <div class="flex-1"></div>
-      <div class="text-12px lh-12px color-[--third-text] mb-0px">{{ t('mcap') }}</div>
+      <div v-if="isExpand" class="text-12px lh-12px color-[--third-text] mb-0px">{{ t('mcap') }}</div>
     </div>
     <div class="mt-12px mb-10px mr-15px" v-if="isExpand">
       <div class="flex flex-col gap-8px">

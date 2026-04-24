@@ -18,6 +18,7 @@ import {
   MarkPointComponent,
   MarkAreaComponent,
   DataZoomComponent,
+  TitleComponent,
 } from 'echarts/components'
 
 // 注册所需组件（只注册一次）
@@ -34,6 +35,7 @@ use([
   MarkPointComponent,
   MarkAreaComponent,
   DataZoomComponent,
+  TitleComponent,
 ])
 
 export { init, getInstanceByDom, graphic } from 'echarts/core'

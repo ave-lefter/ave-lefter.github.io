@@ -38,13 +38,12 @@ onMounted(() => {
     v-if="walletStore.address"
     v-model="activeName"
     class="flex-1 bg-[--main-bg] [--el-text-color-primary:--third-text] [--el-border-color-light:--main-divider] pt-14px tabs"
-    style="min-height: calc(100vh - 92px)"
   >
     <el-tab-pane :label="t('chainWallet2')" name="wallet">
-      <WalletAssets style="max-height: auto" />
+      <WalletAssets class1="max-h-[calc(100vh-132px)]!" />
     </el-tab-pane>
     <el-tab-pane :label="t('perp')" name="perp">
-      <PerpAssets v-if="activeName === 'perp'" />
+      <PerpAssets v-if="activeName === 'perp'"  class1="max-h-[calc(100vh-132px)]!"/>
     </el-tab-pane>
   </el-tabs>
   <WalletAssets v-else />

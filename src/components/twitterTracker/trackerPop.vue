@@ -366,7 +366,7 @@ function updateCache() {
 }
 
 watch([() => trackerStore.isPaused, () => activeParentTab.value], ([val,val2]) => {
-  if (!val && val2 === 1) {
+  if (!val && val2 === 1 && wsCacheArr.value.length > 0) {
     updateCache()
   }
 })
@@ -392,6 +392,12 @@ watch(
   () => trackerStore.visible,(val)=>{
     if(val){
       updateCache()
+      nextTick(() => {
+        const scrollContainer = document.querySelector('.affix-container')
+        if (scrollContainer && scrollContainer.scrollTop <= 60) {
+          trackerStore.isPaused = false
+        }
+      })
     }else{
       trackerStore.isPaused=true
     }

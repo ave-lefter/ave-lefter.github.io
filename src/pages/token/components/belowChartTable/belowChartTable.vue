@@ -35,7 +35,7 @@ const tabs = computed(() => {
   { name: t('myPositions'), component: 'Position' as const },
   { name: t('holders'), component: 'Holders' as const },
   { name: t('poolInfo'), component: 'LP' as const },
-  { name: t('attention1') +`(${globalStore.headFollowsNum.all})`, component: 'Attention' as const },
+  { name: t('followAddress') +`(${globalStore.headFollowsNum.all})`, component: 'Attention' as const },
   { name: t('orders'), component: 'Orders' as const },
   { name: t('mySwap'), component: 'MySwap' as const },
   {name:t('devTokens'), component: 'DevTokens' as const},
