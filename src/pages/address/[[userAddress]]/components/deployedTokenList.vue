@@ -113,6 +113,7 @@ const tokenDetailSStore = useTokenDetailsStore()
 const route = useRoute()
 
 function onRowClick(row) {
+  console.log('jumpBalance deployedTokenList', row)
   tokenDetailSStore.$patch({
     drawerVisible: true,
     tokenInfo: {
@@ -121,6 +122,10 @@ function onRowClick(row) {
       logo_url: row.logo_url,
       chain: row.chain,
       address: row.token,
+      total: row.total,
+      lock_amount_dec: row.lock_amount_dec,
+      other_amount_dec: row.other_amount_dec,
+      burn_amount_dec: row.burn_amount_dec,
       remark: '',
     },
     pairInfo: {
