@@ -7,7 +7,7 @@
             :id="row?.target_token + '-' + row?.chain"
             :key="row?.pair + '-' + row?.chain"
             class="pump-item_item relative item-row"
-            :style="{ background:  pumpSetting.bgList?.includes(row.platform)? pumpSetting?.bg?.[row.platform]?.bg : '' }"
+            :style="{ background:  pumpSetting.bgList?.includes(row.platform_id || row.platform)? resolveBg(pumpSetting?.bg?.[row.platform_id || row.platform]?.bg) : '', '--row-bg': pumpSetting.bgList?.includes(row.platform_id || row.platform)? resolveBg(pumpSetting?.bg?.[row.platform_id || row.platform]?.bg) : 'var(--d-0E0F10-l-FFF)', '--row-bg-hover': pumpSetting.bgList?.includes(row.platform_id || row.platform)? resolveBg(pumpSetting?.bg?.[row.platform_id || row.platform]?.bg) : 'var(--main-list-hover)' }"
             @click.stop="tableRowClick(row)"
             @contextmenu="handleContextMenu($event, row)"
             @mouseenter="() => currentRow = row "
@@ -720,8 +720,8 @@
               </div>
               <div class="pump-right" @click.stop="handlePumpRightClick(row)">
                 <div
-                 v-show="(pumpSetting.border && pumpSetting.size_swap === '16px') || pumpSetting.bgList?.includes(row.platform)"
-                 class="w-160px h-120px absolute z-2 top--12px right--8px border border-solid rounded-8px" :style="{background:  pumpSetting.bgList?.includes(row.platform)? pumpSetting?.bg?.[row.platform]?.bg : ( pumpSetting.border &&  pumpSetting.size_swap ==='16px'? '#12B88614': ''), 'border-color': pumpSetting.border &&  pumpSetting.size_swap ==='16px'? (pumpSetting.border =='border_hight' ? '#12B886': 'var(--border)') : 'transparent' ,'box-shadow': pumpSetting.border &&  pumpSetting.size_swap ==='16px'? (pumpSetting.border =='border_hight' ? '0px 0px 10px 0px #12B88699': '0px 2px 10px 0px var(--border)') : ''}"
+                 v-show="(pumpSetting.border && pumpSetting.size_swap === '16px') || pumpSetting.bgList?.includes(row.platform_id || row.platform)"
+                 class="w-160px h-120px absolute z-2 top--12px right--8px border border-solid rounded-8px" :style="{'border-color': pumpSetting.border &&  pumpSetting.size_swap ==='16px'? (pumpSetting.border =='border_hight' ? '#12B886': 'var(--border)') : 'transparent' ,'box-shadow': pumpSetting.border &&  pumpSetting.size_swap ==='16px'? (pumpSetting.border =='border_hight' ? '0px 0px 10px 0px #12B88699': '0px 2px 10px 0px var(--border)') : ''}"
                  >
                 </div>
                 <div
@@ -827,7 +827,7 @@
                     />
                   </div>
                 </div>
-                <div class="btns-swap flex-end pr-12px" :style="{ background:  pumpSetting.bgList?.includes(row.platform)? pumpSetting?.bg?.[row.platform]?.bg : '' }" @click.stop="handlePumpRightClick(row)">
+                <div class="btns-swap flex-end pr-12px" @click.stop="handlePumpRightClick(row)">
                   <div
                     v-if="row?.state === 'migrating'"
                     style="
@@ -858,7 +858,8 @@
                     :quickBuyValue="quickBuyValue"
                     :swapSetSelected="props.swapSetSelected"
                     :row="row"
-                    :classNames="pumpSetting.border &&  pumpSetting.size_swap ==='16px' ? 'bg-[transparent]' :'bg-[--up-color] color-#fff'"
+                    :classNames="pumpSetting.border &&  pumpSetting.size_swap ==='16px' ? 'bg-[transparent] color-[--up-color]' : 'color-#fff'"
+                    :buttonBg="pumpSetting.border &&  pumpSetting.size_swap ==='16px' ? '' : pumpSetting.swapColor"
                     :size="pumpSetting.size_swap"
                     @jump="jump(row)"
                   />
@@ -920,7 +921,7 @@ import {
   getSymbolDefaultIcon,
   getChainDefaultIcon,
   formatTimeFromNow,
-  formatIconTag,
+  formatIconTag
 } from '@/utils/index'
 import { formatNumber } from '@/utils/formatNumber'
 import { Icon } from '#components'
@@ -993,6 +994,7 @@ const route = useRoute()
 const { token_logo_url } = useConfigStore()
 const globalStore = useGlobalStore()
 const { pumpSetting, pumpBlackList, lang,isDark, dialogVisible_search, dialogSearchText} = storeToRefs(globalStore)
+const resolveBg = (val: string | undefined | null) => !val ? '' : val.startsWith('--') ? `var(${val})` : val
 // const isPaused = defineModel<boolean>('isPaused')
 
 const { t } = useI18n()
@@ -1393,7 +1395,7 @@ defineExpose({
     border-top: 1px solid var(--main-input-button-bg);
     border-radius: 4px;
     .bg-1{
-      background-color: var(--d-0E0F10-l-FFF);
+      background-color: var(--row-bg, var(--d-0E0F10-l-FFF));
     }
     &:hover {
       background-color: var(--main-list-hover);
@@ -1402,7 +1404,7 @@ defineExpose({
         visibility: visible;
       }
       .bg-1{
-        background-color: var(--main-list-hover);
+        background-color: var(--row-bg-hover, var(--main-list-hover));
       }
       .pump-right {
         box-shadow: none;
