@@ -18,7 +18,7 @@
       <div class="flex justify-between mb-12px items-center">
         <div class="flex items-center gap-16px">
           <span v-for="el in tabs" :key="el.value" :class="[
-            'text-14px cursor-pointer',
+            'text-14px cursor-pointer break-keep',
             activeTab === el.value ? 'color-[--main-text]' : 'color-[--secondary-text]',
           ]" @click="setActiveTab(el.value)">
             {{ el.label }}
