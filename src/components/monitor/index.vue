@@ -234,8 +234,9 @@ class="w-monitor bg-[--secondary-bg] w-100% h-100% pl-12px pr-6px relative overf
           :style="{height:`${props.scrollHeight-50}px`}"
           class="overflow-hidden"
         >
-          <span class="text-12px mt-10px">{{ $t('noBotWalletTip') }}</span>
+          <span class="text-12px mt-10px color-[--third-text]">{{ $t('noBotWalletTip') }}</span>
           <el-button
+            type="primary"
             class="mt-10px"
             @click="botStore.$patch({
             connectVisible: true
