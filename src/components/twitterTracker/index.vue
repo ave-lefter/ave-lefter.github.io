@@ -52,8 +52,8 @@ const {
   loadComponent: () => import('./trackerPop.vue'),
   panelKey: 'twitter',
   isLargeWidthThreshold: 720,
-  minWidth: 360,
-  maxWidth: 438,
+  minWidth: 280,
+  maxWidth: 330,
 })
 
 // Override childProps for twitter tracker's specific needs

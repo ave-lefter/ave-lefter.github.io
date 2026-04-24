@@ -3,8 +3,8 @@
     :class="{ 'pr-16px': trackerStore.isLeftFixed, 'pl-16px': trackerStore.isRightFixed }">
     <Icon name="custom:drag2" class="absolute top-4px left-50% ml--6px text-6px bg-[--dialog-list-hover] drag-handle" />
     <div class="flex items-center pb-14px border-b-1px border-b-solid border-b-[--border] mb-12px">
-      <div :class="`flex justify-between items-center mr-16px clickable ${activeParentTab===1?'color-[--main-text]':'color-[--secondary-text]'}`" @click="activeParentTab=1">{{ t('twitterTracker') }}</div>
-      <div :class="`flex justify-between items-center clickable ${activeParentTab===2?'color-[--main-text]':'color-[--secondary-text]'}`" @click="activeParentTab=2">{{ t('twitterTracker2') }}</div>
+      <div :class="`flex justify-between items-center mr-16px clickable break-keep ${activeParentTab===1?'color-[--main-text]':'color-[--secondary-text]'}`" @click="activeParentTab=1">{{ t('twitterTracker') }}</div>
+      <div :class="`flex justify-between items-center clickable break-keep ${activeParentTab===2?'color-[--main-text]':'color-[--secondary-text]'}`" @click="activeParentTab=2">{{ t('twitterTracker2') }}</div>
       <div class="flex-1 drag-handle h-20px" />
       <div class="flex items-center gap-12px">
         <Icon v-if="botStore.evmAddress&&activeParentTab===1" name="custom:pump-setting"
