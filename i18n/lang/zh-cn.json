@@ -2190,5 +2190,6 @@
   "notOpen": "不打开",
   "dataHighlight": "数据高亮",
   "defineBgColor": "自定义背景色",
-  "swapButtonColor": "按钮颜色"
+  "swapButtonColor": "按钮颜色",
+  "pairsTh3": "24h 额/资金"
 }
