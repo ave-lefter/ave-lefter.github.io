@@ -34,6 +34,7 @@
     <TrackerDragger/>
     <FavAddressPop
       ref="favAddressPopRef"
+      v-if="favAddressPopVisible"
       :visible="favAddressPopVisible"
       :button-ref="attentionTrigger || {}"
       width="248"
