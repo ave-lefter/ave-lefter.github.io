@@ -353,6 +353,18 @@
                 :width="12"
                 style="border-radius: 100%"
               >
+              <template v-if="Number(token?.badges?.length || 0) > 0">
+                <img
+                  v-for="(i, $index) in token?.badges"
+                  :key="$index"
+                  v-tooltip="$t(`${i.tag}`)"
+                  class="rounded-100% bg-btn cursor-pointer"
+                  :src="formatIconTag(i.tag)"
+                  alt=""
+                  :width="12"
+                  onerror="this.src='/icon-default.png'"
+                >
+              </template>
               <a
                 v-if="aiSummary?.headline || aiSummary?.summary"
                 v-tooltip.raw="{
@@ -365,7 +377,7 @@
                 <Icon name="custom:ai" class="text-14px"/>
               </a>
             </div>
-            <DeBox/>
+            <!-- <DeBox/> -->
             <el-popover
               v-if="collected"
               v-model:visible="editableGroup"
@@ -1062,7 +1074,7 @@ import Top50 from './top50.vue'
 import HolderRank from '@/pages/token/components/right/info/holderRank/index.vue'
 // import Run from './run.vue'
 import Check from './check.vue'
-import DeBox from './deBox.vue'
+// import DeBox from './deBox.vue'
 import XPopup from '~/components/xPopup/index.vue'
 import XIcon from '~/components/xPopup/xIcon.vue'
 import Collect from '~/components/collect.vue'
