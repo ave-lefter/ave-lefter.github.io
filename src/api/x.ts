@@ -14,6 +14,8 @@ export function getXType(tokenId: string): Promise<{
 export interface XType1 {
   bookmark_count: number
   content: string
+  content_en: string
+  content_zh: string
   display_pic: string
   followers: number
   joined_date: string
@@ -25,6 +27,7 @@ export interface XType1 {
   twitter_url: string
   username: string
   media?: string
+  replied_tweet?: XType1
 }
 
 export interface XType2 {

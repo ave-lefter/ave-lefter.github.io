@@ -1238,6 +1238,12 @@ export const bot_getUserPendingTx = createCacheRequest(async function(query: {
   inAmount: string
   PriceLimit: string
   expireAt: number
+  triggerConfig: {
+    open: boolean
+    priceChange: number
+    sellRatio: number
+    type: string
+  }
 }>> {
   const { $api } = useNuxtApp()
   if (!query.walletAddress) return []

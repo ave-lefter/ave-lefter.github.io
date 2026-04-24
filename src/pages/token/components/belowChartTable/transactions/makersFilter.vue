@@ -37,7 +37,7 @@ const self_address = computed(() => {
 })
 function filterSelfWalletSubmit() {
   if(!verifyLogin()){
-    return 
+    return
   }
   console.log('filterSelfWalletSubmit',self_address.value)
   tempAddress.value=self_address.value
@@ -64,7 +64,6 @@ function filterSelfWalletSubmit() {
           v-model.trim="tempAddress"
           style="--el-input-bg-color: var(--dialog-list-hover);"
           :placeholder="$t('enterAddress')"
-          
         />
       </div>
       <el-button

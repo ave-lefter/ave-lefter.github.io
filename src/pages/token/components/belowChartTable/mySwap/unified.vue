@@ -311,6 +311,18 @@ const filterConditions = ref<any>({
 const txHistory = ref<any[]>([])
 const loading = ref(false)
 
+// 退出登录时清空交易数据
+watch(() => botStore.accessToken, (val, oldVal) => {
+  if (!val && oldVal) {
+    txHistory.value = []
+    try {
+      globalStore.mySwapList = []
+    } catch (e) {
+      // ignore
+    }
+  }
+})
+
 const tableHeight = computed(() => {
   return Math.max(tokenStore.commonHeight - 360, 450)
 })

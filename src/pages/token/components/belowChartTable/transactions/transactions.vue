@@ -28,6 +28,8 @@ import DateFilterCard from '../../dateFilterCard.vue'
 // import type { content } from 'html2canvas/dist/types/css/property-descriptors/content'
 const globalStore = useGlobalStore()
 const klineDateFilter = inject<Ref<string[]>>(ProvideType.KLINE_DATE_FILTER)
+const klineMarkerAddress = inject<Ref<string>>(ProvideType.KLINE_MARKER_ADDRESS, ref(''))
+const klineFilterTxs = inject<Ref<any[]>>(ProvideType.KLINE_FILTER_TXS, shallowRef([]))
 // 订单簿状态 - 通过 provide/inject 与父组件通信
 const orderBookVisible = inject<Ref<boolean>>('orderBookVisible', ref(false))
 const $refs = ref({
@@ -232,6 +234,16 @@ const tableView = ref({
   // isSwapPriceUSDT: true, 不常用，先删除
   // isVolUSDT: true
 })
+// 当筛选地址时，同步 filterTableList 到 klineFilterTxs 用于 K 线打点
+watch(filterTableList, (val) => {
+  if (tableFilter.value.markerAddress) {
+    klineFilterTxs.value = [...val]
+    klineMarkerAddress.value = tableFilter.value.markerAddress
+  } else {
+    klineFilterTxs.value = []
+    klineMarkerAddress.value = ''
+  }
+}, { deep: false })
 const tableFilterVisible = ref({
   timestamp: false,
   amountU: false,
@@ -949,6 +961,7 @@ function setActiveTab(val: string,index:number) {
 function setMakerAddress(address: string) {
   txCount.value = {}
   tableFilter.value.markerAddress = tableFilter.value.markerAddress ? '' : address
+  klineMarkerAddress.value = tableFilter.value.markerAddress
   filterSubmit()
 }
 
@@ -987,6 +1000,7 @@ function onRowClick({ rowData }: RowEventHandlerParams) {
 function resetMakerAddress() {
   txCount.value = {}
   tableFilter.value.markerAddress = ''
+  klineMarkerAddress.value = ''
   filterSubmit()
 }
 
@@ -1104,7 +1118,7 @@ onUnmounted(() => {
           <div
             v-html="$t('filterTip', {
             address: `<span class='color-#3F80F7'>&nbsp;${tableFilter.markerAddress.slice(0, 4)}...${tableFilter.markerAddress.slice(-4)}&nbsp;</span>`,
-            count: `<span>&nbsp;${filterTableList[0]?.count || 0}&nbsp;</span>`
+            count: `<span>&nbsp;${filterTableList.length}&nbsp;</span>`
           })" />
           <span class='color-#3F80F7 decoration-underline cursor-pointer ml-2px' @click.stop="resetMakerAddress">
             {{ $t('filterCancel') }}

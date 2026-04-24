@@ -8,7 +8,7 @@ const props = defineProps<{
 }>()
 const searchKey = shallowRef('')
 const quickOptions = computed(() => {
-  const chainList = ['solana','bsc','xlayer']
+  const chainList = ['solana','bsc','eth']
   if(!chainList.includes(_activeChain.value) && _activeChain.value !== 'AllChains'){
     chainList.push(_activeChain.value)
   }
@@ -54,7 +54,7 @@ const currentChain = computed(() => {
       <el-input
         v-model="searchKey"
         :placeholder="$t('searchChain')"
-        
+
       >
         <template #prefix>
           <Icon name="hugeicons:search-01" />
