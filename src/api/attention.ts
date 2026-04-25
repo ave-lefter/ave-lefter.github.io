@@ -375,10 +375,12 @@ export function getFavUserRemarks2({ address, pageNO, pageSize, user_chain, time
 }
 
 // Get user monitorAddress
-export function getHistoryMonitor({pageNo=1,pageSize=50,filtered_type}:{
+export function getHistoryMonitor({pageNo=1,pageSize=50,filtered_type,chain,amt_u_min}:{
   pageNo?:number,
   pageSize?:number,
   filtered_type?:string
+  chain?:string,
+  amt_u_min?:string
 }) {
   const { $api } = useNuxtApp()
   return $api('/v2api/fav_users/v1/user/historyMonitorv2',{
@@ -386,10 +388,24 @@ export function getHistoryMonitor({pageNo=1,pageSize=50,filtered_type}:{
     params: {
       pageNo,
       pageSize,
-      filtered_type
+      filtered_type,
+      amt_u_min,
+      chain
     }
   })
 }
+
+// Get user monitorAddress
+export function getFavCount({self_address}:{self_address:string}) {
+  const { $api } = useNuxtApp()
+  return $api('/v2api/fav_users/v1/user/fav_count',{
+    method: 'get',
+    params: {
+      self_address,
+    }
+  })
+}
+
 export const getAttentionPageList=createCacheRequest(function({ group = 0, user_chain, sort = '', sort_dir = '', keyword = '', last_tx_time_max = '', last_tx_time_min = '', time_interval = '', pageSize = 100, pageNO = 1, address = localStorage.bot_evmAddress || localStorage.walletAddress }: any){
 if (!address || address === 'undefined') {
     return Promise.resolve(null)
@@ -536,12 +552,13 @@ export function monitorAddresses({ group = 0, user_chain, sort = '', sort_dir = 
 /**
  * 批量筛选地址监控推送
  */
-export function batchPauseMonitor(monitor_type: Array<'sell' | 'buy'>): Promise<any> {
+export function batchPauseMonitor(monitor_type: Array<'sell' | 'buy'>,chain:string): Promise<any> {
   const { $api } = useNuxtApp()
   return $api('/v2api/fav_users/v1/user/monitor/batchPause', {
     method: 'post',
     body:{
-      monitor_type
+      monitor_type,
+      chain
     }
   })
 }

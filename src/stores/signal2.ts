@@ -14,7 +14,8 @@ export const useMonitorStore = defineStore('monitor', () => {
   const monitorList2 = shallowRef([] as any[])
   const activeName = ref(0)
   const user_chain = shallowRef('AllChains')
-  const txType = shallowRef([0, 1])
+  const txType = useStorage('monitorTxType', [0, 1])
+  const minVol=useStorage('monitorMinVol', 0)
   const selectGroupId = shallowRef(0)
   const paginationParams = ref({...defaultPaginationParams, pageSize: 50})
 
@@ -54,6 +55,7 @@ export const useMonitorStore = defineStore('monitor', () => {
     paginationParams,
     filterParams,
     listStatus,
-    pageParams
+    pageParams,
+    minVol
   }
 })

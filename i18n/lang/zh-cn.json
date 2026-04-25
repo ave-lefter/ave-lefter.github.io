@@ -45,7 +45,7 @@
   "removeFavGroupTips": "删除分组会将分组内的 token 移入默认分组中，是否继续？",
   "tips": "提示",
   "profit2": "盈亏",
-  "closePosition": "平仓",
+  "closePosition": "清仓",
   "openPrice": "开盘价格",
   "24Exchange": "24H换手率",
   "theChain": "所属链",
@@ -2194,5 +2194,17 @@
   "dataHighlight": "数据高亮",
   "defineBgColor": "自定义背景色",
   "swapButtonColor": "按钮颜色",
-  "pairsTh3": "24h 额/资金"
+  "pairsTh3": "24h 额/资金",
+  "onlyBuy": "只看买入",
+  "onlySell": "只看卖出",
+  "minAmountU": "最小成交额",
+  "monitorNum": "监控钱包数",
+  "favTotal": "关注钱包总数",
+  "emptyButtonText": "请先监控钱包",
+  "emptyButtonText1": "请先关注钱包",
+  "allWalletsInsufficientBalance": "所有钱包余额不足: {wallets}",
+  "someWalletsSkipped": "{count} 个钱包因余额不足被跳过: {wallets}",
+  "walletsWillExecute": "个钱包将执行交易",
+  "allTradeSuccess": "所有 {count} 笔交易均成功",
+  "partialTradeResult": "{success}成功，{fail}失败"
 }

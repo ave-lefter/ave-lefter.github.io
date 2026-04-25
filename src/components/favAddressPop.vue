@@ -139,6 +139,11 @@ const visible=computed({
   }
 })
 
+onBeforeMount(() => {
+  console.log('onBeforeMount')
+  form.value = { ...props.formData,...followStore.favAddressPopFormData }
+})
+
 watch(()=>visible.value, (val) => {
   console.log('visible', val,props.formData)
   form.value = { ...props.formData,...followStore.favAddressPopFormData }

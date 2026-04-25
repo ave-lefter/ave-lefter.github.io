@@ -220,6 +220,7 @@
 <script setup lang="tsx">
 import { throttle } from 'lodash-es'
 import { formatDec } from '~/utils/formatNumber'
+import BigNumber from 'bignumber.js'
 import { getTokensPrice } from '@/api/token'
 import type { GetSignalV2ListResponse } from '~/api/signal'
 import UserAvatar from '../userAvatar.vue'
@@ -242,7 +243,7 @@ const { showBanner } = storeToRefs(useGlobalStore())
 const { width } = useWindowSize()
 
 const { t } = useI18n()
-const { visible, hasRing } = storeToRefs(useMonitorStore())
+const { visible, hasRing,minVol } = storeToRefs(useMonitorStore())
 const dragStore = useDragStore()
 const monitorStore = useMonitorStore()
 const signalStore = useSignalStore()
@@ -552,10 +553,18 @@ watch(visible, (val) => {
   }
 })
 
+function getVol(item: any) {
+  const isBuy = getIsBuy(item)
+  return new BigNumber((item[isBuy ? 'from_amount' : 'to_amount'] || 0)).times(item[isBuy ? 'from_price_usd' : 'to_price_usd'] || 0).toFixed(0) || 0
+}
 watch(
   () => wsStore.wsResult[WSEventType.MONITOR],
   (val) => {
-    // console.log('wsStore.wsResult[WSEventType.MONITOR]', wsStore.wsResult[WSEventType.MONITOR])
+    const filterVal= val.filter((item:any) => {
+      const vol = getVol(item)
+      return vol && Number(vol) > minVol.value
+    })||[]
+    if(!filterVal.length) return 
     throttle(() => {
       if (globalStore.audioSettings.audio.monitor && botStore.evmAddress) {
         audioElement.value?.play()
@@ -565,6 +574,7 @@ watch(
       isDoted2.value = true
     }
     if (globalStore.audioSettings.notice.monitor) {
+    
       monitorToast(val)
     }
   }

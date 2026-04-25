@@ -1,18 +1,22 @@
 <template>
   <div class="w-walletManage">
-    <div class="flex justify-between items-center gap-8px h-54px">
-      <el-select v-model="selectGroupId" style="--el-fill-color-blank:var(--dialog-list-hover)" class="[&&]:[--el-text-color-regular:--d-E0E0E0-l-333]" :persistent="false" :mode="mode" @click.stop @change="(val) => filterGroup(val)">
-        <el-option :key="0" :value="0" :label="$t('defaultGroup')" class="[&&]:h-20px [&&]:lh-20px [&&]:text-12px"/>
-        <el-option v-for="item in addressGroups" :key="item.group_id" :label="item.name" :value="item.group_id"  class="[&&]:h-20px [&&]:lh-20px [&&]:text-12px"/>
-      </el-select>
-      <el-button ref="addButtonRef" class="dialog-button"  style="height: 32px; padding: 8px 10px !important;font-size: 12px; color:var(--d-E0E0E0-l-333)">
-        <Icon name="ic:baseline-person-add-alt-1" class="text-12px  mr-5px"/>
-        {{ $t('addWallet') }}
-      </el-button>
-      <el-button class="dialog-button" style="height: 32px;padding: 8px 10px !important; margin-left: 0px;font-size: 12px; color:var(--d-E0E0E0-l-333)" @click.stop.prevent="showBatchAddressDetails=true" >
-        <Icon name="mingcute:new-folder-fill" class="text-12px mr-5px"/>
-        {{ $t('bulkImport') }}
-      </el-button>
+    <div class="flex flex-between items-center gap-8px h-48px px-12px">
+      <div ref="selectWrapperRef" class="wallet-manage-select-wrapper" :style="{ width: selectWrapperWidth + 'px' }">
+        <el-select v-model="selectGroupId" style="--el-fill-color-blank:var(--dialog-list-hover); width: 100%;" class="[&&]:[--el-text-color-regular:--d-E0E0E0-l-333]" :persistent="false" :mode="mode" @click.stop @change="(val) => filterGroup(val)" size="small">
+          <el-option :key="0" :value="0" :label="$t('defaultGroup')" class="[&&]:h-20px [&&]:lh-20px [&&]:text-12px"/>
+          <el-option v-for="item in addressGroups" :key="item.group_id" :label="item.name" :value="item.group_id"  class="[&&]:h-20px [&&]:lh-20px [&&]:text-12px"/>
+        </el-select>
+      </div>
+      <div class="flex items-center gap-8px">
+        <el-button ref="addButtonRef1" class="dialog-button"  style="height: 24px; padding: 4px 8px !important;font-size: 12px; color:var(--d-E0E0E0-l-333);--el-button-border-color:var(--third-text); --el-button-hover-border-color:var(--third-text)" size="small" :dark="isDark" :color="isDark ? '#0E0F10' : '#F6F9FF'">
+          <!-- <Icon name="ic:baseline-person-add-alt-1" class="text-12px  mr-5px"/> -->
+          {{ $t('add') }}
+        </el-button>
+        <el-button class="dialog-button" style="height: 24px;padding: 4px 8px !important; margin-left: 0px;font-size: 12px; color:var(--d-E0E0E0-l-333);--el-button-border-color:var(--third-text);--el-button-hover-border-color:var(--third-text)" @click.stop.prevent="showBatchAddressDetails=true" size="small" :dark="isDark" :color="isDark ? '#0E0F10' : '#F6F9FF'">
+          <!-- <Icon name="mingcute:new-folder-fill" class="text-12px mr-5px"/> -->
+          {{ $t('bulkImport') }}
+        </el-button>
+      </div>
     </div>
     <div v-loading="loading" class="text-12px m-table" element-loading-background="transparent">
       <!-- @scroll="onScroll" -->
@@ -25,7 +29,7 @@
         :footText="footText"
         :columns="columns"
         :headerHeight="36"
-        :rowHeight="40"
+        :rowHeight="44"
 
         headerClass="bg-transparent"
         :style="{
@@ -42,16 +46,41 @@
         @endReached="loadMore"
         >
           <template #header-wallet>
-            <span>{{ $t('wallet') }}</span>
+            <div class="flex items-center gap-2px">
+              <span>{{ $t('wallet') }}/<span class="cursor-pointer" :class="{ 'color-[--main-text]': lastTxSort }" @click="handleLastTxSortClick">{{ $t('lastTx') }}</span></span>
+              <HeadSort :default-sort="lastTxSort" @sort-change="handleLastTxSort" />
+            </div>
           </template>
-          <template #cell-wallet="{ row }">
+          <template #cell-wallet="{ row, $index }">
             <UserAvatar :key="row.user_address+row.user_chain" class="mr-10px" :wallet_logo="row.wallet_logo" :address="row.user_address" :chain="row.user_chain" iconSize="24px" />
             <div>
-              <!-- :formatAddress="(address) =>address?.slice(0, 4) + '...' + address?.slice(-4)" -->
-            <UserRemark :key="row.user_address+row.user_chain"  :remark="row.remark" :address="row.user_address" :chain="row.user_chain" addressClass="token-symbol ellipsis" addressStyle="max-width: 60px;font-size: 14px;color:var(--d-E0E0E0-l-333)" iconEditColor="var(--third-text)" iconEditSize="10px" showAddressTitle/>
+              <UserRemark :key="row.user_address+row.user_chain"  :remark="row.remark" :address="row.user_address" :chain="row.user_chain" addressClass="token-symbol ellipsis" addressStyle="max-width: 60px;font-size: 13px;color:var(--d-E0E0E0-l-333)" iconEditColor="var(--third-text)" iconEditSize="10px" showAddressTitle/>
+              <div :style="{
+                color:
+                  Number(formatTimeFromNow(row?.last_tx_time, true)) <= 600? '#FFA622': 'var(--third-text)',
+              }">
+                <span v-if="!row?.last_tx_time"  class="text-11px">-</span>
+                <TimerCount v-else-if="
+                  Number(formatTimeFromNow(row?.last_tx_time, true)) < 60
+                " :key="`${row.last_tx_time}${$index}`" :timestamp="row.last_tx_time" :end-time="60">
+                  <template #default="{ seconds }">
+                    <span class="color-#FFA622 text-11px">
+                      <template v-if="seconds < 60">
+                        {{ seconds }}s
+                      </template>
+                      <template v-else>
+                        {{ formatTimeFromNow(row.last_tx_time) }}
+                      </template>
+                    </span>
+                  </template>
+                </TimerCount>
+                <div v-else class="text-11px">
+                  {{ formatTimeFromNow(row.last_tx_time) }}
+                </div>
+              </div>
             </div>
-         </template>
-         <template #header-group>
+          </template>
+         <!-- <template #header-group>
             <span>{{ $t('group') }}</span>
           </template>
           <template #cell-group="{ row }">
@@ -59,8 +88,8 @@
               <el-option :key="0" :value="0" :label="$t('defaultGroup')" filterable class="[&&]:h-20px [&&]:lh-20px [&&]:text-12px"/>
               <el-option v-for="item in addressGroups" :key="item.group_id" :label="item.name" :value="item.group_id" class="[&&]:h-20px [&&]:lh-20px [&&]:text-12px"/>
             </el-select>
-          </template>
-          <template #header-chain>
+          </template> -->
+          <!-- <template #header-chain>
             <span>{{ $t('chain') }}</span>
             <el-popover v-model:visible="visible" popper-style="width: 133px;min-width: 133px;" trigger="click">
               <template #reference>
@@ -81,6 +110,38 @@
                 </li>
               </ul>
             </el-popover>
+          </template> -->
+          <template #header-group>
+            <div class="flex items-center gap-2px">
+              <Icon :name="`custom:${!AmountU ? 'amount2' : 'price2'}`"  :class="`color-[--third-text] cursor-pointer text-10px mr-4px`"
+                @click.self.stop="AmountU = !AmountU" />
+              <span 
+                class="cursor-pointer" 
+                :class="{ 'color-[--main-text]': balanceSort }"
+                @click="handleBalanceSortClick"
+              >
+                {{ $t('balance1') }}
+              </span>
+              <HeadSort :default-sort="balanceSort" @sort-change="handleBalanceSort" />
+            </div>
+          </template>
+          <template #cell-group="{ row }">
+            <template v-if="!AmountU">
+              <div v-if="row?.main_token_balance_amount > 0" :class="!row?.main_token_balance_amount ? 'color-[--third-text]' : ''" class="flex items-center justify-end text-13px">
+                <img :src="`${token_logo_url}chain/${row.user_chain}.png`" class="rd-50% inline-block mr-4px" width="10" height="10" lazy alt="">{{ formatNumber2(row?.main_token_balance_amount || 0, 2) }}&nbsp;{{row.main_token_symbol}}
+              </div>
+              <div v-else class="color-[--third-text] flex items-center justify-end text-13px">
+                0
+              </div>
+            </template>
+            <template v-else>
+              <div v-if="row?.main_token_balance_amount > 0" :class="!row?.main_token_balance_amount ? 'color-[--third-text]' : ''" class="flex items-center justify-end text-13px">
+                ${{formatNumber2(getAmountU(row), 2)}}
+              </div>
+              <div v-else class="color-[--third-text] flex items-center justify-end text-13px">
+                $0
+              </div>  
+            </template>
           </template>
           <template #cell-chain="{ row }">
             <span class="text-12px">{{ getChainInfo(row.user_chain).name }}</span>
@@ -90,10 +151,13 @@
           </template>
           <template #cell-operate="{ row ,rowIndex}">
             <div class="flex justify-end items-center" @click.stop>
-              <!-- <div class=" color-#666 flex-end mr-2px">
-                <Icon name="material-symbols-light:notifications-rounded" class="text-15px"/>
-                <span>{{ $t('enableMonitor') }}</span>
-              </div> -->
+              <Icon 
+                :ref="(el) => groupIconRefs[rowIndex] = el" 
+                name="custom:group" 
+                class="text-10px mr-4px text-[--third-text] cursor-pointer"
+                @click.stop="handleGroupIconClick(row, rowIndex)"
+              />
+           
               <div
                 v-if="SupportMonitorChain.includes(row?.user_chain)"
                 class="flex items-center mr-4px cursor-pointer color-[--third-text]"
@@ -112,6 +176,18 @@
               <Icon name="bx:bxs-trash-alt" class="text-13px color-[--third-text]" @click.stop.prevent="handleDeleteAttention(row)"/>
             </div>
          </template>
+         <template #empty>
+            <div v-if="!loading" class="h-full flex flex-col items-center justify-center pt-0px">
+              <img v-if="themeStore.theme==='light'" src="@/assets/images/empty-white.svg" alt="">
+              <img v-else src="@/assets/images/empty-black.svg" alt="">
+              <span class="mt-10px">
+                {{ $t('emptyNoData') }}
+              </span>
+              <el-button ref="addButtonRef2" class="mt-10px" type="primary" size="small">{{ $t('emptyButtonText1') }}</el-button>
+            </div>
+            <div v-else>
+            </div>
+         </template>
           <!-- <template #footer>
             <div
               class="flex items-center"
@@ -126,16 +202,32 @@
           </template> -->
       </AveTable>
     </div>
-     <AddFavAddressPop v-if="addButtonRef" ref="addFavAddressPopRef" :buttonRef="addButtonRef" @onConfirm="handleConfirmAdd"/>
+     <AddFavAddressPop v-if="addButtonRef1" ref="addFavAddressPopRef" :buttonRef="addButtonRef1" @onConfirm="handleConfirmAdd"/>
+     <AddFavAddressPop v-if="addButtonRef2" ref="addFavAddressPopRef" :buttonRef="addButtonRef2" @onConfirm="handleConfirmAdd"/>
+    <GroupSelect
+      v-if="currentRowData"
+      :visible="groupSelectVisible"
+      :model-value="currentRowData.group_id"
+      :trigger-ref="currentTriggerRef"
+      :address-groups="addressGroups"
+      @update:model-value="handleGroupChange"
+      @update:visible="(val) => groupSelectVisible = val"
+      @new-group="handleNewGroup"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { getAttentionPageList, moveFavoriteGroup2, deleteAttention ,addAttention2,addAddressMonitor,favUsersResumeMonitor,favUsersPauseMonitor} from '~/api/attention'
+import { getAttentionPageList, moveFavoriteGroup2, deleteAttention ,addAttention2,addAddressMonitor,favUsersResumeMonitor,favUsersPauseMonitor,addFavoriteGroup2} from '~/api/attention'
 import { defaultPaginationParams } from '@/utils/constants'
 import type {RowEventHandlerParams} from 'element-plus'
+import BigNumber from 'bignumber.js'
 import { throttle } from 'lodash-es'
+import { useStorage } from '@vueuse/core'
 import SuffixIcon from '../suffixIcon.vue'
+import GroupSelect from './components/groupSelect.vue'
+import HeadSort from '~/components/headSort.vue'
+
 const { t } = useI18n()
 const $router = useRouter()
 const props=defineProps({
@@ -146,7 +238,11 @@ const props=defineProps({
   isLarge:{
     type:Boolean,
     default:false
-  }
+  },
+  chain:{
+    type:String,
+    default:'AllChains'
+  },
 })
 const { mode, isDark, token_logo_url } = storeToRefs(useGlobalStore())
 const chainOptions=computed(()=>{
@@ -162,17 +258,33 @@ const chainOptions=computed(()=>{
     })
   ]
 })
+const aveTableRef = ref()
 const visible = ref(false)
-const addButtonRef = ref()
+const addButtonRef1 = ref() 
+const addButtonRef2 = ref() 
 const addFavAddressPopRef = ref()
+const selectWrapperRef = ref<HTMLElement>()
+const selectWrapperWidth = ref(120)
+const AmountU = useStorage('walletManageAmountU', false)
+const groupIconRefs = ref<Record<string, any>>({})
+const currentRowData = ref<any>(null)
+const currentRowIndex = ref(0)
+const currentTriggerRef = ref<any>(null)
+const groupSelectVisible = ref(false)
+const balanceSort = ref('')
+const lastTxSort = ref('')
+// 当前激活的按钮 ref（用于弹框定位）
+const currentButtonRef = ref()
 // const selectGroupId=ref(0)
 const {selectGroupId,paginationParams,user_chain,monitorList1} = storeToRefs(useMonitorStore())
-const {currentAddress ,showBatchAddressDetails, updateNum12,updateNum13,updateNum14,updateNum2,updateNum3,addressGroups} = storeToRefs(useFollowStore())
+const {currentAddress ,showBatchAddressDetails, updateNum12,updateNum13,updateNum14,updateNum2,updateNum3,addressGroups,delWalletGroup} = storeToRefs(useFollowStore())
+
+const followStore = useFollowStore()
 const conditions = reactive({
   group: selectGroupId.value,
   activeTab: '7d',
   isMonitor: false,
-  user_chain:user_chain.value,
+  user_chain: props.chain || 'AllChains',
   sort: '',
   sort_dir: '',
   keyword: '',
@@ -192,6 +304,7 @@ const conditions = reactive({
   last_trade_time: string|number
 })
 const botStore = useBotStore()
+const themeStore = useThemeStore()
 // const dataSource=ref([] as Array<any>)
 const loading=ref(false)
 // const pageData = ref({
@@ -225,9 +338,27 @@ onMounted(() => {
    if(monitorList1.value.length>0) return
   init()
 })
+
+watch(() => currentAddress.value, (val) => {
+  if(!val) return
+  paginationParams.value={...defaultPaginationParams,pageSize: 50}
+  if(aveTableRef.value){
+    aveTableRef.value.scrollToTop(0)
+  }
+  getTableList()
+})
+
 watch(() => updateNum12.value+updateNum13.value+updateNum14.value+updateNum3.value, () => {
   paginationParams.value={...defaultPaginationParams,pageSize: 50}
+  if(aveTableRef.value){
+    aveTableRef.value.scrollToTop(0)
+  }
   getTableList()
+})
+watch(() => props.chain, (newChain) => {
+  conditions.user_chain = newChain || 'AllChains'
+  // if(aveTableRef.value) aveTableRef.value.scrollToTop(0)
+  // getTableList()
 })
 // watch(() => monitorStore.visible, (val) => {
 //   // console.log('monitorStore.visible', monitorStore.visible)
@@ -239,6 +370,7 @@ watch(() => updateNum12.value+updateNum13.value+updateNum14.value+updateNum3.val
 function init(){
   getTableList()
 }
+
 function handleConfirmAdd(formData:any,resetFields?:() => void,stopLoading?:()=>void) {
   addAttention2({ address:botStore.evmAddress, user_chain: formData?.user_chain?.id ,user_address:formData.address,remark:formData.remark,group:formData.group_id,is_monitored:0}).then(() => {
     // init2()
@@ -258,7 +390,7 @@ function filterGroup(val: number) {
 }
 
 const handleDeleteAttention=throttle((item: any)=>{
-  deleteAttention({address: currentAddress.value, user_chain: item.chain,user_address: item.user_address}).then(() => {
+  deleteAttention({address: currentAddress.value, user_chain: item.user_chain,user_address: item.user_address}).then(() => {
     ElMessage.success(t('success'))
     getTableList()
     updateNum2.value++
@@ -325,6 +457,68 @@ watch([() => conditions], () => {
    paginationParams.value={...defaultPaginationParams,pageSize: 50}
    getTableList()
 },{deep: true})
+
+watch(() => delWalletGroup.value, (val) => {
+  if(val) {
+    if(selectGroupId.value===val){
+      selectGroupId.value=0
+      conditions.group=0
+      console.log('delWalletGroup', val)
+    }
+    // getTableList()
+    // delWalletGroup.value = false
+  }
+})
+
+
+// 通用排序处理函数
+const handleSort = (
+  sortField: string,
+  currentSortRef: Ref<string>,
+  otherSortRef: Ref<string>
+) => {
+  return (sort: string) => {
+    // 清除其他排序
+    otherSortRef.value = ''
+    currentSortRef.value = sort
+    
+    if (!sort) {
+      conditions.sort = ''
+      conditions.sort_dir = ''
+    } else {
+      conditions.sort = sortField
+      conditions.sort_dir = sort
+    }
+  }
+}
+
+// 通用点击文本切换排序函数
+const handleSortClick = (
+  currentSortRef: Ref<string>,
+  sortHandler: (sort: string) => void
+) => {
+  return () => {
+    const nextSort = { asc: '', desc: 'asc', '': 'desc' }[currentSortRef.value] || ''
+    sortHandler(nextSort)
+  }
+}
+
+// 余额排序
+const handleBalanceSort = handleSort('main_token_balance', balanceSort, lastTxSort)
+const handleBalanceSortClick = handleSortClick(balanceSort, handleBalanceSort)
+
+// 最后交易时间排序
+const handleLastTxSort = handleSort('last_tx_time', lastTxSort, balanceSort)
+const handleLastTxSortClick = handleSortClick(lastTxSort, handleLastTxSort)
+
+// 监听 AmountU 变化，更新排序字段
+// watch(AmountU, () => {
+//   if (balanceSort.value) {
+//     conditions.sort = AmountU.value ? 'total_balance' : 'main_token_balance_amount'
+//     conditions.sort_dir = balanceSort.value
+//   }
+// })
+
 const getTableList = throttle(function() {
   if(paginationParams.value.pageNO===1)loading.value = true
   if (paginationParams.value.loaded) return
@@ -373,11 +567,139 @@ const getRowGroupChange = async (val: number, row: any) => {
   updateNum2.value++
   getTableList()
 }
+
+const handleGroupIconClick = (row: any, rowIndex: number) => {
+  // 如果点击的是同一行，切换显示状态
+  if (currentRowData.value?.index === row.index) {
+    groupSelectVisible.value = !groupSelectVisible.value
+    return
+  }
+  
+  // 切换到新行
+  currentRowData.value = row
+  currentRowIndex.value = rowIndex
+  currentTriggerRef.value = groupIconRefs.value[rowIndex]
+  groupSelectVisible.value = true
+}
+
+const handleGroupChange = async (groupId: number) => {
+  if (!currentRowData.value) return
+  
+  try {
+    paginationParams.value = { ...defaultPaginationParams, pageSize: 50 }
+    await moveFavoriteGroup2({
+      user_chain: currentRowData.value.user_chain,
+      user_address: currentRowData.value.user_address,
+      group: groupId
+    })
+    
+    ElMessage.success(t('success'))
+    updateNum2.value++
+    getTableList()
+  } catch (error) {
+    ElMessage.error(String(error))
+  }
+}
+
+const handleNewGroup = async (name: string) => {
+  // 检查分组名称是否已存在
+  const existingGroup = addressGroups.value.find(group => group.name === name)
+  
+  if (existingGroup) {
+    // 如果分组已存在，直接切换到该分组
+    try {
+      paginationParams.value = { ...defaultPaginationParams, pageSize: 50 }
+      await moveFavoriteGroup2({
+        user_chain: currentRowData.value.user_chain,
+        user_address: currentRowData.value.user_address,
+        group: existingGroup.group_id
+      })
+      
+      ElMessage.success(t('success'))
+      updateNum2.value++
+      getTableList()
+    } catch (error) {
+      ElMessage.error(String(error))
+    }
+    return
+  }
+  
+  // 如果分组不存在，创建新分组
+  try {
+    await addFavoriteGroup2(name)
+    ElMessage.success(t('success'))
+    
+    // 刷新分组列表
+    await followStore.getUserFavoriteGroups2()
+    
+    // 找到新创建的分组并切换
+    const newGroup = addressGroups.value.find(group => group.name === name)
+    if (newGroup) {
+      paginationParams.value = { ...defaultPaginationParams, pageSize: 50 }
+      await moveFavoriteGroup2({
+        user_chain: currentRowData.value.user_chain,
+        user_address: currentRowData.value.user_address,
+        group: newGroup.group_id
+      })
+      
+      updateNum2.value++
+      getTableList()
+    }
+  } catch (error) {
+    ElMessage.error(String(error))
+  }
+}
+
 function tableRowClick(row: { user_address: string; user_chain: string }) {
   $router.push({
     path: `/address/${row.user_address}/${row.user_chain}`,
   })
 }
+
+// 计算选中值的显示文本
+const getSelectedLabel = computed(() => {
+  if (selectGroupId.value === 0) {
+    return t('defaultGroup')
+  }
+  const group = addressGroups.value.find(g => g.group_id === selectGroupId.value)
+  return group?.name || ''
+})
+
+// 动态计算宽度
+const updateSelectWidth = () => {
+  nextTick(() => {
+    const text = getSelectedLabel.value
+    
+    // 创建临时元素测量文本宽度
+    const tempSpan = document.createElement('span')
+    tempSpan.style.visibility = 'hidden'
+    tempSpan.style.position = 'absolute'
+    tempSpan.style.whiteSpace = 'nowrap'
+    tempSpan.style.fontSize = '12px'
+    tempSpan.style.fontFamily = 'inherit'
+    tempSpan.style.padding = '0 4px'
+    tempSpan.textContent = text
+    
+    document.body.appendChild(tempSpan)
+    const width = tempSpan.offsetWidth
+    document.body.removeChild(tempSpan)
+    
+    // 加上箭头空间(24px)和最小宽度限制
+    const calculatedWidth = Math.max(Math.min(width + 20, 120), 60)
+    selectWrapperWidth.value = calculatedWidth
+  })
+}
+
+// 监听选中值变化
+watch(selectGroupId, () => {
+  updateSelectWidth()
+}, { immediate: true })
+
+// 监听地址组变化（可能影响显示文本）
+watch(addressGroups, () => {
+  updateSelectWidth()
+}, { deep: true })
+
 const columns = computed(() => {
   return [
     {
@@ -394,21 +716,25 @@ const columns = computed(() => {
       minWidth: 90,
       align: 'right',
     },
-    {
-      title: t('chain'),
-      dataKey: 'chain',
-      key: 'chain',
-      align: 'right',
-      minWidth: 55,
-    },
+    // {
+    //   title: t('chain'),
+    //   dataKey: 'chain',
+    //   key: 'chain',
+    //   align: 'right',
+    //   minWidth: 55,
+    // },
     {
       title: t('operate'),
       dataKey: 'operate',
       key: 'operate',
       align: 'right',
-      minWidth: 40,
+      minWidth: 52,
     }]
 })
+
+function getAmountU(row: any) {
+  return new BigNumber(row.main_token_balance_amount).times(row.main_token_price).toNumber()
+}
 
 </script>
 
@@ -419,6 +745,25 @@ const columns = computed(() => {
   .el-virtual-scrollbar{
     display: none;
   }
+  //  .el-table-v2__header-cell{
+  //     padding: 0 6px 0 12px;
+  //   }
+    // .el-table-v2__row-cell{
+    //   padding: 0 6px 0 12px;
+    // }
+  .el-table-v2__header-cell,.el-table-v2__row-cell{
+    &:nth-child(1){
+      padding-left: 12px;
+    }
+    &:last-child{
+      padding-right: 6px;
+    }
+  }
+}
+
+.wallet-manage-select-wrapper {
+  transition: width 0.2s ease;
+  flex-shrink: 0;
 }
 </style>
 

@@ -144,7 +144,7 @@ function calculateColumnWidths() {
         </template>
         <!--如果没有自定义空样式则使用默认值-->
         <template v-if="!defaultSlots.empty" #empty>
-          <div v-if="!loading" class="h-full flex flex-col items-center justify-center pt-100px">
+          <div v-if="!loading" class="h-full flex flex-col items-center justify-center pt-0px">
             <img v-if="themeStore.theme==='light'" src="@/assets/images/empty-white.svg" alt="">
             <img v-else src="@/assets/images/empty-black.svg" alt="">
             <span
