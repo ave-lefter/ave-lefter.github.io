@@ -12,7 +12,7 @@
           :key="item.value"
           :ref="setBtnRef"
           class="cursor-pointer border-none font-400 rounded-4px min-w-24px py-5px px-5px text-center"
-          :class="`${item.value === props.customSelected?'color-[--main-text] bg-[--tab-active-bg]':'color-[--secondary-text] bg-transparent'}`"
+          :class="`${item.value === props.customSelected?'color-[--main-text1] bg-[--tab-active-bg]':'color-[--secondary-text] bg-transparent'}`"
           type="button"
           @click.stop="emit('update:customSelected', item.value)"
           @mouseenter="showPopover(item.value)"
@@ -26,14 +26,13 @@
     <el-input
       v-model.trim="quickBuyValue1"
       style="
-          --el-input-text-color: var(--main-text);
+          --el-input-text-color: var(--main-text1);
           border-radius: 4px;
-          width: 88px;
+          width: 65px;
           height: 28px;
           font-size: 12px;
         "
       placeholder="0"
-      
       type="text"
       @input="(value) => {
             quickBuyValue1 = value.replace(/\-|[^\d.]/g, '')
