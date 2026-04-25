@@ -8,7 +8,7 @@
     :clearable="false"
     style="--el-fill-color-blank:var(--border);"
     :suffix-icon="CaretBottom"
-    :class="[props.class, props.wrapperClass]"
+    :class="[props.class, props.wrapperClass,'[&&]:[--el-select-input-color:var(--third-text)]']"
     :teleported="props.teleported||false"
     :popper-class="`${props.popperClass} w-103px chain-selector-popper`"
     :persistent="false"

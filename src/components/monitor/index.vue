@@ -8,7 +8,7 @@
         <template v-if="botStore.evmAddress">
           <div v-if="props.isLarge" v-loading="loading" class="text-13px m-table"
             element-loading-background="transparent">
-            <AveTable ref="aveTableRef" :showEmptyText="true" rowKey="id" :data="filterDataSource" :columns="columns" fixed :style="{
+            <AveTable ref="aveTableRef" :showEmptyText="true" rowKey="id" :data="filterDataSource" :columns="columns"  fixed :style="{
               height: props.scrollHeight + 'px',
               fontSize: '13px',
               // '--el-table-border':'1px solid var(--dialog-list-hover)',
@@ -114,8 +114,8 @@
             </AveTable>
           </div>
           <div v-else v-loading="loading" class="text-13px m-table pt-12px" element-loading-background="transparent">
-            <AveTable ref="aveTableRef" rowKey="id" fixed :data="filterDataSource" :columns="columns" :headerHeight="54"  :showEmptyText="true"
-              :rowHeight="70" headerClass="bg-transparent" :style="{
+            <AveTable ref="aveTableRef" rowKey="id" fixed :data="filterDataSource" :columns="columns" :headerHeight="64"  :showEmptyText="true"
+              :rowHeight="64" headerClass="bg-transparent" :style="{
                 height: props.scrollHeight + 'px',
                 fontSize: '13px',
                 // height:'500px',
