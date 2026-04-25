@@ -344,20 +344,44 @@
               :header-row-style="{ fontSize: '12px', color: '#697F95' }"
               style="width: 100%"
               class="table-list"
+              @sort-change="handleInviteeSortChange"
             >
-              <el-table-column prop="time" :label="$t('registerTime')">
+              <el-table-column prop="bindRefTime" :label="$t('registerTime')" sortable="custom">
                 <template #default="{ row }">
                   {{ formatDate(row.bindRefTime) }}
                 </template>
               </el-table-column>
-              <el-table-column prop="name" :label="$t('friendName')">
+              <el-table-column prop="username" :label="$t('friendName')">
                 <template #default="{ row }">
                   {{ row?.username }}
+                </template>
+              </el-table-column>
+              <el-table-column prop="remark" :label="$t('remark')">
+                <template #default="{ row }">
+                  <div class="flex items-center">
+                    <div v-if="editingRemarkGuid !== row.guid">{{ row?.remark || '--' }}</div>
+                    <form v-else class="flex items-center gap-5px" @submit.prevent="confirmEditRemark(row)" >
+                      <el-input v-model="editingRemarkValue" size="small" :placeholder="t('remark')" maxlength="16" />
+                      <el-button native-type="submit" size="small" type="primary" :loading="editingRemarkLoading">{{ $t('save') }}</el-button>
+                      <el-button native-type="button" size="small" class="ml-0!" @click.stop="cancelEditRemark">{{ $t('cancel') }}</el-button>
+                    </form>
+                    <Icon
+                      v-if="editingRemarkGuid !== row.guid"
+                      name="custom:editor"
+                      class="ml-8px clickable text-12px color-#697F95"
+                      @click.stop="startEditRemark(row)"
+                    />
+                  </div>
                 </template>
               </el-table-column>
               <el-table-column prop="name" :label="$t('commission')">
                 <template #default="{ row }">
                   ${{ formatNumber(new BigNumber(row?.refFee || '0').plus(new BigNumber(row?.perpRefFee || '0')).toFixed(), 2) }}
+                </template>
+              </el-table-column>
+                <el-table-column prop="lastSwap" :label="$t('lastSwap')" sortable="custom">
+                <template #default="{ row }">
+                  {{ row?.lastSwap ? formatDate(row.lastSwap) : '--' }}
                 </template>
               </el-table-column>
               <el-table-column prop="level" :label="$t('vipLevel')" align="right">
@@ -693,7 +717,8 @@ import {
   getInviteeList as getInviteeListApi,
   createWithdrawIncomeOrder as createWithdrawIncomeOrderApi,
   getWithdrawRecordList as getWithdrawRecordListApi,
-  getLevelsReferralInfo
+  getLevelsReferralInfo,
+  setInviteeRemark as setInviteeRemarkApi,
 } from '~/api/referral'
 import { formatExplorerUrl } from '~/utils'
 import BigNumber from 'bignumber.js'
@@ -732,6 +757,10 @@ interface InviteeItem {
   bindRefTime: number
   username: string
   vip?: string
+  remark?: string
+  lastSwap?: number
+  refFee?: string
+  perpRefFee?: string
 }
 
 interface WithdrawableItem {
@@ -793,8 +822,15 @@ const pageSize = ref(10)
 const referralInfo = ref<ReferralInfo>({
   refCode: '',
   withdrawableList: [],
-})
+} as any)
 const inviteeList = ref<InviteeItem[]>([])
+// invitee 列表排序参数（server side）
+const inviteeSortBy = ref<'invite' | 'swap' | ''>('swap')
+const inviteeSortOrder = ref<'asc' | 'desc' | ''>('desc')
+// 编辑备注状态
+const editingRemarkGuid = ref<string | null>(null)
+const editingRemarkValue = ref<string>('')
+const editingRemarkLoading = ref(false)
 const currentPage1 = ref(1)
 const total = ref(0)
 const withdrawRecordList = ref<WithdrawRecord[]>([])
@@ -900,7 +936,7 @@ const init = () => {
     referralInfo.value = {
       refCode: '',
       withdrawableList: [],
-    }
+    } as any
     total.value = 0
     currentPage.value = 1
     currentPage1.value = 1
@@ -926,12 +962,66 @@ const getReferralInfo = async () => {
 
 const getInviteeList = async () => {
   try {
-    const data = { pageNo: currentPage.value - 1, pageSize: pageSize.value }
+    const data: any = { pageNo: currentPage.value - 1, pageSize: pageSize.value }
+    if (inviteeSortBy.value) {
+      data.sortBy = inviteeSortBy.value
+      if (inviteeSortOrder.value) data.sortOrder = inviteeSortOrder.value
+    }
     const res = await getInviteeListApi(data)
     inviteeList.value = Array.isArray(res?.userItems) ? res.userItems : []
     total.value = res?.totalUserCount || 0
   } catch (error) {
     console.error('获取邀请列表失败:', error)
+  }
+}
+
+// 处理表格排序（bindRefTime -> invite, lastSwap -> swap）
+function handleInviteeSortChange({ prop, order }: { prop: string; order: string }) {
+  if (!prop) return
+  if (prop === 'bindRefTime') {
+    inviteeSortBy.value = 'invite'
+  } else if (prop === 'lastSwap') {
+    inviteeSortBy.value = 'swap'
+  } else {
+    inviteeSortBy.value = ''
+  }
+  inviteeSortOrder.value = order === 'ascending' ? 'asc' : order === 'descending' ? 'desc' : ''
+  currentPage.value = 1
+  getInviteeList()
+}
+
+function startEditRemark(row: InviteeItem) {
+  editingRemarkGuid.value = row.guid
+  editingRemarkValue.value = (row.remark || '').slice(0, 16)
+}
+
+function cancelEditRemark() {
+  editingRemarkGuid.value = null
+  editingRemarkValue.value = ''
+}
+
+async function confirmEditRemark(row: InviteeItem) {
+  if (!editingRemarkGuid.value) return
+  // 长度校验
+  if ((editingRemarkValue.value || '').length > 16) {
+    ElMessage.error(t('remarkMaxLength') || '备注长度不能超过16')
+    return
+  }
+  editingRemarkLoading.value = true
+  try {
+    await setInviteeRemarkApi(row.guid, editingRemarkValue.value || '')
+    // 更新本地数据
+    const idx = inviteeList.value.findIndex(i => i.guid === row.guid)
+    if (idx !== -1) {
+      inviteeList.value[idx] = { ...inviteeList.value[idx], remark: editingRemarkValue.value }
+    }
+    ElMessage.success(t('saveSuccess'))
+    cancelEditRemark()
+  } catch (err: any) {
+    const msg = err?.data?.message || err?.message || '保存失败'
+    ElMessage.error(msg)
+  } finally {
+    editingRemarkLoading.value = false
   }
 }
 
