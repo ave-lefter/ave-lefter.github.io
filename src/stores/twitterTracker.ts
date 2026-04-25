@@ -22,7 +22,6 @@ export const useTwitterTrackerStore = defineStore('tracker', () => {
   const showFooter = ref(false)
   const loading2 = ref(false)
   const finished2 = ref(false)
-
   return {
     ...draggableState,
     visible: draggableState.visible,

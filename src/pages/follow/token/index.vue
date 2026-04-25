@@ -178,6 +178,7 @@ watch(() => botStore.evmAddress, (newVal) => {
     getList()
     // getGroupList()
   } else {
+    activeTab.value = 0
     tableList.value = []
     tabsGroup.value = []
   }
@@ -188,6 +189,7 @@ watch(() => walletStore.address, (newVal) => {
     getList()
     // getGroupList()
   } else {
+    activeTab.value = 0
     tableList.value = []
     tabsGroup.value = []
   }

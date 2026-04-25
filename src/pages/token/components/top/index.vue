@@ -45,7 +45,7 @@
         <Collect iconClass="text-16px cursor-pointer" :isCollected="collected" :userFavoriteGroups="userFavoriteGroups" @confirmSwitchGroup="confirmSwitchGroup" @collect="collect" @newGroupAndCollect="newGroupAndCollect"/>
       </div>
 
-      <div class="pump-item_item token-info ml-16px flex items-center color-[--third-text] ">
+      <div class="pump-item_item token-info ml-8px flex items-center color-[--third-text] ">
         <div class="black-container">
           <span
             v-tooltip="pumpBlackList?.findIndex(i => (i.address == token?.token && i.type == 'ca') || (i.address == token?.symbol && i.type == 'keyword')) !== -1 ? $t('cancel') + $t('BlackListToken') : $t('BlackListToken')"
@@ -289,6 +289,9 @@
                     <a :href="`https://x.com/search?q=${token?.token}`" target="_blank" class="text-12px py-4px px-8px color-[--main-text] hover:bg-[--dialog-tab-active]">
                       {{ $t('tweetSearchContractAddress') }}
                     </a>
+                    <a href=""  @click.stop.prevent="globalStore.searchTwitter(token?.token)" class="text-12px py-4px px-8px color-[--main-text] hover:bg-[--dialog-tab-active]">
+                      {{ $t('tweetSearchContractAddressMediaTracker') }}
+                    </a>
                     <a :href="`https://x.com/search?q=$${token?.symbol}`" target="_blank" class="text-12px py-4px px-8px color-[--main-text] hover:bg-[--dialog-tab-active]">
                       {{ $t('tweetSearchContractAddress2') }}
                     </a>
@@ -350,6 +353,18 @@
                 :width="12"
                 style="border-radius: 100%"
               >
+              <template v-if="Number(token?.badges?.length || 0) > 0">
+                <img
+                  v-for="(i, $index) in token?.badges"
+                  :key="$index"
+                  v-tooltip="$t(`${i.tag}`)"
+                  class="rounded-100% bg-btn cursor-pointer"
+                  :src="formatIconTag(i.tag)"
+                  alt=""
+                  :width="12"
+                  onerror="this.src='/icon-default.png'"
+                >
+              </template>
               <a
                 v-if="aiSummary?.headline || aiSummary?.summary"
                 v-tooltip.raw="{
@@ -362,7 +377,7 @@
                 <Icon name="custom:ai" class="text-14px"/>
               </a>
             </div>
-            <DeBox/>
+            <!-- <DeBox/> -->
             <el-popover
               v-if="collected"
               v-model:visible="editableGroup"
@@ -1059,7 +1074,7 @@ import Top50 from './top50.vue'
 import HolderRank from '@/pages/token/components/right/info/holderRank/index.vue'
 // import Run from './run.vue'
 import Check from './check.vue'
-import DeBox from './deBox.vue'
+// import DeBox from './deBox.vue'
 import XPopup from '~/components/xPopup/index.vue'
 import XIcon from '~/components/xPopup/xIcon.vue'
 import Collect from '~/components/collect.vue'
@@ -1780,9 +1795,9 @@ async function handleSearchTokenName() {
     width: 40px;
   }
   .icon-symbol {
-    width: 20px;
+    width: 15px;
     position: absolute;
-    bottom: 3px;
+    bottom: 2px;
     right: 0px;
   }
 }

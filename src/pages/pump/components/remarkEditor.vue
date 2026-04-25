@@ -1,5 +1,5 @@
 <template>
-  <div v-if="walletAddress" class="remark-wrapper flex items-center justify-center mr-4px" @click.stop>
+  <div v-if="walletAddress" class="remark-wrapper flex items-center justify-center mr-4px relative z-14" @click.stop>
     <span
       v-if="props.remark && !editable"
       v-tooltip="props.remark"

@@ -14,7 +14,7 @@
           $t('takeProfit')
         }}</span>
         <span v-else class="color-#F6465D text-14px mr-10px">{{ $t('stopLoss') }}</span>
-        <el-input-number v-model="item.priceChange" class="input-number-limit" :min="1" :controls="false" :disabled="!!name"
+        <el-input-number v-model="item.priceChange" class="input-number-limit" :min="1" :max="item.isUp ? undefined : 99" :controls="false" :disabled="!!name"
           placeholder="--">
           <template #prefix>
             <div class="flex items-center">

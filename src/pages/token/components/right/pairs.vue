@@ -4,7 +4,8 @@
       <tr>
         <th>{{ $t('liquidityPair') }}</th>
         <th>{{ $t('amount') }}/{{ $t('initial') }}</th>
-        <th>{{ $t('price') }}/{{ $t('poolCirculatingSupply') }}</th>
+        <th>{{ $t('pairsTh3') }}</th>
+        <!-- <th>{{ $t('price') }}/{{ $t('poolCirculatingSupply') }}</th> -->
       </tr>
     </thead>
     <tbody>

@@ -1231,11 +1231,12 @@ export const pumpMap: Record<PlatformsType, pumpObjColor> = {
 export function getPumpBgColor(platform: string): pumpObjColor {
   const item = pumpMap[platform as PlatformsType]
   if (!item) {
-    return { color: '#55D592', bg: resolveColor('--d-172521-l-DEF4EF') }
+    return { color: '#55D592', bg: resolveColor('--d-172521-l-DEF4EF'), custom: false }
   }
   return {
     ...item,
     bg: resolveColor(item.bg),
+    custom: false,
   }
 }
 function resolveColor(value: string): string {
@@ -1285,9 +1286,9 @@ export function requestTimeout(interval: number, callback: () => void | Promise<
   request()
   return timerId
 }
-
 export function getCssVariable(key: string) {
-  return getComputedStyle(document.documentElement).getPropertyValue(key)
+  if (typeof window === 'undefined') return key
+  return getComputedStyle(document.documentElement).getPropertyValue(key).trim() || key
 }
 
 export function hexToRgba(hex: string, alpha = 1) {

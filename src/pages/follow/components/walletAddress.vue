@@ -27,7 +27,7 @@
       :default-sort="defaultSort" @sort-change="handleSortChange" @row-click="tableRowClick"  @selection-change="_handleSelectionChange" :row-key="(row:any)=>`${row?.user_address}-${row?.user_chain}`">
         <template #empty>
           <AveEmpty
-            v-if="!botStore?.evmAddress"
+            v-if="isMonitor&&!botStore?.evmAddress"
             :style="{height:`100%`}"
             class="overflow-hidden"
           >
@@ -50,7 +50,7 @@
           <span v-else />
         </template>
         <el-table-column v-if="favHover||checkedList.length" type="selection" width="22" fixed="left" reserve-selection/>
-        <el-table-column v-if="isMonitor" type="selection" width="22" fixed="left" reserve-selection/>
+        <el-table-column v-if="isMonitor&&botStore?.evmAddress" type="selection" width="22" fixed="left" reserve-selection/>
        <el-table-column :label="$t('wallet2')" width="215" :fixed="false">
           <template #header>
             <div v-if="favHover|| (!isMonitor && checkedList.length)" :class="`batchDel mr-8px ${(checkedList.length&&'warning')}`" @click="batchDelete">{{ $t('batchDelete') }}{{checkedList.length?`(${checkedList.length})`:''}}</div>

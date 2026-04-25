@@ -81,6 +81,7 @@ export const useFollowStore = defineStore('follow', () => {
   watch(currentAddress, (val) => {
     if(!val){
       addressGroups.value = []
+      addressConditions.value.group = 0
       favAddressPopFormData.value = {
         group: 0,
         is_monitored: 1

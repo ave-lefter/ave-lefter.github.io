@@ -4,7 +4,7 @@
     @update:visible="updateVisible"
     popper-class="new-popover"
     placement="bottom"
-    :width="380"
+    :width="488"
     trigger="click"
     :teleported="false"
     :persistent="false"
@@ -21,87 +21,115 @@
       </slot>
     </template>
     <template #default>
-        <div>
-          <span class="text-12px color-[--secondary-text]">{{ $t('mc/vol') }}</span>
-          <div class="tabs mt-10px">
-            <button
-              v-for="item in list_mc"
-              :key="item.size"
-              class="flex-1"
-              :class="{ active: item.size === pumpSetting.fontSize_mc }"
-              type="button"
-              @click.stop="pumpSetting.fontSize_mc = item.size"
-            >
-              <span :style="{ 'font-size': item.size }">Mc $99K</span>
-              <span class="block text-12px mt-8px">{{ item.name || '' }}</span>
-            </button>
-          </div>
-        </div>
-
-        <div class="mt-20px border-b border-[--dialog-divider] pb-20px">
-          <span class="text-12px color-[--secondary-text]">{{ $t('sell/buy') }}</span>
-          <div class="tabs flex-wrap mt-10px">
-            <button
-              v-for="item in list_swap"
-              :key="item.size"
-              class="flex-1 small"
-              :class="{ active: item.size === activeFontSize }"
-              type="button"
-              @click.stop="switchSwap(item)"
-            >
-              <div
-                class="swap flex items-center justify-center"
+        <div class="">
+          <div class="text-14px font-medium pb-12px border-b border-b-solid border-b-[--border] lh-16px">{{ $t('customSetting') }}</div>
+          <div class="   border-b-1px border-b-solid border-b-[var(--border)]">
+            <div class="tabs switchTabs">
+              <button
+                v-for="item in list_tabs"
+                :key="item.id"
+                :class="{ active: item.id === activeTab }"
+                type="button"
+                @click.stop="activeTab = item.id"
               >
-                <Icon
-                  class="mr-4px"
-                  :style="{ 'font-size': item.value}"
-                  name="mynaui:lightning-solid"
-                />
-                0.01
-              </div>
-              <span class="block text-12px mt-8px">{{ item.name || '' }}</span>
-            </button>
-            <div class="slider-wrapper" v-show="activeFontSize !== 'large'">
-              <el-slider
-                v-model.lazy="defineProgress"
-                :format-tooltip="formatTooltip"
-              />
+                <span class="text-14px">{{ item.name || '' }}</span>
+              </button>
             </div>
           </div>
-          <div class="tabs mt-10px" v-if="activeFontSize == 'large'">
-            <button
-              v-for="item in list_border"
-              :key="item.id"
-              class="flex-1"
-              :class="{ active: item.id === pumpSetting.border }"
-              type="button"
-              style="padding: 7px"
-              @click.stop="pumpSetting.border = item.id"
-            >
-              <span class="text-12px">{{ item.name || '' }}</span>
-            </button>
-          </div>
-        </div>
-        <div class="">
-          <div class="tabs pb-10px border-b-0.5px border-b-solid border-b-[var(--border)]">
-            <button
-              v-for="item in list_tabs"
-              :key="item.id"
-              class="flex-1 switchTab"
-              :class="{ active: item.id === activeTab }"
-              type="button"
-              @click.stop="activeTab = item.id"
-            >
-              <span class="text-14px">{{ item.name || '' }}</span>
-            </button>
-          </div>
         <el-scrollbar :height="scrollHeight"  class="hidden-scrollbar">
-          <div class="mt-10px">
+          <div class="mt-12px">
             <template v-if="activeTab == 1">
-              <ul class="item pb-20px border-b-0.5px border-b-solid border-b-[var(--border)]">
-                <li @click="pumpSetting.show_search = !pumpSetting.show_search">
+              <div class="border-b border-[--dialog-divider] pb-20px">
+                <!-- <span class="text-12px color-[--secondary-text]">{{ $t('sell/buy') }}</span> -->
+                <div class="tabs flex-wrap">
+                  <!-- 普通尺寸按钮（排除 define） -->
+                  <button
+                    v-for="item in list_swap.filter(i => i.size !== 'define')"
+                    :key="item.size"
+                    class="flex-1 small"
+                    :class="{ active: item.size === activeFontSize }"
+                    type="button"
+                    @click.stop="switchSwap(item)"
+                  >
+                    <div class="swap flex items-center justify-center">
+                      <Icon
+                        class="mr-4px"
+                        :style="{ 'font-size': item.value + 'px' }"
+                        name="mynaui:lightning-solid"
+                      />
+                      0.01
+                    </div>
+                    <span class="block text-12px mt-8px">{{ item.name || '' }}</span>
+                  </button>
+                  <!-- 常住 slider 行，点击激活自定义模式 -->
+                  <div
+                    v-if="activeFontSize !== 'large'"
+                    class="define-slider-row w-full mt-10px"
+                    :class="{ active: activeFontSize === 'define' }"
+                    @click.stop="switchSwap({ size: 'define' })"
+                  >
+                    <span class="text-12px shrink-0 mr-12px define-label">{{ $t('define') }}</span>
+                    <div class="slider-wrapper flex-1" @click.stop>
+                      <el-slider
+                        v-model.lazy="defineProgress"
+                        :format-tooltip="formatTooltip"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div class="tabs mt-10px" v-if="activeFontSize == 'large'">
+                  <button
+                    v-for="item in list_border"
+                    :key="item.id"
+                    class="flex-1"
+                    :class="{ active: item.id === pumpSetting.border }"
+                    type="button"
+                    style="padding: 7px"
+                    @click.stop="pumpSetting.border = item.id"
+                  >
+                    <span class="text-12px">{{ item.name || '' }}</span>
+                  </button>
+                </div>
+              </div>
+              <div class="flex-start py-12px border-b border-b-solid border-b-[--border] lh-16px border-t border-t-solid border-t-[--border]">
+                <span>{{ $t('swapButtonColor') }}</span>
+                <span class="flex-1"></span>
+                <div ref="el">
+                  <el-color-picker
+                    v-model="pumpSetting.swapColor"
+                    persistent
+                    append-to="body"
+                    :teleported="true"
+                    @blur="isColor = false"
+                    @focus="isColor = true"
+                  />
+                </div>
+                <Icon
+                  name="custom:refresh"
+                  class="color-[--third-text] text-12px ml-5px cursor-pointer"
+                  @click.stop.prevent="pumpSetting.swapColor ='#12B886'"
+                />
+              </div>
+              <ul class="item pb-20px border-b-0.5px border-b-solid border-b-[var(--border)] text-12px lh-16px">
+                <li>
+                  <Icon name="custom:vol" class="mr-8px" />
+                  <span>{{ $t('mc/vol') }}</span>
+                  <span class="flex-1"></span>
+                  <div class="tabs pill-group">
+                    <button
+                      v-for="item in list_mc"
+                      :key="item.size"
+                      class="flex-1"
+                      :class="{ active: item.size === pumpSetting.fontSize_mc }"
+                      type="button"
+                      @click.stop="pumpSetting.fontSize_mc = item.size"
+                    >
+                      <span>{{ item.name }}</span>
+                    </button>
+                  </div>
+                </li>
+                <li>
                   <template v-if="pumpSetting.show_search">
-                    <!-- <Icon name="custom:show-search" class="text-12px mr-8px" /> -->
                     <img
                       v-if="isDark"
                       src="@/assets/icons/show-search-dark.svg"
@@ -116,75 +144,253 @@
                       class="mr-8px"
                       :width="12"
                     />
+                  </template>
+                  <Icon v-else name="custom:search1" class="mr-8px" />
+                  <span>{{ $t('searchBar') }}</span>
+                  <span class="flex-1"></span>
+                  <div class="tabs pill-group">
+                    <button
+                      class="flex-1"
+                      :class="{ active: pumpSetting.show_search }"
+                      type="button"
+                      @click.stop="pumpSetting.show_search = true"
+                    >
+                      <span>{{ $t('display') }}</span>
+                    </button>
+                    <button
+                      class="flex-1"
+                      :class="{ active: !pumpSetting.show_search }"
+                      type="button"
+                      @click.stop="pumpSetting.show_search = false"
+                    >
+                      <span>{{ $t('hidden') }}</span>
+                    </button>
+                  </div>
+                </li>
+                <li>
+                  <Icon :name="`${pumpSetting.isLang ? 'custom:auto-translation' : 'custom:auto-translation-hide'}`"class="mr-8px" :class="pumpSetting.isLang ? 'text-12px' : 'text-11px'"/>
+                  <span>{{ $t('autoTranslation') }}</span>
+                  <span class="flex-1"></span>
+                  <div class="tabs pill-group">
+                    <button
+                      class="flex-1"
+                      :class="{ active: pumpSetting.isLang }"
+                      type="button"
+                      @click.stop="pumpSetting.isLang = true"
+                    >
+                      <span>{{ $t('on') }}</span>
+                    </button>
+                    <button
+                      class="flex-1"
+                      :class="{ active: !pumpSetting.isLang }"
+                      type="button"
+                      @click.stop="pumpSetting.isLang = false"
+                    >
+                      <span>{{ $t('off') }}</span>
+                    </button>
+                  </div>
+                </li>
+                <li>
+                  <Icon :name="pumpSetting.Progress_isCircle === 'horizontal' ? 'custom:progress-horizontal' : 'custom:progress-circle'" class="mr-8px"  :class="pumpSetting.Progress_isCircle === 'horizontal' ? 'text-2px' : 'text-12px'"/>
+                  <span>{{ $t('progress') }}</span>
+                  <span class="flex-1"></span>
+                  <div class="tabs pill-group">
+                    <button
+                      class="flex-1"
+                      :class="{ active: pumpSetting.Progress_isCircle === 'horizontal' }"
+                      type="button"
+                      @click.stop="pumpSetting.Progress_isCircle = 'horizontal'"
+                    >
+                      <span>{{ $t('bar') }}</span>
+                    </button>
+                    <button
+                      class="flex-1"
+                      :class="{ active: pumpSetting.Progress_isCircle === 'circle' }"
+                      type="button"
+                      @click.stop="pumpSetting.Progress_isCircle = 'circle'"
+                    >
+                      <span>{{ $t('ring') }}</span>
+                    </button>
+                  </div>
+                </li>
 
-                    {{ $t('showSearch') }}
-                  </template>
-                  <template v-else>
-                    <Icon name="custom:search" class="text-12px mr-8px" />
-                    {{ $t('hideSearch') }}
-                  </template>
+                <li>
+                  <Icon :name="`${pumpSetting.avatar_isCircle == 'circle' ? 'custom:avatar-circle' : 'custom:avatar-rect'}`" class="mr-8px" />
+                  <span>Logo</span>
+                  <span class="flex-1"></span>
+                  <div class="tabs pill-group">
+                    <button
+                      class="flex-1"
+                      :class="{ active: pumpSetting.avatar_isCircle === 'circle' }"
+                      type="button"
+                      @click.stop="pumpSetting.avatar_isCircle = 'circle'"
+                    >
+                      <span>{{ $t('circle') }}</span>
+                    </button>
+                    <button
+                      class="flex-1"
+                      :class="{ active: pumpSetting.avatar_isCircle === 'rect' }"
+                      type="button"
+                      @click.stop="pumpSetting.avatar_isCircle = 'rect'"
+                    >
+                      <span>{{ $t('square') }}</span>
+                    </button>
+                  </div>
                 </li>
-                <li @click="pumpSetting.isLang = !pumpSetting.isLang">
-                    <Icon :name="`${pumpSetting.isLang ? 'majesticons:translate' : 'tdesign:translate-1'}`" class="text-12px mr-8px" />
-                    {{ pumpSetting.isLang ? $t('autoTranslationOn'): $t('autoTranslationOFF') }}
-                </li>
-                <li @click="switchProgress">
-                  <Icon
-                    v-if="pumpSetting.Progress_isCircle == 'horizontal'"
-                    name="custom:progress-horizontal"
-                    class="text-4px mr-8px"
-                  /><Icon v-else name="custom:progress-circle" class="text-12px mr-8px" />
-                  {{ $t('progress') }}
-                </li>
-                <li @click="switchAvatar">
-                  <template v-if="pumpSetting.avatar_isCircle == 'circle'">
-                    <Icon name="custom:progress-circle" class="text-12px mr-8px" />
 
-                    {{ $t('circleTokenImage') }}
-                  </template>
-                  <template v-else>
-                    <Icon name="custom:avatar-rect" class="text-12px mr-8px" />
-                    {{ $t('rectTokenImage') }}
-                  </template>
+                <li>
+                  <Icon :name="`${pumpSetting.isInt? 'custom:int' : 'custom:dot'}`" class="mr-8px" />
+                  <span>{{ $t('decimalsDisplay') }}</span>
+                  <span class="flex-1"></span>
+                  <div class="tabs pill-group">
+                    <button
+                      class="flex-1"
+                      :class="{ active: !pumpSetting.isInt }"
+                      type="button"
+                      @click.stop="pumpSetting.isInt = false"
+                    >
+                      <span>{{ $t('display') }}</span>
+                    </button>
+                    <button
+                      class="flex-1"
+                      :class="{ active: pumpSetting.isInt }"
+                      type="button"
+                      @click.stop="pumpSetting.isInt = true"
+                    >
+                      <span>{{ $t('hidden') }}</span>
+                    </button>
+                  </div>
                 </li>
-                <li @click="pumpSetting.isGutter = !pumpSetting.isGutter">
-                  <template v-if="pumpSetting.isGutter">
-                    <Icon name="custom:gutter-big" class="text-12px mr-8px" />
-                    {{ $t('looseColumns') }}
-                  </template>
-                  <template v-else>
-                    <Icon name="custom:gutter-small" class="text-12px mr-8px" />
-                    {{ $t('compactColumns') }}
-                  </template>
+                <li>
+                  <Icon name="custom:gutter" class="mr-8px text-11px" />
+                  <span>{{ $t('columns') }}</span>
+                  <span class="flex-1"></span>
+                  <div class="tabs pill-group">
+                    <button
+                      class="flex-1"
+                      :class="{ active: pumpSetting.isGutter }"
+                      type="button"
+                      @click.stop="pumpSetting.isGutter = true"
+                    >
+                      <span>{{ $t('looseColumns') }}</span>
+                    </button>
+                    <button
+                      class="flex-1"
+                      :class="{ active: !pumpSetting.isGutter }"
+                      type="button"
+                      @click.stop="pumpSetting.isGutter = false"
+                    >
+                      <span>{{ $t('compactColumns') }}</span>
+                    </button>
+                  </div>
                 </li>
-                <li @click="pumpSetting.isRight = !pumpSetting.isRight">
-                  <Icon name="custom:right-key" class="text-12px mr-8px" />
-                  <template v-if="pumpSetting.isRight">{{ $t('newTabRightClick') }}</template>
-                  <template v-else>{{ $t('noNewTabRightClick') }}</template>
+                <li>
+                  <Icon name="custom:right-key" class="mr-8px text-15px" />
+                  <span>{{ $t('newTabRightClick') }}</span>
+                  <span class="flex-1"></span>
+                  <div class="tabs pill-group">
+                    <button
+                      class="flex-1"
+                      :class="{ active: !pumpSetting.isRight }"
+                      type="button"
+                      @click.stop="pumpSetting.isRight = false"
+                    >
+                      <span>{{ $t('notOpen') }}</span>
+                    </button>
+                    <button
+                      class="flex-1"
+                      :class="{ active: pumpSetting.isRight }"
+                      type="button"
+                      @click.stop="pumpSetting.isRight = true"
+                    >
+                      <span>{{ $t('newTab') }}</span>
+                    </button>
+                  </div>
                 </li>
-                <li @click="pumpSetting.isBlacklist = !pumpSetting.isBlacklist">
-                  <template v-if="pumpSetting.isBlacklist">
-                    <Icon name="custom:key-invisible" class="text-12px mr-8px" />
-                    {{ $t('hideBlackList') }}
-                  </template>
-                  <template v-else>
-                    <Icon name="custom:key-visible" class="text-8px mr-8px" />
-                    {{ $t('showBlackList') }}
-                  </template>
+
+                <li>
+                  <Icon :name="`${pumpSetting.isBlacklist? 'custom:key-invisible' : 'custom:key-visible'}`" class="mr-8px" :class="`${pumpSetting.isBlacklist? 'text-12px' : 'text-10px'}`" />
+                  <span>{{ $t('blockToken') }}</span>
+                  <span class="flex-1"></span>
+                  <div class="tabs pill-group">
+                    <button
+                      class="flex-1"
+                      :class="{ active: !pumpSetting.isBlacklist }"
+                      type="button"
+                      @click.stop="pumpSetting.isBlacklist = false"
+                    >
+                      <span>{{ $t('display') }}</span>
+                    </button>
+                    <button
+                      class="flex-1"
+                      :class="{ active: pumpSetting.isBlacklist }"
+                      type="button"
+                      @click.stop="pumpSetting.isBlacklist = true"
+                    >
+                      <span>{{ $t('hidden') }}</span>
+                    </button>
+                  </div>
                 </li>
-                <li @click="pumpSetting.isInt = !pumpSetting.isInt">
-                  <template v-if="pumpSetting.isInt">
-                    <Icon name="custom:int" class="text-12px mr-8px" />
-                    {{ $t('roundUpDisplay') }}
-                  </template>
-                  <template v-else>
-                    <Icon name="custom:dot" class="text-12px mr-8px" />
-                    {{ $t('decimalsDisplay') }}
-                  </template>
+                <li>
+                  <Icon name="custom:copy-plain" class="mr-8px" />
+                  <span>{{ $t('similarTokens') }}</span>
+                  <span class="flex-1"></span>
+                  <div class="tabs pill-group">
+                    <button
+                      class="flex-1"
+                      :class="{ active: pumpSetting.isSimilarTokens }"
+                      type="button"
+                      @click.stop="pumpSetting.isSimilarTokens = true"
+                    >
+                      <span>{{ $t('display') }}</span>
+                    </button>
+                    <button
+                      class="flex-1"
+                      :class="{ active: !pumpSetting.isSimilarTokens }"
+                      type="button"
+                      @click.stop="pumpSetting.isSimilarTokens = false"
+                    >
+                      <span>{{ $t('hidden') }}</span>
+                    </button>
+                  </div>
                 </li>
+                <li>
+                  <Icon name="custom:forward" class="mr-8px" />
+                  <span>{{ $t('detailsAfterPurchase') }}</span>
+                  <span class="flex-1"></span>
+                  <div class="tabs pill-group">
+                    <button
+                      class="flex-1"
+                      :class="{ active: pumpSetting.jump ==='open' }"
+                      type="button"
+                      @click.stop="pumpSetting.jump = 'open'"
+                    >
+                      <span>{{ $t('newTab') }}</span>
+                    </button>
+                    <button
+                      class="flex-1"
+                      :class="{ active: pumpSetting.jump === 'close' }"
+                      type="button"
+                      @click.stop="pumpSetting.jump = 'close'"
+                    >
+                      <span>{{ $t('notOpen') }}</span>
+                    </button>
+                    <button
+                      class="flex-1"
+                      :class="{ active: pumpSetting.jump === 'open_jump' }"
+                      type="button"
+                      @click.stop="pumpSetting.jump = 'open_jump'"
+                    >
+                      <span>{{ $t('jump') }}</span>
+                    </button>
+                  </div>
+                </li>
+
               </ul>
-              <span class="text-12px color-[--secondary-text] mt-16px block">{{ $t('define') }}</span>
-              <div class="tabs define mt-16px" >
+            </template>
+            <div v-if="activeTab == 2">
+              <span class="text-12px color-[--main-text] mt-12px block">{{ $t('defineData') }}</span>
+              <div class="tabs define mt-12px mb-12px" >
                 <el-button
                   v-for="(item, index) in defineList"
                   :key="index"
@@ -194,15 +400,10 @@
                   >{{ item.name }}</el-button
                 >
               </div>
-            </template>
-            <div v-if="activeTab == 2">
-
               <Data @blur="isColor = false" @focus="isColor = true"/>
             </div>
             <div v-if="activeTab == 3">
               <Bg :pumpConfig="pumpConfig" :chain="chain" @blur="isColor = false" @focus="isColor = true"/>
-            </div>
-            <div v-if="activeTab == 4">
               <Grid :isFloat="isFloat" />
             </div>
           </div>
@@ -217,11 +418,11 @@
 import { useLocalStorage, useWindowSize } from '@vueuse/core'
 import type { Size } from '~/api/types/pump'
 import type { PumpConfig } from '@/api/types/pump'
+import { getPumpBgColor } from '@/utils/index'
 
 import Data from './data.vue'
 import Bg from './bg.vue'
 import Grid from './grid.vue'
-const { width } = useWindowSize()
 const props = withDefaults(
   defineProps<{
     chain: string
@@ -232,23 +433,23 @@ const props = withDefaults(
     isFloat: false
   }
 )
+const { width } = useWindowSize()
 const isColor = shallowRef(false)
 const { t } = useI18n()
 const visible = shallowRef(false)
 const globalStore = useGlobalStore()
-const { pumpSetting, token_logo_url, isDark } = storeToRefs(globalStore)
+const { pumpSetting, token_logo_url, isDark, mode } = storeToRefs(globalStore)
 const defineFontsize = useLocalStorage('defineFontsize', 15)
 const defineProgress = useLocalStorage('defineProgress', 0)
 const activeFontSize = useLocalStorage('activeFontSize', 'medium')
 const activeTab = shallowRef(1)
-
-const scrollHeight = ref(300)
+const scrollHeight = ref(Math.max(window.innerHeight * 0.7, 500))
 
 const list_mc = computed(() => {
   return [
     {
       size: '12px',
-      name: t('convention'),
+      name: t('mini'),
     },
     {
       size: '16px',
@@ -280,10 +481,6 @@ const list_tabs = computed(() => {
     },
     {
       id: 3,
-      name: t('background'),
-    },
-    {
-      id: 4,
       name: t('layout'),
     },
   ]
@@ -352,6 +549,9 @@ watch(defineProgress, (newval) => {
     pumpSetting.value.size_swap = formatNumber(newval * defineFontsize.value /100 || 0, 0)+ 'px'
   }
 })
+watch(mode, (val) => {
+  visible.value = false
+})
 function switchProgress() {
   if (pumpSetting.value.Progress_isCircle == 'circle') {
     pumpSetting.value.Progress_isCircle = 'horizontal'
@@ -359,16 +559,23 @@ function switchProgress() {
     pumpSetting.value.Progress_isCircle = 'circle'
   }
 }
-onMounted(() => {
+function updateScrollHeight() {
   if (width.value >= 1920) {
-    scrollHeight.value = 500
+    scrollHeight.value = Math.max(window.innerHeight * 0.7, 500)
   } else if (width.value >= 1200) {
-    scrollHeight.value = 270
+    scrollHeight.value = Math.max(window.innerHeight * 0.6, 300)
   } else if (width.value >= 768) {
-    scrollHeight.value = 270
+    scrollHeight.value = Math.max(window.innerHeight * 0.5, 200)
   } else {
-    scrollHeight.value = 300
+    scrollHeight.value = Math.max(window.innerHeight * 0.5, 200)
   }
+}
+onMounted(() => {
+  updateScrollHeight()
+  window.addEventListener('resize', updateScrollHeight)
+})
+onUnmounted(() => {
+  window.removeEventListener('resize', updateScrollHeight)
 })
 function dealDefine(item: { id: string }) {
   if (pumpSetting.value.define) {
@@ -383,7 +590,7 @@ function dealDefine(item: { id: string }) {
   }
   console.log(pumpSetting.value)
 }
-function switchSwap(item: { size: string; value: number }) {
+function switchSwap(item: { size: string; value?: number }) {
   activeFontSize.value = item.size
   if (item.size !== 'define') {
     pumpSetting.value.size_swap = item.value + 'px'
@@ -413,19 +620,71 @@ function updateVisible(value: boolean) {
   justify-content: space-between;
   gap: 8px;
   font-size: 12px;
+  &.pill-group {
+    gap: 0;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0;
+    button {
+      border: none;
+      border-radius: 6px;
+      padding: 5px 18px;
+      background: transparent;
+      color: var(--secondary-text);
+      min-width: 62px;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      &.active {
+        background: var(--border);
+        color: var(--main-text1);
+        border-radius: 4px;
+      }
+      // 选中第一个：保留左侧圆角，右侧方角
+      // &:first-child.active {
+      //   border-radius: 4px 0 0 4px;
+      // }
+      // // 选中最后一个：保留右侧圆角，左侧方角
+      // &:last-child.active {
+      //   border-radius: 0 4px 4px 0;
+      // }
+    }
+  }
   &.define {
     flex-wrap: wrap;
     gap: 8px;
     justify-content: flex-start;
     button {
-      border: 1px solid var(--border);
-      background: transparent;
-      color: var(--third-text);
+      border: 1px solid var(--d-1E1F23-l-E0ECFF);
+      border-radius: 4px;
+      color: var(--secondary-text);
       margin-left: 0;
-      padding: 4px;
+      padding: 3px 8px;
+      height: 28px;
       &.active {
-        color: var(--secondary-text);
-        background: var(--border);
+        color: var(--main-text1);
+        border: 1px solid var(--d-E2EEFF-l-1F242C);
+      }
+    }
+  }
+  &.switchTabs{
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    button{
+      background: transparent;
+      padding: 12px 0;
+      border: none;
+      border-bottom: transparent solid 2px;
+      &.active {
+        color: var(--main-text1);
+        background: transparent;
+        border-bottom: var(--main-text1) solid 2px;
+        border-radius:0px;
+      }
+      &+button{
+        margin-left: 16px;
       }
     }
   }
@@ -433,7 +692,7 @@ function updateVisible(value: boolean) {
   button {
     border: 1px solid var(--border);
     // font-size: 14px;
-    color: var(--third-text);
+    color: var(--secondary-text);
     letter-spacing: 0;
     font-weight: 400;
     cursor: pointer;
@@ -450,6 +709,10 @@ function updateVisible(value: boolean) {
       // flex: 0 0 64px;
       // flex: 0 0 25%;
       width: 64px;
+      &.active {
+        border: 1px solid var(--up-color);
+        background: transparent;
+      }
     }
     // & + button {
     //   margin-left: 8px;
@@ -459,10 +722,10 @@ function updateVisible(value: boolean) {
       background: var(--border);
     }
     .swap {
-      background: #12b8861a;
+      background: #12b886;
       border-radius: 4px;
       padding: 5px;
-      color: #12b886;
+      color: var(--main-bg);
       .el-image {
         width: 14px;
       }
@@ -499,26 +762,47 @@ function updateVisible(value: boolean) {
   }
 }
 
+/* 常住 slider 行 */
+.define-slider-row {
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: border-color 0.2s;
+  &.active {
+    border-color: var(--up-color);
+    .define-label {
+      color: var(--main-text1);
+    }
+  }
+  .define-label {
+    color: var(--secondary-text);
+  }
+}
+
 /* 1. 控制整体宽度 */
 .slider-wrapper {
-  width: 75%; /* 改这里就是滑块长度 */
+  width: 100%;
+
   // margin-left: 20px;
   /* 2. 修改轨道已选部分颜色 */
   :deep(.el-slider__bar) {
-    height: 2px;
-    background-color: #3f80f7; /* 渐变可改成 linear-gradient */
+    height: 6px;
+    background-color: var(--up-color); /* 渐变可改成 linear-gradient */
   }
 
   /* 3. 修改轨道未选部分颜色 */
   :deep(.el-slider__runway) {
-    height: 2px;
+    height: 6px;
     background-color: #3f80f733;
   }
 
   /* 4. 修改滑块（圆点）颜色和大小 */
   :deep(.el-slider__button) {
-    background-color: #3f80f7;
-    border: 2px solid #3f80f7;
+    background-color: var(--up-color);
+    border: 6px solid var(--up-color);
     width: 6px;
     height: 6px;
   }
@@ -526,5 +810,10 @@ function updateVisible(value: boolean) {
     top: 50%;
     transform: translate(-50%, -50%); /* 水平垂直都居中 */
   }
+}
+
+/* setting popover 背景色与主背景一致 */
+:deep(.new-popover) {
+  background: var(--main-bg) !important;
 }
 </style>

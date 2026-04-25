@@ -6,7 +6,7 @@ import OneClick from '../right/botSwap/oneClick.vue'
 import OrderBookButton from '../right/botSwap/orderBookButton.vue'
 import Bubble from './holders/new/bubble.vue'
 import { useBotStore } from '@/stores/bot'
-import { useEventBus  } from '@vueuse/core'
+import { useEventBus, useSessionStorage  } from '@vueuse/core'
 const devTokensEvent = useEventBus(BusEventType.DEV_TOKENS_TAB)
 
 // 订单簿状态 - 通过 provide/inject 与父组件通信
@@ -18,7 +18,7 @@ const botStore = useBotStore()
 const { t } = useI18n()
 const globalStore = useGlobalStore()
 const {token, tokenInfoExtra ,pairAddress,commonHeight} = storeToRefs(useTokenStore())
-const activeTab = shallowRef<keyof typeof components | 'Orders'>('Transactions')
+const activeTab = useSessionStorage<keyof typeof components | 'Orders'>('token_bottom_activeTab', 'Transactions')
 const components = {
   Transactions,
   Position: defineAsyncComponent(() => import('./position/index.vue')),
@@ -35,7 +35,7 @@ const tabs = computed(() => {
   { name: t('myPositions'), component: 'Position' as const },
   { name: t('holders'), component: 'Holders' as const },
   { name: t('poolInfo'), component: 'LP' as const },
-  { name: t('attention1') +`(${globalStore.headFollowsNum.all})`, component: 'Attention' as const },
+  { name: t('followAddress') +`(${globalStore.headFollowsNum.all})`, component: 'Attention' as const },
   { name: t('orders'), component: 'Orders' as const },
   { name: t('mySwap'), component: 'MySwap' as const },
   {name:t('devTokens'), component: 'DevTokens' as const},
@@ -103,8 +103,7 @@ watch(
       activeTab.value = previousTab.value || 'Transactions'
       // console.log('🔄 恢复到标签:', activeTab.value)
     }
-  },
-  { immediate: true }
+  }
 )
 
 devTokensEvent.on(() => {

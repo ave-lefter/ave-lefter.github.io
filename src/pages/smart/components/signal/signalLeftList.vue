@@ -466,7 +466,7 @@ function openTokenDetail(el: IActionItem) {
                 class="py-4px px-8px min-w-67px text-center rounded-tl-2 rounded-br-[10px] text-[24px] leading-[24px] text-white font-500 bg-#12B886"
               >
                 {{
-                  Number(max_price_change) < 1 ? '<1' : Math.ceil(Number(max_price_change)) + 'X'
+                  Number(max_price_change) < 1 ? '<1X' : Math.ceil(Number(max_price_change)) + 'X'
                 }}
               </div>
             </div> -->

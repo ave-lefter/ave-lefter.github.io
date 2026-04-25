@@ -110,7 +110,7 @@ function handleSelectChild(childItem, renderKey:string) {
       <div class="flex flex-col gap-20px pt-20px pb-20px border-t border-t-solid border-t-[--border]">
         <div class="cursor-pointer flex items-center" @click="hotSettings.avatar_isCircle = ({circle:'rect',rect:'circle'})[hotSettings.avatar_isCircle]">
           <template v-if="hotSettings.avatar_isCircle === 'circle'">
-            <Icon name="custom:progress-circle" class="text-12px mr-8px" />
+            <Icon name="custom:avatar-circle" class="text-12px mr-8px" />
             {{ $t('circleTokenImage') }}
           </template>
           <template v-else>
@@ -124,18 +124,18 @@ function handleSelectChild(childItem, renderKey:string) {
             {{ $t('hideBlackList') }}
           </template>
           <template v-else>
-            <Icon name="custom:key-visible" class="text-8px mr-8px" />{{
+            <Icon name="custom:key-visible" class="text-10px mr-8px" />{{
               $t('showBlackList')
             }}</template
           >
         </div>
         <div class="cursor-pointer flex items-center" @click="hotSettings.isLang = !hotSettings.isLang">
           <template v-if="hotSettings.isLang">
-            <Icon name="majesticons:translate" class="text-12px mr-8px" />
+            <Icon name="custom:auto-translation" class="text-12px mr-8px" />
             {{ $t('autoTranslationOn') }}
           </template>
           <template v-else>
-            <Icon name="tdesign:translate-1" class="text-12px mr-8px" />{{
+            <Icon name="custom:auto-translation-hide" class="text-11px mr-8px" />{{
               $t('autoTranslationOFF')
             }}</template
           >

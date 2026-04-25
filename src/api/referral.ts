@@ -17,42 +17,23 @@ export async function getReferralInfo() {
   }
 
   // 获取被邀请人列表
-export async function getInviteeList(data = {pageNo: 0, pageSize: 50}){
-    //   return {
-    //     userItems:[
-    //         {
-    //             'level': 1, //等级
-    //             'guid': '6074341763',
-    //             'bindRefTime': 1729910374, // 绑定时间
-    //             'username': 'zh**tg' // 用户名
-    //         },
-    //         {
-    //             'level': 2,
-    //             'guid': '6876082173',
-    //             'bindRefTime': 1729846475,
-    //             'username': 'jg**ds'
-    //         },
-    //         {
-    //             'level': 1,
-    //             'guid': '6097411603',
-    //             'bindRefTime': 1729846475,
-    //             'username': 'Jo**av'
-    //         },
-    //         {
-    //             'level': 1,
-    //             'guid': '6006728920',
-    //             'bindRefTime': 1729846475,
-    //             'username': 'Tina***bers'
-    //         }
-    //     ],
-    //     totalUserCount:4
-    //   }
+export async function getInviteeList(data: {pageNo: number, pageSize: number, sortBy: 'invite' | 'swap', sortOrder: 'asc' | 'desc'} = {pageNo: 0, pageSize: 50, sortBy: 'swap', sortOrder: 'desc'}): Promise<{userItems: Array<{
+  level: number; // 等级
+  guid: string; //
+  bindRefTime: number; // 绑定时间
+  username: string; // 用户名
+  vip: number; // vip等级
+  refFee: string; // 佣金
+  perpRefFee: string;
+  lastSwap: number;
+  remark: string;
+}>, totalUserCount: number}> {
     const { $api } = useNuxtApp()
-      return $api('/botapi/referral/getInviteeListWithPageInfo',{
-        method: 'get',
-        query: data
-      })
-    }
+    return $api('/botapi/referral/getInviteeListWithPageInfo',{
+      method: 'get',
+      query: data
+    })
+}
 
     // 一键领取分佣
 // 错误
@@ -190,4 +171,16 @@ export async function getLevelsReferralInfo(): Promise<{
 }> {
   const { $api } = useNuxtApp()
   return $api('/botapi/referral/getLevelsReferralInfo')
+}
+
+
+export async function setInviteeRemark(invitee: string, remark: string): Promise<Boolean> {
+   const { $api } = useNuxtApp()
+  return $api('/botapi/referral/setInviteeRemark', {
+    method: 'post',
+    body: {
+      invitee,
+      remark
+    }
+  })
 }
