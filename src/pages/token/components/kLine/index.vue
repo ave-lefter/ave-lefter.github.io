@@ -222,6 +222,8 @@ const props = defineProps<{
 }>()
 const { t } = useI18n()
 const klineDateFilter = inject<Ref<string[]>>(ProvideType.KLINE_DATE_FILTER)
+const klineMarkerAddress = inject<Ref<string>>(ProvideType.KLINE_MARKER_ADDRESS, ref(''))
+const klineFilterTxs = inject<Ref<any[]>>(ProvideType.KLINE_FILTER_TXS, ref([]))
 const tokenStore = props.isRank ? useRankKlineStore() : useTokenStore()
 const botStore = useBotStore()
 const tokenDetailsStore = useTokenDetailsStore()
@@ -475,6 +477,22 @@ watch(user, () => {
   }
 })
 
+// 当地址筛选变化时，刷新 K 线打点
+watch(klineMarkerAddress, () => {
+  if (isReady.value && route.name === 'token-id') {
+    _widget?.activeChart?.()?.clearMarks?.()
+    _widget?.activeChart?.()?.refreshMarks?.()
+  }
+})
+
+// 当筛选地址的交易列表更新时，清除旧打点并刷新 K 线打点
+watch(klineFilterTxs, () => {
+  if (isReady.value && route.name === 'token-id' && klineMarkerAddress.value) {
+    _widget?.activeChart?.()?.clearMarks?.()
+    _widget?.activeChart?.()?.refreshMarks?.()
+  }
+})
+
 watch(()=>localeStore.locale,()=>{
   if (isReady.value && route.name === 'token-id') {
     console.log('localeStore.locale', localeStore.locale)
@@ -608,7 +626,7 @@ function createToggleButton() {
     const isShowMarket = showMarket.value
     btn.innerHTML = `
         <span style="font-size: 12px; cursor: pointer;">
-          ${isShowMarket ? 'Price / <span style="color:#286DFF">MCap</span>' : '<span style="color:#286DFF">Price</span> / MCap'}
+          ${isShowMarket ? `${t('price')} / <span style="color:#286DFF">${t('mcap')}</span>` : `<span style="color:#286DFF">${t('price')}</span> / ${t('mcap')}`}
         </span>`
   }
 

@@ -17,30 +17,47 @@ const route=useRoute()
 const { t } = useI18n()
 const defaultPath=ref('/follow/token')
 const globalStore = useGlobalStore()
+const botStore = useBotStore()
 const { getFollowingInfo, getFollowingAddress } = useCopyTradeStore()
 const height = computed(()=>{
   // return 'calc(100vh - 92px)'
   return globalStore.tokenHistoryVisible ? 'calc(100vh - 125px)':'calc(100vh - 92px)'
 })
+const {currentAddress} = storeToRefs(useFollowStore())
 const { copyTradeVisible } = storeToRefs(useCopyTradeStore())
-const tabData=computed(()=>[
-  {
-    label:t('customToken'),
-    path:'/follow/token'
-  },
-  {
-    label:t('watchAddress'),
-    path:'/follow/addr'
-  },
-  {
-    label:t('monitor'),
-    path:'/follow/monitor'
-  },
-  {
-    label:t('remarkLib'),
-    path:'/follow/remark'
+const tabData = computed(() => {
+  const baseTabs = [
+    {
+      label: t('customToken'),
+      path: '/follow/token'
+    },
+    {
+      label: t('watchAddress'),
+      path: '/follow/addr'
+    }
+  ]
+
+  if (botStore.evmAddress) {
+    baseTabs.push({
+      label: t('monitor'),
+      path: '/follow/monitor'
+    })
   }
-])
+
+  baseTabs.push({
+    label: t('remarkLib'),
+    path: '/follow/remark'
+  })
+
+  return baseTabs
+})
+
+watch(() => currentAddress.value, (val) => {
+  if(!val){
+    navigateTo(defaultPath.value, { replace: true })
+  }
+})
+
 watch(
   () => route.path,
   (newPath, oldPath) => {

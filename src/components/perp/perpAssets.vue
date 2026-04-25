@@ -6,10 +6,16 @@ import PerpTable from './perpTable.vue'
 import WithdrawAlert from './withdrawAlert.vue'
 const perpStore = usePerpStore()
 
+const props = defineProps({
+  class1: {
+    type: String,
+    default: ''
+  }
+})
 </script>
 
 <template>
-  <div :key="Number(perpStore.isLogin)" class="pb-32px">
+  <div :key="Number(perpStore.isLogin)" class="pb-32px" :class="class1">
     <WithdrawAlert/>
     <div class="flex gap-8px mb-28px px-16px">
       <Overview/>

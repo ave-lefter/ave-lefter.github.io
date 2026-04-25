@@ -195,6 +195,7 @@ export interface SizeObj {
 export interface pumpObjColor {
   color: string
   bg: string
+  custom?: boolean
 }
 export interface pumpData {
   platforms: string[]

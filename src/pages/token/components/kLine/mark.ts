@@ -95,6 +95,8 @@ export function useKlineMarks() {
   const remarksStore = useRemarksStore()
   const globalStore = useGlobalStore()
   const wsStore = useWSStore()
+  const klineMarkerAddress = inject<Ref<string>>(ProvideType.KLINE_MARKER_ADDRESS, ref(''))
+  const klineFilterTxs = inject<Ref<any[]>>(ProvideType.KLINE_FILTER_TXS, ref([]))
   // 创建打点数据
   const marksTabs = computed(() => {
     const arr = (botStore?.evmAddress || walletStore?.address) ? [{ id: 'trade', name: t('mine') }] : []
@@ -613,12 +615,25 @@ export function useKlineMarks() {
     if (migrated?.migrate_time && isTokenKline) {
       getMigrated(onDataCallback, migrated, Number(interval))
     }
+
+    const filterAddress = klineMarkerAddress.value
+    const isFilteringByAddress = !!filterAddress
+    // 当按地址筛选时，直接将 filterTableList 的交易数据显示为 K 线打点，跳过画像打点避免重复（不受 markTabsVisible 控制）
+    if (isFilteringByAddress && klineFilterTxs.value.length > 0) {
+      const filterMarks = formatFilterTxsToMarks(klineFilterTxs.value, interval, from, to)
+      if (filterMarks.length > 0) {
+        onDataCallback(filterMarks)
+      }
+      return
+    }
+
     if (!markTabsVisible.value) return
     const now = Date.now()
     const isMyPortraitOnlyRefresh = now < myPortraitOnlyRefreshUntil
     const isPortraitCacheOnlyRefresh = now < portraitCacheOnlyRefreshUntil
-    const isMyWatchlistChecked = !!markTabsChecked.value?.['-100']
-    const isMyRemarkChecked = !!markTabsChecked.value?.['-101']
+    const isMyWatchlistChecked = isFilteringByAddress || !!markTabsChecked.value?.['-100']
+    const isMyRemarkChecked = isFilteringByAddress || !!markTabsChecked.value?.['-101']
+
     if ((isMyWatchlistChecked || isMyRemarkChecked) && !isPortraitCacheOnlyRefresh) {
       Promise.all([
         isMyWatchlistChecked
@@ -638,17 +653,20 @@ export function useKlineMarks() {
     marksTabs.value.forEach((v) => {
       if (v.id === '-100' || v.id === '-101') return
       if (isMyPortraitOnlyRefresh) return
+      // 当按地址筛选时，跳过 trade 类型（聚合数据无法按地址过滤）
+      if (isFilteringByAddress && v.id === 'trade') return
+      const isTabActive = isFilteringByAddress || !!markTabsChecked.value?.[v.id]
       const id = pair + '-' + chain + '-' + user + '-' + interval + '-' + v.id + '-' + from + '-' + to
       const cachePrefix = `${pair}-${chain}-${user}-${interval}-${v.id}-`
       const liveKey = getProfilingLiveCacheKey({ pair, chain, user, interval, type: String(v.id) })
-      if (marksMap.has(id) && markTabsChecked.value?.[v.id]) {
+      if (marksMap.has(id) && isTabActive) {
         const res = touchCache(marksMap, id)
         const marks = formatToMarks(res || [], interval, v.id, v.name)
         onDataCallback(marks || [])
         return
       }
       const reusableTradeKey = findReusableCacheKey(marksMap, cachePrefix, from, to)
-      if (reusableTradeKey && markTabsChecked.value?.[v.id]) {
+      if (reusableTradeKey && isTabActive) {
         const res = touchCache(marksMap, reusableTradeKey) || []
         const filteredRes = filterTradeDataByRange(res as TradeData[], from, to, interval)
         if (filteredRes.length > 0) {
@@ -658,7 +676,7 @@ export function useKlineMarks() {
         }
       }
       // 如果缓存存在但数据为空，强制重新请求
-      if(profilingMarksCache.has(id) && markTabsChecked.value?.[v.id]) {
+      if(profilingMarksCache.has(id) && isTabActive) {
         const res = touchCache(profilingMarksCache, id) || []
         // 如果缓存数据为空，清除缓存并重新请求
         if(res.length === 0) {
@@ -672,7 +690,7 @@ export function useKlineMarks() {
         }
       }
       const reusableProfilingKey = findReusableCacheKey(profilingMarksCache, cachePrefix, from, to)
-      if(reusableProfilingKey && markTabsChecked.value?.[v.id] && v.id !== '-100' && v.id !== '-101') {
+      if(reusableProfilingKey && isTabActive && v.id !== '-100' && v.id !== '-101') {
         const res = touchCache(profilingMarksCache, reusableProfilingKey) || []
         const filteredRes = filterProfilingDataByRange(res, from, to, interval)
         const liveRes = profilingLiveCache.has(liveKey) ? (touchCache(profilingLiveCache, liveKey) || []) : []
@@ -683,7 +701,7 @@ export function useKlineMarks() {
           return
         }
       }
-      if (profilingLiveCache.has(liveKey) && markTabsChecked.value?.[v.id] && v.id !== '-100' && v.id !== '-101') {
+      if (profilingLiveCache.has(liveKey) && isTabActive && v.id !== '-100' && v.id !== '-101') {
         const res = touchCache(profilingLiveCache, liveKey) || []
         const filteredRes = filterProfilingDataByRange(res, from, to, interval)
         if (filteredRes.length > 0) {
@@ -693,7 +711,7 @@ export function useKlineMarks() {
         }
       }
       if (isPortraitCacheOnlyRefresh) return
-      if (v.id === 'trade' && markTabsChecked.value?.[v.id]) {
+      if (v.id === 'trade' && isTabActive) {
         let data = {
           from,
           to,
@@ -707,7 +725,7 @@ export function useKlineMarks() {
           setCache(marksMap, id, res || [])
           onDataCallback(marks || [])
         })
-      } else if (markTabsChecked.value?.[v.id]) {
+      } else if (isTabActive) {
         let data = {
           from,
           to,
@@ -775,9 +793,12 @@ export function useKlineMarks() {
     const result: (Mark & { tx_time: number,user_address:string,txid?:string })[] = []
     const urlPrefix = useConfigStore().globalConfig?.token_logo_url || 'https://www.iconaves.com/'
     const interval1 = Number(interval)
+    const filterAddress = klineMarkerAddress.value
     for(const item of data){
       const bucketTime = Math.floor(item.time / interval1) * interval1
       for(const holder of item.holders){
+        // 当 klineMarkerAddress 有值时，只显示此地址的打点
+        if(filterAddress && holder.wallet_address !== filterAddress) continue
         const {wallet_address,wallet_logo,remark} = holder
         if(holder.buy){
           result.push(formatTxsObj({
@@ -801,6 +822,95 @@ export function useKlineMarks() {
         }
       }
     }
+    return result
+  }
+
+  // 将 filterTableList 的交易数据转换为 K 线打点（按地址筛选时使用）
+  function formatFilterTxsToMarks(
+    txs: any[],
+    interval: number | string,
+    from: number,
+    to: number
+  ) {
+    const result: (Mark & { tx_time: number; user_address: string; txid?: string })[] = []
+    const interval1 = Number(interval)
+    const chain = tokenStore?.token?.chain
+
+    for (const tx of txs) {
+      const bucketTime = Math.floor(tx.time / interval1) * interval1
+      // 过滤不在当前可视时间范围内的交易
+      if (bucketTime < from || bucketTime > to) continue
+
+      let isBuyTx = false
+      let side: 'buy' | 'sell' = 'sell'
+      let volume = 0
+      let amount = 0
+      let price = 0
+      let typeLabel = ''
+
+      if ('direction' in tx && tx.direction) {
+        // IGetSimpleTxsResponse 交易数据
+        isBuyTx = tx.direction === 'buy'
+        side = isBuyTx ? 'buy' : 'sell'
+        amount = Number(tx.target_amt || 0)
+        price = Number(tx.target_price_u || 0)
+        volume = amount * price
+      } else if ('type' in tx && tx.type) {
+        // GetPairLiqResponse 流动性数据
+        if (tx.type === 'addLiquidity' || tx.type === 'CreatePair') {
+          side = 'buy'
+          isBuyTx = true
+          typeLabel = tx.type === 'CreatePair' ? t('CreatePair') : t('addLiq')
+        } else {
+          side = 'sell'
+          isBuyTx = false
+          typeLabel = tx.type === 'removeLiquidity' ? t('removeLiq') : (tx.type === 'CollectFee' ? t('CollectFee') : tx.type)
+        }
+        volume = (tx.amount0 || 0) * (tx.token0_price_usd || 0) + (tx.amount1 || 0) * (tx.token1_price_usd || 0)
+        amount = volume
+        price = amount > 0 ? volume / amount : 0
+      } else {
+        continue
+      }
+
+      const walletAddr = tx.wallet_address || tx.sender || ''
+      const displayName = getDisplayName(tx.remark, undefined, walletAddr, chain)
+      const txid = tx.txhash || tx.transaction || tx.uuid || ''
+      const markId = `${tx.time}-${side}-${txid}`
+
+      // 使用 generateAvatarIcon 生成头像图标
+      const imageUrl = generateAvatarIcon(tx.remark || walletAddr || '')
+      const borderColor = isBuyTx ? '#12B886' : '#F6465D'
+
+      const swapType = typeLabel || (isBuyTx ? t('bought') : t('sold'))
+      const tooltipText = typeLabel
+        ? `${displayName || formatAddress(walletAddr)} ${typeLabel}
+          ${t('amountU')}: $${formatNumber(volume, 2)}
+          ${formatDate(tx.time, 'YYYY-MM-DD HH:mm')}`
+        : `${displayName || formatAddress(walletAddr)} ${swapType}
+          ${t('amountB')}: ${formatNumber(amount, 2)}
+          ${t('amountU')}: $${formatNumber(volume, 2)}
+          ${t('price')}: $${formatNumber(price, 4)}
+          ${formatDate(tx.time, 'YYYY-MM-DD HH:mm')}`
+
+      result.push({
+        id: markId,
+        time: bucketTime,
+        color: { background: 'transparent', border: borderColor },
+        imageUrl,
+        label: isBuyTx ? 'B' : 'S',
+        labelFontColor: '#fff',
+        minSize: volume >= 2000 ? 30 : 25,
+        hoveredBorderWidth: 2,
+        borderWidth: 2,
+        text: tooltipText,
+        showLabelWhenImageLoaded: false,
+        user_address: walletAddr,
+        tx_time: tx.time,
+        txid,
+      })
+    }
+
     return result
   }
 

@@ -96,6 +96,17 @@ watch([() => route.params.id, () => wsStore.wsResult?.tgbot], () => {
   })
 })
 
+// 监听 accessToken 变化，退出登录时清空订单数据
+watch(() => botStore.accessToken, (val, oldVal) => {
+  if (!val && oldVal) {
+    // 清空 unifiedRef 里的订单数据
+    if (unifiedRef.value && Array.isArray(unifiedRef.value.txOrder)) {
+      unifiedRef.value.txOrder.length = 0
+    }
+    // 如有其他本地状态（如分页、选中等），可一并清理
+  }
+})
+
 onMounted(() => {
   const chain = String(route.params.id).split('-')[1]
   if (tabs.value.find(i => i?.chain === chain)) {

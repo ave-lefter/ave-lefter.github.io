@@ -277,7 +277,7 @@ function openTokenDetail(el: IActionItem | IActionV3Item) {
         >
           {{
             Number(item.max_price_change) < 1
-              ? '<1'
+              ? '<1X'
               : Math.ceil(Number(item.max_price_change)) + 'X'
           }}
         </div>

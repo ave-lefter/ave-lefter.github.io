@@ -7,6 +7,10 @@ export const useTokenDetailsStore = defineStore('tokenDetailsStore', () => {
     chain: string;
     address: string;
     remark: string;
+    total: string;
+    lock_amount_dec: string;
+    other_amount_dec: string;
+    burn_amount_dec: string;
   }>()
   const pairInfo = ref<{
     target_token: string;
@@ -16,7 +20,7 @@ export const useTokenDetailsStore = defineStore('tokenDetailsStore', () => {
     pairAddress: string;
   }>()
   const user_address = ref('')
-
+  
   return {
     drawerVisible,
     tokenInfo,

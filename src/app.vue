@@ -69,6 +69,7 @@
   watch(currentAddress, (val) => {
     if (!val) return
     useFollowStore().initAddressGroups()
+    useGlobalStore().getUserFavoriteGroups(val)
   }, { immediate: true })
   // import { bot_getWalletsAllChain, bot_getWebConfig } from '@/api/bot'
   function init() {

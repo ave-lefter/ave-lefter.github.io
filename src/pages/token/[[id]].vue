@@ -128,6 +128,14 @@ provide('orderBookVisible', orderBookVisible)
 const klineDateFilter = ref<string[]>([])
 provide(ProvideType.KLINE_DATE_FILTER, klineDateFilter)
 
+// K 线打点按地址筛选
+const klineMarkerAddress = ref('')
+provide(ProvideType.KLINE_MARKER_ADDRESS, klineMarkerAddress)
+
+// K 线打点按地址筛选时的交易列表
+const klineFilterTxs = shallowRef<any[]>([])
+provide(ProvideType.KLINE_FILTER_TXS, klineFilterTxs)
+
 // KLine 高度监听
 const klineHeight = useStorage('kHeight', DefaultHeight.KLINE)
 // 订单簿宽度管理

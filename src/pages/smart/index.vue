@@ -3,8 +3,8 @@ import SignalContainer from './components/signal/signalContainer.vue'
 import Filter from './components/signal/filter.vue'
 import { useStorage } from '@vueuse/core'
 import type { ChainKey } from '~/api/types/pump'
-const Version = 1
-const { t } = useI18n()
+// const Version = 1
+// const { t } = useI18n()
 
 const configStore = useConfigStore()
 const localeStore = useLocaleStore()
@@ -13,7 +13,7 @@ const audioButtonRef = ref()
 const signalContainerRef =
   useTemplateRef<InstanceType<typeof SignalContainer>>('signalContainerRef')
 const smartChains = computed(() => {
-  return ['solana', 'bsc'].map((value) => {
+  return ['solana', 'bsc', 'eth'].map((value) => {
     return {
       label: getChainInfo(value)?.name,
       value,

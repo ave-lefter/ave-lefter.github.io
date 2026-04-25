@@ -474,6 +474,7 @@ const totalSelectWalletBalance1 = computed(() => {
       balance = new BigNumber(balance).plus(getAddressFromChainBalance(chain, i?.addresses, token?.address) || 0).toFixed()
     }
   })
+  console.log('totalSelectWalletBalance1', balance)
   return balance
 })
 
@@ -939,11 +940,14 @@ async function submitBotSwap() {
             //   this.$store.state.tabActive = 'myBotHistory'
             // }
             loadingSwap.value = false
-            amountToken.value = ''
-            amountSellTokenPercent.value = ''
-            amountNative.value = ''
-            amountTokenOut.value = ''
-            amountNativeOut.value = ''
+
+            if (!isBuy) {
+              amountToken.value = ''
+              amountSellTokenPercent.value = ''
+              amountNative.value = ''
+              amountTokenOut.value = ''
+              amountNativeOut.value = ''
+            }
             // this.dialogVisibleSwap = false
           }, 500)
           if (txInfo?.errorLog) {
@@ -1079,11 +1083,13 @@ async function submitBotSwap() {
             // tokenStore.placeOrderUpdate++
             // ElNotification({ type: 'success', message: walletName + ' ' + t('transactionsSubmitted') })
             loadingSwap.value = false
-            amountNative.value = ''
-            amountNativeOut.value = ''
-            amountToken.value = ''
-            amountSellTokenPercent.value = ''
-            amountTokenOut.value = ''
+            if (!isBuy) {
+              amountNative.value = ''
+              amountNativeOut.value = ''
+              amountToken.value = ''
+              amountSellTokenPercent.value = ''
+              amountTokenOut.value = ''
+            }
             // this.dialogVisibleSwap = false
           }, 500)
           if (hasCreateTxError(txInfo)) {
@@ -1237,11 +1243,13 @@ function submitBotLimit() {
             //   this.$store.state.tabActive = 'botLimitOrder'
             // }
             loadingSwap.value = false
-            amountToken.value = ''
-            amountSellTokenPercent.value = ''
-            amountNative.value = ''
-            amountTokenOut.value = ''
-            amountNativeOut.value = ''
+            if (!isBuy) {
+              amountToken.value = ''
+              amountSellTokenPercent.value = ''
+              amountNative.value = ''
+              amountTokenOut.value = ''
+              amountNativeOut.value = ''
+            }
             // this.dialogVisibleSwap = false
             // if (this.$store.state.tabActive === 'botLimitOrder') {
             //   this.$store.state.bot.orderTabActive = 'my'
@@ -1347,11 +1355,13 @@ function submitBotLimit() {
           }
           ElNotification({ type: 'success', message: walletName + ' ' + t('limitSubmitted') })
           loadingSwap.value = false
-          amountToken.value = ''
-          amountSellTokenPercent.value = ''
-          amountNative.value = ''
-          amountTokenOut.value = ''
-          amountNativeOut.value = ''
+          if (!isBuy) {
+            amountToken.value = ''
+            amountSellTokenPercent.value = ''
+            amountNative.value = ''
+            amountTokenOut.value = ''
+            amountNativeOut.value = ''
+          }
         }, 500)
         if (hasCreateTxError(txInfo)) {
           if (Timer) {
@@ -1610,7 +1620,7 @@ defineExpose({
   handleMax,
   totalSelectWalletBalance,
   totalSelectWalletBalance1
-});
+})
 // 生命周期钩子
 onMounted(() => {
   initPriceLimit()

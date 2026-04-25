@@ -2,8 +2,7 @@
   <div
     v-if="userAddress && chain && SupportFullDataChain.includes(chain)"
     ref="scrollRef"
-    className="flex flex-col w-full p-[20px] pt-[16px] bg-[--main-bg] pb-0 overflow-y-auto"
-    style="max-height: calc(100vh - 92px)"
+    :class="['flex flex-col w-full p-[20px] pt-[16px] bg-[--main-bg] pb-0 overflow-y-auto max-h-[calc(100vh-92px)]', class1]"
   >
     <div class="flex-between mb-16px">
       <div class="flex gap-6">
@@ -214,6 +213,13 @@ import { useEventBus, useStorage } from '@vueuse/core'
 import SuffixIcon from '~/components/suffixIcon.vue'
 import { bindTwitter, getWalletBasicInfo } from '~/api/wallet'
 import { addAttention, deleteAttention } from '~/api/attention'
+
+const props = defineProps({
+  class1: {
+    type: String,
+    default: () => {'max-height: calc(100vh - 92px)'}
+  }
+})
 
 const themeStore = useThemeStore()
 

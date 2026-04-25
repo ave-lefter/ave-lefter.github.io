@@ -3,7 +3,7 @@ import type { CheckboxValueType } from 'element-plus'
 import dayjs from 'dayjs'
 import type { GetTokenDetailsListResponse } from '~/api/token'
 import { getAddressAndChainFromId, isEvmChain } from '@/utils/index'
-
+import BigNumber from 'bignumber.js'
 const { t } = useI18n()
 const tokenDetailsStore = useTokenDetailsStore()
 
@@ -38,6 +38,18 @@ const id = computed(() => route.params.id as string)
 const chain = computed(() => {
   const { chain } = getAddressAndChainFromId(id.value, 0)
   return chain || tokenDetailsStore.tokenInfo?.chain || ''
+})
+
+ const circulation = computed(() => {
+  if(tokenStore.circulation.toNumber()){
+    return tokenStore.circulation.toNumber()
+  }else{
+    const circulation = new BigNumber(tokenDetailsStore.tokenInfo?.total || 0)
+      .minus(tokenDetailsStore.tokenInfo?.lock_amount_dec || 0)
+      .minus(tokenDetailsStore.tokenInfo?.other_amount_dec || 0)
+      .minus(tokenDetailsStore.tokenInfo?.burn_amount_dec || 0)
+    return circulation.lt(0) ? 0 : circulation.toNumber()
+  }
 })
 
 const list = computed(() => {
@@ -330,7 +342,7 @@ function goToExplorer() {
             {{
               Number(row.main_token_price) === 0
                 ? '-'
-                : formatNumber(Number(row.token_price_u) * Number(tokenStore.circulation) || 0, 2)
+                : formatNumber(Number(row.token_price_u) * Number(circulation) || 0, 2)
             }}
           </template>
         </div>

@@ -10,8 +10,12 @@ const props = defineProps({
     default: () => ({
       chain: '',
       logo_url: '',
-      symbol: ''
+      symbol: '',
     })
+  },
+  showChain: {
+    type: Boolean,
+    default: true
   },
   tokenClass: {
     type: String,
@@ -49,15 +53,27 @@ const tokenLogoUrl = computed(() => {
       :class="`mr-3px ${isCircle?'rounded-full':''}  block ${tokenClass}`"
       :src="tokenLogoUrl"
     >
-      <template #error>
+      <!-- <template #error>
         <img class="w-full block" src="@/assets/images/icon-default.png" alt="">
+      </template> -->
+      <template #error>
+        <img
+          class="w-full block"
+          :src="getChainDefaultIcon(row.chain, row.symbol)"
+        >
+      </template>
+      <template #placeholder>
+        <img
+          class="w-full block"
+          :src="getChainDefaultIcon(row.chain, row.symbol)"
+        >
       </template>
     </el-image>
 
     <img v-if="row.issue_platform" v-tooltip="row.issue_platform" :src="formatIconTag(row.issue_platform)"
       :class="`rounded-full absolute right-0 bottom-0 block ${chainClass}`" alt="">
     <img
-v-else-if="row.chain"
+v-else-if="row.chain&&showChain"
       :class="`rounded-full absolute right-0 bottom-0 block ${chainClass}`"
       :src="`${token_logo_url}chain/${row.chain}.png`"
       alt=""

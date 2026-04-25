@@ -102,8 +102,9 @@ class="w-monitor bg-[--secondary-bg] w-100% h-100% pl-12px pr-6px relative overf
                 <TokenImg
                 :row="{
                   logo_url: row?._target_Token?.logo_url,
-                  chain: ''
-                }" token-class="w-16px h-16px [&&]:mr-4px" />
+                  chain: row.chain,
+                  symbol: row?._target_Token?.symbol
+                }" token-class="w-16px h-16px [&&]:mr-4px" :showChain="false" />
                   <span>{{ row?._target_Token?.symbol }}</span>
                   <img v-if="row?.amm=='pump'"  src="https://www.iconaves.com/signals/pump_king.png" style="width:12px;height:12px">
               </template>
@@ -212,8 +213,9 @@ class="w-monitor bg-[--secondary-bg] w-100% h-100% pl-12px pr-6px relative overf
                       <TokenImg
                         :row="{
                           logo_url: row?._target_Token?.logo_url,
-                          chain: ''
-                        }" token-class="w-16px h-16px [&&]:mr-4px" />
+                          chain: row.chain,
+                          symbol: row?._target_Token?.symbol
+                        }" token-class="w-16px h-16px [&&]:mr-4px" :showChain="false" />
                           <span class="color-[--main-text]">{{ format4Str4(row?._target_Token?.symbol) }}</span>
                           <img v-if="row?.amm=='pump'"  src="https://www.iconaves.com/signals/pump_king.png" style="width:12px;height:12px">
                     </div>
@@ -232,8 +234,9 @@ class="w-monitor bg-[--secondary-bg] w-100% h-100% pl-12px pr-6px relative overf
           :style="{height:`${props.scrollHeight-50}px`}"
           class="overflow-hidden"
         >
-          <span class="text-12px mt-10px">{{ $t('noBotWalletTip') }}</span>
+          <span class="text-12px mt-10px color-[--third-text]">{{ $t('noBotWalletTip') }}</span>
           <el-button
+            type="primary"
             class="mt-10px"
             @click="botStore.$patch({
             connectVisible: true
