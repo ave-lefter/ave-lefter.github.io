@@ -337,15 +337,6 @@ export function useLimitPriceLine(getWidget: () => IChartingLibraryWidget | null
   let drawingEventHandler: ((id: EntityId, type: DrawingEventType) => void) | null = null
   let drawingEventWidget: IChartingLibraryWidget | null = null
   let isDrawingSubscribed = false
-  const safeUnsubscribe = (widget: IChartingLibraryWidget) => {
-    if (!drawingEventHandler || !isDrawingSubscribed) return
-    try {
-      widget?.unsubscribe?.('drawing_event', drawingEventHandler)
-    } catch (err) {
-      console.warn('tv unsubscribe drawing_event failed', err)
-    }
-    isDrawingSubscribed = false
-  }
   // 创建 限价价格线
   async function createLimitPriceLine(price: number) {
     const _widget = getWidget()
@@ -428,9 +419,6 @@ export function useLimitPriceLine(getWidget: () => IChartingLibraryWidget | null
         }
       }
     }
-    if (drawingEventWidget && drawingEventWidget !== _widget) {
-      safeUnsubscribe(drawingEventWidget)
-    }
     if (drawingEventHandler) {
       if (drawingEventWidget === _widget && isDrawingSubscribed) {
         return
@@ -444,9 +432,6 @@ export function useLimitPriceLine(getWidget: () => IChartingLibraryWidget | null
   onUnmounted(() => {
     if (stop) {
       stop()
-    }
-    if (drawingEventWidget) {
-      safeUnsubscribe(drawingEventWidget)
     }
     drawingEventWidget = null
     drawingEventHandler = null
@@ -886,15 +871,6 @@ export function useBotLimitLine(getWidget: () => IChartingLibraryWidget | null, 
   const textShapeMap: Map<EntityId, GetUserPendingTxRes[number]> = new Map()
   let drawingEventWidget: IChartingLibraryWidget | null = null
   let isDrawingSubscribed = false
-  const safeUnsubscribe = (widget: IChartingLibraryWidget) => {
-    if (!isDrawingSubscribed) return
-    try {
-      widget?.unsubscribe?.('drawing_event', handlerLimitPriceLineRemove)
-    } catch (err) {
-      console.warn('tv unsubscribe drawing_event failed', err)
-    }
-    isDrawingSubscribed = false
-  }
 
   function getData(isFirst = true) {
     if (!chain.value || !tokenAddress.value || !botStore.accessToken) return
@@ -1070,9 +1046,6 @@ export function useBotLimitLine(getWidget: () => IChartingLibraryWidget | null, 
   function subscribeLimitPriceLineRemove() {
     const _widget = getWidget()
     if (!_widget) return
-    if (drawingEventWidget && drawingEventWidget !== _widget) {
-      safeUnsubscribe(drawingEventWidget)
-    }
     if (drawingEventWidget === _widget && isDrawingSubscribed) {
       return
     }
@@ -1175,16 +1148,12 @@ export function useBotLimitLine(getWidget: () => IChartingLibraryWidget | null, 
     if (updateKlineLimitLineOff) {
       updateKlineLimitLineOff()
     }
-    if (drawingEventWidget) {
-      safeUnsubscribe(drawingEventWidget)
-      drawingEventWidget = null
-    }
     // 清理定时器
     if (Timer) {
       clearTimeout(Timer)
       Timer = null
     }
-    resetAllLimitLines('onUnmounted')
+    // resetAllLimitLines('onUnmounted')
   })
 
   return {
