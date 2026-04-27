@@ -909,7 +909,7 @@ function handleConfirmAdd(formData?: any, resetFields?: () => void, stopLoading?
 }
 
 function jumpBalance(row: any, e: Event): void {
-  e.stopPropagation()
+  e?.stopPropagation()
   const chain = row?.chain || 'eth'
   const address = row?._marker?.maker_address || row?.wallet_address
   if (address) {
@@ -918,7 +918,7 @@ function jumpBalance(row: any, e: Event): void {
 }
 
 function jumpToken({ e, rowData }: { e: Event; rowData: any }): void {
-  e.stopPropagation()
+  e?.stopPropagation()
   const addr = rowData?._target_Token?.address + '-' + rowData.chain
   navigateTo(`/token/${addr}`, { replace: true })
 }
