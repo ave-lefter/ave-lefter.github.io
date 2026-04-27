@@ -718,10 +718,11 @@
                   </div>
                 </div>
               </div>
-              <div class="pump-right" @click.stop="handlePumpRightClick(row)">
+              <div class="pump-right">
                 <div
                  v-show="(pumpSetting.border && pumpSetting.size_swap === '16px') || pumpSetting.bgList?.includes(row.platform_id || row.platform)"
                  class="w-160px h-120px absolute z-2 top--12px right--8px border border-solid rounded-8px" :style="{'border-color': pumpSetting.border &&  pumpSetting.size_swap ==='16px'? (pumpSetting.border =='border_hight' ? '#12B886': 'var(--border)') : 'transparent' ,'box-shadow': pumpSetting.border &&  pumpSetting.size_swap ==='16px'? (pumpSetting.border =='border_hight' ? '0px 0px 10px 0px #12B88699': '0px 2px 10px 0px var(--border)') : ''}"
+                 @click.stop="handlePumpRightClick(row)"
                  >
                 </div>
                 <div
@@ -827,7 +828,7 @@
                     />
                   </div>
                 </div>
-                <div class="btns-swap flex-end pr-12px" @click.stop="handlePumpRightClick(row)">
+                <div class="btns-swap flex-end pr-12px">
                   <div
                     v-if="row?.state === 'migrating'"
                     style="

@@ -6,7 +6,7 @@
     placement="bottom"
     :width="488"
     trigger="click"
-    :teleported="false"
+    :teleported="true"
     :persistent="false"
   >
     <template #reference>
