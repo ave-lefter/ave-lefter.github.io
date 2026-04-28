@@ -194,6 +194,41 @@
               style="--el-switch-on-color: #3c6cf6; zoom: 0.9; height: 14px"
             />
           </el-form-item>
+          <el-form-item v-if="currentAmmList && currentAmmList.length > 0" :label="$t('platform')" label-position="left">
+            <div class="w-full">
+              <div class="flex justify-end mb-4px">
+                <span
+                  class="text-12px color-[--primary-color] cursor-pointer"
+                  @click.stop="toggleSelectAll"
+                >{{ isAllSelected ? $t('deselectAll') : $t('selectAll') }}</span>
+              </div>
+              <el-checkbox-group
+                v-model="form.followAmm"
+                class="grid grid-cols-3 gap-3px justify-items-stretch grid-flow-row"
+              >
+                <el-checkbox
+                  v-for="item in currentAmmList"
+                  :key="item.value"
+                  :label="item.value"
+                  :value="item.value"
+                  class="m-0! !h-28px"
+                >
+                  <div
+                    class="flex px-8px py-4px items-center border-1px border-solid border-[--border] rounded-40px"
+                    :style="getCheckboxBorderStyle(item.value)"
+                  >
+                    <el-image
+                      class="mr-6px w-13px h-13px rounded-10px"
+                      :src="`${configStore.token_logo_url}${item.icon?.replace('/signals/', 'signals/')}`"
+                    />
+                    <span class="inline-block ellipsis max-w-86px">{{ item.label }}</span>
+                  </div>
+                </el-checkbox>
+              </el-checkbox-group>
+
+            </div>
+          </el-form-item>
+
           <el-form-item>
             <div class="w-full">
               <div class="flex-between">
@@ -454,7 +489,7 @@
 </template>
 <script setup lang="ts">
 import SuffixIcon from '~/components/suffixIcon.vue'
-import { getChainInfo } from '@/utils'
+import { getChainInfo, getPumpBgColor } from '@/utils'
 import Setting from './setting.vue'
 import DateTime from './dateTime.vue'
 import ClockTime from './clockTime.vue'
@@ -472,6 +507,7 @@ import type { BotChain } from '~/utils/types'
 // const route = useRoute()
 const { t } = useI18n()
 const botStore = useBotStore()
+const pumpStore = usePumpStore()
 const { settingCopyTrade, form, advancedForm, blacklist, activeCopyAddress,type } = storeToRefs(useCopyTradeStore())
 const { getFollowingInfo } = useCopyTradeStore()
 const props = defineProps({
@@ -534,6 +570,77 @@ const strategyList = computed(() => {
 ]
 })
 const chain = shallowRef('solana')
+
+const configStore = useConfigStore()
+
+// AMM平台从 pumpStore.pumpConfig 动态获取
+const ammOptions = computed(() => {
+  const result: Record<string, { value: string; label: string; icon: string }[]> = {}
+  pumpStore.pumpConfig.forEach((chainItem: any) => {
+    result[chainItem.chain] = chainItem.platforms.map((platform: any) => ({
+      value: platform.platform,
+      label: platform.platform_show,
+      icon: platform.platform_icon,
+    }))
+  })
+  return result
+})
+
+const currentAmmList = computed(() => ammOptions.value[form.value.chain] || [])
+
+const isAllSelected = computed(() => {
+  const list = currentAmmList.value
+  if (!list.length) return false
+  return list.every((item) => form.value.followAmm.includes(item.value))
+})
+
+
+function getCheckboxBorderColor(platform: string) {
+  return getPumpBgColor(platform).color
+}
+
+// 判断checkbox是否被选中
+function isPlatformChecked(platform: string) {
+  return form.value.followAmm?.includes(platform)
+}
+
+// 获取checkbox的边框样式
+function getCheckboxBorderStyle(platform: string) {
+  const color = getCheckboxBorderColor(platform)
+  if (isPlatformChecked(platform)) {
+    // 选中时显示完整颜色
+    return {
+      borderColor: color,
+    }
+  }
+  // 未选中时显示淡色（30%透明度）
+  return {
+    borderColor: hexToRgba(color, 0.3),
+  }
+}
+
+// 将hex颜色转换为rgba格式
+function hexToRgba(hex: string, alpha: number = 1) {
+  // 移除 # 号
+  hex = hex.replace('#', '')
+  const r = parseInt(hex.slice(0, 2), 16)
+  const g = parseInt(hex.slice(2, 4), 16)
+  const b = parseInt(hex.slice(4, 6), 16)
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`
+}
+
+function toggleSelectAll() {
+  if (isAllSelected.value) {
+    form.value.followAmm = []
+  } else {
+    form.value.followAmm = currentAmmList.value.map((item) => item.value)
+  }
+}
+
+// 切换 chain 时清空 followAmm
+watch(() => form.value.chain, () => {
+  form.value.followAmm = []
+})
 const clockTime_Ref = ref<InstanceType<typeof ClockTime> | null>(null)
 const dateTime_Ref = ref<InstanceType<typeof DateTime> | null>(null)
 const disabled = computed(() => {
@@ -820,6 +927,7 @@ function createFollowOrder() {
     priorityFee: new BigNumber(priorityFee || 0).multipliedBy(10 ** 9!),
     tokenBlacklist: tokenBlacklist?.value?.filter(Boolean),
     isFastModel: form.value.isFastModel, //快速模式
+    followAmm: form.value.followAmm, //AMM平台设置
   }
   // ...(form.value?.id ? { id: form.value.id } : {}),
   formRef.value?.validate((valid) => {
@@ -1001,5 +1109,4 @@ function apply(type: 'low' | 'high') {
 :deep(.fast-mode-switch.is-checked .el-switch__core .el-switch__action) {
   background-image: url("data:image/svg+xml,%3Csvg width='9' height='12' viewBox='0 0 9 12' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M5.0625 4.90909H9L3.9375 12V7.09091H0L5.0625 0V4.90909Z' fill='%233F80F7'/%3E%3C/svg%3E");
 }
-
 </style>

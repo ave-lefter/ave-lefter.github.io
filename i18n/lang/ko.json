@@ -1513,5 +1513,7 @@
   "tokenAddressDesc": "하이라이트 토큰 CA",
   "newMessage": "새 메시지",
   "fastModeTitle": "번개 모드, 즉시 온체인",
-  "fastModeDesc": "더 빠름(약 2초 빠름), 롤백 또는 중복 실행이 발생할 수 있습니다."
+  "fastModeDesc": "더 빠름(약 2초 빠름), 롤백 또는 중복 실행이 발생할 수 있습니다.",
+  "deselectAll": "모두 선택 해제",
+  "kolHoldingRatio": "KOL 보유 비율"
 }

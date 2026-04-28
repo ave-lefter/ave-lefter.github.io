@@ -2206,5 +2206,7 @@
   "someWalletsSkipped": "{count} 个钱包因余额不足被跳过: {wallets}",
   "walletsWillExecute": "个钱包将执行交易",
   "allTradeSuccess": "所有 {count} 笔交易均成功",
-  "partialTradeResult": "{success}成功，{fail}失败"
+  "partialTradeResult": "{success}成功，{fail}失败",
+  "deselectAll": "取消全选",
+  "kolHoldingRatio": "KOL持仓占比"
 }

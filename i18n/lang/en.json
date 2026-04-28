@@ -2205,5 +2205,7 @@
   "someWalletsSkipped": "{count} wallets were skipped due to insufficient balance: {wallets}",
   "walletsWillExecute": "wallet will execute the transaction",
   "allTradeSuccess": "All {count} trades successful",
-  "partialTradeResult": "{success} successful, {fail} failed"
+  "partialTradeResult": "{success} successful, {fail} failed",
+  "deselectAll": "Deselect All",
+  "kolHoldingRatio": "KOL Holding Ratio"
 }

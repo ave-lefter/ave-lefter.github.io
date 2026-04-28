@@ -765,6 +765,7 @@ function add() {
     slippage: 9, //滑点
     isPrivate: false, //防夹
     priorityFee: '', //优先费/gas费
+    followAmm: [], //跟单AMM平台设置
   }
 }
 </script>

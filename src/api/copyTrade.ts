@@ -32,6 +32,7 @@ interface CopyTradeParams {
   tokenBlacklist: Array<string> // token黑名单，里面的不跟买
   ignoreHeld: false // 是否跟买已持仓的代币，false是跟买， true不跟买已持仓
   isFastModel: boolean // 是否开启快速模式
+  followAmm: string[] // 跟单AMM平台设置
 }
 
 //创建跟单
@@ -86,6 +87,7 @@ export interface CopyObj {
   followIconUrl: string
   isHeart: boolean
   finishTime?: string
+  followAmm?: string[] // 跟单AMM平台设置
 }
 //查询进行中跟单列表
 export function _getFollowingInfo(evmAddress: string): Promise<CopyOrder> {

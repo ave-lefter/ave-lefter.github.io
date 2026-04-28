@@ -908,5 +908,7 @@
   "tokenAddressDesc": "Đánh dấu mã thông báo CA",
   "newMessage": "Tin nhắn mới",
   "fastModeTitle": "Chế độ Tia chớp, Tức thì trên chuỗi",
-  "fastModeDesc": "Nhanh hơn (nhanh hơn khoảng 2 giây), có thể dẫn đến khôi phục hoặc thực thi trùng lặp."
+  "fastModeDesc": "Nhanh hơn (nhanh hơn khoảng 2 giây), có thể dẫn đến khôi phục hoặc thực thi trùng lặp.",
+  "deselectAll": "Bỏ chọn tất cả",
+  "kolHoldingRatio": "Tỷ lệ Nắm giữ KOL"
 }

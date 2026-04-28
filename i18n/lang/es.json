@@ -690,5 +690,7 @@
   "tokenAddressDesc": "Resaltar token CA",
   "newMessage": "Nuevo mensaje",
   "fastModeTitle": "Modo Relámpago, Instantáneo en Cadena",
-  "fastModeDesc": "Más rápido (aproximadamente 2 segundos más rápido), puede resultar en reversión o ejecución duplicada."
+  "fastModeDesc": "Más rápido (aproximadamente 2 segundos más rápido), puede resultar en reversión o ejecución duplicada.",
+  "deselectAll": "Deseleccionar Todo",
+  "kolHoldingRatio": "Ratio de Tenencia KOL"
 }
