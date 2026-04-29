@@ -493,7 +493,7 @@ import { getChainInfo, getPumpBgColor } from '@/utils'
 import Setting from './setting.vue'
 import DateTime from './dateTime.vue'
 import ClockTime from './clockTime.vue'
-import { _createFollowOrder } from '~/api/copyTrade'
+import { _createFollowOrder, _getFollowAmms } from '~/api/copyTrade'
 import BigNumber from 'bignumber.js'
 import { ElMessage, type FormInstance } from 'element-plus'
 import type { BotChain } from '~/utils/types'
@@ -507,7 +507,6 @@ import type { BotChain } from '~/utils/types'
 // const route = useRoute()
 const { t } = useI18n()
 const botStore = useBotStore()
-const pumpStore = usePumpStore()
 const { settingCopyTrade, form, advancedForm, blacklist, activeCopyAddress,type } = storeToRefs(useCopyTradeStore())
 const { getFollowingInfo } = useCopyTradeStore()
 const props = defineProps({
@@ -573,18 +572,32 @@ const chain = shallowRef('solana')
 
 const configStore = useConfigStore()
 
-// AMM平台从 pumpStore.pumpConfig 动态获取
-const ammOptions = computed(() => {
-  const result: Record<string, { value: string; label: string; icon: string }[]> = {}
-  pumpStore.pumpConfig.forEach((chainItem: any) => {
-    result[chainItem.chain] = chainItem.platforms.map((platform: any) => ({
-      value: platform.platform,
-      label: platform.platform_show,
-      icon: platform.platform_icon,
-    }))
-  })
-  return result
-})
+// AMM平台从接口获取
+const ammOptions = ref<Record<string, { value: string; label: string; icon: string }[]>>({})
+const ammLoading = ref(false)
+
+async function fetchAmmOptions() {
+  if (ammLoading.value) return
+  ammLoading.value = true
+  try {
+    const res = await _getFollowAmms()
+    if (res) {
+      const result: Record<string, { value: string; label: string; icon: string }[]> = {}
+      for (const [chain, platforms] of Object.entries(res)) {
+        result[chain] = (platforms as any[]).map((item: any) => ({
+          value: item.amm,
+          label: item.showName,
+          icon: item.logoUrl,
+        }))
+      }
+      ammOptions.value = result
+    }
+  } catch (err) {
+    console.error('获取跟单AMM列表失败', err)
+  } finally {
+    ammLoading.value = false
+  }
+}
 
 const currentAmmList = computed(() => ammOptions.value[form.value.chain] || [])
 
@@ -790,7 +803,10 @@ const sellTypeList = computed(() => {
 const tokenBlacklist = computed(() => {
   return blacklist?.value?.map?.((i) => i.value) || []
 })
-watch(() => visible.value, () => {
+watch(() => visible.value, (val) => {
+  if (val) {
+    fetchAmmOptions()
+  }
   if (type.value == 2) {
     const copy_setting_default = localStorage.getItem('copy_setting_add')
     if (copy_setting_default && JSON.parse(copy_setting_default)?.[form.value.chain]) {

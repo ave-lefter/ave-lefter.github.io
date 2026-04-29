@@ -1,3 +1,5 @@
+import localforage from 'localforage'
+import { cloneDeep } from 'lodash-es'
 
 
 interface CopyTradeParams {
@@ -234,9 +236,6 @@ export function _getFollowSwapOrder(data: { chain: string; id: number }): Promis
     params: data,
   })
 }
-interface ActiveCopyAddress {
-
-}
 // const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 //查询活跃跟单地址
 export async function _getFollowingAddress(evmAddress: string) {
@@ -251,4 +250,66 @@ export async function _getFollowingAddress(evmAddress: string) {
       evmAddress,
     },
   })
+}
+
+//获取跟单AMM平台列表（带缓存）
+interface FollowAmmItem {
+  showName: string
+  amm: string
+  logoUrl: string
+}
+const FOLLOW_AMMS_CACHE_KEY = 'follow_amms_cache'
+const FOLLOW_AMMS_CACHE_DURATION = 10 * 60 * 1000 // 10 分钟
+
+export async function _getFollowAmms(): Promise<Record<string, FollowAmmItem[]>> {
+  const { $api } = useNuxtApp()
+
+  try {
+    // 尝试从缓存读取
+    const cachedData = await localforage.getItem<{ data: Record<string, FollowAmmItem[]>, timestamp: number }>(FOLLOW_AMMS_CACHE_KEY)
+
+    if (cachedData) {
+      const { data, timestamp } = cachedData
+      const now = Date.now()
+
+      // 检查缓存是否有效（10 分钟内）
+      if (now - timestamp < FOLLOW_AMMS_CACHE_DURATION && data && Object.keys(data).length) {
+        console.log('[FollowAmms] 使用缓存数据')
+        return cloneDeep(data)
+      } else {
+        console.log('[FollowAmms] 缓存已过期，清除旧缓存')
+        await localforage.removeItem(FOLLOW_AMMS_CACHE_KEY)
+      }
+    }
+
+    // 缓存不存在或已过期，从 API 获取
+    console.log('[FollowAmms] 从 API 获取最新数据')
+    const freshData = await $api('/botapi/swap/getFollowAmms', {
+      method: 'get',
+      headers: {
+        'ave-platform': 'web',
+      },
+    })
+
+    // 保存到缓存
+    await localforage.setItem(FOLLOW_AMMS_CACHE_KEY, {
+      data: freshData,
+      timestamp: Date.now()
+    })
+
+    return freshData
+  } catch (error) {
+    console.error('[FollowAmms] 获取配置失败:', error)
+    // 如果出错，尝试返回缓存数据（即使已过期）
+    try {
+      const expiredCache = await localforage.getItem<{ data: Record<string, FollowAmmItem[]>, timestamp: number }>(FOLLOW_AMMS_CACHE_KEY)
+      if (expiredCache?.data) {
+        console.warn('[FollowAmms] API 失败，使用过期缓存')
+        return cloneDeep(expiredCache.data)
+      }
+    } catch (fallbackError) {
+      console.error('[FollowAmms] 获取过期缓存也失败:', fallbackError)
+    }
+    throw error
+  }
 }
