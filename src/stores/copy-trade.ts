@@ -117,7 +117,7 @@ export const useCopyTradeStore = defineStore('copyTrade', () => {
       return
     }
 
-    activeCopyAddress.value = await _getFollowingAddress(botStore?.evmAddress)
+    activeCopyAddress.value = (await _getFollowingAddress(botStore?.evmAddress)) || {}
     console.log('-----activeCopyAddress.value -------', activeCopyAddress.value)
   }
   return {

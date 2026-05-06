@@ -955,6 +955,12 @@ function createFollowOrder() {
             ElMessage.success('修改跟单成功')
           } else {
             ElMessage.success('创建跟单成功')
+            if (!activeCopyAddress.value) {
+              activeCopyAddress.value = {}
+            }
+            if (!activeCopyAddress.value[data.chain]) {
+              activeCopyAddress.value[data.chain] = []
+            }
             activeCopyAddress.value[data.chain].push(data.followAddress)
             if (type.value == 2) {
               localStorage.setItem('copy_setting_add', JSON.stringify({ ...settingCopyTrade.value }))
