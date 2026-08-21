@@ -1,0 +1,1 @@
+const t="https://ave-center-api.luweijun.com";function s(e){return e&&(e.startsWith("/uploads/")||e.startsWith("/uploads\\")?t+e:e)}function a(e){if(!e)return e;let r=e.replace(/src=["']\/(uploads\/[^"']+)["']/g,`src="${t}/$1"`);return r=r.replace(/poster=["']\/(uploads\/[^"']+)["']/g,`poster="${t}/$1"`),r}export{a,s as r};
